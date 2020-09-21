@@ -1,13 +1,13 @@
 import unittest
 
-from geometry.geo_factory import Geo2D
+from geometry.geo_factory import create_vector_2d
 
 
 class BasicVectorTestCase(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.v1 = Geo2D.create_vector_2d(42, -42)
+        cls.v1 = create_vector_2d(42, -42)
 
     def test_vector_type(self):
         self.assertEqual(self.v1.type, 'Vector')
@@ -22,33 +22,33 @@ class BasicVectorMathTestCase(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.v1 = Geo2D.create_vector_2d(0, 42)
-        cls.v2 = Geo2D.create_vector_2d(10, 3)
+        cls.v1 = create_vector_2d(0, 42)
+        cls.v2 = create_vector_2d(10, 3)
 
     def test_vector_addition(self):
         result = self.v1.add_vector(self.v2)
         self.assertEqual(result.type, 'Vector')
-        self.assertEqual(result, Geo2D.create_vector_2d(10, 45))
+        self.assertEqual(result, create_vector_2d(10, 45))
 
     def test_vector_subtraction(self):
         result = self.v1.subtract_vector(self.v2)
         self.assertEqual(result.type, 'Vector')
-        self.assertEqual(result, Geo2D.create_vector_2d(-10, 39))
+        self.assertEqual(result, create_vector_2d(-10, 39))
 
     def test_vector_vector_multiplication(self):
         result = self.v1 * self.v2
         self.assertEqual(result.type, 'Vector')
-        self.assertEqual(result, Geo2D.create_vector_2d(0, 126))
+        self.assertEqual(result, create_vector_2d(0, 126))
 
     def test_vector_int_multiplication(self):
         result = self.v1 * 2
         self.assertEqual(result.type, 'Vector')
-        self.assertEqual(result, Geo2D.create_vector_2d(0, 84))
+        self.assertEqual(result, create_vector_2d(0, 84))
 
     def test_vector_float_multiplication(self):
         result = self.v1 * 1.01
         self.assertEqual(result.type, 'Vector')
-        self.assertEqual(result, Geo2D.create_vector_2d(0, 42.42))
+        self.assertEqual(result, create_vector_2d(0, 42.42))
 
     def test_vector_reversal(self):
         result = self.v2.reverse_vector()
