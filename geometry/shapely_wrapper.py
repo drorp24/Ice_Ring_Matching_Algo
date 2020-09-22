@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import List, Tuple, Iterator
 
 from shapely.geometry import Point, Polygon, LineString, LinearRing
-from shapely.geometry.base import BaseGeometry
+from shapely.geometry.base import BaseGeometry, EmptyGeometry
 
 from geometry.geo2d import Point2D, Vector2D, Polygon2D, MultiPolygon2D, LineString2D, LinearRing2D
 
@@ -18,12 +18,29 @@ class _ShapelyGeometry(object):
         return self._shapely_obj
 
     @staticmethod
-    def create_from_shapely(geo: BaseGeometry):
+    def __create_from_shapely(geo: BaseGeometry):
         raise NotImplementedError
 
     @property
     def type(self) -> str:
         return self._shapely_obj.type
+
+
+class _ShapelyEmptyGeometry(_ShapelyGeometry):
+
+    def __init__(self):
+        super().__init__(EmptyGeometry())
+
+    @property
+    def __shapely_obj(self) -> BaseGeometry:
+        return self._shapely_obj
+
+    @staticmethod
+    def __create_from_shapely(geo: EmptyGeometry) -> _ShapelyEmptyGeometry:
+        return _ShapelyEmptyGeometry()
+
+    def calc_area(self):
+        return 0
 
 
 class _ShapelyPoint2D(_ShapelyGeometry, Point2D):
@@ -40,7 +57,7 @@ class _ShapelyPoint2D(_ShapelyGeometry, Point2D):
         return self._shapely_obj.y
 
     @staticmethod
-    def create_from_shapely(point: Point) -> Point2D:
+    def __create_from_shapely(point: Point) -> Point2D:
         return _ShapelyPoint2D(point.x, point.y)
 
     @property
@@ -82,7 +99,7 @@ class _ShapelyLineString2D(_ShapelyGeometry, LineString2D):
         super().__init__(LineString(_ShapelyUtils.convert_points_list_to_xy_array(points)))
 
     @staticmethod
-    def create_from_shapely(line_string: LineString) -> LineString2D:
+    def __create_from_shapely(line_string: LineString) -> LineString2D:
         return _ShapelyLinearRing2D(_ShapelyUtils.convert_xy_array_to_points_list(line_string.xy))
 
     @classmethod
@@ -95,7 +112,8 @@ class _ShapelyLineString2D(_ShapelyGeometry, LineString2D):
 
     @property
     def points(self) -> List[Point2D]:
-        return _ShapelyUtils.convert_xy_separate_arrays_to_points_list(self.__shapely_obj.xy)
+        x_array, y_array = self.__shapely_obj.xy
+        return _ShapelyUtils.convert_xy_separate_arrays_to_points_list(x_array, y_array)
 
     def calc_length(self) -> float:
         return self.__shapely_obj.length
@@ -110,7 +128,7 @@ class _ShapelyLinearRing2D(_ShapelyGeometry, LinearRing2D):
         super().__init__(LinearRing(_ShapelyUtils.convert_points_list_to_xy_array(points)))
 
     @staticmethod
-    def create_from_shapely(linear_ring: LinearRing):
+    def __create_from_shapely(linear_ring: LinearRing):
         return _ShapelyLinearRing2D(_ShapelyUtils.convert_xy_array_to_points_list(linear_ring.xy))
 
     @property
@@ -119,8 +137,8 @@ class _ShapelyLinearRing2D(_ShapelyGeometry, LinearRing2D):
 
     @property
     def points(self) -> List[Point2D]:
-        x, y = self.__shapely_obj.xy
-        return _ShapelyUtils.convert_xy_separate_arrays_to_points_list(x.tolist(), y.tolist())
+        x_array, y_array = self.__shapely_obj.xy
+        return _ShapelyUtils.convert_xy_separate_arrays_to_points_list(x_array.tolist(), y_array.tolist())
 
     def calc_length(self) -> float:
         return self.__shapely_obj.length
@@ -138,7 +156,9 @@ class _ShapelyPolygon2D(_ShapelyGeometry, Polygon2D):
         super().__init__(Polygon(_ShapelyUtils.convert_points_list_to_xy_array(boundary.points)))
 
     @staticmethod
-    def create_from_shapely(polygon: Polygon):
+    def __create_from_shapely(polygon: Polygon):
+        if polygon.is_empty:
+            return _ShapelyEmptyGeometry()
         x_array, y_array = polygon.exterior.xy
         points_list_shapely = _ShapelyUtils.convert_xy_separate_arrays_to_points_list(x_array, y_array)
         return _ShapelyPolygon2D(_ShapelyLinearRing2D(points_list_shapely))
@@ -148,8 +168,8 @@ class _ShapelyPolygon2D(_ShapelyGeometry, Polygon2D):
         return Polygon(self._shapely_obj)
 
     @property
-    def boundary(self) -> LineString2D:
-        return _ShapelyLineString2D(self.points)
+    def boundary(self) -> LinearRing2D:
+        return _ShapelyLinearRing2D(self.points)
 
     @property
     def points(self) -> List[Point2D]:
@@ -161,11 +181,17 @@ class _ShapelyPolygon2D(_ShapelyGeometry, Polygon2D):
 
     def calc_intersection(self, other_polygon: Polygon2D) -> [Polygon2D, MultiPolygon2D]:
         other_polygon_shapely = self.__get_shapely_polygon(other_polygon)
-        return _ShapelyPolygon2D.create_from_shapely(self.__shapely_obj.intersection(other_polygon_shapely))
+        internal_intersection = self.__shapely_obj.intersection(other_polygon_shapely)
+        if isinstance(internal_intersection, Polygon):
+            return _ShapelyPolygon2D.__create_from_shapely(internal_intersection)
+        return _ShapelyEmptyGeometry()
 
     def calc_difference(self, other_polygon: Polygon2D) -> [Polygon2D, MultiPolygon2D]:
         other_polygon_shapely = self.__get_shapely_polygon(other_polygon)
-        return _ShapelyPolygon2D.create_from_shapely(self.__shapely_obj.difference(other_polygon_shapely))
+        internal_difference = self.__shapely_obj.difference(other_polygon_shapely)
+        if isinstance(internal_difference, Polygon):
+            return _ShapelyPolygon2D.__create_from_shapely(internal_difference)
+        return _ShapelyEmptyGeometry()
 
     @staticmethod
     def __get_shapely_polygon(polygon: Polygon2D):
@@ -173,6 +199,12 @@ class _ShapelyPolygon2D(_ShapelyGeometry, Polygon2D):
             return polygon.__shapely_obj
         except NonShapelyNativeGeometry:
             return _ShapelyUtils.convert_polygon2d_to_shapely(polygon)
+
+    def __str__(self):
+        return self.type + [p.__str__() for p in self.points].__str__()
+
+    def __eq__(self, other):
+        return self.calc_difference(other).calc_area() == 0 and other.calc_difference(self).calc_area() == 0
 
 
 class _ShapelyUtils:
@@ -209,5 +241,12 @@ class _ShapelyUtils:
 class NonShapelyNativeGeometry(Exception):
     """
     Given operations requiring Shapely Geometry, an exception defining a non-shapely geometry will be used to validate.
+    """
+    pass
+
+
+class NonPolygonalResult(Exception):
+    """
+    Given geometric operation the result is non polygonal.
     """
     pass
