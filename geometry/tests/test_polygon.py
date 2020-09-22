@@ -18,10 +18,13 @@ class BasicPointTestCase(unittest.TestCase):
         cls.poly1 = create_polygon_2d([cls.p1, cls.p2, cls.p3, cls.p4])
         cls.poly2 = create_polygon_2d([cls.p1, cls.p2, cls.p5, cls.p6])
 
-    def test_polygon_type(self):
+    def test_type(self):
         self.assertEqual(self.poly1.type, 'Polygon')
 
-    def test_polygon_points(self):
+    def test_points(self):
         points_result = self.poly1.points
         self.assertSetEqual(set(points_result), set([self.p1, self.p2, self.p3, self.p4]))
         self.assertEqual(points_result, list((self.p1, self.p2, self.p3, self.p4)))
+
+    # def test_boundary(self):
+    #     continue here
