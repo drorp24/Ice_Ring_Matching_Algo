@@ -3,7 +3,7 @@ import unittest
 from geometry.geo_factory import create_polygon_2d, create_point_2d
 
 
-class BasicPointTestCase(unittest.TestCase):
+class BasicPolygonTestCase(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
