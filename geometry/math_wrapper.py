@@ -38,8 +38,8 @@ class MathVector2D(Vector2D):
         return self * -1
 
     def to_point(self):
-        from geometry.geo_factory import Geo2D
-        return Geo2D.convert_to_point(self)
+        from geometry.geo_factory import convert_to_point
+        return convert_to_point(self)
 
     def __add__(self, other: Vector2D) -> Vector2D:
         return MathVector2D(self.x + other.x, self.y + other.y)
