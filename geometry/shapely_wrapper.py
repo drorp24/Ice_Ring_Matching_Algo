@@ -133,7 +133,9 @@ class ShapelyPolygon2D(ShapelyGeometry, Polygon2D):
 
     @staticmethod
     def create_from_shapely(polygon: Polygon):
-        return ShapelyPolygon2D(ShapelyLinearRing2D(ShapelyUtils.convert_xy_array_to_points_list(polygon.xy)))
+        x_array, y_array = polygon.exterior.xy
+        points_list_shapely = ShapelyUtils.convert_xy_separate_arrays_to_points_list(x_array, y_array)
+        return ShapelyPolygon2D(ShapelyLinearRing2D(points_list_shapely))
 
     @property
     def __shapely_obj(self) -> Polygon:
@@ -152,9 +154,10 @@ class ShapelyPolygon2D(ShapelyGeometry, Polygon2D):
 
     def calc_intersection(self, other_polygon: Polygon2D) -> [Polygon2D, MultiPolygon2D]:
         try:
-            return self.__shapely_obj.intersection(other_polygon.__shapely_obj)
+            other_polygon_shapely = other_polygon.__shapely_obj
         except NonShapelyNativeGeometry:
-            return self.__shapely_obj.intersection(ShapelyUtils.convert_polygon2d_to_shapely(other_polygon))
+            other_polygon_shapely = ShapelyUtils.convert_polygon2d_to_shapely(other_polygon)
+        return ShapelyPolygon2D.create_from_shapely(self.__shapely_obj.intersection(other_polygon_shapely))
 
 
 class ShapelyUtils:
