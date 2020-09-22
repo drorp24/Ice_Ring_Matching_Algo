@@ -129,7 +129,7 @@ class _ShapelyLinearRing2D(_ShapelyGeometry, LinearRing2D):
         return self.calc_length()
 
     def __eq__(self, other):
-        pass
+        return self.points == other.points
 
 
 class _ShapelyPolygon2D(_ShapelyGeometry, Polygon2D):
@@ -160,11 +160,19 @@ class _ShapelyPolygon2D(_ShapelyGeometry, Polygon2D):
         return self.__shapely_obj.area
 
     def calc_intersection(self, other_polygon: Polygon2D) -> [Polygon2D, MultiPolygon2D]:
-        try:
-            other_polygon_shapely = other_polygon.__shapely_obj
-        except NonShapelyNativeGeometry:
-            other_polygon_shapely = _ShapelyUtils.convert_polygon2d_to_shapely(other_polygon)
+        other_polygon_shapely = self.__get_shapely_polygon(other_polygon)
         return _ShapelyPolygon2D.create_from_shapely(self.__shapely_obj.intersection(other_polygon_shapely))
+
+    def calc_difference(self, other_polygon: Polygon2D) -> [Polygon2D, MultiPolygon2D]:
+        other_polygon_shapely = self.__get_shapely_polygon(other_polygon)
+        return _ShapelyPolygon2D.create_from_shapely(self.__shapely_obj.difference(other_polygon_shapely))
+
+    @staticmethod
+    def __get_shapely_polygon(polygon: Polygon2D):
+        try:
+            return polygon.__shapely_obj
+        except NonShapelyNativeGeometry:
+            return _ShapelyUtils.convert_polygon2d_to_shapely(polygon)
 
 
 class _ShapelyUtils:
@@ -188,7 +196,6 @@ class _ShapelyUtils:
     @staticmethod
     def convert_linear_ring2d_to_shapely(linear_ring: LinearRing2D) -> LinearRing:
         return LinearRing(_ShapelyUtils.convert_points_list_to_xy_array(linear_ring.points))
-
 
     @staticmethod
     def convert_line_string2d_to_shapely(line_string: LineString2D) -> LineString:
