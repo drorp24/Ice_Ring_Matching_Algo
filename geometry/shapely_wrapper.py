@@ -40,7 +40,7 @@ class _ShapelyPoint2D(_ShapelyGeometry, Point2D):
         return self._shapely_obj.y
 
     @staticmethod
-    def create_from_shapely(point: Point):
+    def create_from_shapely(point: Point) -> Point2D:
         return _ShapelyPoint2D(point.x, point.y)
 
     @property
@@ -53,12 +53,18 @@ class _ShapelyPoint2D(_ShapelyGeometry, Point2D):
     def add_vector(self, vector: Vector2D) -> Point2D:
         return _ShapelyPoint2D(self.x + vector.x, self.y + vector.y)
 
-    def calc_distance_to_point(self, other_point: _ShapelyPoint2D) -> float:
-        return self.shapely_obj().distance(other_point.shapely_obj())
+    def calc_distance_to_point(self, other_point: Point2D) -> float:
+        try:
+            return self.__shapely_obj.distance(other_point.__shapely_obj)
+        except NonShapelyNativeGeometry:
+            return self.__shapely_obj.distance(_ShapelyUtils.convert_point2d_to_shapely(other_point))
 
     def to_vector(self) -> Vector2D:
         from geometry.geo_factory import convert_to_vector
         return convert_to_vector(self)
+
+    def to_tuple(self) -> Tuple[float, float]:
+        return self.x, self.y
 
     def __str__(self) -> str:
         return "({}, {})".format(self.x, self.y)
@@ -70,18 +76,18 @@ class _ShapelyPoint2D(_ShapelyGeometry, Point2D):
         return hash(self.to_tuple())
 
 
-class ShapelyLineString2D(_ShapelyGeometry, LineString2D):
+class _ShapelyLineString2D(_ShapelyGeometry, LineString2D):
 
     def __init__(self, points: List[Point2D]):
-        super().__init__(LineString(ShapelyUtils.convert_points_list_to_xy_array(points)))
+        super().__init__(LineString(_ShapelyUtils.convert_points_list_to_xy_array(points)))
 
     @staticmethod
-    def create_from_shapely(line_string: LineString):
-        return ShapelyLinearRing2D(ShapelyUtils.convert_xy_array_to_points_list(line_string.xy))
+    def create_from_shapely(line_string: LineString) -> LineString2D:
+        return _ShapelyLinearRing2D(_ShapelyUtils.convert_xy_array_to_points_list(line_string.xy))
 
     @classmethod
     def create_from_xy_array(cls, xy_array: List[Tuple[float, float]]) -> LineString2D:
-        return ShapelyLineString2D(ShapelyUtils.convert_xy_array_to_points_list(xy_array))
+        return _ShapelyLineString2D(_ShapelyUtils.convert_xy_array_to_points_list(xy_array))
 
     @property
     def __shapely_obj(self) -> LineString:
@@ -89,7 +95,7 @@ class ShapelyLineString2D(_ShapelyGeometry, LineString2D):
 
     @property
     def points(self) -> List[Point2D]:
-        return ShapelyUtils.convert_xy_separate_arrays_to_points_list(self.__shapely_obj.xy)
+        return _ShapelyUtils.convert_xy_separate_arrays_to_points_list(self.__shapely_obj.xy)
 
     def calc_length(self) -> float:
         return self.__shapely_obj.length
@@ -98,14 +104,14 @@ class ShapelyLineString2D(_ShapelyGeometry, LineString2D):
         return self.points == other.points
 
 
-class ShapelyLinearRing2D(_ShapelyGeometry, LinearRing2D):
+class _ShapelyLinearRing2D(_ShapelyGeometry, LinearRing2D):
 
     def __init__(self, points: List[Point2D]):
-        super().__init__(LinearRing(ShapelyUtils.convert_points_list_to_xy_array(points)))
+        super().__init__(LinearRing(_ShapelyUtils.convert_points_list_to_xy_array(points)))
 
     @staticmethod
     def create_from_shapely(linear_ring: LinearRing):
-        return ShapelyLinearRing2D(ShapelyUtils.convert_xy_array_to_points_list(linear_ring.xy))
+        return _ShapelyLinearRing2D(_ShapelyUtils.convert_xy_array_to_points_list(linear_ring.xy))
 
     @property
     def __shapely_obj(self) -> LineString:
@@ -114,7 +120,7 @@ class ShapelyLinearRing2D(_ShapelyGeometry, LinearRing2D):
     @property
     def points(self) -> List[Point2D]:
         x, y = self.__shapely_obj.xy
-        return ShapelyUtils.convert_xy_separate_arrays_to_points_list(x.tolist(), y.tolist())
+        return _ShapelyUtils.convert_xy_separate_arrays_to_points_list(x.tolist(), y.tolist())
 
     def calc_length(self) -> float:
         return self.__shapely_obj.length
@@ -126,16 +132,16 @@ class ShapelyLinearRing2D(_ShapelyGeometry, LinearRing2D):
         pass
 
 
-class ShapelyPolygon2D(_ShapelyGeometry, Polygon2D):
+class _ShapelyPolygon2D(_ShapelyGeometry, Polygon2D):
 
     def __init__(self, boundary: LinearRing2D):
-        super().__init__(Polygon(ShapelyUtils.convert_points_list_to_xy_array(boundary.points)))
+        super().__init__(Polygon(_ShapelyUtils.convert_points_list_to_xy_array(boundary.points)))
 
     @staticmethod
     def create_from_shapely(polygon: Polygon):
         x_array, y_array = polygon.exterior.xy
-        points_list_shapely = ShapelyUtils.convert_xy_separate_arrays_to_points_list(x_array, y_array)
-        return ShapelyPolygon2D(ShapelyLinearRing2D(points_list_shapely))
+        points_list_shapely = _ShapelyUtils.convert_xy_separate_arrays_to_points_list(x_array, y_array)
+        return _ShapelyPolygon2D(_ShapelyLinearRing2D(points_list_shapely))
 
     @property
     def __shapely_obj(self) -> Polygon:
@@ -143,12 +149,12 @@ class ShapelyPolygon2D(_ShapelyGeometry, Polygon2D):
 
     @property
     def boundary(self) -> LineString2D:
-        return ShapelyLineString2D(self.points)
+        return _ShapelyLineString2D(self.points)
 
     @property
     def points(self) -> List[Point2D]:
         x_array, y_array = self.__shapely_obj.exterior.xy
-        return ShapelyUtils.convert_xy_separate_arrays_to_points_list(x_array[:-1], y_array[:-1])
+        return _ShapelyUtils.convert_xy_separate_arrays_to_points_list(x_array[:-1], y_array[:-1])
 
     def calc_area(self) -> float:
         return self.__shapely_obj.area
@@ -157,11 +163,11 @@ class ShapelyPolygon2D(_ShapelyGeometry, Polygon2D):
         try:
             other_polygon_shapely = other_polygon.__shapely_obj
         except NonShapelyNativeGeometry:
-            other_polygon_shapely = ShapelyUtils.convert_polygon2d_to_shapely(other_polygon)
-        return ShapelyPolygon2D.create_from_shapely(self.__shapely_obj.intersection(other_polygon_shapely))
+            other_polygon_shapely = _ShapelyUtils.convert_polygon2d_to_shapely(other_polygon)
+        return _ShapelyPolygon2D.create_from_shapely(self.__shapely_obj.intersection(other_polygon_shapely))
 
 
-class ShapelyUtils:
+class _ShapelyUtils:
 
     @staticmethod
     def convert_xy_array_to_points_list(xy_array: Iterator[Tuple[float, float]]) -> List[Point2D]:
@@ -169,7 +175,7 @@ class ShapelyUtils:
 
     @staticmethod
     def convert_xy_separate_arrays_to_points_list(x_array: List[float], y_array: List[float]) -> List[Point2D]:
-        return ShapelyUtils.convert_xy_array_to_points_list(zip(x_array, y_array))
+        return _ShapelyUtils.convert_xy_array_to_points_list(zip(x_array, y_array))
 
     @staticmethod
     def convert_points_list_to_xy_array(points: List[Point2D]) -> List[Tuple[float, float]]:
@@ -177,16 +183,16 @@ class ShapelyUtils:
 
     @staticmethod
     def convert_polygon2d_to_shapely(polygon: Polygon2D) -> Polygon:
-        return Polygon(ShapelyUtils.convert_points_list_to_xy_array(polygon.points))
+        return Polygon(_ShapelyUtils.convert_points_list_to_xy_array(polygon.points))
 
     @staticmethod
     def convert_linear_ring2d_to_shapely(linear_ring: LinearRing2D) -> LinearRing:
-        return LinearRing(ShapelyUtils.convert_points_list_to_xy_array(linear_ring.points))
+        return LinearRing(_ShapelyUtils.convert_points_list_to_xy_array(linear_ring.points))
 
 
     @staticmethod
     def convert_line_string2d_to_shapely(line_string: LineString2D) -> LineString:
-        return LineString(ShapelyUtils.convert_points_list_to_xy_array(line_string.points))
+        return LineString(_ShapelyUtils.convert_points_list_to_xy_array(line_string.points))
 
     @staticmethod
     def convert_point2d_to_shapely(point: Point2D) -> Point:

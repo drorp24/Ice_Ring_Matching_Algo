@@ -35,11 +35,6 @@ class BasicVectorMathTestCase(unittest.TestCase):
         self.assertEqual(result.type, 'Vector')
         self.assertEqual(result, create_vector_2d(-10, 39))
 
-    def test_vector_vector_multiplication(self):
-        result = self.v1 * self.v2
-        self.assertEqual(result.type, 'Vector')
-        self.assertEqual(result, create_vector_2d(0, 126))
-
     def test_int_multiplication(self):
         result = self.v1 * 2
         self.assertEqual(result.type, 'Vector')
