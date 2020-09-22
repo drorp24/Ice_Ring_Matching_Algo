@@ -15,11 +15,13 @@ class BasicPointTestCase(unittest.TestCase):
         cls.p5 = create_point_2d(5.0, 11.0)
         cls.p6 = create_point_2d(4.0, 1.0)
 
-        point_list = list([cls.p1, cls.p2, cls.p3, cls.p4])
-        cls.poly1 = create_polygon_2d(point_list)
+        cls.poly1 = create_polygon_2d([cls.p1, cls.p2, cls.p3, cls.p4])
         cls.poly2 = create_polygon_2d([cls.p1, cls.p2, cls.p5, cls.p6])
 
-    def test_point_type(self):
+    def test_polygon_type(self):
         self.assertEqual(self.poly1.type, 'Polygon')
-        p = self.poly1.calc_intersection(self.poly2)
-        self.assertTrue(p.calc_area() > 0)
+
+    def test_polygon_points(self):
+        points_result = self.poly1.points
+        self.assertSetEqual(set(points_result), set([self.p1, self.p2, self.p3, self.p4]))
+        self.assertEqual(points_result, list((self.p1, self.p2, self.p3, self.p4)))

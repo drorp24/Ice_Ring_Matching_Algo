@@ -69,6 +69,9 @@ class ShapelyPoint2D(ShapelyGeometry, Point2D):
     def __eq__(self, other: Point2D):
         return (self.x, self.y) == (other.x, other.y)
 
+    def __hash__(self):
+        return hash(self.to_tuple())
+
 
 class ShapelyLineString2D(ShapelyGeometry, LineString2D):
 
@@ -147,7 +150,8 @@ class ShapelyPolygon2D(ShapelyGeometry, Polygon2D):
 
     @property
     def points(self) -> List[Point2D]:
-        return ShapelyUtils.convert_xy_array_to_points_list(self.__shapely_obj.exterior.xy)
+        x_array, y_array = self.__shapely_obj.exterior.xy
+        return ShapelyUtils.convert_xy_separate_arrays_to_points_list(x_array[:-1], y_array[:-1])
 
     def calc_area(self) -> float:
         return self.__shapely_obj.area
