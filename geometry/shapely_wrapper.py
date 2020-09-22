@@ -8,7 +8,7 @@ from shapely.geometry.base import BaseGeometry
 from geometry.geo2d import Point2D, Vector2D, Polygon2D, MultiPolygon2D, LineString2D, LinearRing2D
 
 
-class ShapelyGeometry(object):
+class _ShapelyGeometry(object):
 
     def __init__(self, _shapely_obj: BaseGeometry):
         self._shapely_obj = _shapely_obj
@@ -26,7 +26,7 @@ class ShapelyGeometry(object):
         return self._shapely_obj.type
 
 
-class ShapelyPoint2D(ShapelyGeometry, Point2D):
+class _ShapelyPoint2D(_ShapelyGeometry, Point2D):
 
     def __init__(self, x: float, y: float):
         super().__init__(Point(x, y))
@@ -41,39 +41,36 @@ class ShapelyPoint2D(ShapelyGeometry, Point2D):
 
     @staticmethod
     def create_from_shapely(point: Point):
-        return ShapelyPoint2D(point.x, point.y)
+        return _ShapelyPoint2D(point.x, point.y)
 
     @property
     def __shapely_obj(self) -> Point:
         return Point(self._shapely_obj)
 
-    def subtract_point(self, other_point: Point2D) -> Vector2D:
+    def subtract(self, other_point: Point2D) -> Vector2D:
         return self.to_vector() - other_point.to_vector()
 
     def add_vector(self, vector: Vector2D) -> Point2D:
-        return ShapelyPoint2D(self.x + vector.x, self.y + vector.y)
+        return _ShapelyPoint2D(self.x + vector.x, self.y + vector.y)
 
-    def calc_distance_to_point(self, other_point: ShapelyPoint2D) -> float:
-        return self.__shapely_obj.distance(other_point.__shapely_obj)
+    def calc_distance_to_point(self, other_point: _ShapelyPoint2D) -> float:
+        return self.shapely_obj().distance(other_point.shapely_obj())
 
-    def to_vector(self):
+    def to_vector(self) -> Vector2D:
         from geometry.geo_factory import convert_to_vector
         return convert_to_vector(self)
-
-    def to_tuple(self) -> Tuple:
-        return self.x, self.y
 
     def __str__(self) -> str:
         return "({}, {})".format(self.x, self.y)
 
-    def __eq__(self, other: Point2D):
+    def __eq__(self, other) -> bool:
         return (self.x, self.y) == (other.x, other.y)
 
     def __hash__(self):
         return hash(self.to_tuple())
 
 
-class ShapelyLineString2D(ShapelyGeometry, LineString2D):
+class ShapelyLineString2D(_ShapelyGeometry, LineString2D):
 
     def __init__(self, points: List[Point2D]):
         super().__init__(LineString(ShapelyUtils.convert_points_list_to_xy_array(points)))
@@ -101,7 +98,7 @@ class ShapelyLineString2D(ShapelyGeometry, LineString2D):
         return self.points == other.points
 
 
-class ShapelyLinearRing2D(ShapelyGeometry, LinearRing2D):
+class ShapelyLinearRing2D(_ShapelyGeometry, LinearRing2D):
 
     def __init__(self, points: List[Point2D]):
         super().__init__(LinearRing(ShapelyUtils.convert_points_list_to_xy_array(points)))
@@ -129,7 +126,7 @@ class ShapelyLinearRing2D(ShapelyGeometry, LinearRing2D):
         pass
 
 
-class ShapelyPolygon2D(ShapelyGeometry, Polygon2D):
+class ShapelyPolygon2D(_ShapelyGeometry, Polygon2D):
 
     def __init__(self, boundary: LinearRing2D):
         super().__init__(Polygon(ShapelyUtils.convert_points_list_to_xy_array(boundary.points)))
@@ -168,7 +165,7 @@ class ShapelyUtils:
 
     @staticmethod
     def convert_xy_array_to_points_list(xy_array: Iterator[Tuple[float, float]]) -> List[Point2D]:
-        return [ShapelyPoint2D(xy[0], xy[1]) for xy in xy_array]
+        return [_ShapelyPoint2D(xy[0], xy[1]) for xy in xy_array]
 
     @staticmethod
     def convert_xy_separate_arrays_to_points_list(x_array: List[float], y_array: List[float]) -> List[Point2D]:

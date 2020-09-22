@@ -25,34 +25,31 @@ class Vector2D(Geometry2D):
     def y(self) -> float:
         raise NotImplementedError()
 
-    def add_vector(self, other_vector: Vector2D) -> Vector2D:
+    def add(self, other_vector: Vector2D) -> Vector2D:
         raise NotImplementedError()
 
-    def subtract_vector(self, other_vector: Vector2D) -> Vector2D:
+    def subtract(self, other_vector: Vector2D) -> Vector2D:
         raise NotImplementedError
 
-    def reverse_vector(self) -> Vector2D:
+    def reverse(self) -> Vector2D:
         raise NotImplementedError()
 
     def to_point(self) -> Point2D:
         raise NotImplementedError()
 
-    def dot_product(self, other_vector: Vector2D) -> float:
+    def dot(self, other_vector: Vector2D) -> float:
         raise NotImplementedError()
 
-    def __add__(self, other: Vector2D):
+    def __add__(self, other: Vector2D) -> Vector2D:
         raise NotImplementedError()
 
-    def __sub__(self, other: Vector2D):
+    def __sub__(self, other: Vector2D) -> Vector2D:
         raise NotImplementedError()
 
-    def __mul__(self, other: Union[float, Vector2D]):
+    def __mul__(self, other: float) -> Vector2D:
         raise NotImplementedError()
 
-    def __abs__(self):
-        raise NotImplementedError()
-
-    def __eq__(self, other):
+    def __eq__(self, other) -> bool:
         raise NotImplementedError()
 
 
@@ -70,7 +67,7 @@ class Point2D(Geometry2D):
     def y(self) -> float:
         raise NotImplementedError()
 
-    def subtract_point(self, other_point: Point2D) -> Vector2D:
+    def subtract(self, other_point: Point2D) -> Vector2D:
         raise NotImplementedError()
 
     def add_vector(self, vector: Vector2D) -> Point2D:
@@ -82,7 +79,7 @@ class Point2D(Geometry2D):
     def calc_distance_to_point(self, other_point: Point2D) -> float:
         raise NotImplementedError()
 
-    def __eq__(self, other):
+    def __eq__(self, other) -> bool:
         raise NotImplementedError()
 
 

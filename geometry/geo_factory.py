@@ -3,12 +3,15 @@ from __future__ import annotations
 from typing import List
 
 from geometry.geo2d import Point2D, Vector2D, Polygon2D, LineString2D, LinearRing2D
-from geometry.math_wrapper import MathVector2D
-from geometry.shapely_wrapper import ShapelyPoint2D, ShapelyPolygon2D, ShapelyLineString2D, ShapelyLinearRing2D
+from geometry.math_wrapper import _MathVector2D
+from geometry.shapely_wrapper import _ShapelyPoint2D, ShapelyPolygon2D, ShapelyLineString2D, ShapelyLinearRing2D
+from geometry.geo2d import Point2D, Vector2D
+from geometry.math_wrapper import _MathVector2D
+from geometry.shapely_wrapper import _ShapelyPoint2D
 
 
 def create_point_2d(x: float, y: float) -> Point2D:
-    return ShapelyPoint2D(x, y)
+    return _ShapelyPoint2D(x, y)
 
 
 def convert_to_point(vector: Vector2D) -> Point2D:
@@ -16,7 +19,7 @@ def convert_to_point(vector: Vector2D) -> Point2D:
 
 
 def create_vector_2d(x: float, y: float) -> Vector2D:
-    return MathVector2D(x, y)
+    return _MathVector2D(x, y)
 
 
 def convert_to_vector(point: Point2D) -> Vector2D:
