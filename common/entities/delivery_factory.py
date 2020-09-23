@@ -8,7 +8,9 @@ __package_dict = {"Tiny": _TinyPackage(), "Small": _SmallPackage(),
 
 
 def package_factory(package_type: str) -> Package:
-    return __package_dict[package_type].clone()
+    if __package_dict.get(package_type) is not None:
+        return __package_dict[package_type].clone()
+    return None
 
 
 def package_delivery_plan_factory(x: float, y: float, azimuth: float, elevation: float,

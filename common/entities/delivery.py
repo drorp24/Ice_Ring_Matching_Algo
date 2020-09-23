@@ -2,7 +2,8 @@ from __future__ import annotations
 
 from abc import ABC
 import copy
-from geometry.geo_factory import create_point_2D
+
+from geometry.geo_factory import create_point_2d
 from geometry.geo2d import Point2D, Vector2D
 
 
@@ -87,7 +88,7 @@ class _LargePackage(Package):
 class _DropPoint:
 
     def __init__(self, x: float, y: float):
-        self._coordinates = create_point_2D(x, y)
+        self._coordinates = create_point_2d(x, y)
 
     @property
     def coordinates(self) -> Point2D:
