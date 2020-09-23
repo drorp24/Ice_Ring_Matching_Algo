@@ -52,3 +52,10 @@ class PolygonOperationsTestCase(unittest.TestCase):
         intersection_result_a = self.poly1.calc_intersection(self.poly2)
         intersection_result_b = self.poly2.calc_intersection(self.poly1)
         self.assertEqual(intersection_result_a, intersection_result_b)
+
+    def test_difference(self):
+        difference_result = self.poly1.calc_difference(self.poly2)
+        expected_difference = create_polygon_2d([self.p5, self.p3, self.p4, self.p6])
+        self.assertEqual(difference_result, expected_difference)
+
+

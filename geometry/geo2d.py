@@ -11,6 +11,13 @@ class Geometry2D(ABC):
         raise NotImplementedError()
 
 
+class EmptyGeometry2D(Geometry2D):
+
+    @property
+    def type(self) -> str:
+        raise NotImplementedError()
+
+
 class Vector2D(Geometry2D):
 
     @property
@@ -149,7 +156,13 @@ class Polygon2D(Geometry2D):
     def calc_area(self) -> float:
         raise NotImplementedError()
 
-    def calc_intersection(self, other_polygon: Polygon2D) -> Union[Polygon2D, MultiPolygon2D]:
+    def calc_intersection(self, other_polygon: Polygon2D) -> Union[Polygon2D, MultiPolygon2D, EmptyGeometry2D]:
+        raise NotImplementedError()
+
+    def calc_difference(self, other_polygon: Polygon2D) -> Union[Polygon2D, MultiPolygon2D, EmptyGeometry2D]:
+        raise NotImplementedError()
+
+    def calc_union(self, other_polygon: Polygon2D) -> Union[Polygon2D, MultiPolygon2D]:
         raise NotImplementedError()
 
 

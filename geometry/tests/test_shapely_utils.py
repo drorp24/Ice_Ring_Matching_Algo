@@ -1,5 +1,4 @@
 import unittest
-from typing import List
 
 from geometry.geo_factory import create_point_2d
 from geometry.shapely_wrapper import _ShapelyUtils
