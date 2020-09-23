@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from common.entities.delivery import Package, _TinyPackage, _SmallPackage, _MediumPackage, _LargePackage, \
-    PackageDeliveryPlan
+from common.entities.package import Package, _TinyPackage, _SmallPackage, _MediumPackage, _LargePackage
+from common.entities.PackageDeliveryPlan import PackageDeliveryPlan
 
 __package_dict = {"Tiny": _TinyPackage(), "Small": _SmallPackage(),
                   "Medium": _MediumPackage(), "Large": _LargePackage()}
