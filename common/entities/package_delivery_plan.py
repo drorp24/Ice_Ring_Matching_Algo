@@ -27,10 +27,10 @@ class _DropPoint:
 
 class PackageDeliveryPlan:
 
-    def __init__(self, x: float, y: float, azimuth: float, elevation: float, package: Package):
+    def __init__(self, x: float, y: float, arrival_angle: float, hitting_angle: float, package: Package):
         self._drop_point = _DropPoint(x, y)
-        self._azimuth = azimuth
-        self._elevation = elevation
+        self._arrival_angle = arrival_angle
+        self._hitting_angle = hitting_angle
         self._package = package
 
     @property
@@ -38,19 +38,19 @@ class PackageDeliveryPlan:
         return self._drop_point
 
     @property
-    def azimuth(self) -> float:
-        return self._azimuth
+    def arrival_angle(self) -> float:
+        return self._arrival_angle
 
     @property
-    def elevation(self) -> float:
-        return self._elevation
+    def hitting_angle(self) -> float:
+        return self._hitting_angle
 
     @property
     def package(self) -> Package:
         return self._package
 
     def get_package_type(self) -> str:
-        return self._package.type
+        return self._package.type()
 
     def get_package_weight(self) -> float:
-        return self._package.weight_kg
+        return self._package.weight_kg()

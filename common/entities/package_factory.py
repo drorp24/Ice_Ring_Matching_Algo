@@ -13,7 +13,7 @@ def package_factory(package_type: str) -> Package:
     return None
 
 
-def package_delivery_plan_factory(x: float, y: float, azimuth: float, elevation: float,
+def package_delivery_plan_factory(x: float, y: float, arrival_angle: float, hitting_angle: float,
                                   package_type: str) -> PackageDeliveryPlan:
     package = package_factory(package_type)
-    return PackageDeliveryPlan(x, y, azimuth, elevation, package)
+    return PackageDeliveryPlan(x, y, arrival_angle, hitting_angle, package)

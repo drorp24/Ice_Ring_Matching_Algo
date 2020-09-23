@@ -12,7 +12,7 @@ class BasicPackageGeneration(unittest.TestCase):
         cls.p3 = package_factory("Medium")
         cls.p4 = package_factory("Large")
         cls.p5 = package_factory("mini")
-        cls.pdp = package_delivery_plan_factory(x=0, y=0, azimuth=0.1, elevation=1.81, package_type="Tiny")
+        cls.pdp = package_delivery_plan_factory(x=0, y=0, arrival_angle=0.1, hitting_angle=1.81, package_type="Tiny")
 
     def test_package_type(self):
         self.assertEqual(self.p1.type(), "Tiny")
