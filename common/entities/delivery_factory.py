@@ -1,3 +1,5 @@
+from time_window import TimeWindow
+
 from common.entities.customer_delivery import CustomerDelivery
 from common.entities.delivery_option import DeliveryOption
 from common.entities.delivery_request import DeliveryRequest
@@ -17,6 +19,6 @@ def create_delivery_option(x: float, y: float, azimuth: float, elevation: float,
 
 
 def create_delivery_request(x: float, y: float, azimuth: float, elevation: float,
-                            package_type: str, since_time: int, until_time: int, priority: int) -> DeliveryRequest:
+                            package_type: str, time_window: TimeWindow, priority: int) -> DeliveryRequest:
     delivery_option = [create_delivery_option(x, y, azimuth, elevation, package_type)]
-    return DeliveryRequest(delivery_option, since_time, until_time, priority)
+    return DeliveryRequest(delivery_option, time_window, priority)

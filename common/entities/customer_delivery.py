@@ -7,12 +7,7 @@ class CustomerDelivery:
         if not isinstance(package_delivery_plans, list):
             raise TypeError("package_delivery_plans must be a list")
 
-        self._type = "CustomerDelivery"
         self._package_delivery_plans = package_delivery_plans
-
-    @property
-    def type(self) -> str:
-        return self._type
 
     @property
     def package_delivery_plans(self) -> [PackageDeliveryPlan]:
