@@ -9,7 +9,7 @@ class DeliveryRequest:
             raise TypeError("delivery_options must be a list")
 
         self._delivery_options = delivery_options if delivery_options is not None else []
-        self.time_window = time_window
+        self._time_window = time_window
         self._priority = priority
 
     @property
