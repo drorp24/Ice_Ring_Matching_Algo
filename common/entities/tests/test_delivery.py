@@ -30,21 +30,15 @@ class BasicPackageGeneration(unittest.TestCase):
         self.assertEqual(self.pdp.package.type(), "Tiny")
 
     def test_customer_delivery(self):
-        self.assertEqual(self.cd.type, "CustomerDelivery")
         self.assertEqual(self.cd.package_delivery_plans[0].package.type(), "Tiny")
 
     def test_delivery_option(self):
-        self.assertEqual(self.do.type, "DeliveryOption")
-        self.assertEqual(self.do.customer_deliveries[0].type, "CustomerDelivery")
         self.assertEqual(self.do.customer_deliveries[0].package_delivery_plans[0].package.type(), "Tiny")
 
     def test_delivery_request(self):
-        self.assertEqual(self.dr.type, "DeliveryRequest")
         self.assertEqual(self.dr.since_time, 1600847749)
         self.assertEqual(self.dr.until_time, 1600851349)
         self.assertEqual(self.dr.priority, 10)
-        self.assertEqual(self.dr.delivery_options[0].type, "DeliveryOption")
-        self.assertEqual(self.dr.delivery_options[0].customer_deliveries[0].type, "CustomerDelivery")
         self.assertEqual(self.dr.delivery_options[0].customer_deliveries[0].package_delivery_plans[0].package.type(),
                          "Tiny")
 
