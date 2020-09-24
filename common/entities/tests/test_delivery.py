@@ -1,28 +1,39 @@
 import unittest
+from datetime import datetime
 
+from time_window import TimeWindow
+
+from common.entities.delivery_factory import create_customer_delivery, create_delivery_request, create_delivery_option
 from common.entities.package import PackageType
-from common.entities.package_factory import package_delivery_plan_factory
 from common.math.angle import Angle
 from geometry.geo_factory import create_point_2d
 
 
-class BasicPackageGeneration(unittest.TestCase):
+class BasicDeliveryGeneration(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.p1 = PackageType.TINY
-        cls.p2 = PackageType.SMALL
-        cls.p3 = PackageType.MEDIUM
-        cls.p4 = PackageType.LARGE
-        point = create_point_2d(1,2)
-        cls.pdp = package_delivery_plan_factory(point, azimuth=Angle(30), elevation=Angle(80),
-                                                package=PackageType.TINY)
+        point = create_point_2d(1, 2)
 
-    def test_package_type(self):
-        self.assertEqual(self.p1.value.size, 1)
-        self.assertEqual(self.p2.value.size, 2)
-        self.assertEqual(self.p3.value.size, 4)
-        self.assertEqual(self.p4.value.size, 8)
+        cls.cd = create_customer_delivery(point, azimuth=Angle(30), elevation=Angle(80),
+                                          package=PackageType.TINY)
+        cls.do = create_delivery_option(point, azimuth=Angle(30), elevation=Angle(80),
+                                        package=PackageType.TINY)
 
-    def test_package_delivery_plan(self):
-        self.assertEqual(self.pdp.package.value.size, 1)
+        cls.time_window = TimeWindow(datetime(2020, 1, 23, 11, 30, 00),
+                                     datetime(2020, 1, 23, 11, 35, 00))
+        cls.dr = create_delivery_request(point, azimuth=Angle(30), elevation=Angle(80),
+                                         package=PackageType.TINY,
+                                         time_window=cls.time_window, priority=10)
+
+    def test_customer_delivery(self):
+        self.assertEqual(self.cd.package_delivery_plans[0].package.value.size, 1)
+
+    def test_delivery_option(self):
+        self.assertEqual(self.do.customer_deliveries[0].package_delivery_plans[0].package.value.size, 1)
+
+    def test_delivery_request(self):
+        self.assertFalse(self.dr.time_window.since > self.dr.time_window.until)
+        self.assertEqual(self.dr.priority, 10)
+        self.assertEqual(
+            self.dr.delivery_options[0].customer_deliveries[0].package_delivery_plans[0].package.value.size, 1)
