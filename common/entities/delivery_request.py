@@ -1,4 +1,4 @@
-from rafazonscale.common.entities.delivery_option import DeliveryOption
+from common.entities.delivery_option import DeliveryOption
 
 
 class DeliveryRequest:
