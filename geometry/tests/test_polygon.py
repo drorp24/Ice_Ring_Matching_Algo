@@ -65,6 +65,12 @@ class PolygonOperationsTestCase(unittest.TestCase):
         poly5_p4 = poly1_p4
         cls.poly5 = create_polygon_2d([poly5_p1, poly5_p2, poly5_p3, poly5_p4])
 
+        poly6_p1 = create_point_2d(1, 1)
+        poly6_p2 = create_point_2d(1, 2)
+        poly6_p3 = create_point_2d(2, 2)
+        poly6_p4 = create_point_2d(2, 1)
+        cls.poly6 = create_polygon_2d([poly6_p1, poly6_p2, poly6_p3, poly6_p4])
+
     def test_intersection(self):
         intersection_result = self.poly1.calc_intersection(self.poly3)
         self.assertEqual(intersection_result, self.poly3)
@@ -93,6 +99,11 @@ class PolygonOperationsTestCase(unittest.TestCase):
         multipolygon_expected_result = create_multipolygon_2d([self.poly3, self.poly4])
         difference_result = self.poly1.calc_difference(self.poly2)
         self.assertEqual(difference_result, multipolygon_expected_result)
+
+    def test_difference_with_hole_result(self):
+        difference_result = self.poly1.calc_difference(self.poly6)
+        expected_hole = create_linear_ring_2d(self.poly6.points)
+        raise NotImplementedError
 
     def test_union(self):
         union_result = self.poly1.calc_union(self.poly3)

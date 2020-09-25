@@ -62,10 +62,9 @@ class _ShapelyPoint2D(_ShapelyGeometry, Point2D):
         return _ShapelyPoint2D(self.x + vector.x, self.y + vector.y)
 
     def calc_distance_to_point(self, other_point: Point2D) -> float:
-        try:
-            return self._shapely_obj.distance(other_point.__shapely_obj)
-        except NonShapelyNativeGeometry:
-            return self._shapely_obj.distance(_ShapelyUtils.convert_point2d_to_shapely(other_point))
+        if isinstance(other_point, _ShapelyPoint2D):
+            return self._shapely_obj.distance(other_point._shapely_obj)
+        return self._shapely_obj.distance(_ShapelyUtils.convert_point2d_to_shapely(other_point))
 
     def to_vector(self) -> Vector2D:
         from geometry.geo_factory import convert_to_vector
@@ -120,7 +119,7 @@ class _ShapelyLinearRing2D(_ShapelyGeometry, LinearRing2D):
 
     @staticmethod
     def _create_from_shapely(linear_ring: LinearRing):
-        return _ShapelyLinearRing2D(_ShapelyUtils.convert_xy_array_to_points_list(linear_ring.xy))
+        return
 
     @property
     def _shapely_obj(self) -> LinearRing:
@@ -154,8 +153,9 @@ class _ShapelyPolygon2D(_ShapelyGeometry, Polygon2D):
     def _shapely_obj(self) -> Polygon:
         return super()._shapely_obj
 
-    def holes(self) -> List[Polygon2D]:
-        raise NotImplementedError()
+    @property
+    def holes(self) -> List[LinearRing2D]:
+        raise NotImplementedError
 
     @property
     def boundary(self) -> LinearRing2D:
@@ -259,8 +259,12 @@ class _ShapelyUtils:
         return Point(point.x, point.y)
 
     @staticmethod
-    def convert_shapely_to_point(point: Point) -> Point2D:
+    def convert_shapely_to_point_2d(point: Point) -> Point2D:
         return _ShapelyPoint2D(point.x, point.y)
+
+    @staticmethod
+    def convert_shapely_to_linear_ring_2d(linear_ring: LinearRing) -> LinearRing2D:
+        return _ShapelyLinearRing2D(_ShapelyUtils.convert_xy_array_to_points_list(linear_ring.xy))
 
     @staticmethod
     def convert_shapely_to_polygon_2d(polygon: Polygon) -> Polygon2D:

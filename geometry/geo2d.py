@@ -159,7 +159,7 @@ class Polygon2D(Geometry2D, Surface2D):
         raise NotImplementedError()
 
     @property
-    def holes(self) -> List[Polygon2D]:
+    def holes(self) -> List[LinearRing2D]:
         raise NotImplementedError()
 
     @property
