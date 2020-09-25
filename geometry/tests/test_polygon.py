@@ -35,29 +35,53 @@ class PolygonOperationsTestCase(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.p1 = create_point_2d(0.0, 0.0)
-        cls.p2 = create_point_2d(0.0, 5.0)
-        cls.p3 = create_point_2d(5.0, 5.0)
-        cls.p4 = create_point_2d(5.0, 0.0)
+        poly1_p1 = create_point_2d(0, 0)
+        poly1_p2 = create_point_2d(0, 4)
+        poly1_p3 = create_point_2d(10, 4)
+        poly1_p4 = create_point_2d(10, 0)
+        cls.poly1 = create_polygon_2d([poly1_p1, poly1_p2, poly1_p3, poly1_p4])
 
-        cls.p5 = create_point_2d(3.0, 5.0)
-        cls.p6 = create_point_2d(3.0, 0.0)
+        poly2_p1 = create_point_2d(5, -5)
+        poly2_p2 = create_point_2d(5, 5)
+        poly2_p3 = create_point_2d(6, 5)
+        poly2_p4 = create_point_2d(6, -5)
+        cls.poly2 = create_polygon_2d([poly2_p1, poly2_p2, poly2_p3, poly2_p4])
 
-        cls.poly1 = create_polygon_2d([cls.p1, cls.p2, cls.p3, cls.p4])
-        cls.poly2 = create_polygon_2d([cls.p1, cls.p2, cls.p5, cls.p6])
+        poly3_p1 = poly1_p1
+        poly3_p2 = poly1_p2
+        poly3_p3 = create_point_2d(5, 4)
+        poly3_p4 = create_point_2d(5, 0)
+        cls.poly3 = create_polygon_2d([poly3_p1, poly3_p2, poly3_p3, poly3_p4])
+
+        pol4_p1 = create_point_2d(6, 0)
+        poly4_p2 = create_point_2d(6, 4)
+        poly4_p3 = poly1_p3
+        poly4_p4 = poly1_p4
+        cls.poly4 = create_polygon_2d([pol4_p1, poly4_p2, poly4_p3, poly4_p4])
+
+        poly5_p1 = create_point_2d(5, 0)
+        poly5_p2 = create_point_2d(5, 4)
+        poly5_p3 = poly1_p3
+        poly5_p4 = poly1_p4
+        cls.poly5 = create_polygon_2d([poly5_p1, poly5_p2, poly5_p3, poly5_p4])
 
     def test_intersection(self):
-        intersection_result = self.poly1.calc_intersection(self.poly2)
-        self.assertEqual(intersection_result, self.poly2)
+        intersection_result = self.poly1.calc_intersection(self.poly3)
+        self.assertEqual(intersection_result, self.poly3)
 
     def test_intersection_commutative(self):
         intersection_result_a = self.poly1.calc_intersection(self.poly2)
         intersection_result_b = self.poly2.calc_intersection(self.poly1)
         self.assertEqual(intersection_result_a, intersection_result_b)
 
+    def test_intersection_with_empty_result(self):
+        intersection_result_a = self.poly1.calc_intersection(self.poly2)
+        intersection_result_b = self.poly2.calc_intersection(self.poly1)
+        self.assertEqual(intersection_result_a, intersection_result_b)
+
     def test_difference(self):
-        difference_result = self.poly1.calc_difference(self.poly2)
-        expected_difference = create_polygon_2d([self.p5, self.p3, self.p4, self.p6])
+        difference_result = self.poly1.calc_difference(self.poly3)
+        expected_difference = self.poly5
         self.assertEqual(difference_result, expected_difference)
 
     def test_difference_with_empty_result(self):
@@ -66,34 +90,19 @@ class PolygonOperationsTestCase(unittest.TestCase):
         self.assertEqual(difference_result, expected_difference)
 
     def test_difference_with_multiple_polygon_output(self):
-
-        poly1_p1 = create_point_2d(0, 0)
-        poly1_p2 = create_point_2d(0, 4)
-        poly1_p3 = create_point_2d(10, 4)
-        poly1_p4 = create_point_2d(10, 0)
-        poly1 = create_polygon_2d([poly1_p1, poly1_p2, poly1_p3, poly1_p4])
-
-        poly2_p1 = create_point_2d(5, -5)
-        poly2_p2 = create_point_2d(5, 5)
-        poly2_p3 = create_point_2d(6, 5)
-        poly2_p4 = create_point_2d(6, -5)
-        poly2 = create_polygon_2d([poly2_p1, poly2_p2, poly2_p3, poly2_p4])
-
-        poly3_p1 = poly1_p1
-        poly3_p2 = poly1_p2
-        poly3_p3 = create_point_2d(5, 4)
-        poly3_p4 = create_point_2d(5, 0)
-        poly3 = create_polygon_2d([poly3_p1, poly3_p2, poly3_p3, poly3_p4])
-
-        pol4_p1 = create_point_2d(6, 0)
-        poly4_p2 = create_point_2d(6, 4)
-        poly4_p3 = poly1_p3
-        poly4_p4 = poly1_p4
-        poly4 = create_polygon_2d([pol4_p1, poly4_p2, poly4_p3, poly4_p4])
-
-        multipolygon_expected_result = create_multipolygon_2d([poly3, poly4])
-        difference_result = poly1.calc_difference(poly2)
-
+        multipolygon_expected_result = create_multipolygon_2d([self.poly3, self.poly4])
+        difference_result = self.poly1.calc_difference(self.poly2)
         self.assertEqual(difference_result, multipolygon_expected_result)
 
+    def test_union(self):
+        union_result = self.poly1.calc_union(self.poly3)
+        self.assertEqual(union_result, self.poly1)
 
+    def test_union_with_self_result(self):
+        union_result = self.poly1.calc_union(self.poly1)
+        self.assertEqual(union_result, self.poly1)
+
+    def test_union_with_multiple_polygon_output(self):
+        multipolygon_expected_result = create_multipolygon_2d([self.poly3, self.poly4])
+        union_result = self.poly3.calc_union(self.poly4)
+        self.assertEqual(union_result, multipolygon_expected_result)

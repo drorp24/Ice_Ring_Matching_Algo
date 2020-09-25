@@ -159,6 +159,10 @@ class Polygon2D(Geometry2D, Surface2D):
         raise NotImplementedError()
 
     @property
+    def holes(self) -> List[Polygon2D]:
+        raise NotImplementedError()
+
+    @property
     def boundary(self) -> LinearRing2D:
         raise NotImplementedError()
 
@@ -185,4 +189,4 @@ class MultiPolygon2D(Geometry2D, Surface2D):
         raise NotImplementedError()
 
     def to_polygons(self) -> List[Polygon2D]:
-        raise NotImplementedError
+        raise NotImplementedError()

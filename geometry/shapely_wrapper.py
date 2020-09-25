@@ -154,6 +154,9 @@ class _ShapelyPolygon2D(_ShapelyGeometry, Polygon2D):
     def _shapely_obj(self) -> Polygon:
         return super()._shapely_obj
 
+    def holes(self) -> List[Polygon2D]:
+        raise NotImplementedError()
+
     @property
     def boundary(self) -> LinearRing2D:
         return _ShapelyLinearRing2D(self.points)
@@ -220,6 +223,9 @@ class _ShapelyMultiPolygon2D(_ShapelyGeometry, MultiPolygon2D):
         if isinstance(other_polygonal_geometry, Polygon2D):
             return other_polygonal_geometry in self
         return self in other_polygonal_geometry.to_polygons() and other_polygonal_geometry in self.to_polygons()
+
+    def __str__(self):
+        return self.type + [polygon.__str__ for polygon in self.to_polygons()].__str__()
 
 
 class _ShapelyUtils:
