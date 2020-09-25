@@ -17,6 +17,9 @@ class EmptyGeometry2D(Geometry2D):
     def type(self) -> str:
         raise NotImplementedError()
 
+    def calc_area(self) -> float:
+        raise NotImplementedError()
+
 
 class Vector2D(Geometry2D):
 
@@ -139,7 +142,13 @@ class LinearRing2D(LineString2D):
         raise NotImplementedError()
 
 
-class Polygon2D(Geometry2D):
+class Surface2D(ABC):
+
+    def calc_area(self) -> float:
+        raise NotImplementedError()
+
+
+class Polygon2D(Geometry2D, Surface2D):
 
     @property
     def type(self) -> str:
@@ -166,7 +175,7 @@ class Polygon2D(Geometry2D):
         raise NotImplementedError()
 
 
-class MultiPolygon2D(Geometry2D):
+class MultiPolygon2D(Geometry2D, Surface2D):
 
     @property
     def type(self) -> str:
@@ -174,3 +183,6 @@ class MultiPolygon2D(Geometry2D):
 
     def calc_area(self) -> float:
         raise NotImplementedError()
+
+    def to_polygons(self) -> List[Polygon2D]:
+        raise NotImplementedError

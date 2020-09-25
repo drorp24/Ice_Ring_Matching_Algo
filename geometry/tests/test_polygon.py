@@ -1,6 +1,8 @@
 import unittest
 
-from geometry.geo_factory import create_polygon_2d, create_point_2d, create_linear_ring_2d
+from geometry.geo2d import EmptyGeometry2D
+from geometry.geo_factory import create_polygon_2d, create_point_2d, create_linear_ring_2d, create_multipolygon_2d
+from geometry.shapely_wrapper import _ShapelyEmptyGeometry
 
 
 class BasicPolygonTestCase(unittest.TestCase):
@@ -58,4 +60,25 @@ class PolygonOperationsTestCase(unittest.TestCase):
         expected_difference = create_polygon_2d([self.p5, self.p3, self.p4, self.p6])
         self.assertEqual(difference_result, expected_difference)
 
+    def test_difference_with_empty_result(self):
+        difference_result = self.poly1.calc_difference(self.poly1)
+        expected_difference = EmptyGeometry2D()
+        self.assertEqual(difference_result, expected_difference)
 
+    def test_difference_with_multiple_polygon_output(self):
+        wide_polygon = create_polygon_2d(
+            [create_point_2d(0, 0), create_point_2d(0, 4), create_point_2d(10, 4), create_point_2d(10, 0)])
+        tall_polygon = create_polygon_2d(
+            [create_point_2d(5, -5), create_point_2d(5, 5), create_point_2d(6, 5), create_point_2d(6, -5)])
+        multipolygon_expected_result = create_multipolygon_2d([
+            create_polygon_2d([create_point_2d(0, 0),
+                               create_point_2d(0, 4),
+                               create_point_2d(5, 4),
+                               create_point_2d(5, 0)]),
+            create_polygon_2d([create_point_2d(6, 0),
+                               create_point_2d(6, 4),
+                               create_point_2d(10, 4),
+                               create_point_2d(10, 0)])]
+        )
+        difference_result = wide_polygon.calc_difference(tall_polygon)
+        self.assertEqual(difference_result, multipolygon_expected_result)
