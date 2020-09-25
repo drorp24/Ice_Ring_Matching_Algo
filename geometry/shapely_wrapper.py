@@ -183,7 +183,11 @@ class _ShapelyPolygon2D(_ShapelyGeometry, Polygon2D):
         return _ShapelyUtils.convert_shapely_to_polygon_2d(internal_difference)
 
     def calc_union(self, other_polygon: Polygon2D) -> Union[Polygon2D, MultiPolygon2D]:
-        pass
+        other_polygon_shapely = _ShapelyUtils.convert_polygon2d_to_shapely(other_polygon)
+        internal_union = self._shapely_obj.union(other_polygon_shapely)
+        if isinstance(internal_union, MultiPolygon):
+            return _ShapelyUtils.convert_shapely_to_multipolygon_2d(internal_union)
+        return _ShapelyUtils.convert_shapely_to_polygon_2d(internal_union)
 
     def __str__(self):
         return self.type + [p.__str__() for p in self.points].__str__()

@@ -66,19 +66,34 @@ class PolygonOperationsTestCase(unittest.TestCase):
         self.assertEqual(difference_result, expected_difference)
 
     def test_difference_with_multiple_polygon_output(self):
-        wide_polygon = create_polygon_2d(
-            [create_point_2d(0, 0), create_point_2d(0, 4), create_point_2d(10, 4), create_point_2d(10, 0)])
-        tall_polygon = create_polygon_2d(
-            [create_point_2d(5, -5), create_point_2d(5, 5), create_point_2d(6, 5), create_point_2d(6, -5)])
-        multipolygon_expected_result = create_multipolygon_2d([
-            create_polygon_2d([create_point_2d(0, 0),
-                               create_point_2d(0, 4),
-                               create_point_2d(5, 4),
-                               create_point_2d(5, 0)]),
-            create_polygon_2d([create_point_2d(6, 0),
-                               create_point_2d(6, 4),
-                               create_point_2d(10, 4),
-                               create_point_2d(10, 0)])]
-        )
-        difference_result = wide_polygon.calc_difference(tall_polygon)
+
+        poly1_p1 = create_point_2d(0, 0)
+        poly1_p2 = create_point_2d(0, 4)
+        poly1_p3 = create_point_2d(10, 4)
+        poly1_p4 = create_point_2d(10, 0)
+        poly1 = create_polygon_2d([poly1_p1, poly1_p2, poly1_p3, poly1_p4])
+
+        poly2_p1 = create_point_2d(5, -5)
+        poly2_p2 = create_point_2d(5, 5)
+        poly2_p3 = create_point_2d(6, 5)
+        poly2_p4 = create_point_2d(6, -5)
+        poly2 = create_polygon_2d([poly2_p1, poly2_p2, poly2_p3, poly2_p4])
+
+        poly3_p1 = poly1_p1
+        poly3_p2 = poly1_p2
+        poly3_p3 = create_point_2d(5, 4)
+        poly3_p4 = create_point_2d(5, 0)
+        poly3 = create_polygon_2d([poly3_p1, poly3_p2, poly3_p3, poly3_p4])
+
+        pol4_p1 = create_point_2d(6, 0)
+        poly4_p2 = create_point_2d(6, 4)
+        poly4_p3 = poly1_p3
+        poly4_p4 = poly1_p4
+        poly4 = create_polygon_2d([pol4_p1, poly4_p2, poly4_p3, poly4_p4])
+
+        multipolygon_expected_result = create_multipolygon_2d([poly3, poly4])
+        difference_result = poly1.calc_difference(poly2)
+
         self.assertEqual(difference_result, multipolygon_expected_result)
+
+
