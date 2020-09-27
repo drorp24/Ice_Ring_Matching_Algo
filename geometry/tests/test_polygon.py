@@ -103,7 +103,7 @@ class PolygonOperationsTestCase(unittest.TestCase):
     def test_difference_with_hole_result(self):
         difference_result = self.poly1.calc_difference(self.poly6)
         expected_hole = create_linear_ring_2d(self.poly6.points)
-        raise NotImplementedError
+        self.assertEqual(difference_result.holes[0], expected_hole)
 
     def test_union(self):
         union_result = self.poly1.calc_union(self.poly3)
