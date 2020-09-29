@@ -98,7 +98,7 @@ class _ShapelyLineString2D(_ShapelyGeometry, LineString2D):
 
     @property
     def _shapely_obj(self) -> LineString:
-        return super().__shapely_obj
+        return super()._shapely_obj
 
     @property
     def points(self) -> List[Point2D]:
