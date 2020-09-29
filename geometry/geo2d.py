@@ -177,10 +177,3 @@ class MultiPolygon2D(Geometry2D):
 
     def calc_area(self) -> float:
         raise NotImplementedError()
-
-
-class Arrow2D(Geometry2D):
-
-    @property
-    def type(self) -> str:
-        raise NotImplementedError()

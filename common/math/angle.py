@@ -10,21 +10,21 @@ class AngleUnit(IntEnum):
 
 class Angle:
 
-    def __init__(self, value: float, unit: AngleUnit = AngleUnit.DEGREE):
-        self._value = value
-        self._unit = unit
+    def __init__(self, value: float, unit: AngleUnit):
+        self.__value = value
+        self.__unit = unit
 
     @property
-    def value(self) -> float:
-        return self._value
+    def _value(self) -> float:
+        return self.__value
 
     @property
-    def unit(self) -> AngleUnit:
-        return self._unit
+    def _unit(self) -> AngleUnit:
+        return self.__unit
 
-    def convert_to_radians(self):
-        return math.radians(self._value)
+    def in_degrees(self) -> float:
+        return self._value if self._unit is AngleUnit.DEGREE else math.degrees(self._value)
 
-    def convert_to_degrees(self):
-        return math.degrees(self._value)
+    def in_radians(self) -> float:
+        return self._value if self._unit is AngleUnit.RADIAN else math.radians(self._value)
 

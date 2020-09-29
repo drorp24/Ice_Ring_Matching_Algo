@@ -33,25 +33,28 @@ class PackageDeliveryPlan:
         return self._drop_point
 
     @property
-    def azimuth_deg(self) -> Angle:
+    def azimuth(self) -> Angle:
         return self._azimuth
 
     @property
-    def elevation_deg(self) -> Angle:
+    def elevation(self) -> Angle:
         return self._elevation
 
     @property
     def package(self) -> Package:
         return self._package
 
-    def drop_envelope(self, drone_direction: Angle) -> Polygon2D:
-        drop_azimuth_in_rad = self._azimuth.value if (self._azimuth.unit is AngleUnit.RADIAN) else self._azimuth.convert_to_radians()
-        drone_direction_in_degrees = drone_direction.value if (drone_direction.unit is AngleUnit.DEGREE) else drone_direction.convert_to_degrees()
-        drone_arrival_angle_in_rad = Angle(180 + drone_direction_in_degrees).convert_to_radians()
-        average_radius = statistics.mean([self._package.potential_drop_envelope.maximal_radius_meters, self._package.potential_drop_envelope.minimal_radius_meters])
-        envelope_center = create_point_2d(self._drop_point.coordinates.x + (average_radius * cos(drone_arrival_angle_in_rad)), self._drop_point.coordinates.y + (average_radius * sin(drone_arrival_angle_in_rad)))
-        envelope_width = self._package.potential_drop_envelope.maximal_radius_meters - self._package.potential_drop_envelope.minimal_radius_meters
-        envelope_height = envelope_width * create_vector_2d(cos(drop_azimuth_in_rad), sin(drop_azimuth_in_rad)).dot(
+    def drop_envelope(self, drone_azimuth: Angle) -> Polygon2D:
+        drone_arrival_angle_in_rad = Angle(180 + drone_azimuth.in_degrees(), AngleUnit.DEGREE).in_radians()
+        average_radius = statistics.mean([self._package.potential_drop_envelope.maximal_radius_meters,
+                                          self.package.potential_drop_envelope.minimal_radius_meters])
+        envelope_center = create_point_2d(self._drop_point.coordinates.x + (average_radius * cos(drone_arrival_angle_in_rad)),
+                                          self.drop_point.coordinates.y + (average_radius * sin(drone_arrival_angle_in_rad)))
+        envelope_width = self._package.potential_drop_envelope.maximal_radius_meters - self.package.potential_drop_envelope.minimal_radius_meters
+        envelope_height = envelope_width * create_vector_2d(cos(self.azimuth.in_radians()), sin(self.azimuth.in_radians())).dot(
             create_vector_2d(cos(drone_arrival_angle_in_rad), sin(drone_arrival_angle_in_rad))
         )
-        return create_polygon_2d_from_ellipsis((envelope_center.x, envelope_center.y), envelope_width, envelope_height, drone_direction_in_degrees)
+        return create_polygon_2d_from_ellipsis(ellipsis_center=(envelope_center.x, envelope_center.y),
+                                               ellipsis_width=envelope_width,
+                                               ellipsis_height=envelope_height,
+                                               ellipsis_rotation=drone_azimuth.in_degrees())

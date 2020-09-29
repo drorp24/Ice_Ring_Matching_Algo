@@ -30,8 +30,8 @@ def create_polygon_2d(points: List[Point2D]) -> Polygon2D:
     return _ShapelyPolygon2D(create_linear_ring_2d(points))
 
 
-def create_polygon_2d_from_ellipsis(center_xy, width, height, rotation) -> Polygon2D:
-    plt_ellipsis = Ellipse(center_xy, width, height, rotation)
+def create_polygon_2d_from_ellipsis(ellipsis_center, ellipsis_width, ellipsis_height, ellipsis_rotation) -> Polygon2D:
+    plt_ellipsis = Ellipse(ellipsis_center, ellipsis_width, ellipsis_height, ellipsis_rotation)
     vertices = plt_ellipsis.get_verts()
     return create_polygon_2d(_ShapelyUtils.convert_xy_array_to_points_list(vertices))
 
