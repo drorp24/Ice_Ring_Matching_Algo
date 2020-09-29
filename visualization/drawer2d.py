@@ -5,7 +5,7 @@ from abc import ABC, abstractmethod
 from geometry.geo2d import Point2D, Vector2D, Polygon2D, LineString2D, LinearRing2D
 
 
-class Drawer2d(ABC):
+class Drawer2D(ABC):
     @abstractmethod
     def add_point2d(self, point2d: Point2D):
         pass
@@ -28,6 +28,10 @@ class Drawer2d(ABC):
 
     @abstractmethod
     def draw(self):
+        pass
+
+    @abstractmethod
+    def add_arrow2d(self, tail: Point2D, head: Point2D):
         pass
 
 #from geometry.geo_factory import Geo2D

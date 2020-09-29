@@ -2,7 +2,7 @@ import math
 from enum import IntEnum
 
 
-class _AngleUnit(IntEnum):
+class AngleUnit(IntEnum):
 
     DEGREE = 1
     RADIAN = 2
@@ -10,7 +10,7 @@ class _AngleUnit(IntEnum):
 
 class Angle:
 
-    def __init__(self, value: float, unit: _AngleUnit = _AngleUnit.DEGREE):
+    def __init__(self, value: float, unit: AngleUnit = AngleUnit.DEGREE):
         self._value = value
         self._unit = unit
 
@@ -19,7 +19,7 @@ class Angle:
         return self._value
 
     @property
-    def unit(self) -> _AngleUnit:
+    def unit(self) -> AngleUnit:
         return self._unit
 
     def convert_to_radians(self):

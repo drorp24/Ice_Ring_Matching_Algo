@@ -74,6 +74,9 @@ class Point2D(Geometry2D):
     def y(self) -> float:
         raise NotImplementedError()
 
+    def xy(self) -> (float, float):
+        raise NotImplementedError()
+
     def subtract(self, other_point: Point2D) -> Vector2D:
         raise NotImplementedError()
 
@@ -173,4 +176,11 @@ class MultiPolygon2D(Geometry2D):
         raise NotImplementedError()
 
     def calc_area(self) -> float:
+        raise NotImplementedError()
+
+
+class Arrow2D(Geometry2D):
+
+    @property
+    def type(self) -> str:
         raise NotImplementedError()

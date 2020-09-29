@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 from matplotlib.patches import Polygon, Circle, PathPatch, Path
 from typing import List
 
-from visualization.drawer2d import Drawer2d
+from visualization.drawer2d import Drawer2D
 from geometry.geo2d import Point2D, Vector2D, Polygon2D, LineString2D, LinearRing2D
 
 
@@ -19,7 +19,7 @@ def convert_to_numpy_points(point2d_list: List[Point2D]) -> np.ndarray:
     return np_points
 
 
-class PltDrawer2d(Drawer2d):
+class PltDrawer2D(Drawer2D):
     def __init__(self):
         self._fig, self._ax = plt.subplots()
 
@@ -47,6 +47,9 @@ class PltDrawer2d(Drawer2d):
         transparent_facecolor = change_color_alpha(polygon.get_facecolor(), 0.2)
         polygon.set_facecolor(transparent_facecolor)
         self._ax.add_patch(polygon)
+
+    def add_arrow2d(self, tail: Point2D, head: Point2D):
+        self._ax.annotate("", xy=(head.x, head.y), xytext=(tail.x, tail.y), arrowprops=dict(arrowstyle="->"))
 
     def draw(self):
         self._ax.axis('scaled')

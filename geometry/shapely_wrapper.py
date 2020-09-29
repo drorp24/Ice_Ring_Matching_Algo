@@ -56,6 +56,9 @@ class _ShapelyPoint2D(_ShapelyGeometry, Point2D):
     def y(self) -> float:
         return self._shapely_obj.y
 
+    def xy(self) -> (float, float):
+        return self._shapely_obj.x, self._shapely_obj.y
+
     @staticmethod
     def __create_from_shapely(point: Point) -> Point2D:
         return _ShapelyPoint2D(point.x, point.y)

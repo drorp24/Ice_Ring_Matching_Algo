@@ -4,9 +4,10 @@ from pathlib import Path
 from geometry.geo_factory import create_polygon_2d, \
     create_point_2d, create_vector_2d, create_line_string_2d, \
     create_linear_ring_2d
-from visualization.pltdrawer2d import PltDrawer2d
+from visualization.drawer2d_factory import create_drawer2d
 
 expected_image_path = Path('test_drawer2d_expected.png')
+
 
 class DrawGeometriesTestCase(unittest.TestCase):
 
@@ -31,7 +32,7 @@ class DrawGeometriesTestCase(unittest.TestCase):
         cls.result_image_path.unlink()
 
     def test_draw(self):
-        drawer = PltDrawer2d()
+        drawer = create_drawer2d()
         drawer.add_point2d(self.p1)
         drawer.add_vector2d(self.v1)
         drawer.add_line_string2d(self.line_string1)

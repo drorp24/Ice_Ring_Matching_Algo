@@ -5,8 +5,9 @@ from typing import List
 from geometry.geo2d import Point2D, Vector2D
 from geometry.geo2d import Polygon2D, LineString2D, LinearRing2D
 from geometry.math_wrapper import _MathVector2D
-from geometry.shapely_wrapper import _ShapelyPoint2D
+from geometry.shapely_wrapper import _ShapelyPoint2D, _ShapelyUtils
 from geometry.shapely_wrapper import _ShapelyPolygon2D, _ShapelyLineString2D, _ShapelyLinearRing2D
+from matplotlib.patches import Ellipse
 
 
 def create_point_2d(x: float, y: float) -> Point2D:
@@ -27,6 +28,12 @@ def convert_to_vector(point: Point2D) -> Vector2D:
 
 def create_polygon_2d(points: List[Point2D]) -> Polygon2D:
     return _ShapelyPolygon2D(create_linear_ring_2d(points))
+
+
+def create_polygon_2d_from_ellipsis(center_xy, width, height, rotation) -> Polygon2D:
+    plt_ellipsis = Ellipse(center_xy, width, height, rotation)
+    vertices = plt_ellipsis.get_verts()
+    return create_polygon_2d(_ShapelyUtils.convert_xy_array_to_points_list(vertices))
 
 
 def create_line_string_2d(points: List[Point2D]) -> LineString2D:
