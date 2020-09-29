@@ -3,10 +3,6 @@ from datetime import datetime
 
 from time_window import TimeWindow
 
-from common.entities.delivery_factory import create_customer_delivery, create_delivery_request, create_delivery_option
-from common.entities.package import PackageType
-from common.math.angle import create_radian_angle, create_degree_angle
-from geometry.geo_factory import create_point_2d
 from common.entities.delivery_requests_factory import create_delivery_requests_from_file
 
 
