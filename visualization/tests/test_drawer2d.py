@@ -6,8 +6,6 @@ from geometry.geo_factory import create_polygon_2d, \
     create_linear_ring_2d
 from visualization.drawer2d_factory import create_drawer2d
 
-expected_image_path = Path('test_drawer2d_expected.png')
-
 
 class DrawGeometriesTestCase(unittest.TestCase):
 
@@ -26,6 +24,8 @@ class DrawGeometriesTestCase(unittest.TestCase):
         cls.poly1 = create_polygon_2d([cls.p1, cls.p2, cls.p3, cls.p4])
         cls.linear_ring1 = create_linear_ring_2d([cls.p1, cls.p2, cls.p5, cls.p6])
         cls.result_image_path = Path('test_drawer2d_actual.png')
+        cls.expected_image_path = Path('test_drawer2d_expected.png')
+
 
     @classmethod
     def tearDownClass(cls) -> None:
@@ -38,7 +38,8 @@ class DrawGeometriesTestCase(unittest.TestCase):
         drawer.add_line_string2d(self.line_string1)
         drawer.add_polygon2d(self.poly1)
         drawer.add_linear_ring2d(self.linear_ring1)
-        #drawer.draw()
+        drawer.add_arrow2d(tail=self.p5, head=self.p8)
+        #drawer.draw()  # For debug. If this line is not commented out the test will fail!
 
         drawer.save_plot_to_png(self.result_image_path)
-        self.assertIsNone(compare_images(expected_image_path, self.result_image_path, tol=1))
+        self.assertIsNone(compare_images(self.expected_image_path, self.result_image_path, tol=1))

@@ -22,6 +22,9 @@ def convert_to_numpy_points(point2d_list: List[Point2D]) -> np.ndarray:
 class PltDrawer2D(Drawer2D):
     def __init__(self):
         self._fig, self._ax = plt.subplots()
+        plt.title('90\xb0', fontsize=14)
+        plt.xlabel('270\xb0', fontsize=14)
+        plt.ylabel('180\xb0', fontsize=14)
 
     def add_point2d(self, point2d: Point2D, edgecolor='blue', facecolor='blue', linewidth=2):
         point = Circle((point2d.x, point2d.y), radius=0.05, edgecolor=edgecolor, facecolor=facecolor, linewidth=linewidth)
