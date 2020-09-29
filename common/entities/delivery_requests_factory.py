@@ -1,12 +1,15 @@
 from __future__ import annotations
 
+from datetime import datetime
 from typing import List
 
-from common.entities.package_factory import package_factory, package_delivery_plan_factory
+from common.entities.package import PackageType
+from common.entities.package_factory import package_delivery_plan_factory
 from common.entities.customer_delivery import CustomerDelivery
 from common.entities.delivery_option import DeliveryOption
 from common.entities.delivery_request import DeliveryRequest
 from common.entities.package_delivery_plan import PackageDeliveryPlan
+from time_window import TimeWindow
 
 from delivery_request_conf import DeliveryRequestConf
 
@@ -14,6 +17,7 @@ from delivery_request_conf import DeliveryRequestConf
 #
 # def create_delivery_request(num_of_delivery_options, num_of_customer_delivery, num_of_package_delivery_plans per Customer Delivery, Set of drop points) -> DeliveryRequest:
 #     return DeliveryRequest()
+from geometry.geo2d import Point2D
 
 
 def create_delivery_requests_from_file(file_path) -> List[DeliveryRequest]:
@@ -24,11 +28,15 @@ def create_delivery_requests_from_file(file_path) -> List[DeliveryRequest]:
 
 
 def __create_delivery_request_from_dict(delivery_request_dict) -> DeliveryRequest:
+    start_time_dict = delivery_request_dict['time_window']['start_time']
+    end_time_dict = delivery_request_dict['time_window']['end_time']
     return DeliveryRequest(
         delivery_options=[__create_delivery_option_from_dict(delivery_option_dict) for delivery_option_dict in
                           delivery_request_dict['delivery_options']],
-        since_time=delivery_request_dict['since_time'],
-        until_time=delivery_request_dict['until_time'],
+        time_window=TimeWindow(datetime(start_time_dict['year'], start_time_dict['month'], start_time_dict['day'],
+                                        start_time_dict['hour'], start_time_dict['minute'], start_time_dict['seconds']),
+                                      datetime(end_time_dict['year'], end_time_dict['month'], end_time_dict['day'],
+                                        end_time_dict['hour'], end_time_dict['minute'], end_time_dict['seconds'])),
         priority=delivery_request_dict['priority'])
 
 
@@ -45,12 +53,12 @@ def __create_customer_delivery_from_dict(customer_delivery_dict) -> CustomerDeli
 
 
 def __create_package_delivery_plan_from_dict(package_delivery_plan_dict) -> PackageDeliveryPlan:
-    return package_delivery_plan_factory(x=package_delivery_plan_dict['drop_point_x'],
-                                         y=package_delivery_plan_dict['drop_point_y'],
-                                         arrival_angle=package_delivery_plan_dict['arrival_angle'],
-                                         hitting_angle=package_delivery_plan_dict['hitting_angle'],
-                                         package_type=package_delivery_plan_dict['package_type'])
+    return package_delivery_plan_factory(point = Point2D(package_delivery_plan_dict['drop_point_x'],
+                                         package_delivery_plan_dict['drop_point_y']),
+                                         azimuth=package_delivery_plan_dict['azimuth'],
+                                         elevation=package_delivery_plan_dict['elevation'],
+                                         package=PackageType[package_delivery_plan_dict['package_type'].upper()])
 
 
 delivery_requests = create_delivery_requests_from_file('..\..\DeliveryRequest.json')
-
+a= 1
