@@ -11,7 +11,7 @@ from common.entities.delivery_request import DeliveryRequest
 from common.entities.package_delivery_plan import PackageDeliveryPlan
 from time_window import TimeWindow
 
-from common.math.angle import Angle
+from common.math.angle import create_degree_angle, create_radian_angle
 from delivery_request_conf import DeliveryRequestConf
 
 #
@@ -56,8 +56,8 @@ def __create_customer_delivery_from_dict(customer_delivery_dict) -> CustomerDeli
 def __create_package_delivery_plan_from_dict(package_delivery_plan_dict) -> PackageDeliveryPlan:
     return package_delivery_plan_factory(point=geo_factory.create_point_2d(package_delivery_plan_dict['drop_point_x'],
                                                        package_delivery_plan_dict['drop_point_y']),
-                                         azimuth=Angle(package_delivery_plan_dict['azimuth']),
-                                         elevation=Angle(package_delivery_plan_dict['elevation']),
+                                         azimuth=create_degree_angle(package_delivery_plan_dict['azimuth']),
+                                         elevation=create_degree_angle(package_delivery_plan_dict['elevation']),
                                          package=PackageType[package_delivery_plan_dict['package_type'].upper()])
 
 

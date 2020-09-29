@@ -1,7 +1,8 @@
 from __future__ import annotations
 
 from common.entities.package import _Package, PackageType
-from common.entities.package_delivery_plan import Angle,  PackageDeliveryPlan
+from common.entities.package_delivery_plan import PackageDeliveryPlan
+from common.math.angle import Angle
 from geometry.geo2d import Point2D
 
 

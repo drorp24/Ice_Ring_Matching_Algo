@@ -2,7 +2,7 @@ import unittest
 
 from common.entities.package import PackageType
 from common.entities.package_factory import package_delivery_plan_factory
-from common.math.angle import Angle
+from common.math.angle import create_degree_angle, create_radian_angle
 from geometry.geo_factory import create_point_2d
 
 
@@ -15,7 +15,7 @@ class BasicPackageGeneration(unittest.TestCase):
         cls.p3 = PackageType.MEDIUM
         cls.p4 = PackageType.LARGE
         point = create_point_2d(1,2)
-        cls.pdp = package_delivery_plan_factory(point, azimuth=Angle(30), elevation=Angle(80),
+        cls.pdp = package_delivery_plan_factory(point, azimuth=create_degree_angle(30), elevation=create_degree_angle(80),
                                                 package=PackageType.TINY)
 
     def test_package_type(self):

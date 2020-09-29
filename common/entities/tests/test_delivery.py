@@ -5,7 +5,7 @@ from time_window import TimeWindow
 
 from common.entities.delivery_factory import create_customer_delivery, create_delivery_request, create_delivery_option
 from common.entities.package import PackageType
-from common.math.angle import Angle
+from common.math.angle import create_radian_angle, create_degree_angle
 from geometry.geo_factory import create_point_2d
 
 
@@ -15,14 +15,14 @@ class BasicDeliveryGeneration(unittest.TestCase):
     def setUpClass(cls):
         point = create_point_2d(1, 2)
 
-        cls.cd = create_customer_delivery(point, azimuth=Angle(30), elevation=Angle(80),
+        cls.cd = create_customer_delivery(point, azimuth=create_degree_angle(30), elevation=create_degree_angle(80),
                                           package=PackageType.TINY)
-        cls.do = create_delivery_option(point, azimuth=Angle(30), elevation=Angle(80),
+        cls.do = create_delivery_option(point, azimuth=create_degree_angle(30), elevation=create_degree_angle(80),
                                         package=PackageType.TINY)
 
         cls.time_window = TimeWindow(datetime(2020, 1, 23, 11, 30, 00),
                                      datetime(2020, 1, 23, 11, 35, 00))
-        cls.dr = create_delivery_request(point, azimuth=Angle(30), elevation=Angle(80),
+        cls.dr = create_delivery_request(point, azimuth=create_degree_angle(30), elevation=create_degree_angle(80),
                                          package=PackageType.TINY,
                                          time_window=cls.time_window, priority=10)
 
