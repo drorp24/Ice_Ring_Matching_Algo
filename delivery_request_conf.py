@@ -23,7 +23,7 @@ class DeliveryRequestConf:
         return self.__delivery_requests
 
     @staticmethod
-    def from_file(file_path) -> 'DeliveryRequestConf':
+    def from_file(file_path) -> 'dict':
         system = platform.system()
         filename = Path(file_path)
         if system is 'windows':

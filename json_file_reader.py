@@ -17,7 +17,7 @@ class JsonFileReaderTestCase(unittest.TestCase):
 
     def basic_test(self):
         print('ss')
-        reader = JsonFileReader('DeliveryRequest.json')
+        reader = JsonFileReader('common/entities/tests/DeliveryRequestTest.json')
 
         self.assertIsNotNone(reader)
 

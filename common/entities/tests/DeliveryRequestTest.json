@@ -45,8 +45,7 @@
         "seconds": 0
       }
     },
-    "until_time": 10,
-    "priority": 1
+    "priority": 10
   },
     {
     "delivery_options": [{

@@ -13,12 +13,7 @@ from time_window import TimeWindow
 
 from common.math.angle import Angle
 from delivery_request_conf import DeliveryRequestConf
-
-#
-# def create_delivery_request(num_of_delivery_options, num_of_customer_delivery, num_of_package_delivery_plans per Customer Delivery, Set of drop points) -> DeliveryRequest:
-#     return DeliveryRequest()
 from geometry import geo_factory
-from geometry.geo2d import Point2D
 
 
 def create_delivery_requests_from_file(file_path) -> List[DeliveryRequest]:
@@ -48,18 +43,31 @@ def __create_delivery_option_from_dict(delivery_option_dict) -> DeliveryOption:
 
 
 def __create_customer_delivery_from_dict(customer_delivery_dict) -> CustomerDelivery:
-    # return CustomerDelivery([__create_package_delivery_plan_from_dict([package_delivery_plan_dict['package_delivery_plan'] for package_delivery_plan_dict in customer_delivery_dict])
     return CustomerDelivery(package_delivery_plans=[
         __create_package_delivery_plan_from_dict(customer_delivery_dict['package_delivery_plan'])])
 
 
 def __create_package_delivery_plan_from_dict(package_delivery_plan_dict) -> PackageDeliveryPlan:
     return package_delivery_plan_factory(point=geo_factory.create_point_2d(package_delivery_plan_dict['drop_point_x'],
-                                                       package_delivery_plan_dict['drop_point_y']),
+                                                                           package_delivery_plan_dict['drop_point_y']),
                                          azimuth=Angle(package_delivery_plan_dict['azimuth']),
                                          elevation=Angle(package_delivery_plan_dict['elevation']),
                                          package=PackageType[package_delivery_plan_dict['package_type'].upper()])
 
-
-delivery_requests = create_delivery_requests_from_file('..\..\DeliveryRequest.json')
-a = 1
+#
+# def create_customer_delivery(point: Point2D, azimuth: Angle, elevation: Angle,
+#                              package: PackageType) -> CustomerDelivery:
+#     package_delivery_plan = [PackageDeliveryPlan(point, azimuth, elevation, package)]
+#     return CustomerDelivery(package_delivery_plan)
+#
+#
+# def create_delivery_option(point: Point2D, azimuth: Angle, elevation: Angle,
+#                            package: PackageType) -> DeliveryOption:
+#     customer_delivery = [create_customer_delivery(point, azimuth, elevation, package)]
+#     return DeliveryOption(customer_delivery)
+#
+#
+# def create_delivery_request(point: Point2D, azimuth: Angle, elevation: Angle,
+#                             package: PackageType, time_window: TimeWindow, priority: int) -> DeliveryRequest:
+#     delivery_option = [create_delivery_option(point, azimuth, elevation, package)]
+#     return DeliveryRequest(delivery_option, time_window, priority)
