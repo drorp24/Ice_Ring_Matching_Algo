@@ -23,8 +23,12 @@ class Angle:
         return self._unit
 
     def convert_to_radians(self):
+        if self._unit == _AngleUnit.RADIAN:
+            return self._value
         return math.radians(self._value)
 
     def convert_to_degrees(self):
+        if self._unit == _AngleUnit.DEGREE:
+            return self._value
         return math.degrees(self._value)
 
