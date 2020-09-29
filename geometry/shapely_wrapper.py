@@ -5,7 +5,7 @@ from typing import List, Tuple, Iterator
 from shapely.geometry import Point, Polygon, LineString, LinearRing
 from shapely.geometry.base import BaseGeometry, EmptyGeometry
 
-from geometry.geo2d import Point2D, Vector2D, Polygon2D, MultiPolygon2D, LineString2D, LinearRing2D
+from geometry.geo2d import Point2D, Vector2D, Polygon2D, MultiPolygon2D, LineString2D, LinearRing2D, EmptyGeometry2D
 
 
 class _ShapelyGeometry(object):
@@ -26,21 +26,21 @@ class _ShapelyGeometry(object):
         return self._shapely_obj.type
 
 
-class _ShapelyEmptyGeometry(_ShapelyGeometry):
+class _ShapelyEmptyGeometry(_ShapelyGeometry, EmptyGeometry2D):
 
     def __init__(self):
         super().__init__(EmptyGeometry())
 
     @property
-    def __shapely_obj(self) -> BaseGeometry:
+    def __shapely_obj(self) -> EmptyGeometry:
         return self._shapely_obj
 
-    @staticmethod
-    def __create_from_shapely(geo: EmptyGeometry) -> _ShapelyEmptyGeometry:
-        return _ShapelyEmptyGeometry()
-
-    def calc_area(self):
+    def calc_area(self) -> float:
         return 0
+
+    def __eq__(self, other):
+        return isinstance(other, EmptyGeometry2D)
+
 
 
 class _ShapelyPoint2D(_ShapelyGeometry, Point2D):
@@ -199,7 +199,7 @@ class _ShapelyPolygon2D(_ShapelyGeometry, Polygon2D):
     @staticmethod
     def __get_shapely_polygon(polygon: Polygon2D):
         try:
-            return polygon.__shapely_obj
+            return polygon._shapely_obj
         except NonShapelyNativeGeometry:
             return _ShapelyUtils.convert_polygon2d_to_shapely(polygon)
 

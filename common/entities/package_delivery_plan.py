@@ -51,9 +51,9 @@ class PackageDeliveryPlan:
         envelope_center = create_point_2d(self._drop_point.coordinates.x + (average_radius * cos(drone_arrival_angle_in_rad)),
                                           self.drop_point.coordinates.y + (average_radius * sin(drone_arrival_angle_in_rad)))
         envelope_width = self._package.potential_drop_envelope.maximal_radius_meters - self.package.potential_drop_envelope.minimal_radius_meters
-        envelope_height = envelope_width * create_vector_2d(cos(self.azimuth.in_radians()), sin(self.azimuth.in_radians())).dot(
-            create_vector_2d(cos(drone_arrival_angle_in_rad), sin(drone_arrival_angle_in_rad))
-        )
+        drop_and_drone_azimuth_dot = create_vector_2d(cos(self.azimuth.in_radians()), sin(self.azimuth.in_radians())).dot(
+            create_vector_2d(cos(drone_azimuth.in_radians()), sin(drone_azimuth.in_radians())))
+        envelope_height = envelope_width * drop_and_drone_azimuth_dot
         return create_polygon_2d_from_ellipsis(ellipsis_center=(envelope_center.x, envelope_center.y),
                                                ellipsis_width=envelope_width,
                                                ellipsis_height=envelope_height,

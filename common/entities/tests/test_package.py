@@ -1,13 +1,10 @@
 import unittest
-from matplotlib.patches import Circle
-from math import cos, sin
 
 from common.entities.package import PackageType, Package
 from common.entities.package_factory import package_delivery_plan_factory
 from common.math.angle import Angle, AngleUnit
-from geometry.geo_factory import create_point_2d, create_polygon_2d
-from geometry.shapely_wrapper import _ShapelyUtils
-from visualization.drawer2d_factory import create_drawer2d
+from geometry.geo_factory import create_point_2d, create_polygon_2d_from_ellipsis
+from geometry.shapely_wrapper import _ShapelyEmptyGeometry
 
 
 class BasicPackageGeneration(unittest.TestCase):
@@ -18,12 +15,11 @@ class BasicPackageGeneration(unittest.TestCase):
         cls.p2 = Package(PackageType.SMALL)
         cls.p3 = Package(PackageType.MEDIUM)
         cls.p4 = Package(PackageType.LARGE)
-        point = create_point_2d(1,2)
+        point = create_point_2d(1, 2)
         cls.pdp = package_delivery_plan_factory(point,
                                                 azimuth=Angle(30, AngleUnit.DEGREE),
                                                 elevation=Angle(80, AngleUnit.DEGREE),
                                                 package_type=PackageType.TINY)
-        cls.drone_azimuth = Angle(cls.pdp.azimuth.in_degrees() + 35, AngleUnit.DEGREE)
 
     def test_package_type(self):
         self.assertEqual(self.p1.type.value, 1)
@@ -34,24 +30,26 @@ class BasicPackageGeneration(unittest.TestCase):
     def test_package_delivery_plan(self):
         self.assertEqual(self.pdp.package.type.value, 1)
 
-    def test_drop_envelope(self):
-        drawer = create_drawer2d()
-        drawer.add_point2d(self.pdp.drop_point.coordinates)
-        minimal_potential_drop_envelope_circle = Circle(self.pdp.drop_point.coordinates.xy(),
-                                                        self.pdp.package.potential_drop_envelope.minimal_radius_meters)
-        drawer.add_polygon2d(create_polygon_2d(_ShapelyUtils.convert_xy_array_to_points_list(
-            minimal_potential_drop_envelope_circle.get_verts())))
-        maximal_potential_drop_envelope_circle = Circle(self.pdp.drop_point.coordinates.xy(),
-                                                        self.pdp.package.potential_drop_envelope.maximal_radius_meters)
-        drawer.add_polygon2d(create_polygon_2d(_ShapelyUtils.convert_xy_array_to_points_list(
-            maximal_potential_drop_envelope_circle.get_verts())))
-        drawer.add_arrow2d(create_point_2d(self.pdp.drop_point.coordinates.x - cos(self.pdp.azimuth.in_radians()),
-                                           self.pdp.drop_point.coordinates.y - sin(self.pdp.azimuth.in_radians())),
-                            self.pdp.drop_point.coordinates)
-        drop_envelope = self.pdp.drop_envelope(self.drone_azimuth)
-        arrival_point = create_point_2d(self.pdp.drop_point.coordinates.x - self.pdp.package.potential_drop_envelope.maximal_radius_meters * cos(self.drone_azimuth.in_radians()),
-                                        self.pdp.drop_point.coordinates.y - self.pdp.package.potential_drop_envelope.maximal_radius_meters * sin(self.drone_azimuth.in_radians()))
-        drawer.add_arrow2d(create_point_2d(arrival_point.x - cos(self.drone_azimuth.in_radians()),
-                                           arrival_point.y - sin(self.drone_azimuth.in_radians())), arrival_point)
-        drawer.add_polygon2d(drop_envelope, edgecolor='green', facecolor='green')
-        drawer.draw()
+    def test_drop_envelope_when_same_drop_and_drone_azimuth(self):
+        drone_azimuth = Angle(self.pdp.azimuth.in_degrees(), AngleUnit.DEGREE)
+        expected_drop_envelope = create_polygon_2d_from_ellipsis(ellipsis_center=(-821.7241335952167,
+                                                                                  -473.0000000000001),
+                                                                 ellipsis_width=100,
+                                                                 ellipsis_height=100,
+                                                                 ellipsis_rotation=drone_azimuth.in_degrees())
+        actual_drop_envelope = self.pdp.drop_envelope(drone_azimuth)
+        expected_difference = _ShapelyEmptyGeometry()
+        actual_difference = actual_drop_envelope.calc_difference(expected_drop_envelope)
+        self.assertEqual(expected_difference, actual_difference)
+
+    def test_drop_envelope_when_drop_and_drone_azimuth_delta_45_deg(self):
+        drone_azimuth = Angle(self.pdp.azimuth.in_degrees() + 45, AngleUnit.DEGREE)
+        expected_drop_envelope = create_polygon_2d_from_ellipsis(ellipsis_center=(-244.87809284739458,
+                                                                                  -915.6295349746149),
+                                                                 ellipsis_width=100,
+                                                                 ellipsis_height=70.71067811865474,
+                                                                 ellipsis_rotation=drone_azimuth.in_degrees())
+        actual_drop_envelope = self.pdp.drop_envelope(drone_azimuth)
+        expected_difference = _ShapelyEmptyGeometry()
+        actual_difference = actual_drop_envelope.calc_difference(expected_drop_envelope)
+        self.assertEqual(expected_difference, actual_difference)
