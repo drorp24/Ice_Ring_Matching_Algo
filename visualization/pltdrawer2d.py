@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 from matplotlib.patches import Polygon, Circle, PathPatch, Path
 from typing import List
 
-from visualization.drawer2d import Drawer2d
+from visualization.drawer2d import Drawer2D
 from geometry.geo2d import Point2D, Vector2D, Polygon2D, LineString2D, LinearRing2D
 
 
@@ -19,7 +19,7 @@ def convert_to_numpy_points(point2d_list: List[Point2D]) -> np.ndarray:
     return np_points
 
 
-class PltDrawer2d(Drawer2d):
+class PltDrawer2D(Drawer2D):
     def __init__(self):
         self._fig, self._ax = plt.subplots()
 
