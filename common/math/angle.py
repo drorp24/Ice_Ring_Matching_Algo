@@ -3,12 +3,11 @@ from enum import IntEnum
 
 
 class _AngleUnit(IntEnum):
-
     DEGREE = 1
     RADIAN = 2
 
 
-class Angle:
+class _Angle:
 
     def __init__(self, value: float, unit: _AngleUnit = _AngleUnit.DEGREE):
         self._value = value
@@ -32,3 +31,10 @@ class Angle:
             return self._value
         return math.degrees(self._value)
 
+
+def create_degree_angle(value: float) -> _Angle:
+    return _Angle(value, unit=_AngleUnit.DEGREE)
+
+
+def create_radian_angle(value: float) -> _Angle:
+    return _Angle(value, unit=_AngleUnit.RADIAN)
