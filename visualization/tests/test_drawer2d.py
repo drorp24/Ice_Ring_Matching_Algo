@@ -33,11 +33,9 @@ class DrawGeometriesTestCase(unittest.TestCase):
     def test_draw(self):
         drawer = create_drawer2d()
         drawer.add_point2d(self.p1)
-        drawer.add_vector2d(self.v1)
         drawer.add_line_string2d(self.line_string1)
         drawer.add_polygon2d(self.poly1)
         drawer.add_linear_ring2d(self.linear_ring1)
-        #drawer.draw()
 
         drawer.save_plot_to_png(self.result_image_path)
         self.assertIsNone(compare_images(self.expected_image_path, self.result_image_path, tol=1))
