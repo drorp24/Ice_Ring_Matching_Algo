@@ -1,7 +1,50 @@
+import string
 from random import Random
 
 import params
 from common.utils import json_file_handler
+
+"""
+input explanations :
+any input as range : [a,b] :[int, int] 
+generates random number in range [a,b] using uniform distribution
+
+any input as distribution : [[[a,b],p1],[[c,d],p2]],...] : [[[int , int], float],...]]
+generates random number with probability p1 to be in range [a,b] and probability p2 to be in range [c,d]
+
+drop_points_distribution : [[[[a,b],[c,d]],p1],...] : [[[[int, int],[int, int]], float],...]
+generates 2 random numbers (x,y) with probability p1 to be in range [a,b] for x and [c,d] for y...
+
+package_distribution : [[PackageType name, p1],...] : [[string, float] ,..]
+generates package type with probability p1
+
+"""
+def create_delivery_requests_json(file_path: string,
+                                  num_of_delivery_requests_range,
+                                  num_of_delivery_options_distribution,
+                                  num_of_customer_deliveries_distribution,
+                                  num_of_package_delivery_plans_distribution,
+                                  main_time_window_length_range,
+                                  time_windows_length_distribution,
+                                  priority_distribution,
+                                  drop_points_distribution,
+                                  azimuth_distribution,
+                                  elevation_distribution,
+                                  package_distribution,
+                                  random_seed=None):
+    delivery_requests_dict = create_delivery_requests_dict(num_of_delivery_requests_range,
+                                                           num_of_delivery_options_distribution,
+                                                           num_of_customer_deliveries_distribution,
+                                                           num_of_package_delivery_plans_distribution,
+                                                           main_time_window_length_range,
+                                                           time_windows_length_distribution,
+                                                           priority_distribution,
+                                                           drop_points_distribution,
+                                                           azimuth_distribution,
+                                                           elevation_distribution,
+                                                           package_distribution,
+                                                           random_seed)
+    json_file_handler.to_file(file_path, delivery_requests_dict)
 
 
 def create_delivery_requests_dict(num_of_delivery_requests_range,
@@ -51,34 +94,6 @@ def create_delivery_requests_dict(num_of_delivery_requests_range,
                              azimuth=azimuth, elevation=elevation))
 
     return dict(delivery_requests=delivery_requests)
-
-
-def create_delivery_requests_json(file_path,
-                                  num_of_delivery_requests_range,
-                                  num_of_delivery_options_distribution,
-                                  num_of_customer_deliveries_distribution,
-                                  num_of_package_delivery_plans_distribution,
-                                  main_time_window_length_range,
-                                  time_windows_length_distribution,
-                                  priority_distribution,
-                                  drop_points_distribution,
-                                  azimuth_distribution,
-                                  elevation_distribution,
-                                  package_distribution,
-                                  random_seed=None):
-    delivery_requests_dict = create_delivery_requests_dict(num_of_delivery_requests_range,
-                                                           num_of_delivery_options_distribution,
-                                                           num_of_customer_deliveries_distribution,
-                                                           num_of_package_delivery_plans_distribution,
-                                                           main_time_window_length_range,
-                                                           time_windows_length_distribution,
-                                                           priority_distribution,
-                                                           drop_points_distribution,
-                                                           azimuth_distribution,
-                                                           elevation_distribution,
-                                                           package_distribution,
-                                                           random_seed)
-    json_file_handler.to_file(file_path, delivery_requests_dict)
 
 
 def get_distribution(distribution):
