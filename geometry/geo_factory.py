@@ -2,11 +2,15 @@ from __future__ import annotations
 
 from typing import List
 
-from geometry.geo2d import Point2D, Vector2D, MultiPolygon2D
+from geometry.geo2d import Point2D, Vector2D, MultiPolygon2D, EmptyGeometry2D
 from geometry.geo2d import Polygon2D, LineString2D, LinearRing2D
 from geometry.math_wrapper import _MathVector2D
-from geometry.shapely_wrapper import _ShapelyPoint2D, _ShapelyMultiPolygon2D
+from geometry.shapely_wrapper import _ShapelyPoint2D, _ShapelyMultiPolygon2D, _ShapelyEmptyGeometry
 from geometry.shapely_wrapper import _ShapelyPolygon2D, _ShapelyLineString2D, _ShapelyLinearRing2D
+
+
+def create_empty_geometry_2d() -> EmptyGeometry2D:
+    return _ShapelyEmptyGeometry()
 
 
 def create_point_2d(x: float, y: float) -> Point2D:
