@@ -99,7 +99,7 @@ class PolygonOperationsTestCase(unittest.TestCase):
         difference_result = self.poly1.calc_difference(self.poly2)
         self.assertEqual(difference_result, multipolygon_expected_result)
 
-    # TODO:
+    # TODO implement Polygon2D.holes():
     #   def test_difference_with_hole_result(self):
     #     difference_result = self.poly1.calc_difference(self.poly6)
     #     expected_hole = create_linear_ring_2d(self.poly6.points)
