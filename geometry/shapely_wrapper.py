@@ -29,7 +29,7 @@ class _ShapelyEmptyGeometry(_ShapelyGeometry, EmptyGeometry2D):
 
     @property
     def _shapely_obj(self) -> EmptyGeometry:
-        return self.__shapely_obj
+        return self._shapely_obj
 
     def calc_area(self) -> float:
         return 0
@@ -142,12 +142,12 @@ class _ShapelyLinearRing2D(_ShapelyGeometry, LinearRing2D):
 
 class _ShapelyPolygon2D(_ShapelyGeometry, Polygon2D):
 
-    def __init__(self, boundary: LinearRing2D):
-        super().__init__(Polygon(_ShapelyUtils.convert_points_list_to_xy_array(boundary.points)))
+    def __init__(self, boundary_points: List[Point2D]):
+        super().__init__(Polygon(_ShapelyUtils.convert_points_list_to_xy_array(boundary_points)))
 
-    @property
-    def __class__(self):
-        return Polygon2D
+    @classmethod
+    def create_from_linear_ring(cls, boundary: LinearRing2D) -> Polygon2D:
+        return _ShapelyPolygon2D(boundary.points)
 
     @property
     def _shapely_obj(self) -> Polygon:
@@ -270,7 +270,7 @@ class _ShapelyUtils:
     def convert_shapely_to_polygon_2d(polygon: Polygon) -> Polygon2D:
         x_array, y_array = polygon.exterior.xy
         points_list_shapely = _ShapelyUtils.convert_xy_separate_arrays_to_points_list(x_array, y_array)
-        return _ShapelyPolygon2D(_ShapelyLinearRing2D(points_list_shapely))
+        return _ShapelyPolygon2D(points_list_shapely)
 
     @staticmethod
     def convert_shapely_to_multipolygon_2d(multipolygon: MultiPolygon) -> MultiPolygon2D:

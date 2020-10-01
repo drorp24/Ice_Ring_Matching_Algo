@@ -26,7 +26,7 @@ def convert_to_vector(point: Point2D) -> Vector2D:
 
 
 def create_polygon_2d(points: List[Point2D]) -> Polygon2D:
-    return _ShapelyPolygon2D(create_linear_ring_2d(points))
+    return _ShapelyPolygon2D(points)
 
 
 def create_multipolygon_2d(polygons: List[Polygon2D]) -> MultiPolygon2D:
