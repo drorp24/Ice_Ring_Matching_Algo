@@ -1,39 +1,57 @@
-from enum import Enum
-
-from common.entities.drone_model import DroneModel
+from enum import Enum, IntEnum
 from common.entities.package import PackageType
 
 
+class _PlatformType(IntEnum):
+    PLATFORM_1 = 4
+    PLATFORM_2 = 6
+
+
+class _PackageTypesVolumeMap:
+
+    def __init__(self, packages_types_volume: [int]):
+        keys = [package_type for package_type in PackageType]
+        for key, volume in enumerate(keys, packages_types_volume):
+            self._dict[key] = packages_types_volume[volume]
+
+    @property
+    def dict(self) -> dict:
+        return self._dict
+
+    def get_package_types(self) -> [PackageType]:
+        return self._dict.keys()
+
+    def get_package_type_volume(self, package_type: PackageType) -> int:
+        return self._dict[package_type]
+
+    def get_package_types_volumes(self) -> [int]:
+        return self._dict.values()
+
+
 class _DroneConfiguration:
-    def __init__(self, package_type: PackageType, quantity: int):
-        self._package_type = package_type
-        self._quantity = quantity
+
+    def __init__(self, platform_type: _PlatformType, package_types_map: _PackageTypesVolumeMap):
+        self._platform_type = platform_type
+        self._package_types_map = package_types_map
 
     @property
-    def package_type(self) -> PackageType:
-        return self._package_type
+    def platform_type(self) -> _PlatformType:
+        return self._platform_type
 
     @property
-    def quantity(self) -> int:
-        return self._quantity
+    def package_type_map(self) -> _PackageTypesVolumeMap:
+        return self._package_types_map
+
+    def get_package_type_volume(self, package_type: PackageType) -> int:
+        return self._package_types_map.get_package_type_volume(package_type)
 
 
-class _Drone:
-    def __init__(self, drone_model: DroneModel, drone_configuration: [_DroneConfiguration]):
-        self._drone_model = drone_model
-        self._drone_configuration = drone_configuration
-
-    @property
-    def drone_model(self) -> [DroneModel]:
-        return self._drone_model
-
-    @property
-    def drone_configuration(self) -> [_DroneConfiguration]:
-        return self._drone_configuration
-
-
-class DroneType(Enum):
-    DT_1_TINY = _Drone(DroneModel.Model_1, [_DroneConfiguration(PackageType.TINY, 2)])
-    DT_1_TINY_MEDIUM = _Drone(DroneModel.Model_1, [_DroneConfiguration(PackageType.TINY, 2),
-                                        _DroneConfiguration(PackageType.MEDIUM, 2)])
-    DT_2_TINY = _Drone(DroneModel.Model_2, [_DroneConfiguration(PackageType.TINY, 4)])
+class DroneConfigurationType(Enum):
+    PLATFORM_1_2X8 = _DroneConfiguration(_PlatformType.PLATFORM_1, _PackageTypesVolumeMap([0, 0, 0, 2]))
+    PLATFORM_1_4X4 = _DroneConfiguration(_PlatformType.PLATFORM_1, _PackageTypesVolumeMap([0, 0, 4, 0]))
+    PLATFORM_1_8X2 = _DroneConfiguration(_PlatformType.PLATFORM_1, _PackageTypesVolumeMap([0, 8, 0, 0]))
+    PLATFORM_1_16X1 = _DroneConfiguration(_PlatformType.PLATFORM_1, _PackageTypesVolumeMap([16, 0, 0, 0]))
+    PLATFORM_2_4X8 = _DroneConfiguration(_PlatformType.PLATFORM_2, _PackageTypesVolumeMap([0, 0, 0, 4]))
+    PLATFORM_2_8X4 = _DroneConfiguration(_PlatformType.PLATFORM_2, _PackageTypesVolumeMap([0, 0, 8, 0]))
+    PLATFORM_2_16X2 = _DroneConfiguration(_PlatformType.PLATFORM_2, _PackageTypesVolumeMap([0, 16, 0, 0]))
+    PLATFORM_2_32X1 = _DroneConfiguration(_PlatformType.PLATFORM_2, _PackageTypesVolumeMap([32, 0, 0, 0]))
