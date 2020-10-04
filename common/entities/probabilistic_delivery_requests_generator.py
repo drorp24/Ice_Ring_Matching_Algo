@@ -6,17 +6,17 @@ from common.utils import json_file_handler
 
 
 def create_delivery_requests_json(file_path: string,
-                                  num_of_delivery_requests_range,
-                                  num_of_delivery_options_distribution,
-                                  num_of_customer_deliveries_distribution,
-                                  num_of_package_delivery_plans_distribution,
+                                  num_of_delivery_requests_range: [int],
+                                  num_of_delivery_options_distribution: [[]],
+                                  num_of_customer_deliveries_distribution: [[]],
+                                  num_of_package_delivery_plans_distribution: [[]],
                                   main_time_window_length_range,
-                                  time_windows_length_distribution,
-                                  priority_distribution,
-                                  drop_points_distribution,
-                                  azimuth_distribution,
-                                  elevation_distribution,
-                                  package_distribution,
+                                  time_windows_length_distribution: [[]],
+                                  priority_distribution: [[]],
+                                  drop_points_distribution: [[]],
+                                  azimuth_distribution: [[]],
+                                  elevation_distribution: [[]],
+                                  package_distribution: [[]],
                                   random_seed=None):
     """
     input explanations :
@@ -50,17 +50,33 @@ def create_delivery_requests_json(file_path: string,
 
 
 def create_delivery_requests_dict(num_of_delivery_requests_range,
-                                  num_of_delivery_options_distribution,
-                                  num_of_customer_deliveries_distribution,
-                                  num_of_package_delivery_plans_distribution,
+                                  num_of_delivery_options_distribution: [[]],
+                                  num_of_customer_deliveries_distribution: [[]],
+                                  num_of_package_delivery_plans_distribution: [[]],
                                   main_time_window_length_range,
-                                  time_windows_length_distribution,
-                                  priority_distribution,
-                                  drop_points_distribution,
-                                  azimuth_distribution,
-                                  elevation_distribution,
-                                  package_distribution,
-                                  random_seed=None) -> dict:
+                                  time_windows_length_distribution: [[]],
+                                  priority_distribution: [[]],
+                                  drop_points_distribution: [[]],
+                                  azimuth_distribution: [[]],
+                                  elevation_distribution: [[]],
+                                  package_distribution: [[]],
+                                  random_seed: int = None) -> dict:
+    """
+    input explanations :
+    any input as range : [a,b] :[int, int]
+    generates random number in range [a,b] using uniform distribution
+
+    any input as distribution : [[[a,b],p1],[[c,d],p2]],...] : [[[int , int], float],...]]
+    generates random number with probability p1 to be in range [a,b] and probability p2 to be in range [c,d]
+
+    drop_points_distribution : [[[[a,b],[c,d]],p1],...] : [[[[int, int],[int, int]], float],...]
+    generates 2 random numbers (x,y) with probability p1 to be in range [a,b] for x and [c,d] for y...
+
+    package_distribution : [[PackageType name, p1],...] : [[string, float] ,..]
+    generates package type with probability p1
+
+    """
+
     rand = Random()
     if random_seed:
         rand.seed(random_seed)
@@ -98,7 +114,7 @@ def create_delivery_requests_dict(num_of_delivery_requests_range,
     return dict(delivery_requests=delivery_requests)
 
 
-def get_distribution(distribution):
+def get_distribution(distribution: [[]]) -> ([], []):
     population = []
     weights = []
     for range_prob in distribution:
@@ -114,7 +130,8 @@ def get_distribution(distribution):
     return population, weights
 
 
-def get_time_window(main_time_window_length_range, time_windows_length_distribution, rand: Random) -> dict:
+def get_time_window(main_time_window_length_range: [int], time_windows_length_distribution: [[]],
+                    rand: Random) -> dict:
     """
     Assuming main_time_window_length isn't more than a month
     """
