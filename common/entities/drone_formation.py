@@ -38,4 +38,4 @@ class DroneFormationType(Enum):
     _2X_PLATFORM_2_16X2 = _DroneFormation(FormationSize.MINI, DroneConfigurationType.PLATFORM_2_16X2)
     _4X_PLATFORM_2_16X2 = _DroneFormation(FormationSize.MEDIUM, DroneConfigurationType.PLATFORM_2_16X2)
     _2X_PLATFORM_2_32X1 = _DroneFormation(FormationSize.MINI, DroneConfigurationType.PLATFORM_2_32X1)
-    _4X_PLATFORM_2_32X1 = _DroneFormation(FormationSize.MINI, DroneConfigurationType.PLATFORM_2_32X1)
+    _4X_PLATFORM_2_32X1 = _DroneFormation(FormationSize.MEDIUM, DroneConfigurationType.PLATFORM_2_32X1)
