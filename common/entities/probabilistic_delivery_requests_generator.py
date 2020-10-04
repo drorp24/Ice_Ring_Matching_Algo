@@ -4,21 +4,7 @@ from random import Random
 import params
 from common.utils import json_file_handler
 
-"""
-input explanations :
-any input as range : [a,b] :[int, int] 
-generates random number in range [a,b] using uniform distribution
 
-any input as distribution : [[[a,b],p1],[[c,d],p2]],...] : [[[int , int], float],...]]
-generates random number with probability p1 to be in range [a,b] and probability p2 to be in range [c,d]
-
-drop_points_distribution : [[[[a,b],[c,d]],p1],...] : [[[[int, int],[int, int]], float],...]
-generates 2 random numbers (x,y) with probability p1 to be in range [a,b] for x and [c,d] for y...
-
-package_distribution : [[PackageType name, p1],...] : [[string, float] ,..]
-generates package type with probability p1
-
-"""
 def create_delivery_requests_json(file_path: string,
                                   num_of_delivery_requests_range,
                                   num_of_delivery_options_distribution,
@@ -32,6 +18,22 @@ def create_delivery_requests_json(file_path: string,
                                   elevation_distribution,
                                   package_distribution,
                                   random_seed=None):
+    """
+    input explanations :
+    any input as range : [a,b] :[int, int]
+    generates random number in range [a,b] using uniform distribution
+
+    any input as distribution : [[[a,b],p1],[[c,d],p2]],...] : [[[int , int], float],...]]
+    generates random number with probability p1 to be in range [a,b] and probability p2 to be in range [c,d]
+
+    drop_points_distribution : [[[[a,b],[c,d]],p1],...] : [[[[int, int],[int, int]], float],...]
+    generates 2 random numbers (x,y) with probability p1 to be in range [a,b] for x and [c,d] for y...
+
+    package_distribution : [[PackageType name, p1],...] : [[string, float] ,..]
+    generates package type with probability p1
+
+    """
+
     delivery_requests_dict = create_delivery_requests_dict(num_of_delivery_requests_range,
                                                            num_of_delivery_options_distribution,
                                                            num_of_customer_deliveries_distribution,
@@ -112,12 +114,11 @@ def get_distribution(distribution):
     return population, weights
 
 
-"""
-Assuming main_time_window_length isn't more than a month
-"""
-
-
 def get_time_window(main_time_window_length_range, time_windows_length_distribution, rand: Random) -> dict:
+    """
+    Assuming main_time_window_length isn't more than a month
+    """
+
     main_time_window_length = rand.randint(*main_time_window_length_range)
     time_window_length = rand.choices(*get_distribution(time_windows_length_distribution))[0]
 
