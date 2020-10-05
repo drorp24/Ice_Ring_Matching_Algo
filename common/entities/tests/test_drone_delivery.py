@@ -17,12 +17,16 @@ class BasicDroneDeliveryGeneration(unittest.TestCase):
         cls.empty_drone_delivery_2 = EmptyDroneDelivery("edd_2", DroneFormationType._4X_PLATFORM_1_2X8)
 
         cls.drone_delivery_1 = DroneDelivery(cls.empty_drone_delivery_1.identity, cls.empty_drone_delivery_1.drone_formation_type,
-                                         datetime(2020, 1, 23, 11, 30, 00),cls.dr[0])
+                                         datetime(2020, 1, 23, 11, 30, 00),[cls.dr[0],cls.dr[1]]),
 
-        cls.drone_delivery_1 = DroneDelivery(cls.empty_drone_delivery_2.identity,
+        cls.drone_delivery_2 = DroneDelivery(cls.empty_drone_delivery_2.identity,
                                              cls.empty_drone_delivery_2.drone_formation_type,
-                                             datetime(2020, 1, 23, 12, 30, 00), cls.dr[1])
+                                             datetime(2020, 1, 23, 12, 30, 00), cls.dr[2])
 
+
+    def test_delivery_requests_quantity(self):
+        # self.assertGreaterEqual(len(self.cls.dr),3)
+        pass
 
     def test_empty_drone_delivery(self):
         return True
