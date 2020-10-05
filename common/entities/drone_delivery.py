@@ -4,7 +4,7 @@ from common.entities.delivery_request import DeliveryRequest
 from common.entities.drone_formation import DroneFormationType
 
 
-class EmptyDroneDelivery():
+class EmptyDroneDelivery:
     def __init__(self, identity: str, drone_formation_type: DroneFormationType):
         self._identity = identity
         self._drone_formation_type = drone_formation_type
