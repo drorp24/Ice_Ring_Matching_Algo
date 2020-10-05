@@ -21,6 +21,9 @@ class _DroneFormation:
     def drone_configuration(self) -> DroneConfigurationType:
         return self._drone_configuration
 
+    def get_drone_formation_size(self):
+        return self._size
+
 
 class DroneFormationType(Enum):
     _2X_PLATFORM_1_2X8 = _DroneFormation(FormationSize.MINI, DroneConfigurationType.PLATFORM_1_2X8)
