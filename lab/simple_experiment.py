@@ -100,7 +100,7 @@ def main():
     drawer3.draw(block=False)
 
     # Experiment 4
-    drone_azimuth4 = Angle(delivery_plan.azimuth.in_degrees() + 90, AngleUnit.DEGREE)
+    drone_azimuth4 = Angle(delivery_plan.azimuth.in_degrees() + 100, AngleUnit.DEGREE)
     drawer4 = create_drawer2d()
     draw_delivery_plan(drawer4, delivery_plan)
     draw_drone_arrival(drawer4, delivery_plan, drone_azimuth4)
