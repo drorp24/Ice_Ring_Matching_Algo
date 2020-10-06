@@ -1,34 +1,35 @@
 import unittest
 
-from common.entities.package import PackageType, Package
+from common.entities.package import PackageType
 from common.entities.package_factory import package_delivery_plan_factory
 from common.math.angle import Angle, AngleUnit
 from geometry.geo_factory import create_point_2d, create_polygon_2d_from_ellipsis
 from geometry.shapely_wrapper import _ShapelyEmptyGeometry
+from geometry.geo_factory import create_point_2d
 
 
 class BasicPackageGeneration(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.p1 = Package(PackageType.TINY)
-        cls.p2 = Package(PackageType.SMALL)
-        cls.p3 = Package(PackageType.MEDIUM)
-        cls.p4 = Package(PackageType.LARGE)
-        point = create_point_2d(1, 2)
+        cls.p1 = PackageType.TINY
+        cls.p2 = PackageType.SMALL
+        cls.p3 = PackageType.MEDIUM
+        cls.p4 = PackageType.LARGE
+        point = create_point_2d(1,2)
         cls.pdp = package_delivery_plan_factory(point,
                                                 azimuth=Angle(30, AngleUnit.DEGREE),
                                                 elevation=Angle(80, AngleUnit.DEGREE),
                                                 package_type=PackageType.TINY)
 
     def test_package_type(self):
-        self.assertEqual(self.p1.type.value, 1)
-        self.assertEqual(self.p2.type.value, 2)
-        self.assertEqual(self.p3.type.value, 4)
-        self.assertEqual(self.p4.type.value, 8)
+        self.assertEqual(self.p1.value.size, 1)
+        self.assertEqual(self.p2.value.size, 2)
+        self.assertEqual(self.p3.value.size, 4)
+        self.assertEqual(self.p4.value.size, 8)
 
     def test_package_delivery_plan(self):
-        self.assertEqual(self.pdp.package.type.value, 1)
+        self.assertEqual(self.pdp.package.value.size, 1)
 
     def test_drop_envelope_when_same_drop_and_drone_azimuth(self):
         drone_azimuth = Angle(self.pdp.azimuth.in_degrees(), AngleUnit.DEGREE)

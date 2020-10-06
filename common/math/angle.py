@@ -1,15 +1,15 @@
+from __future__ import annotations
+
 import math
 from enum import IntEnum
 
 
 class AngleUnit(IntEnum):
-
     DEGREE = 1
     RADIAN = 2
 
 
 class Angle:
-
     def __init__(self, value: float, unit: AngleUnit):
         self.__value = value
         self.__unit = unit

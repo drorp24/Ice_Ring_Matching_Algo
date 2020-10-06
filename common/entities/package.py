@@ -21,26 +21,26 @@ class PotentialDropEnvelope:
         return self._maximal_radius_meters
 
 
-class PackageType(Enum):
-    TINY = 1
-    SMALL = 2
-    MEDIUM = 4
-    LARGE = 8
+class _Package:
 
-
-class Package:
-
-    def __init__(self, package_type: PackageType):
-        self._package_type = package_type
+    def __init__(self, size: float):
+        self._size = size
         self._potential_drop_envelope = PotentialDropEnvelope(
-            minimal_radius_meters=maximal_potential_drop_envelope_radius_meters / package_type.value -
-            maximal_delta_between_minimal_and_maximal_radius_meters / package_type.value,
-            maximal_radius_meters=maximal_potential_drop_envelope_radius_meters / package_type.value)
+            minimal_radius_meters=maximal_potential_drop_envelope_radius_meters / size -
+            maximal_delta_between_minimal_and_maximal_radius_meters / size,
+            maximal_radius_meters=maximal_potential_drop_envelope_radius_meters / size)
 
     @property
-    def type(self):
-        return self._package_type
+    def size(self):
+        return self._size
 
     @property
     def potential_drop_envelope(self):
         return self._potential_drop_envelope
+
+
+class PackageType(Enum):
+    TINY = _Package(1)
+    SMALL = _Package(2)
+    MEDIUM = _Package(4)
+    LARGE = _Package(8)
