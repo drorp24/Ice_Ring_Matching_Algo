@@ -45,12 +45,19 @@ class PackageDeliveryPlan:
         return self._package
 
     def _calc_envelope(self, envelope_center: Point2D, drone_azimuth: Angle) -> Polygon2D:
+        if drone_azimuth.in_degrees() < 0 or drone_azimuth.in_degrees() > 360:
+            raise ValueError("Azimuth should be between 0-360 degrees.")
         envelope_width = (self._package.potential_drop_envelope.maximal_radius_meters -
                           self.package.potential_drop_envelope.minimal_radius_meters)
-        drop_and_drone_azimuth_dot = (create_vector_2d(cos(self.azimuth.in_radians()), sin(self.azimuth.in_radians()))
-                                      .dot(
-                                    create_vector_2d(cos(drone_azimuth.in_radians()), sin(drone_azimuth.in_radians()))))
-        envelope_height = envelope_width * drop_and_drone_azimuth_dot
+        if abs(self.azimuth.in_degrees() - drone_azimuth.in_degrees()) < 90:
+            drop_and_drone_azimuth_dot = (create_vector_2d(cos(self.azimuth.in_radians()),
+                                                           sin(self.azimuth.in_radians()))
+                                          .dot(
+                                        create_vector_2d(cos(drone_azimuth.in_radians()),
+                                                         sin(drone_azimuth.in_radians()))))
+            envelope_height = envelope_width * drop_and_drone_azimuth_dot
+        else:
+            envelope_height = 0
         return create_polygon_2d_from_ellipsis(ellipsis_center=(envelope_center.x, envelope_center.y),
                                                ellipsis_width=envelope_width,
                                                ellipsis_height=envelope_height,
