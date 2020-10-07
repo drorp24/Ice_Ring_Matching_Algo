@@ -1,5 +1,5 @@
 import unittest
-from common.entities.delivery_requests_factory import create_delivery_requests_from_file
+from input.delivery_requests_json_converter import create_delivery_requests_from_file
 
 
 class BasicDeliveryGeneration(unittest.TestCase):
