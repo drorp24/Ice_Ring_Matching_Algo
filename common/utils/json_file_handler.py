@@ -11,13 +11,13 @@ def __get_path(file_path):
     return Path(filename)
 
 
-def from_file(file_path) -> 'dict':
+def from_file(file_path:str) -> dict:
     correct_path = __get_path(file_path)
     with open(correct_path, "r") as file:
         return json.load(file)
 
 
-def to_file(file_path, data):
+def to_file(file_path:str, data:dict):
     correct_path = __get_path(file_path)
 
     with open(correct_path, 'w') as file:
