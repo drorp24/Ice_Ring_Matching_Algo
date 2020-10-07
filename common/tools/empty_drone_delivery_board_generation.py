@@ -45,6 +45,3 @@ def _get_population(distribution: [], platform_type: PlatformType) -> {}:
     return platform_configuration_population
 
 
-def _formation_options(platform_type: PlatformType) -> []:
-    maximum_formations_of_medium_size = math.floor(PlatformType.PLATFORM_1 / FormationSize.MEDIUM)
-    for formation in range()
