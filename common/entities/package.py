@@ -3,18 +3,18 @@ from __future__ import annotations
 from enum import Enum
 
 
-class _Package:
+class Package:
 
-    def __init__(self, size: float):
-        self._size = size
+    def __init__(self, weight: float):
+        self._weight = weight
 
     @property
-    def size(self):
-        return self._size
+    def weight(self) -> float:
+        return self._weight
 
 
 class PackageType(Enum):
-    TINY = _Package(1)
-    SMALL = _Package(2)
-    MEDIUM = _Package(4)
-    LARGE = _Package(8)
+    TINY = Package(1)
+    SMALL = Package(2)
+    MEDIUM = Package(4)
+    LARGE = Package(8)

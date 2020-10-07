@@ -3,7 +3,7 @@ from geometry.geo2d import Point2D
 from common.math.angle import Angle
 
 
-class _DropPoint:
+class DropPoint:
 
     def __init__(self, point: Point2D):
         self._coordinates = point
@@ -15,13 +15,13 @@ class _DropPoint:
 class PackageDeliveryPlan:
 
     def __init__(self, point: Point2D, azimuth: Angle, elevation: Angle, package: PackageType):
-        self._drop_point = _DropPoint(point)
+        self._drop_point = DropPoint(point)
         self._azimuth = azimuth
         self._elevation = elevation
         self._package = package
 
     @property
-    def drop_point(self) -> _DropPoint:
+    def drop_point(self) -> DropPoint:
         return self._drop_point
 
     @property

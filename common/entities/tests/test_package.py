@@ -18,11 +18,11 @@ class BasicPackageGeneration(unittest.TestCase):
         cls.pdp = package_delivery_plan_factory(point, azimuth=create_degree_angle(30), elevation=create_degree_angle(80),
                                                 package=PackageType.TINY)
 
-    def test_package_type(self):
-        self.assertEqual(self.p1.value.size, 1)
-        self.assertEqual(self.p2.value.size, 2)
-        self.assertEqual(self.p3.value.size, 4)
-        self.assertEqual(self.p4.value.size, 8)
+    def test_package_size(self):
+        self.assertEqual(self.p1.value.weight, 1)
+        self.assertEqual(self.p2.value.weight, 2)
+        self.assertEqual(self.p3.value.weight, 4)
+        self.assertEqual(self.p4.value.weight, 8)
 
     def test_package_delivery_plan(self):
-        self.assertEqual(self.pdp.package.value.size, 1)
+        self.assertEqual(self.pdp.package.weight, 1)
