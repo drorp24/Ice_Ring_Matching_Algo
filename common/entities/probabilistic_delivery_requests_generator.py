@@ -46,10 +46,11 @@ def create_delivery_requests_json(file_path: string,
                                                            elevation_distribution,
                                                            package_distribution,
                                                            random_seed)
+
     json_file_handler.to_file(file_path, delivery_requests_dict)
 
 
-def create_delivery_requests_dict(num_of_delivery_requests_range,
+def create_delivery_requests_dict(num_of_delivery_requests_range: [int],
                                   num_of_delivery_options_distribution: [[]],
                                   num_of_customer_deliveries_distribution: [[]],
                                   num_of_package_delivery_plans_distribution: [[]],
@@ -87,31 +88,85 @@ def create_delivery_requests_dict(num_of_delivery_requests_range,
     num_of_package_delivery_plans = rand.choices(*get_distribution(num_of_package_delivery_plans_distribution))[0]
 
     delivery_requests = []
-    for delivery_request_ind in range(num_of_delivery_requests):
-        time_window = get_time_window(main_time_window_length_range, time_windows_length_distribution, rand)
-        priority = rand.choices(*get_distribution(priority_distribution))[0]
-        delivery_options = []
-        delivery_requests.append(dict(delivery_options=delivery_options, time_window=time_window, priority=priority))
-        for delivery_option_ind in range(num_of_delivery_options):
-            customer_deliveries = []
-            delivery_options.append(dict(customer_deliveries=customer_deliveries))
-            for customer_delivery_ind in range(num_of_customer_deliveries):
-                package_delivery_plans = []
-                customer_deliveries.append(dict(package_delivery_plans=package_delivery_plans))
-                for package_delivery_plan_ind in range(num_of_package_delivery_plans):
-                    package_type = rand.choices(*get_distribution(package_distribution))[0]
-                    drop_point_area = rand.choices(range(len(drop_points_distribution)),
-                                                   [distribution[1] for distribution in drop_points_distribution])[0]
-                    drop_points_range = drop_points_distribution[drop_point_area][0]
-                    drop_point_x = rand.randint(*drop_points_range[0])
-                    drop_point_y = rand.randint(*drop_points_range[1])
-                    azimuth = rand.choices(*get_distribution(azimuth_distribution))[0]
-                    elevation = rand.choices(*get_distribution(elevation_distribution))[0]
-                    package_delivery_plans.append(
-                        dict(package_type=package_type, drop_point_x=drop_point_x, drop_point_y=drop_point_y,
-                             azimuth=azimuth, elevation=elevation))
+    for _ in range(num_of_delivery_requests):
+        delivery_requests.append(create_delivery_request_dict(azimuth_distribution, drop_points_distribution,
+                                                              elevation_distribution, main_time_window_length_range,
+                                                              num_of_customer_deliveries,
+                                                              num_of_delivery_options, num_of_package_delivery_plans,
+                                                              package_distribution,
+                                                              priority_distribution, rand,
+                                                              time_windows_length_distribution))
 
     return dict(delivery_requests=delivery_requests)
+
+
+def create_delivery_request_dict(azimuth_distribution, drop_points_distribution,
+                                 elevation_distribution, main_time_window_length_range, num_of_customer_deliveries,
+                                 num_of_delivery_options, num_of_package_delivery_plans, package_distribution,
+                                 priority_distribution, rand, time_windows_length_distribution) -> dict:
+    time_window = get_time_window(main_time_window_length_range, time_windows_length_distribution, rand)
+    priority = get_random_value_from_distribution(priority_distribution, rand)
+    delivery_options = []
+    delivery_request_dict = dict(delivery_options=delivery_options, time_window=time_window, priority=priority)
+    for _ in range(num_of_delivery_options):
+        delivery_options.append(__create_delivery_option_dict(azimuth_distribution, drop_points_distribution,
+                                                              elevation_distribution, num_of_customer_deliveries,
+                                                              num_of_package_delivery_plans,
+                                                              package_distribution, rand))
+
+    return delivery_request_dict
+
+
+def __create_delivery_option_dict(azimuth_distribution, drop_points_distribution,
+                                  elevation_distribution, num_of_customer_deliveries, num_of_package_delivery_plans,
+                                  package_distribution, rand) -> dict:
+    customer_deliveries = []
+    delivery_option = dict(customer_deliveries=customer_deliveries)
+    for _ in range(num_of_customer_deliveries):
+        customer_deliveries.append(__create_customer_delivery_dict(azimuth_distribution, drop_points_distribution,
+                                                                   elevation_distribution,
+                                                                   num_of_package_delivery_plans,
+                                                                   package_distribution, rand))
+    return delivery_option
+
+
+def __create_customer_delivery_dict(azimuth_distribution, drop_points_distribution,
+                                    elevation_distribution, num_of_package_delivery_plans,
+                                    package_distribution, rand) -> dict:
+    package_delivery_plans = []
+    customer_delivery = dict(package_delivery_plans=package_delivery_plans)
+    for _ in range(num_of_package_delivery_plans):
+        package_delivery_plans.append(
+            __create_package_delivery_plan_dict(azimuth_distribution, drop_points_distribution,
+                                                elevation_distribution,
+                                                package_distribution, rand))
+    return customer_delivery
+
+
+def __create_package_delivery_plan_dict(azimuth_distribution, drop_points_distribution, elevation_distribution,
+                                        package_distribution, rand) -> dict:
+    package_type = get_random_value_from_distribution(package_distribution, rand)
+
+    drop_point_dict = __create_drop_point_dict(drop_points_distribution, rand)
+    azimuth = get_random_value_from_distribution(azimuth_distribution, rand)
+    elevation = get_random_value_from_distribution(elevation_distribution, rand)
+    package_delivery_plan_dict = dict(package_type=package_type, azimuth=azimuth, elevation=elevation)
+    package_delivery_plan_dict.update(drop_point_dict)
+    return package_delivery_plan_dict
+
+
+def __create_drop_point_dict(drop_points_distribution, rand) -> dict:
+    drop_point_area = rand.choices(range(len(drop_points_distribution)),
+                                   [distribution[1] for distribution in drop_points_distribution])[0]
+
+    drop_points_range = drop_points_distribution[drop_point_area][0]
+    drop_point_x = rand.randint(*drop_points_range[0])
+    drop_point_y = rand.randint(*drop_points_range[1])
+    return dict(drop_point_x=drop_point_x, drop_point_y=drop_point_y)
+
+
+def get_random_value_from_distribution(distribution, rand):
+    return rand.choices(*get_distribution(distribution))[0]
 
 
 def get_distribution(distribution: [[]]) -> ([], []):
@@ -137,7 +192,7 @@ def get_time_window(main_time_window_length_range: [int], time_windows_length_di
     """
 
     main_time_window_length = rand.randint(*main_time_window_length_range)
-    time_window_length = rand.choices(*get_distribution(time_windows_length_distribution))[0]
+    time_window_length = get_random_value_from_distribution(time_windows_length_distribution, rand)
 
     start_time = rand.randint(0, main_time_window_length - time_window_length)
     end_time = start_time + time_window_length
