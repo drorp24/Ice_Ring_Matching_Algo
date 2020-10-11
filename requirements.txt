@@ -19,3 +19,4 @@ pytz==2020.1
 Shapely==1.7.1
 six==1.15.0
 vispy==0.6.4
+time-window==0.1.0
