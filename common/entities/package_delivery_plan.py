@@ -1,7 +1,7 @@
 from common.entities.package import PackageType
 from geometry.geo2d import Point2D, Polygon2D
 from common.math.angle import Angle, AngleUnit
-from geometry.geo_factory import create_point_2d, create_vector_2d, create_polygon_2d_from_ellipsis
+from geometry.geo_factory import create_point_2d, create_vector_2d, create_polygon_2d_from_ellipse
 
 import statistics
 from math import cos, sin
@@ -58,10 +58,10 @@ class PackageDeliveryPlan:
             envelope_height = envelope_width * drop_and_drone_azimuth_dot
         else:
             envelope_height = 0
-        return create_polygon_2d_from_ellipsis(ellipsis_center=(envelope_center.x, envelope_center.y),
-                                               ellipsis_width=envelope_width,
-                                               ellipsis_height=envelope_height,
-                                               ellipsis_rotation=drone_azimuth.in_degrees())
+        return create_polygon_2d_from_ellipse(ellipse_center=(envelope_center.x, envelope_center.y),
+                                               ellipse_width=envelope_width,
+                                               ellipse_height=envelope_height,
+                                               ellipse_rotation=drone_azimuth.in_degrees())
 
     def drop_envelope(self, drone_azimuth: Angle) -> Polygon2D:
         drone_arrival_angle_in_rad = Angle(180 + drone_azimuth.in_degrees(), AngleUnit.DEGREE).in_radians()
