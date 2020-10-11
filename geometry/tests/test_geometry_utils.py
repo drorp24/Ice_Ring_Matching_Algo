@@ -1,10 +1,10 @@
 import unittest
 
 from geometry.geo_factory import create_point_2d
-from geometry.shapely_wrapper import _ShapelyUtils
+from geometry.utils import GeometryUtils
 
 
-class ShapelyConversionTestCase(unittest.TestCase):
+class GeometryUtilsTestCase(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
@@ -13,13 +13,13 @@ class ShapelyConversionTestCase(unittest.TestCase):
         cls.x_array, cls.y_array = [2.2, 6, 4], [3, 5.5, 1.2]
 
     def test_conversion_xy_array_to_point_list(self):
-        point_list_result = _ShapelyUtils.convert_xy_array_to_points_list(self.xy_array)
+        point_list_result = GeometryUtils.convert_xy_array_to_points_list(self.xy_array)
         self.assertEqual(point_list_result, self.point_list)
 
     def test_conversion_xy_separate_arrays_to_point_list(self):
-        point_list_result = _ShapelyUtils.convert_xy_separate_arrays_to_points_list(self.x_array, self.y_array)
+        point_list_result = GeometryUtils.convert_xy_separate_arrays_to_points_list(self.x_array, self.y_array)
         self.assertEqual(point_list_result, self.point_list)
 
     def test_conversion_points_list_to_xy_array(self):
-        point_list_converted_result = _ShapelyUtils.convert_points_list_to_xy_array(self.point_list)
+        point_list_converted_result = GeometryUtils.convert_points_list_to_xy_array(self.point_list)
         self.assertEqual(point_list_converted_result, self.xy_array)

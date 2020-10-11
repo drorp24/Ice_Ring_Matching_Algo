@@ -1,6 +1,5 @@
 import statistics
 from math import cos, sin
-
 from matplotlib.patches import Circle
 
 from common.entities.package import PackageType, PotentialDropEnvelope
@@ -9,7 +8,7 @@ from common.entities.package_factory import package_delivery_plan_factory
 from common.math.angle import Angle, AngleUnit
 from geometry.geo2d import Point2D
 from geometry.geo_factory import create_point_2d, create_polygon_2d
-from geometry.shapely_wrapper import _ShapelyUtils
+from geometry.utils import GeometryUtils
 from visualization.color import Color
 from visualization.drawer2d import Drawer2D
 from visualization.drawer2d_factory import create_drawer2d
@@ -18,11 +17,11 @@ from visualization.drawer2d_factory import create_drawer2d
 def draw_potential_drop_envelope(drawer: Drawer2D, potential_drop_envelope: PotentialDropEnvelope, location: Point2D):
     minimal_potential_drop_envelope_circle = Circle((location.xy()),
                                                     potential_drop_envelope.minimal_radius_meters)
-    drawer.add_polygon2d(create_polygon_2d(_ShapelyUtils.convert_xy_array_to_points_list(
+    drawer.add_polygon2d(create_polygon_2d(GeometryUtils.convert_xy_array_to_points_list(
         minimal_potential_drop_envelope_circle.get_verts())), edgecolor=Color.Red, facecolor=Color.Red)
     maximal_potential_drop_envelope_circle = Circle(location.xy(),
                                                     potential_drop_envelope.maximal_radius_meters)
-    drawer.add_polygon2d(create_polygon_2d(_ShapelyUtils.convert_xy_array_to_points_list(
+    drawer.add_polygon2d(create_polygon_2d(GeometryUtils.convert_xy_array_to_points_list(
         maximal_potential_drop_envelope_circle.get_verts())), edgecolor=Color.Red, facecolor=Color.White)
 
 

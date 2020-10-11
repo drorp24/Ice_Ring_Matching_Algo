@@ -1,14 +1,15 @@
 from __future__ import annotations
 
 from typing import List
+from matplotlib.patches import Ellipse
 
 from geometry.geo2d import Point2D, Vector2D, MultiPolygon2D, EmptyGeometry2D
 from geometry.geo2d import Polygon2D, LineString2D, LinearRing2D
 from geometry.math_wrapper import _MathVector2D
 from geometry.shapely_wrapper import _ShapelyMultiPolygon2D, _ShapelyEmptyGeometry
-from geometry.shapely_wrapper import _ShapelyPoint2D, _ShapelyUtils
+from geometry.shapely_wrapper import _ShapelyPoint2D
 from geometry.shapely_wrapper import _ShapelyPolygon2D, _ShapelyLineString2D, _ShapelyLinearRing2D
-from matplotlib.patches import Ellipse
+from geometry.utils import GeometryUtils
 
 
 def create_empty_geometry_2d() -> EmptyGeometry2D:
@@ -42,7 +43,7 @@ def create_multipolygon_2d(polygons: List[Polygon2D]) -> MultiPolygon2D:
 def create_polygon_2d_from_ellipse(ellipse_center, ellipse_width, ellipse_height, ellipse_rotation) -> Polygon2D:
     plt_ellipse = Ellipse(ellipse_center, ellipse_width, ellipse_height, ellipse_rotation)
     vertices = plt_ellipse.get_verts()
-    return create_polygon_2d(_ShapelyUtils.convert_xy_array_to_points_list(vertices))
+    return create_polygon_2d(GeometryUtils.convert_xy_array_to_points_list(vertices))
 
 
 def create_line_string_2d(points: List[Point2D]) -> LineString2D:
