@@ -18,7 +18,7 @@ from common.math.angle import Angle, AngleUnit
 from geometry import geo_factory
 
 
-def create_delivery_requests_from_file(file_path: string) -> List[DeliveryRequest]:
+def create_delivery_requests_from_file(file_path: str) -> List[DeliveryRequest]:
     delivery_requests_dict = json_file_handler.from_file(file_path)
     delivery_requests = [__create_delivery_request_from_dict(delivery_request_dict) for delivery_request_dict in
                          delivery_requests_dict['delivery_requests']]
@@ -58,21 +58,3 @@ def __create_package_delivery_plan_from_dict(package_delivery_plan_dict: {}) -> 
                                          azimuth=Angle(package_delivery_plan_dict['azimuth'], AngleUnit.DEGREE),
                                          elevation=Angle(package_delivery_plan_dict['elevation'], AngleUnit.DEGREE),
                                          package_type=PackageType[package_delivery_plan_dict['package_type'].upper()])
-
-#
-# def create_customer_delivery(point: Point2D, azimuth: Angle, elevation: Angle,
-#                              package: PackageType) -> CustomerDelivery:
-#     package_delivery_plan = [PackageDeliveryPlan(point, azimuth, elevation, package)]
-#     return CustomerDelivery(package_delivery_plan)
-#
-#
-# def create_delivery_option(point: Point2D, azimuth: Angle, elevation: Angle,
-#                            package: PackageType) -> DeliveryOption:
-#     customer_delivery = [create_customer_delivery(point, azimuth, elevation, package)]
-#     return DeliveryOption(customer_delivery)
-#
-#
-# def create_delivery_request(point: Point2D, azimuth: Angle, elevation: Angle,
-#                             package: PackageType, time_window: TimeWindow, priority: int) -> DeliveryRequest:
-#     delivery_option = [create_delivery_option(point, azimuth, elevation, package)]
-#     return DeliveryRequest(delivery_option, time_window, priority)

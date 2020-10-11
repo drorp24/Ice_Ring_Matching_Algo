@@ -1,12 +1,15 @@
-from __future__ import annotations
-
 import math
-from enum import IntEnum
+from enum import Enum, auto
 
 
-class AngleUnit(IntEnum):
-    DEGREE = 1
-    RADIAN = 2
+class _AngleName(Enum):
+    def _generate_next_value_(self, start, count, last_values):
+        return self
+
+
+class AngleUnit(_AngleName):
+    DEGREE = auto()
+    RADIAN = auto()
 
 
 class Angle:
@@ -27,4 +30,3 @@ class Angle:
 
     def in_radians(self) -> float:
         return self._value if self._unit is AngleUnit.RADIAN else math.radians(self._value)
-
