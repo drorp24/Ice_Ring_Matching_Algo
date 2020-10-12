@@ -7,16 +7,6 @@ class BasicDeliveryGeneration(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        # point = create_point_2d(1, 2)
-        #
-        # cls.cd = create_customer_delivery(point, azimuth=Angle(30), elevation=Angle(80),
-        #                                   package=PackageType.TINY)
-        # cls.do = create_delivery_option(point, azimuth=Angle(30), elevation=Angle(80),
-        #                                 package=PackageType.TINY)
-        #
-        # cls.time_window = TimeWindow(datetime(2020, 1, 23, 11, 30, 00),
-        #                              datetime(2020, 1, 23, 11, 35, 00))
-
         cls.dr = create_delivery_requests_from_file('DeliveryRequestTest.json')
 
     def test_customer_delivery(self):

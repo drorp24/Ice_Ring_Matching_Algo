@@ -53,21 +53,3 @@ def __create_package_delivery_plan_from_dict(package_delivery_plan_dict) -> Pack
                                          azimuth=Angle(package_delivery_plan_dict['azimuth']),
                                          elevation=Angle(package_delivery_plan_dict['elevation']),
                                          package=PackageType[package_delivery_plan_dict['package_type'].upper()])
-
-#
-# def create_customer_delivery(point: Point2D, azimuth: Angle, elevation: Angle,
-#                              package: PackageType) -> CustomerDelivery:
-#     package_delivery_plan = [PackageDeliveryPlan(point, azimuth, elevation, package)]
-#     return CustomerDelivery(package_delivery_plan)
-#
-#
-# def create_delivery_option(point: Point2D, azimuth: Angle, elevation: Angle,
-#                            package: PackageType) -> DeliveryOption:
-#     customer_delivery = [create_customer_delivery(point, azimuth, elevation, package)]
-#     return DeliveryOption(customer_delivery)
-#
-#
-# def create_delivery_request(point: Point2D, azimuth: Angle, elevation: Angle,
-#                             package: PackageType, time_window: TimeWindow, priority: int) -> DeliveryRequest:
-#     delivery_option = [create_delivery_option(point, azimuth, elevation, package)]
-#     return DeliveryRequest(delivery_option, time_window, priority)
