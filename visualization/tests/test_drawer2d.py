@@ -36,6 +36,7 @@ class DrawGeometriesTestCase(unittest.TestCase):
         drawer.add_line_string2d(self.line_string1)
         drawer.add_polygon2d(self.poly1)
         drawer.add_linear_ring2d(self.linear_ring1)
+        drawer.add_arrow2d(tail=self.p5, head=self.p8)
 
         drawer.save_plot_to_png(self.result_image_path)
         self.assertIsNone(compare_images(self.expected_image_path, self.result_image_path, tol=1))

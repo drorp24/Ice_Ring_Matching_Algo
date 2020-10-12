@@ -14,7 +14,7 @@ from time_window import TimeWindow
 
 from common.utils import json_file_handler
 
-from common.math.angle import create_degree_angle
+from common.math.angle import Angle, AngleUnit
 from geometry import geo_factory
 
 
@@ -55,6 +55,6 @@ def __create_customer_delivery_from_dict(customer_delivery_dict: {}) -> Customer
 def __create_package_delivery_plan_from_dict(package_delivery_plan_dict: {}) -> PackageDeliveryPlan:
     return package_delivery_plan_factory(point=geo_factory.create_point_2d(package_delivery_plan_dict['drop_point_x'],
                                                        package_delivery_plan_dict['drop_point_y']),
-                                         azimuth=create_degree_angle(package_delivery_plan_dict['azimuth']),
-                                         elevation=create_degree_angle(package_delivery_plan_dict['elevation']),
-                                         package=PackageType[package_delivery_plan_dict['package_type'].upper()])
+                                         azimuth=Angle(package_delivery_plan_dict['azimuth'], AngleUnit.DEGREE),
+                                         elevation=Angle(package_delivery_plan_dict['elevation'], AngleUnit.DEGREE),
+                                         package_type=PackageType[package_delivery_plan_dict['package_type'].upper()])

@@ -1,6 +1,5 @@
 import math
 from enum import Enum, auto
-from abc import ABC
 
 
 class _AngleName(Enum):
@@ -8,45 +7,26 @@ class _AngleName(Enum):
         return self
 
 
-class _AngleUnit(_AngleName):
+class AngleUnit(_AngleName):
     DEGREE = auto()
     RADIAN = auto()
 
 
-class Angle(ABC):
+class Angle:
+    def __init__(self, value: float, unit: AngleUnit):
+        self.__value = value
+        self.__unit = unit
 
     @property
-    def radians(self) -> float:
-        raise NotImplementedError()
+    def _value(self) -> float:
+        return self.__value
 
     @property
-    def degrees(self) -> float:
-        raise NotImplementedError()
+    def _unit(self) -> AngleUnit:
+        return self.__unit
 
+    def in_degrees(self) -> float:
+        return self._value if self._unit is AngleUnit.DEGREE else math.degrees(self._value)
 
-class _Angle(Angle):
-
-    def __init__(self, value: float, unit: _AngleUnit):
-        if unit == _AngleUnit.RADIAN:
-            self._degrees = math.degrees(value)
-            self._radians = value
-        else:
-            self._degrees = value
-            self._radians = math.radians(value)
-        self._unit = unit
-
-    @property
-    def radians(self) -> float:
-        return self._radians
-
-    @property
-    def degrees(self) -> float:
-        return self._degrees
-
-
-def create_degree_angle(value: float) -> Angle:
-    return _Angle(value, unit=_AngleUnit.DEGREE)
-
-
-def create_radian_angle(value: float) -> Angle:
-    return _Angle(value, unit=_AngleUnit.RADIAN)
+    def in_radians(self) -> float:
+        return self._value if self._unit is AngleUnit.RADIAN else math.radians(self._value)

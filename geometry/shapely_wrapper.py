@@ -1,11 +1,11 @@
 from __future__ import annotations
 
-from typing import List, Tuple, Iterator, Union
-
+from typing import List, Tuple, Union
 from shapely.geometry import Point, Polygon, LineString, LinearRing, MultiPolygon
 from shapely.geometry.base import BaseGeometry, EmptyGeometry
 
 from geometry.geo2d import Point2D, Vector2D, Polygon2D, MultiPolygon2D, LineString2D, LinearRing2D, EmptyGeometry2D
+from geometry.utils import GeometryUtils
 
 
 class _ShapelyGeometry(object):
@@ -51,6 +51,9 @@ class _ShapelyPoint2D(_ShapelyGeometry, Point2D):
     def y(self) -> float:
         return self._shapely_obj.y
 
+    def xy(self) -> (float, float):
+        return self.x, self.y
+
     @property
     def _shapely_obj(self) -> Point:
         return super()._shapely_obj
@@ -86,15 +89,15 @@ class _ShapelyPoint2D(_ShapelyGeometry, Point2D):
 class _ShapelyLineString2D(_ShapelyGeometry, LineString2D):
 
     def __init__(self, points: List[Point2D]):
-        super().__init__(LineString(_ShapelyUtils.convert_points_list_to_xy_array(points)))
+        super().__init__(LineString(GeometryUtils.convert_points_list_to_xy_array(points)))
 
     @staticmethod
     def _create_from_shapely(line_string: LineString) -> LineString2D:
-        return _ShapelyLinearRing2D(_ShapelyUtils.convert_xy_array_to_points_list(line_string.xy))
+        return _ShapelyLinearRing2D(GeometryUtils.convert_xy_array_to_points_list(line_string.xy))
 
     @classmethod
     def create_from_xy_array(cls, xy_array: List[Tuple[float, float]]) -> LineString2D:
-        return _ShapelyLineString2D(_ShapelyUtils.convert_xy_array_to_points_list(xy_array))
+        return _ShapelyLineString2D(GeometryUtils.convert_xy_array_to_points_list(xy_array))
 
     @property
     def _shapely_obj(self) -> LineString:
@@ -103,7 +106,7 @@ class _ShapelyLineString2D(_ShapelyGeometry, LineString2D):
     @property
     def points(self) -> List[Point2D]:
         x_array, y_array = self._shapely_obj.xy
-        return _ShapelyUtils.convert_xy_separate_arrays_to_points_list(x_array, y_array)
+        return GeometryUtils.convert_xy_separate_arrays_to_points_list(x_array, y_array)
 
     def calc_length(self) -> float:
         return self._shapely_obj.length
@@ -115,7 +118,7 @@ class _ShapelyLineString2D(_ShapelyGeometry, LineString2D):
 class _ShapelyLinearRing2D(_ShapelyGeometry, LinearRing2D):
 
     def __init__(self, points: List[Point2D]):
-        super().__init__(LinearRing(_ShapelyUtils.convert_points_list_to_xy_array(points)))
+        super().__init__(LinearRing(GeometryUtils.convert_points_list_to_xy_array(points)))
 
     @staticmethod
     def _create_from_shapely(linear_ring: LinearRing):
@@ -128,7 +131,7 @@ class _ShapelyLinearRing2D(_ShapelyGeometry, LinearRing2D):
     @property
     def points(self) -> List[Point2D]:
         x_array, y_array = self._shapely_obj.xy
-        return _ShapelyUtils.convert_xy_separate_arrays_to_points_list(x_array.tolist(), y_array.tolist())
+        return GeometryUtils.convert_xy_separate_arrays_to_points_list(x_array.tolist(), y_array.tolist())
 
     def calc_length(self) -> float:
         return self._shapely_obj.length
@@ -143,7 +146,7 @@ class _ShapelyLinearRing2D(_ShapelyGeometry, LinearRing2D):
 class _ShapelyPolygon2D(_ShapelyGeometry, Polygon2D):
 
     def __init__(self, boundary_points: List[Point2D]):
-        super().__init__(Polygon(_ShapelyUtils.convert_points_list_to_xy_array(boundary_points)))
+        super().__init__(Polygon(GeometryUtils.convert_points_list_to_xy_array(boundary_points)))
 
     @classmethod
     def create_from_linear_ring(cls, boundary: LinearRing2D) -> Polygon2D:
@@ -164,7 +167,7 @@ class _ShapelyPolygon2D(_ShapelyGeometry, Polygon2D):
     @property
     def points(self) -> List[Point2D]:
         x_array, y_array = self._shapely_obj.exterior.xy
-        return _ShapelyUtils.convert_xy_separate_arrays_to_points_list(x_array[:-1], y_array[:-1])
+        return GeometryUtils.convert_xy_separate_arrays_to_points_list(x_array[:-1], y_array[:-1])
 
     def calc_area(self) -> float:
         return self._shapely_obj.area
@@ -231,28 +234,16 @@ class _ShapelyMultiPolygon2D(_ShapelyGeometry, MultiPolygon2D):
 class _ShapelyUtils:
 
     @staticmethod
-    def convert_xy_array_to_points_list(xy_array: Iterator[Tuple[float, float]]) -> List[Point2D]:
-        return [_ShapelyPoint2D(xy[0], xy[1]) for xy in xy_array]
-
-    @staticmethod
-    def convert_xy_separate_arrays_to_points_list(x_array: List[float], y_array: List[float]) -> List[Point2D]:
-        return _ShapelyUtils.convert_xy_array_to_points_list(zip(x_array, y_array))
-
-    @staticmethod
-    def convert_points_list_to_xy_array(points: List[Point2D]) -> List[Tuple[float, float]]:
-        return [(p.x, p.y) for p in points]
-
-    @staticmethod
     def convert_polygon2d_to_shapely(polygon: Polygon2D) -> Polygon:
-        return Polygon(_ShapelyUtils.convert_points_list_to_xy_array(polygon.points))
+        return Polygon(GeometryUtils.convert_points_list_to_xy_array(polygon.points))
 
     @staticmethod
     def convert_linear_ring2d_to_shapely(linear_ring: LinearRing2D) -> LinearRing:
-        return LinearRing(_ShapelyUtils.convert_points_list_to_xy_array(linear_ring.points))
+        return LinearRing(GeometryUtils.convert_points_list_to_xy_array(linear_ring.points))
 
     @staticmethod
     def convert_line_string2d_to_shapely(line_string: LineString2D) -> LineString:
-        return LineString(_ShapelyUtils.convert_points_list_to_xy_array(line_string.points))
+        return LineString(GeometryUtils.convert_points_list_to_xy_array(line_string.points))
 
     @staticmethod
     def convert_point2d_to_shapely(point: Point2D) -> Point:
@@ -264,12 +255,12 @@ class _ShapelyUtils:
 
     @staticmethod
     def convert_shapely_to_linear_ring_2d(linear_ring: LinearRing) -> LinearRing2D:
-        return _ShapelyLinearRing2D(_ShapelyUtils.convert_xy_array_to_points_list(linear_ring.xy))
+        return _ShapelyLinearRing2D(GeometryUtils.convert_xy_array_to_points_list(linear_ring.xy))
 
     @staticmethod
     def convert_shapely_to_polygon_2d(polygon: Polygon) -> Polygon2D:
         x_array, y_array = polygon.exterior.xy
-        points_list_shapely = _ShapelyUtils.convert_xy_separate_arrays_to_points_list(x_array, y_array)
+        points_list_shapely = GeometryUtils.convert_xy_separate_arrays_to_points_list(x_array, y_array)
         return _ShapelyPolygon2D(points_list_shapely)
 
     @staticmethod

@@ -11,6 +11,9 @@ from geometry.geo2d import Point2D, Polygon2D, LineString2D, LinearRing2D
 class PltDrawer2D(Drawer2D):
     def __init__(self):
         self._fig, self._ax = plt.subplots()
+        plt.title('90\xb0', fontsize=14)
+        plt.xlabel('270\xb0', fontsize=14)
+        plt.ylabel('180\xb0', fontsize=14)
 
     @staticmethod
     def _convert_to_numpy_points(point2d_list: List[Point2D]) -> np.ndarray:
@@ -51,9 +54,20 @@ class PltDrawer2D(Drawer2D):
                           linewidth=linewidth)
         self._ax.add_patch(polygon)
 
-    def draw(self) -> None:
+    def add_arrow2d(self, tail: Point2D, head: Point2D, edgecolor: Color = Color.Black, facecolor: Color = Color.Black,
+                    linewidth=2) -> None:
+        # Drawing transparent points so the annotation arrow will always be drawn even if outside axis
+        self._ax.add_patch(Circle((tail.x, tail.y), radius=0.05, edgecolor=(1, 1, 1, 0), facecolor=(1, 1, 1, 0)))
+        self._ax.add_patch(Circle((head.x, head.y), radius=0.05, edgecolor=(1, 1, 1, 0), facecolor=(1, 1, 1, 0)))
+
+        self._ax.annotate("", xy=(head.x, head.y), xytext=(tail.x, tail.y), annotation_clip=False,
+                          arrowprops=dict(arrowstyle='->', edgecolor=edgecolor.get_rgb(),
+                                          facecolor=facecolor.get_rgb(), linewidth=linewidth))
+
+    def draw(self, block=True) -> None:
         self._ax.axis('scaled')
-        plt.show()
+        self._fig.show()
+        plt.show(block=block)
 
     def save_plot_to_png(self, file_name: Path) -> None:
         self._ax.axis('scaled')

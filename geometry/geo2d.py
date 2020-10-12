@@ -100,6 +100,10 @@ class Point2D(Geometry2D):
         raise NotImplementedError()
 
     @abstractmethod
+    def xy(self) -> (float, float):
+        raise NotImplementedError()
+
+    @abstractmethod
     def subtract(self, other_point: Point2D) -> Vector2D:
         raise NotImplementedError()
 
