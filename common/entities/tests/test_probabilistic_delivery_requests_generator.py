@@ -2,10 +2,10 @@ import unittest
 from random import Random
 
 import params
-from common.entities.delivery_requests_factory import create_delivery_requests_from_file
 from common.entities.package import PackageType
 from common.entities.probabilistic_delivery_requests_generator import get_distribution, create_delivery_requests_dict, \
     get_time_window, create_delivery_requests_json
+from input.delivery_requests_json_converter import create_delivery_requests_from_file
 
 
 class ProbabilisticDeliveryRequestsGenerationTest(unittest.TestCase):
