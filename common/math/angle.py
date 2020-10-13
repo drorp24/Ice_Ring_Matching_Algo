@@ -1,34 +1,32 @@
 import math
-from enum import IntEnum
+from enum import Enum, auto
 
 
-class _AngleUnit(IntEnum):
+class _AngleName(Enum):
+    def _generate_next_value_(self, start, count, last_values):
+        return self
 
-    DEGREE = 1
-    RADIAN = 2
+
+class AngleUnit(_AngleName):
+    DEGREE = auto()
+    RADIAN = auto()
 
 
 class Angle:
-
-    def __init__(self, value: float, unit: _AngleUnit = _AngleUnit.DEGREE):
-        self._value = value
-        self._unit = unit
-
-    @property
-    def value(self) -> float:
-        return self._value
+    def __init__(self, value: float, unit: AngleUnit):
+        self.__value = value
+        self.__unit = unit
 
     @property
-    def unit(self) -> _AngleUnit:
-        return self._unit
+    def _value(self) -> float:
+        return self.__value
 
-    def convert_to_radians(self):
-        if self._unit == _AngleUnit.RADIAN:
-            return self._value
-        return math.radians(self._value)
+    @property
+    def _unit(self) -> AngleUnit:
+        return self.__unit
 
-    def convert_to_degrees(self):
-        if self._unit == _AngleUnit.DEGREE:
-            return self._value
-        return math.degrees(self._value)
+    def in_degrees(self) -> float:
+        return self._value if self._unit is AngleUnit.DEGREE else math.degrees(self._value)
 
+    def in_radians(self) -> float:
+        return self._value if self._unit is AngleUnit.RADIAN else math.radians(self._value)
