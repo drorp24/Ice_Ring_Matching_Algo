@@ -47,7 +47,7 @@ def create_delivery_requests_json(file_path: string,
                                                            package_distribution,
                                                            random_seed)
 
-    json_file_handler.to_file(file_path, delivery_requests_dict)
+    json_file_handler.create_json_from_dict(file_path, delivery_requests_dict)
 
 
 def create_delivery_requests_dict(num_of_delivery_requests_range: [int],
