@@ -92,6 +92,51 @@
       }
     },
     "priority": 1
+  },
+    {
+    "delivery_options": [{
+      "customer_deliveries" : [{
+        "package_delivery_plan" :{
+          "drop_point_x": 0,
+          "drop_point_y": 0,
+          "azimuth": 0,
+          "elevation": 0,
+          "package_type": "Medium"
+        }
+      }
+      ]
+    },
+    {
+      "customer_deliveries" :  [{
+        "package_delivery_plan" :{
+          "drop_point_x": 0,
+          "drop_point_y": 0,
+          "azimuth": 0,
+          "elevation": 0,
+          "package_type": "Medium"
+        }
+      }
+      ]
+    }],
+    "time_window": {
+      "start_time": {
+        "year": 2020,
+        "month": 1,
+        "day": 25,
+        "hour": 11,
+        "minute": 30,
+        "seconds": 0
+      },
+      "end_time": {
+        "year": 2020,
+        "month": 1,
+        "day": 25,
+        "hour": 11,
+        "minute": 35,
+        "seconds": 0
+      }
+    },
+    "priority": 2
   }
   ]
 }
