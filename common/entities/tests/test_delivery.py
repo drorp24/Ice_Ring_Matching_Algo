@@ -15,7 +15,7 @@ class BasicDeliveryGeneration(unittest.TestCase):
         self.assertEqual(len(self.dr[0].delivery_options), 2)
 
     def test_delivery_request_length(self):
-        self.assertEqual(len(self.dr), 2)
+        self.assertEqual(len(self.dr), 3)
 
     def test_delivery_request_time_window(self):
         self.assertFalse(self.dr[0].time_window.since > self.dr[0].time_window.until)
