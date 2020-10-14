@@ -48,51 +48,55 @@ class ProbabilisticDeliveryRequestsGenerationTest(unittest.TestCase):
         self.assertEqual(time_window['end_time']['day'], params.BASE_DAY + 1)
 
     def test_create_delivery_requests_with_seed(self):
+        num_of_delivery_requests_range = IntRange(5, 5)
         num_of_delivery_options_distribution = IntDistribution([WeightedIntRange(1, 2, 1)])
-        drop_points_distribution = PointDistribution([
-            WeightedPointRange(FloatRange(0.0, 100.0), FloatRange(0.0, 100.0), 0.7),
-            WeightedPointRange(FloatRange(100.0, 200.0), FloatRange(0.0, 100.0), 0.3)])
+        num_of_customer_deliveries_distribution = IntDistribution([WeightedIntRange(1, 3, 0.9),
+                                                                  WeightedIntRange(4, 5, 0.1)])
+        num_of_package_delivery_plans_distribution = IntDistribution([WeightedIntRange(1, 3, 0.7),
+                                                                      WeightedIntRange(4, 5, 0.3)])
+        main_time_window_length_range = IntRange(24, 24)
+        time_windows_length_distribution = IntDistribution([WeightedIntRange(1, 2, 0.1),
+                                                            WeightedIntRange(3, 5, 0.3),
+                                                            WeightedIntRange(5, 15, 0.3),
+                                                            WeightedIntRange(15, 24, 0.3)])
+        priority_distribution = IntDistribution([WeightedIntRange(0, 3, 1)])
+        drop_points_distribution = PointDistribution([WeightedPointRange(FloatRange(0.0, 100.0),
+                                                                         FloatRange(0.0, 100.0), 0.7),
+                                                      WeightedPointRange(FloatRange(100.0, 200.0),
+                                                                         FloatRange(0.0, 100.0), 0.3)])
+        azimuth_distribution = IntDistribution([WeightedIntRange(0, 359, 1)])
+        elevation_distribution = IntDistribution([WeightedIntRange(90, 90, 0.5),
+                                                  WeightedIntRange(30, 89, 0.5)])
         package_distribution = PackageDistribution([(PackageType.TINY.name, 0.5),
                                                     (PackageType.SMALL.name, 0.3),
                                                     (PackageType.MEDIUM.name, 0.2),
                                                     (PackageType.LARGE.name, 0)])
+        random_seed = 10
 
-        delivery_request_dict1 = create_delivery_requests_dict(num_of_delivery_requests_range=IntRange(5, 5),
+        delivery_request_dict1 = create_delivery_requests_dict(num_of_delivery_requests_range=num_of_delivery_requests_range,
                                                                num_of_delivery_options_distribution=num_of_delivery_options_distribution,
-                                                               num_of_customer_deliveries_distribution=[[[1, 3], 0.9],
-                                                                                                        [[4, 5], 0.1]],
-                                                               num_of_package_delivery_plans_distribution=[
-                                                                   [[1, 3], 0.7], [[4, 5], 0.3]],
-                                                               main_time_window_length_range=[24, 24],
-                                                               time_windows_length_distribution=[[[1, 2], 0.1],
-                                                                                                 [[3, 5], 0.3],
-                                                                                                 [[5, 15], 0.3],
-                                                                                                 [[15, 24], 0.3]],
-                                                               priority_distribution=[[[0, 3], 1]],
+                                                               num_of_customer_deliveries_distribution=num_of_customer_deliveries_distribution,
+                                                               num_of_package_delivery_plans_distribution=num_of_package_delivery_plans_distribution,
+                                                               main_time_window_length_range=main_time_window_length_range,
+                                                               time_windows_length_distribution=time_windows_length_distribution,
+                                                               priority_distribution=priority_distribution,
                                                                drop_points_distribution=drop_points_distribution,
-                                                               azimuth_distribution=[[[0, 359], 1]],
-                                                               elevation_distribution=[[[90, 90], 0.5],
-                                                                                       [[30, 89], 0.5]],
+                                                               azimuth_distribution=azimuth_distribution,
+                                                               elevation_distribution=elevation_distribution,
                                                                package_distribution=package_distribution,
-                                                               random_seed=10)
-        delivery_request_dict2 = create_delivery_requests_dict(num_of_delivery_requests_range=IntRange(5, 5),
+                                                               random_seed=random_seed)
+        delivery_request_dict2 = create_delivery_requests_dict(num_of_delivery_requests_range=num_of_delivery_requests_range,
                                                                num_of_delivery_options_distribution=num_of_delivery_options_distribution,
-                                                               num_of_customer_deliveries_distribution=[[[1, 3], 0.9],
-                                                                                                        [[4, 5], 0.1]],
-                                                               num_of_package_delivery_plans_distribution=[
-                                                                   [[1, 3], 0.7], [[4, 5], 0.3]],
-                                                               main_time_window_length_range=[24, 24],
-                                                               time_windows_length_distribution=[[[1, 2], 0.1],
-                                                                                                 [[3, 5], 0.3],
-                                                                                                 [[5, 15], 0.3],
-                                                                                                 [[15, 24], 0.3]],
-                                                               priority_distribution=[[[0, 3], 1]],
+                                                               num_of_customer_deliveries_distribution=num_of_customer_deliveries_distribution,
+                                                               num_of_package_delivery_plans_distribution=num_of_package_delivery_plans_distribution,
+                                                               main_time_window_length_range=main_time_window_length_range,
+                                                               time_windows_length_distribution=time_windows_length_distribution,
+                                                               priority_distribution=priority_distribution,
                                                                drop_points_distribution=drop_points_distribution,
-                                                               azimuth_distribution=[[[0, 359], 1]],
-                                                               elevation_distribution=[[[90, 90], 0.5],
-                                                                                       [[30, 89], 0.5]],
+                                                               azimuth_distribution=azimuth_distribution,
+                                                               elevation_distribution=elevation_distribution,
                                                                package_distribution=package_distribution,
-                                                               random_seed=10)
+                                                               random_seed=random_seed)
 
         self.assertEqual(delivery_request_dict1, delivery_request_dict2)
 

@@ -6,12 +6,17 @@ from typing import List
 import params
 from common.entities.package import PackageType
 from common.utils import json_file_handler
+from geometry.geo2d import Point2D
+from geometry.geo_factory import create_point_2d
 
 
 @dataclass
 class IntRange:
     start: int
     stop: int
+
+    def random(self, random_generator) -> int:
+        return random_generator.randint(self.start, self.stop)
 
 
 @dataclass
@@ -25,6 +30,9 @@ class WeightedIntRange:
 class FloatRange:
     start: float
     stop: float
+
+    def random(self, random_generator) -> float:
+        return random_generator.uniform(self.start, self.stop)
 
 
 @dataclass
@@ -60,6 +68,9 @@ class IntDistribution:
     def weights(self) -> List[float]:
         return self._weights
 
+    def random(self, random_generator) -> int:
+        return random_generator.choices(self.population, self.weights)[0]
+
 
 class PointDistribution:
     def __init__(self, ranges: [WeightedPointRange]):
@@ -74,6 +85,12 @@ class PointDistribution:
     def weights(self) -> List[float]:
         return self._weights
 
+    def random(self, random_generator) -> Point2D:
+        drop_point_area = random_generator.choices(self.areas, self.weights)[0]
+        drop_point_x = drop_point_area.x_range.random(random_generator)
+        drop_point_y = drop_point_area.y_range.random(random_generator)
+        return create_point_2d(drop_point_x, drop_point_y)
+
 
 class PackageDistribution:
     def __init__(self, weighted_packages: [(PackageType, float)]):
@@ -87,35 +104,23 @@ class PackageDistribution:
     def weights(self) -> List[float]:
         return self._weights
 
+    def random(self, random_generator) -> PackageType:
+        return random_generator.choices(self.packages, self.weights)[0]
+
 
 def create_delivery_requests_json(file_path: string,
                                   num_of_delivery_requests_range: IntRange,
                                   num_of_delivery_options_distribution: IntDistribution,
-                                  num_of_customer_deliveries_distribution: [[]],
-                                  num_of_package_delivery_plans_distribution: [[]],
+                                  num_of_customer_deliveries_distribution: IntDistribution,
+                                  num_of_package_delivery_plans_distribution: IntDistribution,
                                   main_time_window_length_range: IntRange,
-                                  time_windows_length_distribution: [[]],
-                                  priority_distribution: [[]],
+                                  time_windows_length_distribution: IntDistribution,
+                                  priority_distribution: IntDistribution,
                                   drop_points_distribution: PointDistribution,
-                                  azimuth_distribution: [[]],
-                                  elevation_distribution: [[]],
+                                  azimuth_distribution: IntDistribution,
+                                  elevation_distribution: IntDistribution,
                                   package_distribution: PackageDistribution,
                                   random_seed=None):
-    """
-    input explanations :
-    any input as range : [a,b] :[int, int]
-    generates random number in range [a,b] using uniform distribution
-
-    any input as distribution : [[[a,b],p1],[[c,d],p2]],...] : [[[int , int], float],...]]
-    generates random number with probability p1 to be in range [a,b] and probability p2 to be in range [c,d]
-
-    drop_points_distribution : [[[[a,b],[c,d]],p1],...] : [[[[int, int],[int, int]], float],...]
-    generates 2 random numbers (x,y) with probability p1 to be in range [a,b] for x and [c,d] for y...
-
-    package_distribution : [[PackageType name, p1],...] : [[string, float] ,..]
-    generates package type with probability p1
-
-    """
 
     delivery_requests_dict = create_delivery_requests_dict(num_of_delivery_requests_range,
                                                            num_of_delivery_options_distribution,
@@ -135,42 +140,23 @@ def create_delivery_requests_json(file_path: string,
 
 def create_delivery_requests_dict(num_of_delivery_requests_range: IntRange,
                                   num_of_delivery_options_distribution: IntDistribution,
-                                  num_of_customer_deliveries_distribution: [[]],
-                                  num_of_package_delivery_plans_distribution: [[]],
-                                  main_time_window_length_range,
-                                  time_windows_length_distribution: [[]],
-                                  priority_distribution: [[]],
+                                  num_of_customer_deliveries_distribution: IntDistribution,
+                                  num_of_package_delivery_plans_distribution: IntDistribution,
+                                  main_time_window_length_range: IntRange,
+                                  time_windows_length_distribution: IntDistribution,
+                                  priority_distribution: IntDistribution,
                                   drop_points_distribution: PointDistribution,
-                                  azimuth_distribution: [[]],
-                                  elevation_distribution: [[]],
+                                  azimuth_distribution: IntDistribution,
+                                  elevation_distribution: IntDistribution,
                                   package_distribution: PackageDistribution,
                                   random_seed: int = None) -> dict:
-    """
-    input explanations :
-    any input as range : [a,b] :[int, int]
-    generates random number in range [a,b] using uniform distribution
 
-    any input as distribution : [[[a,b],p1],[[c,d],p2]],...] : [[[int , int], float],...]]
-    generates random number with probability p1 to be in range [a,b] and probability p2 to be in range [c,d]
+    rand = Random(random_seed)
 
-    drop_points_distribution : [[[[a,b],[c,d]],p1],...] : [[[[int, int],[int, int]], float],...]
-    generates 2 random numbers (x,y) with probability p1 to be in range [a,b] for x and [c,d] for y...
-
-    package_distribution : [[PackageType name, p1],...] : [[string, float] ,..]
-    generates package type with probability p1
-
-    """
-
-    rand = Random()
-    if random_seed:
-        rand.seed(random_seed)
-
-    num_of_delivery_requests = rand.randint(num_of_delivery_requests_range.start,
-                                            num_of_delivery_requests_range.stop)
-    num_of_delivery_options = rand.choices(num_of_delivery_options_distribution.population,
-                                           num_of_delivery_options_distribution.weights)[0]
-    num_of_customer_deliveries = rand.choices(*get_distribution(num_of_customer_deliveries_distribution))[0]
-    num_of_package_delivery_plans = rand.choices(*get_distribution(num_of_package_delivery_plans_distribution))[0]
+    num_of_delivery_requests = num_of_delivery_requests_range.random(rand)
+    num_of_delivery_options = num_of_delivery_options_distribution.random(rand)
+    num_of_customer_deliveries = num_of_customer_deliveries_distribution.random(rand)
+    num_of_package_delivery_plans = num_of_package_delivery_plans_distribution.random(rand)
 
     delivery_requests = []
     for _ in range(num_of_delivery_requests):
@@ -190,7 +176,7 @@ def create_delivery_request_dict(azimuth_distribution, drop_points_distribution,
                                  num_of_delivery_options, num_of_package_delivery_plans, package_distribution,
                                  priority_distribution, rand, time_windows_length_distribution) -> dict:
     time_window = get_time_window(main_time_window_length_range, time_windows_length_distribution, rand)
-    priority = get_random_value_from_distribution(priority_distribution, rand)
+    priority = priority_distribution.random(rand)
     delivery_options = []
     delivery_request_dict = dict(delivery_options=delivery_options, time_window=time_window, priority=priority)
     for _ in range(num_of_delivery_options):
@@ -198,7 +184,6 @@ def create_delivery_request_dict(azimuth_distribution, drop_points_distribution,
                                                               elevation_distribution, num_of_customer_deliveries,
                                                               num_of_package_delivery_plans,
                                                               package_distribution, rand))
-
     return delivery_request_dict
 
 
@@ -230,21 +215,19 @@ def __create_customer_delivery_dict(azimuth_distribution, drop_points_distributi
 
 def __create_package_delivery_plan_dict(azimuth_distribution, drop_points_distribution, elevation_distribution,
                                         package_distribution, rand) -> dict:
-    package_type = rand.choices(package_distribution.packages, package_distribution.weights)[0]
+    package_type = package_distribution.random(rand)
 
     drop_point_dict = __create_drop_point_dict(drop_points_distribution, rand)
-    azimuth = get_random_value_from_distribution(azimuth_distribution, rand)
-    elevation = get_random_value_from_distribution(elevation_distribution, rand)
+    azimuth = azimuth_distribution.random(rand)
+    elevation = elevation_distribution.random(rand)
     package_delivery_plan_dict = dict(package_type=package_type, azimuth=azimuth, elevation=elevation)
     package_delivery_plan_dict.update(drop_point_dict)
     return package_delivery_plan_dict
 
 
 def __create_drop_point_dict(drop_points_distribution: PointDistribution, rand) -> dict:
-    drop_point_area = rand.choices(drop_points_distribution.areas, drop_points_distribution.weights)[0]
-    drop_point_x = rand.uniform(drop_point_area.x_range.start, drop_point_area.x_range.stop)
-    drop_point_y = rand.uniform(drop_point_area.y_range.start, drop_point_area.y_range.stop)
-    return dict(drop_point_x=drop_point_x, drop_point_y=drop_point_y)
+    drop_point = drop_points_distribution.random(rand)
+    return dict(drop_point_x=drop_point.x, drop_point_y=drop_point.y)
 
 
 def get_random_value_from_distribution(distribution, rand):
@@ -273,10 +256,10 @@ def get_time_window(main_time_window_length_range: [int], time_windows_length_di
     Assuming main_time_window_length isn't more than a month
     """
 
-    main_time_window_length = rand.randint(*main_time_window_length_range)
-    time_window_length = get_random_value_from_distribution(time_windows_length_distribution, rand)
+    main_time_window_length = main_time_window_length_range.random(rand)
+    time_window_length = time_windows_length_distribution.random(rand)
 
-    start_time = rand.randint(0, main_time_window_length - time_window_length)
+    start_time = IntRange(0, main_time_window_length - time_window_length).random(rand)
     end_time = start_time + time_window_length
     return dict(
         start_time=dict(year=params.BASE_YEAR, month=params.BASE_MONTH, day=params.BASE_DAY + int(start_time / 24),
