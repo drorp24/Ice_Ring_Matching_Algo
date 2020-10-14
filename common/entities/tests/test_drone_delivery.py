@@ -1,10 +1,10 @@
 import unittest
 from datetime import datetime
 
-from common.entities.delivery_requests_factory import create_delivery_requests_from_file
 from common.entities.drone_delivery import DroneDelivery, EmptyDroneDelivery
 from common.entities.drone_delivery_board import EmptyDroneDeliveryBoard, DroneDeliveryBoard
 from common.entities.drone_formation import DroneFormationType
+from input.delivery_requests_json_converter import create_delivery_requests_from_file
 
 
 class BasicDroneDeliveryGeneration(unittest.TestCase):
