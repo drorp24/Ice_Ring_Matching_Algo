@@ -4,6 +4,7 @@ from random import Random
 from typing import List
 
 import params
+from common.entities.package import PackageType
 from common.utils import json_file_handler
 
 
@@ -41,7 +42,6 @@ class WeightedPointRange:
 
 
 class IntDistribution:
-
     def __init__(self, ranges: [WeightedIntRange]):
         self._population = []
         self._weights = []
@@ -62,7 +62,6 @@ class IntDistribution:
 
 
 class PointDistribution:
-
     def __init__(self, ranges: [WeightedPointRange]):
         self._areas = ranges
         self._weights = [range_.weight for range_ in ranges]
@@ -70,6 +69,19 @@ class PointDistribution:
     @property
     def areas(self) -> List[WeightedPointRange]:
         return self._areas
+
+    @property
+    def weights(self) -> List[float]:
+        return self._weights
+
+
+class PackageDistribution:
+    def __init__(self, weighted_packages: [(PackageType, float)]):
+        self._packages, self._weights = zip(*weighted_packages)
+
+    @property
+    def packages(self) -> List[PackageType]:
+        return self._packages
 
     @property
     def weights(self) -> List[float]:
@@ -87,7 +99,7 @@ def create_delivery_requests_json(file_path: string,
                                   drop_points_distribution: PointDistribution,
                                   azimuth_distribution: [[]],
                                   elevation_distribution: [[]],
-                                  package_distribution: [[]],
+                                  package_distribution: PackageDistribution,
                                   random_seed=None):
     """
     input explanations :
@@ -131,7 +143,7 @@ def create_delivery_requests_dict(num_of_delivery_requests_range: IntRange,
                                   drop_points_distribution: PointDistribution,
                                   azimuth_distribution: [[]],
                                   elevation_distribution: [[]],
-                                  package_distribution: [[]],
+                                  package_distribution: PackageDistribution,
                                   random_seed: int = None) -> dict:
     """
     input explanations :
@@ -218,7 +230,7 @@ def __create_customer_delivery_dict(azimuth_distribution, drop_points_distributi
 
 def __create_package_delivery_plan_dict(azimuth_distribution, drop_points_distribution, elevation_distribution,
                                         package_distribution, rand) -> dict:
-    package_type = get_random_value_from_distribution(package_distribution, rand)
+    package_type = rand.choices(package_distribution.packages, package_distribution.weights)[0]
 
     drop_point_dict = __create_drop_point_dict(drop_points_distribution, rand)
     azimuth = get_random_value_from_distribution(azimuth_distribution, rand)

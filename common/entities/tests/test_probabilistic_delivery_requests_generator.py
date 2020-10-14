@@ -4,7 +4,8 @@ from random import Random
 import params
 from common.entities.package import PackageType
 from common.entities.probabilistic_delivery_requests_generator import get_distribution, create_delivery_requests_dict, \
-    get_time_window, create_delivery_requests_json, IntRange, WeightedIntRange, IntDistribution, PointDistribution, WeightedPointRange, FloatRange
+    get_time_window, create_delivery_requests_json, IntRange, WeightedIntRange, IntDistribution, PointDistribution, \
+    WeightedPointRange, FloatRange, PackageDistribution
 from input.delivery_requests_json_converter import create_delivery_requests_from_file
 
 
@@ -51,6 +52,10 @@ class ProbabilisticDeliveryRequestsGenerationTest(unittest.TestCase):
         drop_points_distribution = PointDistribution([
             WeightedPointRange(FloatRange(0.0, 100.0), FloatRange(0.0, 100.0), 0.7),
             WeightedPointRange(FloatRange(100.0, 200.0), FloatRange(0.0, 100.0), 0.3)])
+        package_distribution = PackageDistribution([(PackageType.TINY.name, 0.5),
+                                                    (PackageType.SMALL.name, 0.3),
+                                                    (PackageType.MEDIUM.name, 0.2),
+                                                    (PackageType.LARGE.name, 0)])
 
         delivery_request_dict1 = create_delivery_requests_dict(num_of_delivery_requests_range=IntRange(5, 5),
                                                                num_of_delivery_options_distribution=num_of_delivery_options_distribution,
@@ -68,10 +73,7 @@ class ProbabilisticDeliveryRequestsGenerationTest(unittest.TestCase):
                                                                azimuth_distribution=[[[0, 359], 1]],
                                                                elevation_distribution=[[[90, 90], 0.5],
                                                                                        [[30, 89], 0.5]],
-                                                               package_distribution=[[PackageType.TINY.name, 0.5],
-                                                                                     [PackageType.SMALL.name, 0.3],
-                                                                                     [PackageType.MEDIUM.name, 0.2],
-                                                                                     [PackageType.LARGE.name, 0]],
+                                                               package_distribution=package_distribution,
                                                                random_seed=10)
         delivery_request_dict2 = create_delivery_requests_dict(num_of_delivery_requests_range=IntRange(5, 5),
                                                                num_of_delivery_options_distribution=num_of_delivery_options_distribution,
@@ -89,10 +91,7 @@ class ProbabilisticDeliveryRequestsGenerationTest(unittest.TestCase):
                                                                azimuth_distribution=[[[0, 359], 1]],
                                                                elevation_distribution=[[[90, 90], 0.5],
                                                                                        [[30, 89], 0.5]],
-                                                               package_distribution=[[PackageType.TINY.name, 0.5],
-                                                                                     [PackageType.SMALL.name, 0.3],
-                                                                                     [PackageType.MEDIUM.name, 0.2],
-                                                                                     [PackageType.LARGE.name, 0]],
+                                                               package_distribution=package_distribution,
                                                                random_seed=10)
 
         self.assertEqual(delivery_request_dict1, delivery_request_dict2)
