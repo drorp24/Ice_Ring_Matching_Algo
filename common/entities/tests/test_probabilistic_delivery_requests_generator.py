@@ -72,6 +72,28 @@ class ProbabilisticDeliveryRequestsGenerationTest(unittest.TestCase):
         self.assertEqual(time_window['start_time']['day'], params.BASE_DAY)
         self.assertEqual(time_window['end_time']['day'], params.BASE_DAY + 1)
 
+    def test_create_delivery_options_dict(self):
+        num_of_delivery_requests_range = IntRange(100, 100)
+        num_of_delivery_options_distribution = IntDistribution([WeightedIntRange(1, 100, 1)])
+
+        delivery_request_dict1 = create_delivery_requests_dict(
+            num_of_delivery_requests_range=num_of_delivery_requests_range,
+            num_of_delivery_options_distribution=num_of_delivery_options_distribution,
+            num_of_customer_deliveries_distribution=self.num_of_customer_deliveries_distribution,
+            num_of_package_delivery_plans_distribution=self.num_of_package_delivery_plans_distribution,
+            main_time_window_length_range=self.main_time_window_length_range,
+            time_windows_length_distribution=self.time_windows_length_distribution,
+            priority_distribution=self.priority_distribution,
+            drop_points_distribution=self.drop_points_distribution,
+            azimuth_distribution=self.azimuth_distribution,
+            elevation_distribution=self.elevation_distribution,
+            package_distribution=self.package_distribution,
+            random_seed=self.random_seed)
+
+        delivery_options_size_list = [len(delivery_request["delivery_options"]) for delivery_request in delivery_request_dict1["delivery_requests"]]
+        self.assertGreater(len(delivery_options_size_list), len(set(delivery_options_size_list)))
+        self.assertGreater(len(set(delivery_options_size_list)), 1)
+
     def test_create_delivery_requests_dict_with_seed(self):
         delivery_request_dict1 = create_delivery_requests_dict(
             num_of_delivery_requests_range=self.num_of_delivery_requests_range,

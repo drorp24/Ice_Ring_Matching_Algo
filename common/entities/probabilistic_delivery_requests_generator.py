@@ -153,70 +153,91 @@ def create_delivery_requests_dict(num_of_delivery_requests_range: IntRange,
 
     rand = Random(random_seed)
 
-    num_of_delivery_requests = num_of_delivery_requests_range.random(rand)
-    num_of_delivery_options = num_of_delivery_options_distribution.random(rand)
-    num_of_customer_deliveries = num_of_customer_deliveries_distribution.random(rand)
-    num_of_package_delivery_plans = num_of_package_delivery_plans_distribution.random(rand)
-
     delivery_requests = []
-    for _ in range(num_of_delivery_requests):
-        delivery_requests.append(create_delivery_request_dict(azimuth_distribution, drop_points_distribution,
-                                                              elevation_distribution, main_time_window_length_range,
-                                                              num_of_customer_deliveries,
-                                                              num_of_delivery_options, num_of_package_delivery_plans,
+    for _ in range(num_of_delivery_requests_range.random(rand)):
+        delivery_requests.append(create_delivery_request_dict(azimuth_distribution,
+                                                              drop_points_distribution,
+                                                              elevation_distribution,
+                                                              main_time_window_length_range,
+                                                              num_of_customer_deliveries_distribution,
+                                                              num_of_delivery_options_distribution,
+                                                              num_of_package_delivery_plans_distribution,
                                                               package_distribution,
-                                                              priority_distribution, rand,
+                                                              priority_distribution,
+                                                              rand,
                                                               time_windows_length_distribution))
-
     return dict(delivery_requests=delivery_requests)
 
 
-def create_delivery_request_dict(azimuth_distribution, drop_points_distribution,
-                                 elevation_distribution, main_time_window_length_range, num_of_customer_deliveries,
-                                 num_of_delivery_options, num_of_package_delivery_plans, package_distribution,
-                                 priority_distribution, rand, time_windows_length_distribution) -> dict:
+def create_delivery_request_dict(azimuth_distribution,
+                                 drop_points_distribution,
+                                 elevation_distribution,
+                                 main_time_window_length_range,
+                                 num_of_customer_deliveries_distribution,
+                                 num_of_delivery_options_distribution,
+                                 num_of_package_delivery_plans_distribution,
+                                 package_distribution,
+                                 priority_distribution,
+                                 rand,
+                                 time_windows_length_distribution) -> dict:
     time_window = get_time_window(main_time_window_length_range, time_windows_length_distribution, rand)
     priority = priority_distribution.random(rand)
     delivery_options = []
     delivery_request_dict = dict(delivery_options=delivery_options, time_window=time_window, priority=priority)
-    for _ in range(num_of_delivery_options):
-        delivery_options.append(__create_delivery_option_dict(azimuth_distribution, drop_points_distribution,
-                                                              elevation_distribution, num_of_customer_deliveries,
-                                                              num_of_package_delivery_plans,
-                                                              package_distribution, rand))
+    for _ in range(num_of_delivery_options_distribution.random(rand)):
+        delivery_options.append(__create_delivery_option_dict(azimuth_distribution,
+                                                              drop_points_distribution,
+                                                              elevation_distribution,
+                                                              num_of_customer_deliveries_distribution,
+                                                              num_of_package_delivery_plans_distribution,
+                                                              package_distribution,
+                                                              rand))
     return delivery_request_dict
 
 
-def __create_delivery_option_dict(azimuth_distribution, drop_points_distribution,
-                                  elevation_distribution, num_of_customer_deliveries, num_of_package_delivery_plans,
-                                  package_distribution, rand) -> dict:
+def __create_delivery_option_dict(azimuth_distribution,
+                                  drop_points_distribution,
+                                  elevation_distribution,
+                                  num_of_customer_deliveries_distribution,
+                                  num_of_package_delivery_plans_distribution,
+                                  package_distribution,
+                                  rand) -> dict:
     customer_deliveries = []
     delivery_option = dict(customer_deliveries=customer_deliveries)
-    for _ in range(num_of_customer_deliveries):
-        customer_deliveries.append(__create_customer_delivery_dict(azimuth_distribution, drop_points_distribution,
+    for _ in range(num_of_customer_deliveries_distribution.random(rand)):
+        customer_deliveries.append(__create_customer_delivery_dict(azimuth_distribution,
+                                                                   drop_points_distribution,
                                                                    elevation_distribution,
-                                                                   num_of_package_delivery_plans,
-                                                                   package_distribution, rand))
+                                                                   num_of_package_delivery_plans_distribution,
+                                                                   package_distribution,
+                                                                   rand))
     return delivery_option
 
 
-def __create_customer_delivery_dict(azimuth_distribution, drop_points_distribution,
-                                    elevation_distribution, num_of_package_delivery_plans,
-                                    package_distribution, rand) -> dict:
+def __create_customer_delivery_dict(azimuth_distribution,
+                                    drop_points_distribution,
+                                    elevation_distribution,
+                                    num_of_package_delivery_plans_distribution,
+                                    package_distribution,
+                                    rand) -> dict:
     package_delivery_plans = []
     customer_delivery = dict(package_delivery_plans=package_delivery_plans)
-    for _ in range(num_of_package_delivery_plans):
+    for _ in range(num_of_package_delivery_plans_distribution.random(rand)):
         package_delivery_plans.append(
-            __create_package_delivery_plan_dict(azimuth_distribution, drop_points_distribution,
+            __create_package_delivery_plan_dict(azimuth_distribution,
+                                                drop_points_distribution,
                                                 elevation_distribution,
-                                                package_distribution, rand))
+                                                package_distribution,
+                                                rand))
     return customer_delivery
 
 
-def __create_package_delivery_plan_dict(azimuth_distribution, drop_points_distribution, elevation_distribution,
-                                        package_distribution, rand) -> dict:
+def __create_package_delivery_plan_dict(azimuth_distribution,
+                                        drop_points_distribution,
+                                        elevation_distribution,
+                                        package_distribution,
+                                        rand) -> dict:
     package_type = package_distribution.random(rand)
-
     drop_point_dict = __create_drop_point_dict(drop_points_distribution, rand)
     azimuth = azimuth_distribution.random(rand)
     elevation = elevation_distribution.random(rand)
