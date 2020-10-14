@@ -4,7 +4,7 @@ from random import Random
 import params
 from common.entities.package import PackageType
 from common.entities.probabilistic_delivery_requests_generator import get_distribution, create_delivery_requests_dict, \
-    get_time_window, create_delivery_requests_json
+    get_time_window, create_delivery_requests_json, IntRange, WeightedIntRange, IntDistribution
 from input.delivery_requests_json_converter import create_delivery_requests_from_file
 
 
@@ -47,8 +47,9 @@ class ProbabilisticDeliveryRequestsGenerationTest(unittest.TestCase):
         self.assertEqual(time_window['end_time']['day'], params.BASE_DAY + 1)
 
     def test_create_delivery_requests_with_seed(self):
-        delivery_request_dict1 = create_delivery_requests_dict(num_of_delivery_requests_range=[5, 5],
-                                                               num_of_delivery_options_distribution=[[[1, 2], 1]],
+        num_of_delivery_options_distribution = IntDistribution([WeightedIntRange(1, 2, 1)])
+        delivery_request_dict1 = create_delivery_requests_dict(num_of_delivery_requests_range=IntRange(5, 5),
+                                                               num_of_delivery_options_distribution=num_of_delivery_options_distribution,
                                                                num_of_customer_deliveries_distribution=[[[1, 3], 0.9],
                                                                                                         [[4, 5], 0.1]],
                                                                num_of_package_delivery_plans_distribution=[
@@ -69,8 +70,8 @@ class ProbabilisticDeliveryRequestsGenerationTest(unittest.TestCase):
                                                                                      [PackageType.MEDIUM.name, 0.2],
                                                                                      [PackageType.LARGE.name, 0]],
                                                                random_seed=10)
-        delivery_request_dict2 = create_delivery_requests_dict(num_of_delivery_requests_range=[5, 5],
-                                                               num_of_delivery_options_distribution=[[[1, 2], 1]],
+        delivery_request_dict2 = create_delivery_requests_dict(num_of_delivery_requests_range=IntRange(5, 5),
+                                                               num_of_delivery_options_distribution=num_of_delivery_options_distribution,
                                                                num_of_customer_deliveries_distribution=[[[1, 3], 0.9],
                                                                                                         [[4, 5], 0.1]],
                                                                num_of_package_delivery_plans_distribution=[
