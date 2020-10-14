@@ -1,10 +1,12 @@
+from common.entities.grid import DeliveryRequestId
 from time_window import TimeWindow
 from common.entities.delivery_option import DeliveryOption
 
 
 class DeliveryRequest:
 
-    def __init__(self, delivery_options: [DeliveryOption], time_window :TimeWindow, priority: int):
+    def __init__(self, delivery_request_id: DeliveryRequestId, delivery_options: [DeliveryOption], time_window :TimeWindow, priority: int):
+        self._delivery_request_id = delivery_request_id
         self._delivery_options = delivery_options if delivery_options is not None else []
         self._time_window = time_window
         self._priority = priority
