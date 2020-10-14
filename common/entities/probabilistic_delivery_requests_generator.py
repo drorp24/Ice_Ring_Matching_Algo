@@ -1,9 +1,7 @@
-import math
 import string
 from dataclasses import dataclass
 from random import Random
 from typing import List
-from numpy.random import choice, default_rng, BitGenerator
 
 import params
 from common.utils import json_file_handler
@@ -36,44 +34,15 @@ class WeightedFloatRange:
 
 
 @dataclass
-class WeightedPoint:
+class WeightedPointRange:
     x_range: FloatRange
     y_range: FloatRange
     weight: float
-
-# @dataclass
-# class RangeChoice(WeightedChoice):
-#     obj: Range
-
-
-# class MultiWeightedRangeDistribution:
-#
-#     def __init__(self, options: [WeightedRange]):
-#         self._options = options
-#
-#     @property
-#     def weights(self) -> List[float]:
-#         return [option.weight for option in self._options]
-#
-#     @property
-#     def internal_objects(self):
-#         return [option.obj for option in self._options]
-#
-#     def get_rand(self, rand_generator: BitGenerator):
-#         return rand_generator.choice(self.internal_objects, p=self._get_probs())
-#
-#     def _get_probs(self):
-#         sum = self._calc_sum_of_weights()
-#         return [weight/sum for weight in self.weights]
-#
-#     def _calc_sum_of_weights(self):
-#         return sum(self.weights)
 
 
 class IntDistribution:
 
     def __init__(self, ranges: [WeightedIntRange]):
-        self._options = ranges
         self._population = []
         self._weights = []
         for range_ in ranges:
@@ -92,22 +61,15 @@ class IntDistribution:
         return self._weights
 
 
-class IntDistribution:
+class PointDistribution:
 
-    def __init__(self, ranges: [WeightedIntRange]):
-        self._options = ranges
-        self._population = []
-        self._weights = []
-        for range_ in ranges:
-            values = list(range(range_.start, range_.stop))
-            values.append(range_.stop)
-            relative_weights = [range_.weight / len(values) for _ in values]
-            self._population.extend(values)
-            self._weights.extend(relative_weights)
+    def __init__(self, ranges: [WeightedPointRange]):
+        self._areas = ranges
+        self._weights = [range_.weight for range_ in ranges]
 
     @property
-    def population(self) -> List[int]:
-        return self._population
+    def areas(self) -> List[WeightedPointRange]:
+        return self._areas
 
     @property
     def weights(self) -> List[float]:
@@ -122,7 +84,7 @@ def create_delivery_requests_json(file_path: string,
                                   main_time_window_length_range: IntRange,
                                   time_windows_length_distribution: [[]],
                                   priority_distribution: [[]],
-                                  drop_points_distribution: [[]],
+                                  drop_points_distribution: PointDistribution,
                                   azimuth_distribution: [[]],
                                   elevation_distribution: [[]],
                                   package_distribution: [[]],
@@ -166,7 +128,7 @@ def create_delivery_requests_dict(num_of_delivery_requests_range: IntRange,
                                   main_time_window_length_range,
                                   time_windows_length_distribution: [[]],
                                   priority_distribution: [[]],
-                                  drop_points_distribution: [[]],
+                                  drop_points_distribution: PointDistribution,
                                   azimuth_distribution: [[]],
                                   elevation_distribution: [[]],
                                   package_distribution: [[]],
@@ -266,13 +228,10 @@ def __create_package_delivery_plan_dict(azimuth_distribution, drop_points_distri
     return package_delivery_plan_dict
 
 
-def __create_drop_point_dict(drop_points_distribution, rand) -> dict:
-    drop_point_area = rand.choices(range(len(drop_points_distribution)),
-                                   [distribution[1] for distribution in drop_points_distribution])[0]
-
-    drop_points_range = drop_points_distribution[drop_point_area][0]
-    drop_point_x = rand.randint(*drop_points_range[0])
-    drop_point_y = rand.randint(*drop_points_range[1])
+def __create_drop_point_dict(drop_points_distribution: PointDistribution, rand) -> dict:
+    drop_point_area = rand.choices(drop_points_distribution.areas, drop_points_distribution.weights)[0]
+    drop_point_x = rand.uniform(drop_point_area.x_range.start, drop_point_area.x_range.stop)
+    drop_point_y = rand.uniform(drop_point_area.y_range.start, drop_point_area.y_range.stop)
     return dict(drop_point_x=drop_point_x, drop_point_y=drop_point_y)
 
 

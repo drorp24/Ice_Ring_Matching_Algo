@@ -4,7 +4,7 @@ from random import Random
 import params
 from common.entities.package import PackageType
 from common.entities.probabilistic_delivery_requests_generator import get_distribution, create_delivery_requests_dict, \
-    get_time_window, create_delivery_requests_json, IntRange, WeightedIntRange, IntDistribution
+    get_time_window, create_delivery_requests_json, IntRange, WeightedIntRange, IntDistribution, PointDistribution, WeightedPointRange, FloatRange
 from input.delivery_requests_json_converter import create_delivery_requests_from_file
 
 
@@ -48,6 +48,10 @@ class ProbabilisticDeliveryRequestsGenerationTest(unittest.TestCase):
 
     def test_create_delivery_requests_with_seed(self):
         num_of_delivery_options_distribution = IntDistribution([WeightedIntRange(1, 2, 1)])
+        drop_points_distribution = PointDistribution([
+            WeightedPointRange(FloatRange(0.0, 100.0), FloatRange(0.0, 100.0), 0.7),
+            WeightedPointRange(FloatRange(100.0, 200.0), FloatRange(0.0, 100.0), 0.3)])
+
         delivery_request_dict1 = create_delivery_requests_dict(num_of_delivery_requests_range=IntRange(5, 5),
                                                                num_of_delivery_options_distribution=num_of_delivery_options_distribution,
                                                                num_of_customer_deliveries_distribution=[[[1, 3], 0.9],
@@ -60,8 +64,7 @@ class ProbabilisticDeliveryRequestsGenerationTest(unittest.TestCase):
                                                                                                  [[5, 15], 0.3],
                                                                                                  [[15, 24], 0.3]],
                                                                priority_distribution=[[[0, 3], 1]],
-                                                               drop_points_distribution=[[[[0, 100], [0, 100]], 0.7],
-                                                                                         [[[100, 200], [0, 100]], 0.3]],
+                                                               drop_points_distribution=drop_points_distribution,
                                                                azimuth_distribution=[[[0, 359], 1]],
                                                                elevation_distribution=[[[90, 90], 0.5],
                                                                                        [[30, 89], 0.5]],
@@ -82,8 +85,7 @@ class ProbabilisticDeliveryRequestsGenerationTest(unittest.TestCase):
                                                                                                  [[5, 15], 0.3],
                                                                                                  [[15, 24], 0.3]],
                                                                priority_distribution=[[[0, 3], 1]],
-                                                               drop_points_distribution=[[[[0, 100], [0, 100]], 0.7],
-                                                                                         [[[100, 200], [0, 100]], 0.3]],
+                                                               drop_points_distribution=drop_points_distribution,
                                                                azimuth_distribution=[[[0, 359], 1]],
                                                                elevation_distribution=[[[90, 90], 0.5],
                                                                                        [[30, 89], 0.5]],
