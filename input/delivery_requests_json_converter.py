@@ -11,9 +11,7 @@ from common.entities.delivery_option import DeliveryOption
 from common.entities.delivery_request import DeliveryRequest
 from common.entities.package_delivery_plan import PackageDeliveryPlan
 from time_window import TimeWindow
-
 from common.utils.json_file_handler import create_dict_from_json
-
 from common.math.angle import Angle, AngleUnit
 from geometry import geo_factory
 

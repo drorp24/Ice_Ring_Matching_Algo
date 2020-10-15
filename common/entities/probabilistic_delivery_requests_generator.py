@@ -251,26 +251,6 @@ def __create_drop_point_dict(drop_points_distribution: PointDistribution, rand) 
     return dict(drop_point_x=drop_point.x, drop_point_y=drop_point.y)
 
 
-def get_random_value_from_distribution(distribution, rand):
-    return rand.choices(*get_distribution(distribution))[0]
-
-
-def get_distribution(distribution: [[]]) -> ([], []):
-    population = []
-    weights = []
-    for range_prob in distribution:
-        if isinstance(range_prob[0], list):
-            values_range = list(range(*range_prob[0]))
-            values_range.append(range_prob[0][1])
-            prob = [range_prob[1] / len(values_range) for _ in values_range]
-            population.extend(values_range)
-            weights.extend(prob)
-        else:
-            population.append(range_prob[0])
-            weights.append(range_prob[1])
-    return population, weights
-
-
 def get_time_window(main_time_window_length_range: [int], time_windows_length_distribution: [[]],
                     rand: Random) -> dict:
     """
@@ -280,7 +260,7 @@ def get_time_window(main_time_window_length_range: [int], time_windows_length_di
     main_time_window_length = main_time_window_length_range.random(rand)
     time_window_length = time_windows_length_distribution.random(rand)
 
-    start_time = IntRange(0, main_time_window_length - time_window_length).random(rand)
+    start_time = IntRange(params.BASE_HOUR, main_time_window_length - time_window_length).random(rand)
     end_time = start_time + time_window_length
     return dict(
         start_time=dict(year=params.BASE_YEAR, month=params.BASE_MONTH, day=params.BASE_DAY + int(start_time / 24),

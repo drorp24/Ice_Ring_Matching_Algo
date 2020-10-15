@@ -26,8 +26,28 @@ class BasicPackageGeneration(unittest.TestCase):
         self.assertEqual(self.p3.value.weight, 4)
         self.assertEqual(self.p4.value.weight, 8)
 
+    def test_2_package_equal(self):
+        self.assertEqual(self.p1.value, PackageType.TINY.value)
+
+    def test_2_package_not_equal(self):
+        self.assertNotEqual(self.p1.value, self.p2.value)
+
     def test_package_delivery_plan(self):
-        self.assertEqual(self.pdp.package.weight, 1)
+        self.assertEqual(self.pdp.package_type.value.weight, 1)
+
+    def test_2_package_delivery_plans_equal(self):
+        expected_pdp = package_delivery_plan_factory(create_point_2d(1, 2),
+                                                     azimuth=Angle(30, AngleUnit.DEGREE),
+                                                     elevation=Angle(80, AngleUnit.DEGREE),
+                                                     package_type=PackageType.TINY)
+        self.assertEqual(self.pdp, expected_pdp)
+
+    def test_2_package_delivery_plans_not_equal(self):
+        expected_pdp = package_delivery_plan_factory(create_point_2d(1, 2),
+                                                     azimuth=Angle(31, AngleUnit.DEGREE),
+                                                     elevation=Angle(80, AngleUnit.DEGREE),
+                                                     package_type=PackageType.TINY)
+        self.assertNotEqual(self.pdp, expected_pdp)
 
     def test_drop_envelope_when_same_drop_and_drone_azimuth(self):
         drone_azimuth = Angle(self.pdp.azimuth.in_degrees(), AngleUnit.DEGREE)

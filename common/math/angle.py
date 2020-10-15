@@ -17,16 +17,11 @@ class Angle:
         self.__value = value
         self.__unit = unit
 
-    @property
-    def _value(self) -> float:
-        return self.__value
-
-    @property
-    def _unit(self) -> AngleUnit:
-        return self.__unit
+    def __eq__(self, other):
+        return self.in_degrees() == other.in_degrees()
 
     def in_degrees(self) -> float:
-        return self._value if self._unit is AngleUnit.DEGREE else math.degrees(self._value)
+        return self.__value if self.__unit is AngleUnit.DEGREE else math.degrees(self.__value)
 
     def in_radians(self) -> float:
-        return self._value if self._unit is AngleUnit.RADIAN else math.radians(self._value)
+        return self.__value if self.__unit is AngleUnit.RADIAN else math.radians(self.__value)

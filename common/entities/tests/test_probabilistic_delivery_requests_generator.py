@@ -1,13 +1,21 @@
 import unittest
+from datetime import datetime
 from pathlib import Path
 from random import Random
 
+from time_window import TimeWindow
 import params
+from common.entities.customer_delivery import CustomerDelivery
+from common.entities.delivery_option import DeliveryOption
+from common.entities.delivery_request import DeliveryRequest
 from common.entities.package import PackageType
-from common.entities.probabilistic_delivery_requests_generator import get_distribution, create_delivery_requests_dict, \
+from common.entities.package_delivery_plan import PackageDeliveryPlan
+from common.entities.probabilistic_delivery_requests_generator import create_delivery_requests_dict, \
     get_time_window, create_delivery_requests_json, IntRange, WeightedIntRange, IntDistribution, PointDistribution, \
     WeightedPointRange, FloatRange, PackageDistribution
+from geometry.geo_factory import create_point_2d
 from input.delivery_requests_json_converter import create_delivery_requests_from_file
+from common.math.angle import Angle, AngleUnit
 
 
 class ProbabilisticDeliveryRequestsGenerationTest(unittest.TestCase):
@@ -90,7 +98,8 @@ class ProbabilisticDeliveryRequestsGenerationTest(unittest.TestCase):
             package_distribution=self.package_distribution,
             random_seed=self.random_seed)
 
-        delivery_options_size_list = [len(delivery_request["delivery_options"]) for delivery_request in delivery_request_dict1["delivery_requests"]]
+        delivery_options_size_list = [len(delivery_request["delivery_options"])
+                                      for delivery_request in delivery_request_dict1["delivery_requests"]]
         self.assertGreater(len(delivery_options_size_list), len(set(delivery_options_size_list)))
         self.assertGreater(len(set(delivery_options_size_list)), 1)
 
@@ -152,19 +161,55 @@ class ProbabilisticDeliveryRequestsGenerationTest(unittest.TestCase):
 
         self.assertNotEqual(delivery_request_dict1, delivery_request_dict2)
 
-    def test_create_delivery_requests_json(self):
-        create_delivery_requests_json(self.output_json_path,
-                                      num_of_delivery_requests_range=self.num_of_delivery_requests_range,
-                                      num_of_delivery_options_distribution=self.num_of_delivery_options_distribution,
-                                      num_of_customer_deliveries_distribution=self.num_of_customer_deliveries_distribution,
-                                      num_of_package_delivery_plans_distribution=self.num_of_package_delivery_plans_distribution,
-                                      main_time_window_length_range=self.main_time_window_length_range,
-                                      time_windows_length_distribution=self.time_windows_length_distribution,
-                                      priority_distribution=self.priority_distribution,
-                                      drop_points_distribution=self.drop_points_distribution,
-                                      azimuth_distribution=self.azimuth_distribution,
-                                      elevation_distribution=self.elevation_distribution,
-                                      package_distribution=self.package_distribution)
+    def test_create_delivery_request_from_json(self):
+        expected_request = DeliveryRequest(
+            delivery_options=[
+                DeliveryOption([
+                    CustomerDelivery([
+                        PackageDeliveryPlan(drop_point=create_point_2d(5.0, 7.0),
+                                            azimuth=Angle(45, AngleUnit.DEGREE),
+                                            elevation=Angle(30, AngleUnit.DEGREE),
+                                            package_type=PackageType.MEDIUM)])])],
+            time_window=TimeWindow(
+                datetime(params.BASE_YEAR, params.BASE_MONTH, params.BASE_DAY,
+                         params.BASE_HOUR, params.BASE_MINUTE, params.BASE_SECOND),
+                datetime(params.BASE_YEAR, params.BASE_MONTH, params.BASE_DAY,
+                         params.BASE_HOUR + 2, params.BASE_MINUTE, params.BASE_SECOND)),
+            priority=0)
+
+        create_delivery_requests_json(
+            self.output_json_path,
+            num_of_delivery_requests_range=IntRange(1, 1),
+            num_of_delivery_options_distribution=IntDistribution([WeightedIntRange(1, 1, 1)]),
+            num_of_customer_deliveries_distribution=IntDistribution([WeightedIntRange(1, 1, 1)]),
+            num_of_package_delivery_plans_distribution=IntDistribution([WeightedIntRange(1, 1, 1)]),
+            main_time_window_length_range=IntRange(2, 2),
+            time_windows_length_distribution=IntDistribution([WeightedIntRange(2, 2, 1)]),
+            priority_distribution=IntDistribution([WeightedIntRange(0, 0, 1)]),
+            drop_points_distribution=PointDistribution([WeightedPointRange(FloatRange(5.0, 5.0),
+                                                                           FloatRange(7.0, 7.0), 1)]),
+            azimuth_distribution=IntDistribution([WeightedIntRange(45, 45, 1)]),
+            elevation_distribution=IntDistribution([WeightedIntRange(30, 30, 1)]),
+            package_distribution=PackageDistribution([(PackageType.MEDIUM.name, 1)]))
+        request_from_json = create_delivery_requests_from_file(self.output_json_path)
+
+        self.assertEqual(len(request_from_json), 1)
+        self.assertEqual(request_from_json[0], expected_request)
+
+    def test_create_Multiple_delivery_requests_from_json(self):
+        create_delivery_requests_json(
+            self.output_json_path,
+            num_of_delivery_requests_range=self.num_of_delivery_requests_range,
+            num_of_delivery_options_distribution=self.num_of_delivery_options_distribution,
+            num_of_customer_deliveries_distribution=self.num_of_customer_deliveries_distribution,
+            num_of_package_delivery_plans_distribution=self.num_of_package_delivery_plans_distribution,
+            main_time_window_length_range=self.main_time_window_length_range,
+            time_windows_length_distribution=self.time_windows_length_distribution,
+            priority_distribution=self.priority_distribution,
+            drop_points_distribution=self.drop_points_distribution,
+            azimuth_distribution=self.azimuth_distribution,
+            elevation_distribution=self.elevation_distribution,
+            package_distribution=self.package_distribution)
         dr = create_delivery_requests_from_file(self.output_json_path)
 
         self.assertEqual(len(dr), 5)
