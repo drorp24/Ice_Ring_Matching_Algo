@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-import string
 from datetime import datetime
+from pathlib import Path
 from typing import List
 
 from common.entities.package import PackageType
@@ -11,21 +11,19 @@ from common.entities.delivery_option import DeliveryOption
 from common.entities.delivery_request import DeliveryRequest
 from common.entities.package_delivery_plan import PackageDeliveryPlan
 from time_window import TimeWindow
-
-from common.utils import json_file_handler
-
+from common.utils.json_file_handler import create_dict_from_json
 from common.math.angle import Angle, AngleUnit
 from geometry import geo_factory
 
 
-def create_delivery_requests_from_file(file_path: str) -> List[DeliveryRequest]:
-    delivery_requests_dict = json_file_handler.from_file(file_path)
+def create_delivery_requests_from_file(file_path: Path) -> List[DeliveryRequest]:
+    delivery_requests_dict = create_dict_from_json(file_path)
     delivery_requests = [__create_delivery_request_from_dict(delivery_request_dict) for delivery_request_dict in
                          delivery_requests_dict['delivery_requests']]
     return delivery_requests
 
 
-def __create_delivery_request_from_dict(delivery_request_dict: {}) -> DeliveryRequest:
+def __create_delivery_request_from_dict(delivery_request_dict: dict) -> DeliveryRequest:
 
     start_time_dict = delivery_request_dict['time_window']['start_time']
     end_time_dict = delivery_request_dict['time_window']['end_time']
@@ -39,22 +37,22 @@ def __create_delivery_request_from_dict(delivery_request_dict: {}) -> DeliveryRe
         priority=delivery_request_dict['priority'])
 
 
-def __create_delivery_option_from_dict(delivery_option_dict: {}) -> DeliveryOption:
+def __create_delivery_option_from_dict(delivery_option_dict: dict) -> DeliveryOption:
     return DeliveryOption(
         customer_deliveries=[__create_customer_delivery_from_dict(customer_delivery_dict) for customer_delivery_dict in
                              delivery_option_dict['customer_deliveries']])
 
 
-def __create_customer_delivery_from_dict(customer_delivery_dict: {}) -> CustomerDelivery:
+def __create_customer_delivery_from_dict(customer_delivery_dict: dict) -> CustomerDelivery:
     return CustomerDelivery(
         package_delivery_plans=[__create_package_delivery_plan_from_dict(package_delivery_plan) for
                                 package_delivery_plan in
                                 customer_delivery_dict['package_delivery_plans']])
 
 
-def __create_package_delivery_plan_from_dict(package_delivery_plan_dict: {}) -> PackageDeliveryPlan:
+def __create_package_delivery_plan_from_dict(package_delivery_plan_dict: dict) -> PackageDeliveryPlan:
     return package_delivery_plan_factory(point=geo_factory.create_point_2d(package_delivery_plan_dict['drop_point_x'],
-                                                       package_delivery_plan_dict['drop_point_y']),
+                                                                           package_delivery_plan_dict['drop_point_y']),
                                          azimuth=Angle(package_delivery_plan_dict['azimuth'], AngleUnit.DEGREE),
                                          elevation=Angle(package_delivery_plan_dict['elevation'], AngleUnit.DEGREE),
                                          package_type=PackageType[package_delivery_plan_dict['package_type'].upper()])
