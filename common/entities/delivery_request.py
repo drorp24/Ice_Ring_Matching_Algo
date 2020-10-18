@@ -11,6 +11,11 @@ class DeliveryRequest:
         self._time_window = time_window
         self._priority = priority
 
+    def __eq__(self, other):
+        return (self.delivery_options == other.delivery_options) and \
+               (self.time_window == other.time_window) and \
+               (self.priority == other.priority)
+
     @property
     def delivery_options(self) -> [DeliveryOption]:
         return self._delivery_options

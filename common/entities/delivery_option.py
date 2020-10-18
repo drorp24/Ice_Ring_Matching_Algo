@@ -8,6 +8,9 @@ class DeliveryOption:
         self._delivery_option_id = delivery_option_id
         self._customer_deliveries = customer_deliveries if customer_deliveries is not None else []
 
+    def __eq__(self, other):
+        return self.customer_deliveries == other.customer_deliveries
+
     @property
     def customer_deliveries(self) -> [CustomerDelivery]:
         return self._customer_deliveries
