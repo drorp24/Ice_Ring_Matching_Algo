@@ -224,6 +224,10 @@ class Polygon2D(Geometry2D, Surface2D):
     def boundary(self) -> LinearRing2D:
         raise NotImplementedError()
 
+    @property
+    def bbox(self) -> Polygon2D:
+        raise NotImplementedError()
+
     @abstractmethod
     def calc_area(self) -> float:
         raise NotImplementedError()

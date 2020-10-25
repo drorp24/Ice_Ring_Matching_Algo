@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from typing import List, Tuple, Union
+
 from shapely.geometry import Point, Polygon, LineString, LinearRing, MultiPolygon
 from shapely.geometry.base import BaseGeometry, EmptyGeometry
 
@@ -162,7 +163,12 @@ class _ShapelyPolygon2D(_ShapelyGeometry, Polygon2D):
 
     @property
     def boundary(self) -> LinearRing2D:
-        return _ShapelyLinearRing2D(self.points)
+        raise NotImplementedError
+
+    @property
+    def bbox(self) -> Polygon2D:
+        x_min, y_min, x_max, y_max = self._shapely_obj.bounds
+        return _ShapelyBbox2D(_ShapelyPoint2D(x_min, y_min), _ShapelyPoint2D(x_max, y_max))
 
     @property
     def points(self) -> List[Point2D]:
@@ -200,6 +206,43 @@ class _ShapelyPolygon2D(_ShapelyGeometry, Polygon2D):
 
     def __eq__(self, other):
         return self.calc_difference(other).calc_area() == 0 and other.calc_difference(self).calc_area() == 0
+
+
+class _ShapelyBbox2D(_ShapelyPolygon2D):
+
+    def __init__(self, min_point: Point2D, max_point: Point2D):
+        self._min_point = min_point
+        self._max_point = max_point
+
+        super().__init__([_ShapelyPoint2D(max_point.x, min_point.y),
+                          max_point,
+                          _ShapelyPoint2D(min_point.x, max_point.y),
+                          min_point
+                          ])
+
+    @property
+    def min_x(self):
+        return self._min_point.x
+
+    @property
+    def min_y(self):
+        return self._min_point.y
+
+    @property
+    def max_x(self):
+        return self._max_point.x
+
+    @property
+    def max_y(self):
+        return self._max_point.y
+
+    @property
+    def holes(self) -> List[LinearRing2D]:
+        return []
+
+    @property
+    def boundary(self) -> LinearRing2D:
+        raise NotImplementedError
 
 
 class _ShapelyMultiPolygon2D(_ShapelyGeometry, MultiPolygon2D):
@@ -265,7 +308,8 @@ class _ShapelyUtils:
 
     @staticmethod
     def convert_shapely_to_multipolygon_2d(multipolygon: MultiPolygon) -> MultiPolygon2D:
-        return _ShapelyMultiPolygon2D([_ShapelyUtils.convert_shapely_to_polygon_2d(polygon) for polygon in multipolygon])
+        return _ShapelyMultiPolygon2D(
+            [_ShapelyUtils.convert_shapely_to_polygon_2d(polygon) for polygon in multipolygon])
 
 
 class NonShapelyNativeGeometry(Exception):
