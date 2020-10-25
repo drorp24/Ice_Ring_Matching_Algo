@@ -25,4 +25,5 @@ class DeliveryRequestGraph(DirectedGraph):
         self.add_nodes(delivery_requests)
 
     def add_path(self, delivery_path: DeliveryPath):
-        self.add_edge(delivery_path)
+        if delivery_path in self:
+            self.add_edge(delivery_path)
