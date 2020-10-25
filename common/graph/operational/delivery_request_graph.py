@@ -1,5 +1,3 @@
-from typing import Dict
-
 from common.entities.delivery_request import DeliveryRequest
 from common.graph.base_graph.graph_wrapper import *
 
@@ -24,6 +22,5 @@ class DeliveryRequestGraph(DirectedGraph):
     def add_delivery_requests(self, delivery_requests: [DeliveryRequest]):
         self.add_nodes(delivery_requests)
 
-    def add_path(self, delivery_path: DeliveryPath):
-        if delivery_path in self:
-            self.add_edge(delivery_path)
+    def add_paths(self, delivery_path: [DeliveryPath]):
+        self.add_edges(delivery_path)
