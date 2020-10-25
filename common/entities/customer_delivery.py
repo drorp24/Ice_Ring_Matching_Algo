@@ -1,10 +1,16 @@
-from common.entities.grid import CustomerDeliveryId
+from attr import dataclass
+
 from common.entities.package_delivery_plan import PackageDeliveryPlan
+
+
+@dataclass
+class CustomerDeliveryId:
+    customer_delivery_id: int
 
 
 class CustomerDelivery:
 
-    def __init__(self, customer_delivery_id : CustomerDeliveryId, package_delivery_plans: [PackageDeliveryPlan]):
+    def __init__(self, customer_delivery_id: CustomerDeliveryId, package_delivery_plans: [PackageDeliveryPlan]):
         self._customer_delivery_id = customer_delivery_id
         self._package_delivery_plans = package_delivery_plans
 

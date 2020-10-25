@@ -1,7 +1,10 @@
-from common.entities.grid import DeliveryRequestId
+from attr import dataclass
 from time_window import TimeWindow
 from common.entities.delivery_option import DeliveryOption
 
+@dataclass
+class DeliveryRequestId:
+    delivery_request_id: int
 
 class DeliveryRequest:
 
