@@ -163,7 +163,7 @@ class _ShapelyPolygon2D(_ShapelyGeometry, Polygon2D):
 
     @property
     def boundary(self) -> LinearRing2D:
-        raise NotImplementedError
+        return _ShapelyLinearRing2D(self.points)
 
     @property
     def bbox(self) -> Polygon2D:
