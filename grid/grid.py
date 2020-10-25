@@ -1,60 +1,7 @@
-from abc import ABC
 from math import ceil
 
-from attr import dataclass
 from common.entities.delivery_request import DeliveryRequest
-from common.math.angle import Angle
 from geometry.geo2d import Point2D
-
-
-@dataclass
-class DeliveryRequestId:
-    delivery_request_id: int
-
-
-@dataclass
-class DeliveryOptionId:
-    delivery_option_id: int
-
-
-@dataclass
-class CustomerDeliveryId:
-    customer_delivery_id: int
-
-
-@dataclass
-class PackageDeliveryPlanKey:
-    delivery_request_id: DeliveryRequestId
-    delivery_option_id: DeliveryOptionId
-    customer_delivery_id: CustomerDeliveryId
-
-
-class CellData(ABC):
-    def __init__(self):
-        super().__init__()
-
-
-@dataclass
-class Cell:
-    x_index: int
-    y_index: int
-    data: CellData
-
-
-@dataclass
-class EnvelopeData(CellData):
-    package_delivery_plan_key: PackageDeliveryPlanKey
-    directions: [Angle]
-
-
-@dataclass
-class EnvelopesCell(Cell):
-    envelopes_data: [EnvelopeData]
-
-
-
-
-
 
 
 class Grid:
