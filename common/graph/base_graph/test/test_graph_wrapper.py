@@ -2,7 +2,7 @@ import unittest
 from dataclasses import dataclass
 
 from common.graph.base_graph.graph_factory import create_empty_directed_graph
-from common.graph.base_graph.graph_wrapper import GraphNode, DirectedEdge, DirectedGraph
+from common.graph.base_graph.graph_wrapper import GraphNode, DirectedEdge
 
 
 @dataclass
