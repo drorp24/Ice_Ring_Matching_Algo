@@ -33,6 +33,7 @@ def convert_to_vector(point: Point2D) -> Vector2D:
 
 
 def create_polygon_2d(points: List[Point2D]) -> Polygon2D:
+    assert set(points).__len__() >= 3
     return _ShapelyPolygon2D(points)
 
 

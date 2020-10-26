@@ -166,6 +166,8 @@ class _ShapelyPolygon2D(_ShapelyGeometry, Polygon2D):
 
     @property
     def points(self) -> List[Point2D]:
+        if self._shapely_obj.is_empty:
+            return []
         x_array, y_array = self._shapely_obj.exterior.xy
         return GeometryUtils.convert_xy_separate_arrays_to_points_list(x_array[:-1], y_array[:-1])
 
