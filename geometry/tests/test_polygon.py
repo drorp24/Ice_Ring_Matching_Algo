@@ -29,6 +29,9 @@ class BasicPolygonTestCase(unittest.TestCase):
         area_result = self.poly1.calc_area()
         self.assertEqual(area_result, 100.0)
 
+    def test_creation_of_empty_polygon(self):
+        self.assertRaises(AssertionError, create_polygon_2d, [])
+
 
 class PolygonOperationsTestCase(unittest.TestCase):
 
