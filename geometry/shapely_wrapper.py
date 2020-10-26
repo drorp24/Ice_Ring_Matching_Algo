@@ -172,28 +172,20 @@ class _ShapelyPolygon2D(_ShapelyGeometry, Polygon2D):
     def calc_area(self) -> float:
         return self._shapely_obj.area
 
-    def calc_intersection(self, other_polygon: Polygon2D) -> [Polygon2D, MultiPolygon2D, EmptyGeometry2D]:
+    def calc_intersection(self, other_polygon: Polygon2D) -> Union[EmptyGeometry2D, Polygon2D, MultiPolygon2D]:
         other_polygon_shapely = _ShapelyUtils.convert_polygon2d_to_shapely(other_polygon)
-        internal_intersection = self._shapely_obj.intersection(other_polygon_shapely)
-        if isinstance(internal_intersection, Polygon):
-            return _ShapelyUtils.convert_shapely_to_polygon_2d(internal_intersection)
-        return _ShapelyEmptyGeometry()
+        internal_geometry = self._shapely_obj.intersection(other_polygon_shapely)
+        return _ShapelyUtils.convert_shapely_to_surface_2d(internal_geometry)
 
-    def calc_difference(self, other_polygon: Polygon2D) -> [Polygon2D, MultiPolygon2D, EmptyGeometry2D]:
+    def calc_difference(self, other_polygon: Polygon2D) -> Union[EmptyGeometry2D, Polygon2D, MultiPolygon2D]:
         other_polygon_shapely = _ShapelyUtils.convert_polygon2d_to_shapely(other_polygon)
-        internal_difference = self._shapely_obj.difference(other_polygon_shapely)
-        if internal_difference.is_empty:
-            return _ShapelyEmptyGeometry()
-        if isinstance(internal_difference, MultiPolygon):
-            return _ShapelyUtils.convert_shapely_to_multipolygon_2d(internal_difference)
-        return _ShapelyUtils.convert_shapely_to_polygon_2d(internal_difference)
+        internal_geometry = self._shapely_obj.difference(other_polygon_shapely)
+        return _ShapelyUtils.convert_shapely_to_surface_2d(internal_geometry)
 
-    def calc_union(self, other_polygon: Polygon2D) -> Union[Polygon2D, MultiPolygon2D]:
+    def calc_union(self, other_polygon: Polygon2D) -> Union[EmptyGeometry2D, Polygon2D, MultiPolygon2D]:
         other_polygon_shapely = _ShapelyUtils.convert_polygon2d_to_shapely(other_polygon)
-        internal_union = self._shapely_obj.union(other_polygon_shapely)
-        if isinstance(internal_union, MultiPolygon):
-            return _ShapelyUtils.convert_shapely_to_multipolygon_2d(internal_union)
-        return _ShapelyUtils.convert_shapely_to_polygon_2d(internal_union)
+        internal_geometry = self._shapely_obj.union(other_polygon_shapely)
+        return _ShapelyUtils.convert_shapely_to_surface_2d(internal_geometry)
 
     def __str__(self):
         return self.type + [p.__str__() for p in self.points].__str__()
@@ -266,6 +258,16 @@ class _ShapelyUtils:
     @staticmethod
     def convert_shapely_to_multipolygon_2d(multipolygon: MultiPolygon) -> MultiPolygon2D:
         return _ShapelyMultiPolygon2D([_ShapelyUtils.convert_shapely_to_polygon_2d(polygon) for polygon in multipolygon])
+
+    @staticmethod
+    def convert_shapely_to_surface_2d(internal_shapely_geometry: BaseGeometry) -> Union[EmptyGeometry2D, Polygon2D, MultiPolygon2D]:
+        if internal_shapely_geometry.is_empty:
+            return _ShapelyEmptyGeometry()
+        if isinstance(internal_shapely_geometry, MultiPolygon):
+            return _ShapelyUtils.convert_shapely_to_multipolygon_2d(internal_shapely_geometry)
+        if isinstance(internal_shapely_geometry, Polygon):
+            return _ShapelyUtils.convert_shapely_to_polygon_2d(internal_shapely_geometry)
+        return _ShapelyEmptyGeometry()
 
 
 class NonShapelyNativeGeometry(Exception):
