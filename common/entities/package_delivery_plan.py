@@ -43,6 +43,7 @@ class PackageDeliveryPlan:
         envelope_width = (self.package_type.value.potential_drop_envelope.maximal_radius_meters -
                           self.package_type.value.potential_drop_envelope.minimal_radius_meters)
         if abs(self._azimuth.in_degrees() - drone_azimuth.in_degrees()) < 90:
+
             drop_and_drone_azimuth_dot = (create_vector_2d(cos(self._azimuth.in_radians()),
                                                            sin(self._azimuth.in_radians()))
                                           .dot(
@@ -57,20 +58,13 @@ class PackageDeliveryPlan:
                                               ellipse_rotation=drone_azimuth.in_degrees())
 
     def drop_envelope(self, drone_azimuth: Angle) -> Polygon2D:
-        drone_arrival_angle_in_rad = Angle(180 + drone_azimuth.in_degrees(), AngleUnit.DEGREE).in_radians()
         average_radius = statistics.mean([self.package_type.value.potential_drop_envelope.maximal_radius_meters,
                                           self.package_type.value.potential_drop_envelope.minimal_radius_meters])
-        envelope_center = create_point_2d(self._drop_point.x +
-                                          (average_radius * cos(drone_arrival_angle_in_rad)),
-                                          self._drop_point.y +
-                                          (average_radius * sin(drone_arrival_angle_in_rad)))
+        envelope_center = self._drop_point.add_vector(drone_azimuth.calc_reverse().to_direction() * average_radius)
         return self._calc_envelope(envelope_center, drone_azimuth)
 
     def delivery_envelope(self, drone_location: Point2D, drone_azimuth: Angle) -> Polygon2D:
         average_radius = statistics.mean([self.package_type.value.potential_drop_envelope.maximal_radius_meters,
                                           self.package_type.value.potential_drop_envelope.minimal_radius_meters])
-        envelope_center = create_point_2d(drone_location.x +
-                                          (average_radius * cos(drone_azimuth.in_radians())),
-                                          drone_location.y +
-                                          (average_radius * sin(drone_azimuth.in_radians())))
+        envelope_center = drone_location.add_vector(drone_azimuth.to_direction() * average_radius)
         return self._calc_envelope(envelope_center, drone_azimuth)

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import statistics
 from enum import Enum
 
 maximal_potential_drop_envelope_radius_meters = 1000
@@ -26,9 +27,12 @@ class Package:
     def __init__(self, weight: float):
         self._weight = weight
         self._potential_drop_envelope = PotentialDropEnvelope(
-            minimal_radius_meters=maximal_potential_drop_envelope_radius_meters / weight -
-            maximal_delta_between_minimal_and_maximal_radius_meters / weight,
-            maximal_radius_meters=maximal_potential_drop_envelope_radius_meters / weight)
+            minimal_radius_meters=self.normalize_by_weight(maximal_potential_drop_envelope_radius_meters, weight) -
+                                self.normalize_by_weight(maximal_delta_between_minimal_and_maximal_radius_meters , weight),
+            maximal_radius_meters=self.normalize_by_weight(weight))
+
+    def normalize_by_weight(self, value, weight):
+        return value / weight
 
     @property
     def weight(self) -> float:
@@ -37,6 +41,10 @@ class Package:
     @property
     def potential_drop_envelope(self):
         return self._potential_drop_envelope
+
+    def calc_average_radius(self):
+        return statistics.mean([self.potential_drop_envelope.maximal_radius_meters,
+                                self.potential_drop_envelope.minimal_radius_meters])
 
 
 class PackageType(Enum):
