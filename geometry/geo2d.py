@@ -225,7 +225,7 @@ class Polygon2D(Geometry2D, Surface2D):
         raise NotImplementedError()
 
     @property
-    def bbox(self) -> Polygon2D:
+    def bbox(self) -> Bbox2D:
         raise NotImplementedError()
 
     @abstractmethod
@@ -264,4 +264,37 @@ class MultiPolygon2D(Geometry2D, Surface2D):
 
     @abstractmethod
     def to_polygons(self) -> List[Polygon2D]:
+        raise NotImplementedError()
+
+
+class Bbox2D(Polygon2D):
+
+    """
+        Bbox2D represents a (minx, miny, maxx, maxy) tuple (float values)
+        that bounds an object.
+    """
+
+    @property
+    @abstractmethod
+    def type(self) -> str:
+        raise NotImplementedError()
+
+    @property
+    @abstractmethod
+    def min_x(self) -> float:
+        raise NotImplementedError()
+
+    @property
+    @abstractmethod
+    def min_y(self) -> float:
+        raise NotImplementedError()
+
+    @property
+    @abstractmethod
+    def max_x(self) -> float:
+        raise NotImplementedError()
+
+    @property
+    @abstractmethod
+    def max_y(self) -> float:
         raise NotImplementedError()

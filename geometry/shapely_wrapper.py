@@ -5,7 +5,8 @@ from typing import List, Tuple, Union
 from shapely.geometry import Point, Polygon, LineString, LinearRing, MultiPolygon
 from shapely.geometry.base import BaseGeometry, EmptyGeometry
 
-from geometry.geo2d import Point2D, Vector2D, Polygon2D, MultiPolygon2D, LineString2D, LinearRing2D, EmptyGeometry2D
+from geometry.geo2d import Point2D, Vector2D, Polygon2D, MultiPolygon2D, LineString2D, LinearRing2D, EmptyGeometry2D, \
+    Bbox2D
 from geometry.utils import GeometryUtils
 
 
@@ -166,9 +167,9 @@ class _ShapelyPolygon2D(_ShapelyGeometry, Polygon2D):
         return _ShapelyLinearRing2D(self.points)
 
     @property
-    def bbox(self) -> Polygon2D:
-        x_min, y_min, x_max, y_max = self._shapely_obj.bounds
-        return _ShapelyBbox2D(_ShapelyPoint2D(x_min, y_min), _ShapelyPoint2D(x_max, y_max))
+    def bbox(self) -> Bbox2D:
+        min_x, min_y, max_x, max_y = self._shapely_obj.bounds
+        return _ShapelyBbox2D(_ShapelyPoint2D(min_x, min_y), _ShapelyPoint2D(max_x, max_y))
 
     @property
     def points(self) -> List[Point2D]:
@@ -178,14 +179,17 @@ class _ShapelyPolygon2D(_ShapelyGeometry, Polygon2D):
     def calc_area(self) -> float:
         return self._shapely_obj.area
 
-    def calc_intersection(self, other_polygon: Polygon2D) -> [Polygon2D, MultiPolygon2D, EmptyGeometry2D]:
+    def calc_intersection(self, other_polygon: Polygon2D) -> Union[Polygon2D, MultiPolygon2D, EmptyGeometry2D]:
         other_polygon_shapely = _ShapelyUtils.convert_polygon2d_to_shapely(other_polygon)
         internal_intersection = self._shapely_obj.intersection(other_polygon_shapely)
+        # TODO: need to extract conversions into separate method for intersection, difference & union
         if isinstance(internal_intersection, Polygon):
             return _ShapelyUtils.convert_shapely_to_polygon_2d(internal_intersection)
+        if isinstance(internal_intersection, MultiPolygon):
+            return _ShapelyUtils.convert_shapely_to_multipolygon_2d(internal_intersection)
         return _ShapelyEmptyGeometry()
 
-    def calc_difference(self, other_polygon: Polygon2D) -> [Polygon2D, MultiPolygon2D, EmptyGeometry2D]:
+    def calc_difference(self, other_polygon: Polygon2D) -> Union[Polygon2D, MultiPolygon2D, EmptyGeometry2D]:
         other_polygon_shapely = _ShapelyUtils.convert_polygon2d_to_shapely(other_polygon)
         internal_difference = self._shapely_obj.difference(other_polygon_shapely)
         if internal_difference.is_empty:
@@ -208,7 +212,7 @@ class _ShapelyPolygon2D(_ShapelyGeometry, Polygon2D):
         return self.calc_difference(other).calc_area() == 0 and other.calc_difference(self).calc_area() == 0
 
 
-class _ShapelyBbox2D(_ShapelyPolygon2D):
+class _ShapelyBbox2D(_ShapelyPolygon2D, Bbox2D):
 
     def __init__(self, min_point: Point2D, max_point: Point2D):
         self._min_point = min_point
@@ -221,28 +225,24 @@ class _ShapelyBbox2D(_ShapelyPolygon2D):
                           ])
 
     @property
-    def min_x(self):
+    def min_x(self) -> float:
         return self._min_point.x
 
     @property
-    def min_y(self):
+    def min_y(self) -> float:
         return self._min_point.y
 
     @property
-    def max_x(self):
+    def max_x(self) -> float:
         return self._max_point.x
 
     @property
-    def max_y(self):
+    def max_y(self) -> float:
         return self._max_point.y
 
     @property
     def holes(self) -> List[LinearRing2D]:
         return []
-
-    @property
-    def boundary(self) -> LinearRing2D:
-        raise NotImplementedError
 
 
 class _ShapelyMultiPolygon2D(_ShapelyGeometry, MultiPolygon2D):

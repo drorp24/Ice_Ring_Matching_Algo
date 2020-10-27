@@ -1,17 +1,24 @@
+import math
+from typing import List
+
 from common.entities.package import PackageType
 from common.math.angle import Angle
-from geometry.geo_factory import create_polygon_2d, create_point_2d
+from geometry.geo_factory import create_point_2d
+from geometry.utils import PolygonUtils
 from grid.cell import Location
 from services.envelope_services_interface import EnvelopeServicesInterface
 
 
 class Slide:
-    def __init__(self, service: EnvelopeServicesInterface, package_type: PackageType, drone_azimuth: Angle,
-                 drop_azimuth: Angle):
+    def __init__(self, service: EnvelopeServicesInterface,
+                 package_type: PackageType, drone_azimuth: Angle, drop_azimuth: Angle,
+                 cell_resolution: int, cell_ratio_required: float):
         self._service = service
         self._package_type = package_type
         self._drone_azimuth = drone_azimuth
         self._drop_azimuth = drop_azimuth
+        self._cell_resolution = cell_resolution
+        self._cell_ratio_required = cell_ratio_required
 
         self._envelope_locations = self._locate_envelope()
 
@@ -22,7 +29,7 @@ class Slide:
                (self.envelope_locations == other.envelope_locations)
 
     @property
-    def service(self) -> Angle:
+    def service(self) -> EnvelopeServicesInterface:
         return self._service
 
     @property
@@ -38,16 +45,23 @@ class Slide:
         return self._package_type
 
     @property
-    def envelope_locations(self) -> list[Location]:
+    def envelope_locations(self) -> List[Location]:
         return self._envelope_locations
 
-    def _locate_envelope(self) -> list[Location]:
-
+    def _locate_envelope(self) -> List[Location]:
         drop_point = create_point_2d(0, 0)
-        polygon = self._service.drop_envelope(self._package_type, self._drone_azimuth, drop_point,self._drop_azimuth)
+        polygon = self._service.drop_envelope(self._package_type, self._drone_azimuth, drop_point, self._drop_azimuth)
 
-        # split polygon to boxes
+        required_area = PolygonUtils.convert_ratio_to_required_area(self._cell_resolution, self._cell_ratio_required)
+        splitter_polygons = PolygonUtils.split_polygon(polygon, box_resolution=self._cell_resolution,
+                                                       required_area=required_area)
 
-        # get the indices of the polygon
-        # check the area in each box
-        pass
+        locations = []
+        for split_polygon in splitter_polygons:
+            bbox = split_polygon.bbox
+            min_x, min_y = bbox.min_x, bbox.min_y
+            min_x, min_y = math.floor(min_x / self._cell_resolution), math.floor(min_y / self._cell_resolution)
+
+            locations.append(Location(min_x, min_y))
+
+        return locations
