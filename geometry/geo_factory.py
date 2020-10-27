@@ -4,7 +4,7 @@ from typing import List
 
 from matplotlib.patches import Ellipse
 
-from geometry.geo2d import Point2D, Vector2D, MultiPolygon2D, EmptyGeometry2D
+from geometry.geo2d import Point2D, Vector2D, MultiPolygon2D, EmptyGeometry2D, Bbox2D
 from geometry.geo2d import Polygon2D, LineString2D, LinearRing2D
 from geometry.math_wrapper import _MathVector2D
 from geometry.shapely_wrapper import _ShapelyMultiPolygon2D, _ShapelyEmptyGeometry, _ShapelyBbox2D
@@ -41,7 +41,14 @@ def create_multipolygon_2d(polygons: List[Polygon2D]) -> MultiPolygon2D:
     return _ShapelyMultiPolygon2D(polygons)
 
 
-def create_bbox(min_point: Point2D, max_point: Point2D) -> Polygon2D:
+def create_bbox(min_x: float, min_y: float, max_x: float, max_y: float) -> Bbox2D:
+    min_point = create_point_2d(min_x, min_y)
+    max_point = create_point_2d(max_x, max_y)
+
+    return create_bbox(min_point, max_point)
+
+
+def create_bbox(min_point: Point2D, max_point: Point2D) -> Bbox2D:
     return _ShapelyBbox2D(min_point, max_point)
 
 

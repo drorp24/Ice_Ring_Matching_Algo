@@ -55,7 +55,12 @@ def katana(geometry, threshold, count=0):
 
 
 polys = []
-my_polygon = Polygon([(0, 0), (0, 2), (1, 2), (1,1), (2,1), (2,0)])
+# my_polygon = Polygon([(0, 0), (0, 2), (2, 2),  (2,0)])
+# my_polygon1 = Polygon([(-1,-1), (-1, 1), (1, 1),  (1,-1)])
+
+my_polygon = Polygon([(0, 0), (0, 2), (2, 2),  (2,0)])
+my_polygon1 = Polygon([(0,0), (0,2), (1,0.1),  (2, 2), (2,0)])
+a = my_polygon.intersection(my_polygon1)
 a =  katana(my_polygon,grid_resolution)
 plot(a)
 minx, miny, maxx, maxy = my_polygon.bounds
