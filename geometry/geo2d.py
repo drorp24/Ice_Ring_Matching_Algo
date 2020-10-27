@@ -45,6 +45,11 @@ class Vector2D(Geometry2D):
     def y(self) -> float:
         raise NotImplementedError()
 
+    @property
+    @abstractmethod
+    def norm(self) -> float:
+        raise NotImplementedError()
+
     @abstractmethod
     def add(self, other_vector: Vector2D) -> Vector2D:
         raise NotImplementedError()

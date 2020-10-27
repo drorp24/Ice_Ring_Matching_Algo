@@ -23,7 +23,7 @@ class Angle:
         self.__value = _calc_cyclic_value(value, unit.cyclic_value)
         self.__unit = unit
 
-    def __eq__(self, other):
+    def __eq__(self, other: Angle):
         return _calc_first_cycle_equivalent(self).in_degrees() == \
                _calc_first_cycle_equivalent(other).in_degrees()
 
@@ -37,7 +37,7 @@ class Angle:
         return create_vector_2d(math.cos(self.in_radians()), math.sin(self.in_radians()))
 
     def calc_reverse(self) -> Angle:
-        return Angle(self.in_degrees() + 180, AngleUnit.DEGREE)
+        return Angle(self.in_degrees() + AngleUnit.DEGREE.cyclic_value / 2, AngleUnit.DEGREE)
 
     def calc_abs_difference(self, other: Angle) -> Angle:
         if self.__unit is not other.__unit:
@@ -46,9 +46,12 @@ class Angle:
         angle_2 = _calc_first_cycle_equivalent(other)
         return Angle(abs(angle_1.in_degrees() - angle_2.in_degrees()), AngleUnit.DEGREE)
 
+    def __str__(self):
+        return "Angle ({0}, {1})".format(self.__value, self.__unit)
+
 
 def _calc_first_cycle_equivalent(angle: Angle):
-    # convert the angle to be between 0 and 360
+    # convert the angle to be between 0 [deg] and 360 [deg]
     cyclic_value_deg = AngleUnit.DEGREE.cyclic_value
     return Angle(_calc_cyclic_value(angle.in_degrees(), cyclic_value_deg), AngleUnit.DEGREE)
 

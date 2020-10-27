@@ -41,8 +41,8 @@ def create_multipolygon_2d(polygons: List[Polygon2D]) -> MultiPolygon2D:
     return _ShapelyMultiPolygon2D(polygons)
 
 
-def create_polygon_2d_from_ellipse(ellipse_center, ellipse_width, ellipse_height, ellipse_rotation) -> Polygon2D:
-    plt_ellipse = Ellipse(ellipse_center, ellipse_width, ellipse_height, ellipse_rotation)
+def create_polygon_2d_from_ellipse(ellipse_center: Point2D, ellipse_width: float, ellipse_height: float, ellipse_rotation_deg: float) -> Polygon2D:
+    plt_ellipse = Ellipse(ellipse_center.xy(), ellipse_width, ellipse_height, ellipse_rotation_deg)
     vertices = plt_ellipse.get_verts()
     return create_polygon_2d(GeometryUtils.convert_xy_array_to_points_list(vertices))
 

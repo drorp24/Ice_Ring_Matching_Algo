@@ -5,6 +5,8 @@ from common.entities.package_factory import package_delivery_plan_factory
 from common.math.angle import Angle, AngleUnit
 from geometry.geo_factory import create_point_2d, create_polygon_2d_from_ellipse, create_empty_geometry_2d
 
+EQUAL_AREA_EPSILON_DECIMAL_PLACES: int = 5
+
 
 class BasicPackageGeneration(unittest.TestCase):
 
@@ -51,39 +53,34 @@ class BasicPackageGeneration(unittest.TestCase):
 
     def test_drop_envelope_when_same_drop_and_drone_azimuth(self):
         drone_azimuth = Angle(self.pdp.azimuth.in_degrees(), AngleUnit.DEGREE)
-        expected_drop_envelope = create_polygon_2d_from_ellipse(ellipse_center=(-821.7241335952167,
-                                                                                -473.0000000000001),
+        expected_drop_envelope = create_polygon_2d_from_ellipse(ellipse_center=create_point_2d(-821.72, -473),
                                                                 ellipse_width=100,
                                                                 ellipse_height=100,
-                                                                ellipse_rotation=drone_azimuth.in_degrees())
+                                                                ellipse_rotation_deg=drone_azimuth.in_degrees())
         actual_drop_envelope = self.pdp.drop_envelope(drone_azimuth)
-        expected_difference = create_empty_geometry_2d()
-        actual_difference = actual_drop_envelope.calc_difference(expected_drop_envelope)
-        self.assertEqual(expected_difference, actual_difference)
+        self.assertEqual(expected_drop_envelope, actual_drop_envelope)
 
     def test_drop_envelope_when_drop_and_drone_azimuth_delta_45_deg(self):
         drone_azimuth = Angle(self.pdp.azimuth.in_degrees() + 45, AngleUnit.DEGREE)
-        expected_drop_envelope = create_polygon_2d_from_ellipse(ellipse_center=(-244.87809284739458,
-                                                                                -915.6295349746149),
+        expected_drop_envelope = create_polygon_2d_from_ellipse(ellipse_center=create_point_2d(-244.87, -915.63),
                                                                 ellipse_width=100,
                                                                 ellipse_height=70.71067811865474,
-                                                                ellipse_rotation=drone_azimuth.in_degrees())
+                                                                ellipse_rotation_deg=drone_azimuth.in_degrees())
         actual_drop_envelope = self.pdp.drop_envelope(drone_azimuth)
-        expected_difference = create_empty_geometry_2d()
         actual_difference = actual_drop_envelope.calc_difference(expected_drop_envelope)
-        self.assertEqual(expected_difference, actual_difference)
+        expected_difference = create_empty_geometry_2d()
+        self.assertAlmostEqual(expected_difference.calc_area(), actual_difference.calc_area(), EQUAL_AREA_EPSILON_DECIMAL_PLACES)
 
     def test_drop_envelope_when_drop_and_drone_azimuth_delta_100_deg(self):
         drone_azimuth = Angle(self.pdp.azimuth.in_degrees() + 100, AngleUnit.DEGREE)
-        expected_drop_envelope = create_polygon_2d_from_ellipse(ellipse_center=(611.6482292022123,
-                                                                                -725.7422209630292),
+        expected_drop_envelope = create_polygon_2d_from_ellipse(ellipse_center=create_point_2d(611.65, -725.74),
                                                                 ellipse_width=100,
                                                                 ellipse_height=0,
-                                                                ellipse_rotation=drone_azimuth.in_degrees())
+                                                                ellipse_rotation_deg=drone_azimuth.in_degrees())
         actual_drop_envelope = self.pdp.drop_envelope(drone_azimuth)
-        expected_difference = create_empty_geometry_2d()
         actual_difference = actual_drop_envelope.calc_difference(expected_drop_envelope)
-        self.assertEqual(expected_difference, actual_difference)
+        expected_difference = create_empty_geometry_2d()
+        self.assertAlmostEqual(expected_difference.calc_area(), actual_difference.calc_area(), EQUAL_AREA_EPSILON_DECIMAL_PLACES)
 
     def test_drop_envelope_when_drone_azimuth_is_negative(self):
         drone_azimuth = Angle(-10, AngleUnit.DEGREE)
@@ -96,47 +93,35 @@ class BasicPackageGeneration(unittest.TestCase):
     def test_delivery_envelope_when_same_drop_and_drone_azimuth(self):
         drone_location = create_point_2d(-821.7241335952167, -473.0000000000001)
         drone_azimuth = Angle(self.pdp.azimuth.in_degrees(), AngleUnit.DEGREE)
-        expected_delivery_envelope = create_polygon_2d_from_ellipse(ellipse_center=(1.0000000000001137,
-                                                                                    1.9999999999998295),
+        expected_delivery_envelope = create_polygon_2d_from_ellipse(ellipse_center=create_point_2d(1,2),
                                                                     ellipse_width=100,
                                                                     ellipse_height=100,
-                                                                    ellipse_rotation=drone_azimuth.in_degrees())
+                                                                    ellipse_rotation_deg=drone_azimuth.in_degrees())
         actual_delivery_envelope = self.pdp.delivery_envelope(drone_location, drone_azimuth)
-        expected_difference = create_empty_geometry_2d()
         actual_difference = actual_delivery_envelope.calc_difference(expected_delivery_envelope)
-        self.assertEqual(expected_difference, actual_difference)
+        expected_difference = create_empty_geometry_2d()
+        self.assertAlmostEqual(expected_difference.calc_area(), actual_difference.calc_area(), EQUAL_AREA_EPSILON_DECIMAL_PLACES)
 
     def test_delivery_envelope_when_drop_and_drone_azimuth_delta_45_deg(self):
-        drone_location = create_point_2d(-244.87809284739458, -915.6295349746149)
+        drone_location = create_point_2d(-244.87, -915.63)
         drone_azimuth = Angle(self.pdp.azimuth.in_degrees() + 45, AngleUnit.DEGREE)
-        expected_delivery_envelope = create_polygon_2d_from_ellipse(ellipse_center=(1.0000000000001137, 2),
+        expected_delivery_envelope = create_polygon_2d_from_ellipse(ellipse_center=create_point_2d(1, 2),
                                                                     ellipse_width=100,
-                                                                    ellipse_height=70.71067811865474,
-                                                                    ellipse_rotation=drone_azimuth.in_degrees())
+                                                                    ellipse_height=70.71,
+                                                                    ellipse_rotation_deg=drone_azimuth.in_degrees())
         actual_delivery_envelope = self.pdp.delivery_envelope(drone_location, drone_azimuth)
-        expected_difference = create_empty_geometry_2d()
         actual_difference = actual_delivery_envelope.calc_difference(expected_delivery_envelope)
-        self.assertEqual(expected_difference, actual_difference)
+        expected_difference = create_empty_geometry_2d()
+        self.assertAlmostEqual(expected_difference.calc_area(), actual_difference.calc_area(), EQUAL_AREA_EPSILON_DECIMAL_PLACES)
 
     def test_delivery_envelope_when_drop_and_drone_azimuth_delta_100_deg(self):
-        drone_location = create_point_2d(611.6482292022123, -725.7422209630292)
+        drone_location = create_point_2d(611.65, -725.74)
         drone_azimuth = Angle(self.pdp.azimuth.in_degrees() + 100, AngleUnit.DEGREE)
-        expected_delivery_envelope = create_polygon_2d_from_ellipse(ellipse_center=(0.9999999999998863,
-                                                                                    1.9999999999998863),
+        expected_delivery_envelope = create_polygon_2d_from_ellipse(ellipse_center=create_point_2d(1, 2),
                                                                     ellipse_width=100,
                                                                     ellipse_height=0,
-                                                                    ellipse_rotation=drone_azimuth.in_degrees())
+                                                                    ellipse_rotation_deg=drone_azimuth.in_degrees())
         actual_delivery_envelope = self.pdp.delivery_envelope(drone_location, drone_azimuth)
-        expected_difference = create_empty_geometry_2d()
         actual_difference = actual_delivery_envelope.calc_difference(expected_delivery_envelope)
-        self.assertEqual(expected_difference, actual_difference)
-
-    def test_delivery_envelope_when_drone_azimuth_is_negative(self):
-        drone_location = create_point_2d(1, 2)
-        drone_azimuth = Angle(-10, AngleUnit.DEGREE)
-        self.assertRaises(ValueError, self.pdp.delivery_envelope, drone_location, drone_azimuth)
-
-    def test_delivery_envelope_when_drone_azimuth_is_greater_than_360(self):
-        drone_location = create_point_2d(1, 2)
-        drone_azimuth = Angle(400, AngleUnit.DEGREE)
-        self.assertRaises(ValueError, self.pdp.delivery_envelope, drone_location, drone_azimuth)
+        expected_difference = create_empty_geometry_2d()
+        self.assertAlmostEqual(expected_difference.calc_area(), actual_difference.calc_area(), EQUAL_AREA_EPSILON_DECIMAL_PLACES)

@@ -143,6 +143,8 @@ class _ShapelyLinearRing2D(_ShapelyGeometry, LinearRing2D):
         return self.points == other.points
 
 
+
+
 class _ShapelyPolygon2D(_ShapelyGeometry, Polygon2D):
 
     def __init__(self, boundary_points: List[Point2D]):
@@ -176,16 +178,22 @@ class _ShapelyPolygon2D(_ShapelyGeometry, Polygon2D):
 
     def calc_intersection(self, other_polygon: Polygon2D) -> Union[EmptyGeometry2D, Polygon2D, MultiPolygon2D]:
         other_polygon_shapely = _ShapelyUtils.convert_polygon2d_to_shapely(other_polygon)
+        if not other_polygon_shapely.is_valid or not self._shapely_obj.is_valid:
+            raise InvalidGeometryException("Problem with geometry, not able to apply intersection")
         internal_geometry = self._shapely_obj.intersection(other_polygon_shapely)
         return _ShapelyUtils.convert_shapely_to_surface_2d(internal_geometry)
 
     def calc_difference(self, other_polygon: Polygon2D) -> Union[EmptyGeometry2D, Polygon2D, MultiPolygon2D]:
         other_polygon_shapely = _ShapelyUtils.convert_polygon2d_to_shapely(other_polygon)
+        if not other_polygon_shapely.is_valid or not self._shapely_obj.is_valid:
+            raise InvalidGeometryException("Problem with geometry, not able to apply difference")
         internal_geometry = self._shapely_obj.difference(other_polygon_shapely)
         return _ShapelyUtils.convert_shapely_to_surface_2d(internal_geometry)
 
     def calc_union(self, other_polygon: Polygon2D) -> Union[EmptyGeometry2D, Polygon2D, MultiPolygon2D]:
         other_polygon_shapely = _ShapelyUtils.convert_polygon2d_to_shapely(other_polygon)
+        if not other_polygon_shapely.is_valid or not self._shapely_obj.is_valid:
+            raise InvalidGeometryException("Problem with geometry, not able to apply union")
         internal_geometry = self._shapely_obj.union(other_polygon_shapely)
         return _ShapelyUtils.convert_shapely_to_surface_2d(internal_geometry)
 
@@ -193,7 +201,9 @@ class _ShapelyPolygon2D(_ShapelyGeometry, Polygon2D):
         return self.type + [p.__str__() for p in self.points].__str__()
 
     def __eq__(self, other):
-        return self.calc_difference(other).calc_area() == 0 and other.calc_difference(self).calc_area() == 0
+        epsilon_equal_area = 0.00001
+        return self.calc_difference(other).calc_area() < epsilon_equal_area and \
+               other.calc_difference(self).calc_area() < epsilon_equal_area
 
 
 class _ShapelyMultiPolygon2D(_ShapelyGeometry, MultiPolygon2D):
@@ -259,10 +269,12 @@ class _ShapelyUtils:
 
     @staticmethod
     def convert_shapely_to_multipolygon_2d(multipolygon: MultiPolygon) -> MultiPolygon2D:
-        return _ShapelyMultiPolygon2D([_ShapelyUtils.convert_shapely_to_polygon_2d(polygon) for polygon in multipolygon])
+        return _ShapelyMultiPolygon2D(
+            [_ShapelyUtils.convert_shapely_to_polygon_2d(polygon) for polygon in multipolygon])
 
     @staticmethod
-    def convert_shapely_to_surface_2d(internal_shapely_geometry: BaseGeometry) -> Union[EmptyGeometry2D, Polygon2D, MultiPolygon2D]:
+    def convert_shapely_to_surface_2d(internal_shapely_geometry: BaseGeometry) -> Union[
+        EmptyGeometry2D, Polygon2D, MultiPolygon2D]:
         if internal_shapely_geometry.is_empty:
             return _ShapelyEmptyGeometry()
         if isinstance(internal_shapely_geometry, MultiPolygon):
@@ -282,5 +294,12 @@ class NonShapelyNativeGeometry(Exception):
 class NonPolygonalResult(Exception):
     """
     Given geometric operation the result is non polygonal.
+    """
+    pass
+
+
+class InvalidGeometryException(Exception):
+    """
+    Invalid Geometry can't undergo difference/union/intersection operations, otherwise internal shapely package will break
     """
     pass
