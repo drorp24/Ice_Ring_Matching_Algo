@@ -26,6 +26,9 @@ class PotentialDropEnvelope:
         return statistics.mean([self.maximal_radius_meters,
                                 self.minimal_radius_meters])
 
+    def calc_delta_between_radii(self) -> float:
+        return self.maximal_radius_meters - self.minimal_radius_meters
+
 
 class Package:
 

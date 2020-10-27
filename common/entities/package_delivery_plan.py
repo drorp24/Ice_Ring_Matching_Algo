@@ -3,6 +3,7 @@ from geometry.geo2d import Point2D, Polygon2D
 from common.math.angle import Angle, AngleUnit
 from geometry.geo_factory import create_polygon_2d_from_ellipse
 
+
 class PackageDeliveryPlan:
 
     def __init__(self, drop_point: Point2D, azimuth: Angle, elevation: Angle, package_type: PackageType):
@@ -44,7 +45,7 @@ class PackageDeliveryPlan:
         return self._calc_envelope(envelope_center, drone_azimuth)
 
     def _calc_envelope(self, envelope_center: Point2D, drone_azimuth: Angle) -> Polygon2D:
-        envelope_width = self.package_type.value.potential_drop_envelope.average_radius_meters
+        envelope_width = self.package_type.value.potential_drop_envelope.calc_delta_between_radii()
         envelope_height = envelope_width * self._azimuth.to_direction().dot(drone_azimuth.to_direction())
         if self._azimuth.calc_abs_difference(drone_azimuth).in_degrees() >= 90:
             envelope_height = 0
