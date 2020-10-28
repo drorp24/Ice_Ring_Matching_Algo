@@ -9,6 +9,8 @@ from common.math.angle import Angle, AngleUnit
 from geometry.geo2d import Point2D
 from geometry.geo_factory import create_point_2d, create_polygon_2d
 from geometry.utils import GeometryUtils
+from services.envelope_services_interface import EnvelopeServicesInterface
+from services.mock_envelope_services import MockEnvelopeServices
 from visualization.color import Color
 from visualization.drawer2d import Drawer2D
 from visualization.drawer2d_factory import create_drawer2d
@@ -50,14 +52,14 @@ def draw_drone_arrival(drawer: Drawer2D, delivery_plan: PackageDeliveryPlan, dro
     draw_location_azimuth(drawer, arrival_point, drone_azimuth, Color.Blue)
 
 
-def draw_drop_envelope(drawer: Drawer2D, delivery_plan: PackageDeliveryPlan, drone_azimuth: Angle):
-    drop_envelope = delivery_plan.drop_envelope(drone_azimuth)
+def draw_drop_envelope(drawer: Drawer2D, delivery_plan: PackageDeliveryPlan, drone_azimuth: Angle, drop_envelope_service:EnvelopeServicesInterface):
+    drop_envelope = drop_envelope_service.drop_envelope(delivery_plan.package_type,drone_azimuth,delivery_plan.drop_point,delivery_plan.azimuth)
     drawer.add_polygon2d(polygon2d=drop_envelope, edgecolor=Color.Green, facecolor=Color.Green)
 
 
 def draw_delivery_envelope(drawer: Drawer2D, delivery_plan: PackageDeliveryPlan,
-                           drone_location: Point2D, drone_azimuth: Angle):
-    delivery_envelope = delivery_plan.delivery_envelope(drone_location, drone_azimuth)
+                           drone_location: Point2D, drone_azimuth: Angle, drop_envelope_service:EnvelopeServicesInterface):
+    delivery_envelope = drop_envelope_service.delivery_envelope(delivery_plan.package_type, drone_location, drone_azimuth,delivery_plan.azimuth)
     drawer.add_polygon2d(delivery_envelope, edgecolor=Color.Blue, facecolor=Color.Blue)
     average_radius = statistics.mean([delivery_plan.package_type.value.potential_drop_envelope.maximal_radius_meters,
                                       delivery_plan.package_type.value.potential_drop_envelope.minimal_radius_meters])
@@ -76,10 +78,11 @@ def main():
                                                   elevation=Angle(80, AngleUnit.DEGREE),
                                                   package_type=PackageType.TINY)
     drone_azimuth1 = Angle(delivery_plan.azimuth.in_degrees() + 45, AngleUnit.DEGREE)
+    drop_envelope_service = MockEnvelopeServices()
     drawer1 = create_drawer2d()
     draw_delivery_plan(drawer1, delivery_plan)
     draw_drone_arrival(drawer1, delivery_plan, drone_azimuth1)
-    draw_drop_envelope(drawer1, delivery_plan, drone_azimuth1)
+    draw_drop_envelope(drawer1, delivery_plan, drone_azimuth1, drop_envelope_service)
     drawer1.draw(block=False)
 
     # # Experiment 2
@@ -88,7 +91,7 @@ def main():
     draw_potential_drop_envelope(drawer2, delivery_plan.package_type.value.potential_drop_envelope, drone_location2)
     drone_azimuth2 = Angle(90, AngleUnit.DEGREE)
     draw_drone_arrival(drawer2, delivery_plan, drone_azimuth2)
-    draw_delivery_envelope(drawer2, delivery_plan, drone_location2, drone_azimuth2)
+    draw_delivery_envelope(drawer2, delivery_plan, drone_location2, drone_azimuth2, drop_envelope_service)
     drawer2.draw(block=False)
 
     # Experiment 3
@@ -96,7 +99,7 @@ def main():
     drawer3 = create_drawer2d()
     draw_delivery_plan(drawer3, delivery_plan)
     draw_drone_arrival(drawer3, delivery_plan, drone_azimuth3)
-    draw_drop_envelope(drawer3, delivery_plan, drone_azimuth3)
+    draw_drop_envelope(drawer3, delivery_plan, drone_azimuth3, drop_envelope_service)
     drawer3.draw(block=False)
 
     # Experiment 4
@@ -104,7 +107,7 @@ def main():
     drawer4 = create_drawer2d()
     draw_delivery_plan(drawer4, delivery_plan)
     draw_drone_arrival(drawer4, delivery_plan, drone_azimuth4)
-    draw_drop_envelope(drawer4, delivery_plan, drone_azimuth4)
+    draw_drop_envelope(drawer4, delivery_plan, drone_azimuth4, drop_envelope_service)
     drawer4.draw(block=True)
 
 
