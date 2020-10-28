@@ -1,16 +1,17 @@
 from datetime import datetime
+
 from common.entities.delivery_request import DeliveryRequest
 from common.entities.drone_formation import DroneFormation
 
 
 class EmptyDroneDelivery:
     def __init__(self, id: str, drone_formation: DroneFormation):
-        self._identity = id
+        self._id = id
         self._drone_formation = drone_formation
 
     @property
-    def identity(self) -> str:
-        return self._identity
+    def id(self) -> str:
+        return self._id
 
     @property
     def drone_formation(self) -> DroneFormation:

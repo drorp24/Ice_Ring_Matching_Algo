@@ -6,4 +6,4 @@ from geometry.geo2d import Point2D
 
 def package_delivery_plan_factory(point: Point2D, azimuth: Angle, elevation: Angle,
                                   package_type: PackageType) -> PackageDeliveryPlan:
-    return PackageDeliveryPlan(point, azimuth, elevation, package_type.value)
+    return PackageDeliveryPlan(point, azimuth, elevation, package_type)
