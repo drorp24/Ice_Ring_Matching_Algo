@@ -19,8 +19,8 @@ class DeliveryRequestGraph(DirectedGraph):
     def __init__(self):
         super().__init__()
 
-    def add_delivery_requests(self, delivery_requests: [DeliveryRequest]):
-        self.add_nodes([DeliveryRequestNode(delivery_request) for delivery_request in delivery_requests])
+    def add_delivery_requests(self, delivery_request_nodes: [DeliveryRequestNode]):
+        self.add_nodes(delivery_request_nodes)
 
     def add_delivery_paths(self, delivery_path: [DeliveryPath]):
         self.add_edges(delivery_path)

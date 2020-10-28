@@ -23,6 +23,9 @@ class _ShapelyGeometry(object):
     def type(self) -> str:
         return self._shapely_obj.type
 
+    def is_empty(self) -> bool:
+        return self.__shapely_obj.is_empty or isinstance(self, _ShapelyEmptyGeometry)
+
 
 class _ShapelyEmptyGeometry(_ShapelyGeometry, EmptyGeometry2D):
 

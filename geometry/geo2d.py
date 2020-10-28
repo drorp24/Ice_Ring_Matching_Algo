@@ -27,6 +27,9 @@ class EmptyGeometry2D(Geometry2D):
     def calc_area(self) -> float:
         raise NotImplementedError()
 
+    def is_empty(self) -> bool:
+        raise NotImplementedError()
+
 
 class Vector2D(Geometry2D):
 
