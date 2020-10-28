@@ -23,14 +23,21 @@ class Slide:
         self._envelope_locations = self._locate_envelope()
 
     def __eq__(self, other):
-        return (self.drone_azimuth == other.drone_azimuth) and \
-               (self.drop_azimuth == other.drop_azimuth) and \
+        return (self.service == other.service) and \
                (self.package_type == other.package_type) and \
+               (self.drone_azimuth == other.drone_azimuth) and \
+               (self.drop_azimuth == other.drop_azimuth) and \
+               (self.cell_resolution == other.cell_resolution) and \
+               (self.cell_ratio_required == other.cell_ratio_required) and \
                (self.envelope_locations == other.envelope_locations)
 
     @property
     def service(self) -> EnvelopeServicesInterface:
         return self._service
+
+    @property
+    def package_type(self) -> PackageType:
+        return self._package_type
 
     @property
     def drone_azimuth(self) -> Angle:
@@ -41,8 +48,12 @@ class Slide:
         return self._drop_azimuth
 
     @property
-    def package_type(self) -> PackageType:
-        return self._package_type
+    def cell_resolution(self) -> int:
+        return self._cell_resolution
+
+    @property
+    def cell_ratio_required(self) -> float:
+        return self._cell_ratio_required
 
     @property
     def envelope_locations(self) -> List[Location]:
