@@ -5,7 +5,6 @@ from common.entities.package_factory import package_delivery_plan_factory
 from common.math.angle import Angle, AngleUnit
 from geometry.geo2d import Polygon2D
 from geometry.geo_factory import create_point_2d, create_polygon_2d_from_ellipse, create_empty_geometry_2d
-from geometry.shapely_wrapper import _ShapelyEmptyGeometry
 
 
 class BasicPackageGeneration(unittest.TestCase):
@@ -69,7 +68,7 @@ class BasicPackageGeneration(unittest.TestCase):
     def test_drop_envelope_when_drop_and_drone_azimuth_delta_100_deg(self):
         drone_azimuth = Angle(self.pdp.azimuth.in_degrees() + 100, AngleUnit.DEGREE)
         actual_envelope = self.pdp.drop_envelope(drone_azimuth)
-        self.assertEqual(actual_envelope, _ShapelyEmptyGeometry())
+        self.assertEqual(actual_envelope, create_empty_geometry_2d())
 
     def test_delivery_envelope_when_same_drop_and_drone_azimuth(self):
         drone_location = create_point_2d(-821.72, -473)
