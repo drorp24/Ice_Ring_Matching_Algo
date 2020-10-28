@@ -3,6 +3,7 @@ from typing import Tuple, List, Iterator
 
 from geometry.geo2d import Point2D, Polygon2D, MultiPolygon2D
 from geometry import geo_factory
+import numpy as np
 
 
 class GeometryUtils:
@@ -53,7 +54,7 @@ class PolygonUtils:
             return [polygon]
 
         boxes = [geo_factory.create_bbox(x, y, x + box_resolution, y + box_resolution) for x in
-                 range(min_x, max_x, box_resolution) for y in range(min_y, max_y, box_resolution)]
+                 range(min_x, max_x, box_resolution) for y in np.arange(min_y, max_y, box_resolution)]
         result = []
         for bbox in boxes:
             internal_intersection = polygon.calc_intersection(bbox)
