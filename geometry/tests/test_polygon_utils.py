@@ -86,7 +86,7 @@ class PolygonUtilsTestCase(unittest.TestCase):
              (polygon_side_length + shift, polygon_side_length + shift), (0 + shift, polygon_side_length + shift)]))
         required_area = 1
         box_resolution = 1
-        splited_polygon = PolygonUtils.split_polygon_iterative(polygon, box_resolution, required_area)
+        splited_polygon = PolygonUtils.split_polygon(polygon, box_resolution, required_area)
         print(f'large_box_test took {time.time() - start_time} seconds  with iterative_split_polygon')
         self.assertEqual(len(splited_polygon), polygon_side_length ** 2)
 
@@ -112,7 +112,7 @@ class PolygonUtilsTestCase(unittest.TestCase):
              (polygon_side_length + shift, 0 + shift)]))
         required_area = 1
         box_resolution = 1
-        splited_polygon = PolygonUtils.split_polygon_iterative(polygon, box_resolution, required_area)
+        splited_polygon = PolygonUtils.split_polygon(polygon, box_resolution, required_area)
         print(f'large_box_test took {time.time() - start_time} seconds  with split_polygon1')
         # self.assertEqual(len(splited_polygon), polygon_side_length ** 2)
 

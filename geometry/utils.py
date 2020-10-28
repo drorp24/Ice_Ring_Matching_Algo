@@ -37,7 +37,7 @@ class PolygonUtils:
         return math.floor(value / resolution) * resolution
 
     @staticmethod
-    def split_polygon_iterative(polygon: Polygon2D, box_resolution: int, required_area: float) -> List[
+    def split_polygon(polygon: Polygon2D, box_resolution: int, required_area: float) -> List[
         Polygon2D]:
 
         bounds = polygon.bbox
