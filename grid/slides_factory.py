@@ -13,7 +13,7 @@ from services.envelope_services_interface import EnvelopeServicesInterface
 def create_slide(service: EnvelopeServicesInterface,
                  package_type: PackageType, drone_azimuth: Angle, drop_azimuth: Angle,
                  cell_resolution: int, cell_ratio_required: float):
-    assert cell_ratio_required >= 0 and cell_ratio_required <= 1
+    assert 0 <= cell_ratio_required <= 1
     return Slide(service,
                  package_type, drone_azimuth, drop_azimuth,
                  cell_resolution, cell_ratio_required)
@@ -26,10 +26,10 @@ def generate_slides_container(service: EnvelopeServicesInterface,
     slides = []
 
     drone_azimuth_delta_deg = Angle(MAX_AZIMUTH_ANGLE / drone_azimuth_resolution, AngleUnit.DEGREE)
-    drone_azimuth_steps = np.arrange(MIN_AZIMUTH_ANGLE, MAX_AZIMUTH_ANGLE, drone_azimuth_delta_deg)
+    drone_azimuth_steps = np.arange(MIN_AZIMUTH_ANGLE, MAX_AZIMUTH_ANGLE, drone_azimuth_delta_deg.in_degrees())
 
     drop_azimuth_deg = Angle(MAX_AZIMUTH_ANGLE / drop_azimuth_resolution, AngleUnit.DEGREE)
-    drop_azimuth_steps = np.arrange(MIN_AZIMUTH_ANGLE, MAX_AZIMUTH_ANGLE, drop_azimuth_deg)
+    drop_azimuth_steps = np.arange(MIN_AZIMUTH_ANGLE, MAX_AZIMUTH_ANGLE, drop_azimuth_deg.in_degrees())
 
     for package_type in package_types:
         for drone_azimuth_step in drone_azimuth_steps:

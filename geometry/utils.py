@@ -1,8 +1,8 @@
 import math
 from typing import Tuple, List, Iterator
 
-from geometry.geo2d import Point2D, Polygon2D, MultiPolygon2D
 from geometry import geo_factory
+from geometry.geo2d import Point2D, Polygon2D, MultiPolygon2D
 
 
 class GeometryUtils:
@@ -29,12 +29,16 @@ class PolygonUtils:
         return box_resolution ** 2 * box_ratio_required
 
     @staticmethod
-    def get_higher_value_in_resolution(value: float, resolution: int) -> int:
+    def convert_higher_value_in_resolution(value: float, resolution: int) -> int:
         return math.ceil(value / resolution) * resolution
 
     @staticmethod
-    def get_lower_value_in_resolution(value: float, resolution: int) -> int:
+    def convert_lower_value_in_resolution(value: float, resolution: int) -> int:
         return math.floor(value / resolution) * resolution
+
+    @staticmethod
+    def convert_nearest_value_in_resolution(value: float, resolution: int) -> int:
+        return math.round(value / resolution) * resolution
 
     @staticmethod
     def split_polygon(polygon: Polygon2D, box_resolution: int, required_area: float) -> List[
@@ -74,10 +78,10 @@ class PolygonUtils:
         Polygon2D]:
 
         bounds = polygon.bbox
-        min_x = PolygonUtils.get_lower_value_in_resolution(bounds.min_x, box_resolution)
-        min_y = PolygonUtils.get_lower_value_in_resolution(bounds.min_y, box_resolution)
-        max_x = PolygonUtils.get_higher_value_in_resolution(bounds.max_x, box_resolution)
-        max_y = PolygonUtils.get_higher_value_in_resolution(bounds.max_y, box_resolution)
+        min_x = PolygonUtils.convert_lower_value_in_resolution(bounds.min_x, box_resolution)
+        min_y = PolygonUtils.convert_lower_value_in_resolution(bounds.min_y, box_resolution)
+        max_x = PolygonUtils.convert_higher_value_in_resolution(bounds.max_x, box_resolution)
+        max_y = PolygonUtils.convert_higher_value_in_resolution(bounds.max_y, box_resolution)
 
         width = max_x - min_x
         height = max_y - min_y
@@ -89,11 +93,11 @@ class PolygonUtils:
             return [polygon]
 
         if height >= width:
-            separator = PolygonUtils.get_higher_value_in_resolution(min_y + height / 2, box_resolution)
+            separator = PolygonUtils.convert_higher_value_in_resolution(min_y + height / 2, box_resolution)
             bbox_1 = geo_factory.create_bbox(min_x, min_y, max_x, separator)
             bbox_2 = geo_factory.create_bbox(min_x, separator, max_x, max_y)
         else:
-            separator = PolygonUtils.get_higher_value_in_resolution(min_x + width / 2, box_resolution)
+            separator = PolygonUtils.convert_higher_value_in_resolution(min_x + width / 2, box_resolution)
             bbox_1 = geo_factory.create_bbox(min_x, min_y, separator, max_y)
             bbox_2 = geo_factory.create_bbox(separator, min_y, max_x, max_y)
 
