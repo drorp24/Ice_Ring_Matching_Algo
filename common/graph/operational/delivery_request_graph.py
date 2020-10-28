@@ -1,5 +1,3 @@
-from datetime import datetime
-
 from networkx import DiGraph
 from time_window import TimeWindow
 
