@@ -1,11 +1,5 @@
-from attr import dataclass
-
 from common.entities.customer_delivery import CustomerDelivery
-
-
-@dataclass
-class DeliveryOptionId:
-    delivery_option_id: int
+from common.entities.keys import DeliveryOptionId
 
 
 class DeliveryOption:

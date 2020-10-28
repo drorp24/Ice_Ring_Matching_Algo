@@ -1,21 +1,7 @@
-from attr import dataclass
-
-from common.entities.customer_delivery import CustomerDeliveryId
-from common.entities.delivery_option import DeliveryOptionId
-from common.entities.delivery_request import DeliveryRequestId
 from common.entities.package import PackageType
-from geometry.geo2d import Point2D, Polygon2D
-from common.math.angle import Angle, AngleUnit
-from geometry.geo_factory import create_point_2d, create_vector_2d, create_polygon_2d_from_ellipse
+from common.math.angle import Angle
+from geometry.geo2d import Point2D
 
-import statistics
-from math import cos, sin
-
-@dataclass
-class PackageDeliveryPlanKey:
-    delivery_request_id: DeliveryRequestId
-    delivery_option_id: DeliveryOptionId
-    customer_delivery_id: CustomerDeliveryId
 
 class PackageDeliveryPlan:
 
@@ -46,4 +32,5 @@ class PackageDeliveryPlan:
     @property
     def package_type(self) -> PackageType:
         return self._package_type
+
 
