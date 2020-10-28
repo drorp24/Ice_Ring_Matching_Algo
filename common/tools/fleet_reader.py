@@ -1,7 +1,7 @@
 from common.tools.fleet_property_sets import *
 from common.entities.drone import PlatformType, Configurations
 from pathlib import Path
-from common.utils.json_file_handler import from_file
+from common.utils.json_file_handler import create_dict_from_json
 from enum import Enum
 
 
@@ -14,7 +14,7 @@ class FleetJsonReaderConsts(Enum):
 class FleetReader:
     def __init__(self, fleet_json_file_path: Path = 'Fleet.json'):
         self._file_path = fleet_json_file_path
-        self._json_data = from_file(self._file_path)
+        self._json_data = create_dict_from_json(self._file_path)
 
     def get_configurations_policy(self, platform: PlatformType) -> PlatformConfigurationsPolicyPropertySet:
         configurations_policy_json = self._json_data[platform.name][FleetJsonReaderConsts.configuration_policy.name]
