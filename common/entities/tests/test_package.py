@@ -4,10 +4,8 @@ from common.entities.package import PackageType
 from common.entities.package_factory import package_delivery_plan_factory
 from common.math.angle import Angle, AngleUnit
 from geometry.geo2d import Polygon2D
-from geometry.geo_factory import create_point_2d, create_polygon_2d_from_ellipse
+from geometry.geo_factory import create_point_2d, create_polygon_2d_from_ellipse, create_empty_geometry_2d
 from geometry.shapely_wrapper import _ShapelyEmptyGeometry
-
-EPSILON_DECIMAL_PLACES: int = 2
 
 
 class BasicPackageGeneration(unittest.TestCase):
@@ -97,16 +95,15 @@ class BasicPackageGeneration(unittest.TestCase):
         drone_location = create_point_2d(0, 0)
         drone_azimuth = Angle(self.pdp.azimuth.in_degrees() + 91, AngleUnit.DEGREE)
         actual_envelope = self.pdp.delivery_envelope(drone_location, drone_azimuth)
-        self.assertEqual(actual_envelope, _ShapelyEmptyGeometry())
+        self.assertEqual(actual_envelope, create_empty_geometry_2d())
 
     def assertThatEnvelopesAreApproximatelyEqual(self, actual_envelope: Polygon2D, expected_envelope: Polygon2D):
+        epsilon_value = 0.001
         actual_drop_area = actual_envelope.calc_area()
         expected_drop_area = expected_envelope.calc_area()
-        epsilon_value = 10 ** (-1 * EPSILON_DECIMAL_PLACES)
         relative_epsilon_area = expected_drop_area * epsilon_value
-        self.assertAlmostEqual(expected_drop_area, actual_drop_area, 0)
+        self.assertGreaterEqual(min(actual_drop_area, expected_drop_area) /
+                                max(actual_drop_area, expected_drop_area), 1 - epsilon_value)
         self.assertGreaterEqual(actual_drop_area, relative_epsilon_area)
-        self.assertLessEqual(expected_envelope.calc_difference(actual_envelope).calc_area(),
-                             relative_epsilon_area)
-        self.assertLessEqual(actual_envelope.calc_difference(expected_envelope).calc_area(),
-                             relative_epsilon_area)
+        self.assertLessEqual(expected_envelope.calc_difference(actual_envelope).calc_area(), relative_epsilon_area)
+        self.assertLessEqual(actual_envelope.calc_difference(expected_envelope).calc_area(), relative_epsilon_area)

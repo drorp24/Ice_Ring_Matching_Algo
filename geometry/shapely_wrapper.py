@@ -7,6 +7,8 @@ from shapely.geometry.base import BaseGeometry, EmptyGeometry
 from geometry.geo2d import Point2D, Vector2D, Polygon2D, MultiPolygon2D, LineString2D, LinearRing2D, EmptyGeometry2D
 from geometry.utils import GeometryUtils
 
+EPSILON_FOR_EQUAL_AREA : float = 0.00001
+
 
 class _ShapelyGeometry(object):
 
@@ -203,7 +205,7 @@ class _ShapelyPolygon2D(_ShapelyGeometry, Polygon2D):
 
     @staticmethod
     def is_approximately_equal_by_symmetric_difference(polygon1: Polygon2D, polygon2: Polygon2D,
-                                                       epsilon_equal_area: float = 0.00001) -> bool:
+                                                       epsilon_equal_area: float = EPSILON_FOR_EQUAL_AREA) -> bool:
         return polygon1.calc_difference(polygon2).calc_area() < epsilon_equal_area and \
                polygon2.calc_difference(polygon1).calc_area() < epsilon_equal_area
 
