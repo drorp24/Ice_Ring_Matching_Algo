@@ -1,27 +1,26 @@
 from datetime import datetime
-
 from common.entities.delivery_request import DeliveryRequest
-from common.entities.drone_formation import DroneFormationType
+from common.entities.drone_formation import DroneFormation
 
 
-class EmptyDroneDelivery():
-    def __init__(self, identity: str, drone_formation_type: DroneFormationType):
-        self._identity = identity
-        self._drone_formation_type = drone_formation_type
+class EmptyDroneDelivery:
+    def __init__(self, id: str, drone_formation: DroneFormation):
+        self._identity = id
+        self._drone_formation = drone_formation
 
     @property
     def identity(self) -> str:
         return self._identity
 
     @property
-    def drone_formation_type(self) -> DroneFormationType:
-        return self._drone_formation_type
+    def drone_formation(self) -> DroneFormation:
+        return self._drone_formation
 
 
 class DroneDelivery(EmptyDroneDelivery):
-    def __init__(self, identity: str, drone_formation_type: DroneFormationType, attack_time: datetime,
+    def __init__(self, id: str, drone_formation: DroneFormation, attack_time: datetime,
                  delivery_requests: [DeliveryRequest]):
-        super().__init__(identity, drone_formation_type)
+        super().__init__(id, drone_formation)
         self._attack_time = attack_time
         self._delivery_requests = delivery_requests
 

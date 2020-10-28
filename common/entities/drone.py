@@ -1,10 +1,10 @@
-from enum import Enum, IntEnum
+from enum import Enum
 from common.entities.package import PackageType
 
 
-class PlatformType(IntEnum):
-    PLATFORM_1 = 4
-    PLATFORM_2 = 6
+class PlatformType(Enum):
+    platform_1 = 4
+    platform_2 = 6
 
 
 class _PackageTypesVolumeMap:
@@ -29,7 +29,7 @@ class _PackageTypesVolumeMap:
         return self._dict.values()
 
 
-class _DroneConfiguration:
+class DroneConfiguration:
 
     def __init__(self, platform_type: PlatformType, package_types_map: _PackageTypesVolumeMap):
         self._platform_type = platform_type
@@ -50,12 +50,41 @@ class _DroneConfiguration:
         return self._platform_type
 
 
-class DroneConfigurationType(Enum):
-    PLATFORM_1_2X8 = _DroneConfiguration(PlatformType.PLATFORM_1, _PackageTypesVolumeMap([0, 0, 0, 2]))
-    PLATFORM_1_4X4 = _DroneConfiguration(PlatformType.PLATFORM_1, _PackageTypesVolumeMap([0, 0, 4, 0]))
-    PLATFORM_1_8X2 = _DroneConfiguration(PlatformType.PLATFORM_1, _PackageTypesVolumeMap([0, 8, 0, 0]))
-    PLATFORM_1_16X1 = _DroneConfiguration(PlatformType.PLATFORM_1, _PackageTypesVolumeMap([16, 0, 0, 0]))
-    PLATFORM_2_4X8 = _DroneConfiguration(PlatformType.PLATFORM_2, _PackageTypesVolumeMap([0, 0, 0, 4]))
-    PLATFORM_2_8X4 = _DroneConfiguration(PlatformType.PLATFORM_2, _PackageTypesVolumeMap([0, 0, 8, 0]))
-    PLATFORM_2_16X2 = _DroneConfiguration(PlatformType.PLATFORM_2, _PackageTypesVolumeMap([0, 16, 0, 0]))
-    PLATFORM_2_32X1 = _DroneConfiguration(PlatformType.PLATFORM_2, _PackageTypesVolumeMap([32, 0, 0, 0]))
+class Configurations(Enum):
+    LARGE_X2 = _PackageTypesVolumeMap([0, 0, 0, 2])
+    MEDIUM_X4 = _PackageTypesVolumeMap([0, 0, 4, 0])
+    SMALL_X8 = _PackageTypesVolumeMap([0, 8, 0, 0])
+    TINY_X16 = _PackageTypesVolumeMap([16, 0, 0, 0])
+    LARGE_X4 = _PackageTypesVolumeMap([0, 0, 0, 4])
+    MEDIUM_X8 = _PackageTypesVolumeMap([0, 0, 4, 0])
+    SMALL_X16 = _PackageTypesVolumeMap([0, 16, 0, 0])
+    TINY_X32 = _PackageTypesVolumeMap([32, 0, 0, 0])
+
+
+class DroneConfigurationOptions:
+    drone_configurations_map: {PlatformType: [Configurations]} = \
+        {PlatformType.platform_1: [Configurations.LARGE_X2, Configurations.MEDIUM_X4, Configurations.SMALL_X8,
+                                   Configurations.TINY_X16],
+         PlatformType.platform_2: [Configurations.LARGE_X4, Configurations.MEDIUM_X8, Configurations.SMALL_X16,
+                                   Configurations.TINY_X32]}
+
+    @classmethod
+    def add_configuration_option(cls, configuration_option: {PlatformType: [Configurations]}):
+        for key in configuration_option:
+            cls.drone_configurations_map[key] = configuration_option[key]
+
+    @classmethod
+    def get_drone_configuration(cls, platform_type: PlatformType, configuration: Configurations) -> DroneConfiguration:
+        index = cls.drone_configurations_map[platform_type].index(configuration)
+        return DroneConfiguration(platform_type, cls.drone_configurations_map[platform_type][index])
+
+
+class DroneConfigurations:
+    drone_configurations_map: {PlatformType: {Configurations: DroneConfiguration}} = \
+        {platform_type: {configuration: DroneConfigurationOptions.get_drone_configuration(platform_type, configuration)
+                         for configuration in configurations}
+         for platform_type, configurations in DroneConfigurationOptions.drone_configurations_map.items()}
+
+    @classmethod
+    def get_drone_configuration(cls, platform_type: PlatformType, configuration: Configurations) -> DroneConfiguration:
+        return cls.drone_configurations_map[platform_type][configuration]
