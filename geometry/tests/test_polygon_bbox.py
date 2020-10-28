@@ -8,14 +8,14 @@ class BasicPolygonBboxTestCase(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.p1 = create_point_2d(2.2, -25.1)
-        cls.p2 = create_point_2d(2.2, 4.2)
-        cls.p3 = create_point_2d(9.26, 4.2)
-        cls.p4 = create_point_2d(9.26, -25.1)
 
-        cls.min_x, cls.min_y, cls.max_x, cls.max_y = 2.2, -25., 9.26, 4.2
+        cls.min_x, cls.min_y, cls.max_x, cls.max_y = 2.2, -25.1, 9.26, 4.2
         cls.bbox = create_bbox(cls.min_x, cls.min_y, cls.max_x, cls.max_y)
 
+        cls.p1 = create_point_2d(cls.max_x, cls.min_y)
+        cls.p2 = create_point_2d(cls.max_x, cls.max_y)
+        cls.p3 = create_point_2d(cls.min_x, cls.max_y)
+        cls.p4 = create_point_2d(cls.min_x, cls.min_y)
 
     def test_type(self):
          self.assertEqual(self.bbox.type, 'Polygon')
