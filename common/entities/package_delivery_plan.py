@@ -1,6 +1,6 @@
 from common.entities.package import PackageType
 from geometry.geo2d import Point2D, Polygon2D
-from common.math.angle import Angle, AngleUnit
+from common.math.angle import Angle
 from geometry.geo_factory import create_polygon_2d_from_ellipse
 
 
