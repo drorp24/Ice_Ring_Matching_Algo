@@ -45,13 +45,13 @@ class DeliveryRequestGraph:
         return self.internal_graph.edges
 
     def add_delivery_requests(self, delivery_request_nodes: [DeliveryRequestNode]):
-        self.internal_graph.add_nodes_from([delivery_request_nodes])
+        self.internal_graph.add_nodes_from(delivery_request_nodes)
 
     def add_delivery_paths(self, delivery_request_edges: [DeliveryRequestEdge]):
         self.internal_graph.add_edges_from(delivery_request_edges)
 
-    def calc_subgraph_in_time_window(self, time_window: TimeWindow):
-        nodes_at_time = [node for node in self.nodes if node.time_window in time_window]
+    def calc_subgraph_in_time_window(self, time_window_scope: TimeWindow):
+        nodes_at_time = [node for node in self.nodes if node.time_window in time_window_scope]
         return self.internal_graph.subgraph(nodes_at_time)
 
     def calc_subgraph_below_priority(self, max_priority: int):
