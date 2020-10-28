@@ -56,8 +56,9 @@ def katana(geometry, threshold, count=0):
 fig = plt.figure()
 ax = fig.add_subplot(111)
 
-p = Polygon([(0, 0), (3, 0), (3, 3), (0, 3)])
-for poly in list(katana(p, 1)):
+p = Polygon([(0, 0), (10, 0), (10, 10), (0, 10)])
+a = katana(p, 1)
+for poly in list(a):
     ax.add_patch(PolygonPatch(poly, alpha=0.5, zorder=2))
 
 xrange = [-2, 12]

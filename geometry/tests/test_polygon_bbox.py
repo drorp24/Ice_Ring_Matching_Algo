@@ -13,10 +13,8 @@ class BasicPolygonBboxTestCase(unittest.TestCase):
         cls.p3 = create_point_2d(9.26, 4.2)
         cls.p4 = create_point_2d(9.26, -25.1)
 
-        cls.min_point = create_point_2d(2.2, -25.1)
-        cls.max_point  = create_point_2d(9.26, 4.2)
-
-        cls.bbox = create_bbox(cls.min_point,cls.max_point)
+        cls.min_x, cls.min_y, cls.max_x, cls.max_y = 2.2, -25., 9.26, 4.2
+        cls.bbox = create_bbox(cls.min_x, cls.min_y, cls.max_x, cls.max_y)
 
 
     def test_type(self):
