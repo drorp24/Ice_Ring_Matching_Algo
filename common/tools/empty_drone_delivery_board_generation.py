@@ -4,6 +4,7 @@ from common.tools.fleet_property_sets import PlatformPropertySet
 from common.tools.fleet_partition import FormationSizesAmounts, FleetPartition
 from common.tools.fleet_configuration_attribution import DroneFormationsPerTypeAmounts, FleetConfigurationAttribution
 from common.tools.fleet_reader import FleetReader
+from pathlib import Path
 import uuid
 
 
@@ -28,8 +29,7 @@ def calc_drone_deliveries(platform_properties: PlatformPropertySet) -> [EmptyDro
     return empty_deliveries
 
 
-def generate_empty_delivery_board():
-    fleet_reader = FleetReader()
+def generate_empty_delivery_board(fleet_reader: FleetReader):
     platforms_properties = fleet_reader.get_platforms_properties()
     total_drone_deliveries = []
     for platform_property in platforms_properties:
@@ -38,7 +38,8 @@ def generate_empty_delivery_board():
 
 
 def main():
-    empty_drone_delivery_board = generate_empty_delivery_board()
+    fleet_reader = FleetReader()
+    empty_drone_delivery_board = generate_empty_delivery_board(fleet_reader)
 
 
 if __name__ == '__main__':
