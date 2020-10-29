@@ -1,4 +1,5 @@
 import string
+from abc import abstractmethod, ABC
 from dataclasses import dataclass
 from random import Random
 from typing import List
@@ -15,7 +16,7 @@ class IntRange:
     start: int
     stop: int
 
-    def random(self, random_generator) -> int:
+    def calc_rand_in_range(self, random_generator) -> int:
         return random_generator.randint(self.start, self.stop)
 
 
@@ -31,7 +32,7 @@ class FloatRange:
     start: float
     stop: float
 
-    def random(self, random_generator) -> float:
+    def calc_rand_in_range(self, random_generator) -> float:
         return random_generator.uniform(self.start, self.stop)
 
 
@@ -87,8 +88,8 @@ class PointDistribution:
 
     def random(self, random_generator) -> Point2D:
         drop_point_area = random_generator.choices(self.areas, self.weights)[0]
-        drop_point_x = drop_point_area.x_range.random(random_generator)
-        drop_point_y = drop_point_area.y_range.random(random_generator)
+        drop_point_x = drop_point_area.x_range.calc_rand_in_range(random_generator)
+        drop_point_y = drop_point_area.y_range.calc_rand_in_range(random_generator)
         return create_point_2d(drop_point_x, drop_point_y)
 
 
@@ -121,7 +122,6 @@ def create_delivery_requests_json(file_path: string,
                                   elevation_distribution: IntDistribution,
                                   package_distribution: PackageDistribution,
                                   random_seed=None):
-
     delivery_requests_dict = create_delivery_requests_dict(num_of_delivery_requests_range,
                                                            num_of_delivery_options_distribution,
                                                            num_of_customer_deliveries_distribution,
@@ -150,11 +150,10 @@ def create_delivery_requests_dict(num_of_delivery_requests_range: IntRange,
                                   elevation_distribution: IntDistribution,
                                   package_distribution: PackageDistribution,
                                   random_seed: int = None) -> dict:
-
     rand = Random(random_seed)
 
     delivery_requests = []
-    for _ in range(num_of_delivery_requests_range.random(rand)):
+    for _ in range(num_of_delivery_requests_range.calc_rand_in_range(rand)):
         delivery_requests.append(create_delivery_request_dict(azimuth_distribution,
                                                               drop_points_distribution,
                                                               elevation_distribution,
@@ -181,10 +180,10 @@ def create_delivery_request_dict(azimuth_distribution,
                                  rand,
                                  time_windows_length_distribution) -> dict:
     time_window = get_time_window(main_time_window_length_range, time_windows_length_distribution, rand)
-    priority = priority_distribution.random(rand)
+    priority = priority_distribution.calc_rand_in_range(rand)
     delivery_options = []
     delivery_request_dict = dict(delivery_options=delivery_options, time_window=time_window, priority=priority)
-    for _ in range(num_of_delivery_options_distribution.random(rand)):
+    for _ in range(num_of_delivery_options_distribution.calc_rand_in_range(rand)):
         delivery_options.append(__create_delivery_option_dict(azimuth_distribution,
                                                               drop_points_distribution,
                                                               elevation_distribution,
@@ -204,7 +203,7 @@ def __create_delivery_option_dict(azimuth_distribution,
                                   rand) -> dict:
     customer_deliveries = []
     delivery_option = dict(customer_deliveries=customer_deliveries)
-    for _ in range(num_of_customer_deliveries_distribution.random(rand)):
+    for _ in range(num_of_customer_deliveries_distribution.calc_rand_in_range(rand)):
         customer_deliveries.append(__create_customer_delivery_dict(azimuth_distribution,
                                                                    drop_points_distribution,
                                                                    elevation_distribution,
@@ -222,7 +221,7 @@ def __create_customer_delivery_dict(azimuth_distribution,
                                     rand) -> dict:
     package_delivery_plans = []
     customer_delivery = dict(package_delivery_plans=package_delivery_plans)
-    for _ in range(num_of_package_delivery_plans_distribution.random(rand)):
+    for _ in range(num_of_package_delivery_plans_distribution.calc_rand_in_range(rand)):
         package_delivery_plans.append(
             __create_package_delivery_plan_dict(azimuth_distribution,
                                                 drop_points_distribution,
@@ -237,10 +236,10 @@ def __create_package_delivery_plan_dict(azimuth_distribution,
                                         elevation_distribution,
                                         package_distribution,
                                         rand) -> dict:
-    package_type = package_distribution.random(rand)
+    package_type = package_distribution.calc_rand_in_range(rand)
     drop_point_dict = __create_drop_point_dict(drop_points_distribution, rand)
-    azimuth = azimuth_distribution.random(rand)
-    elevation = elevation_distribution.random(rand)
+    azimuth = azimuth_distribution.calc_rand_in_range(rand)
+    elevation = elevation_distribution.calc_rand_in_range(rand)
     package_delivery_plan_dict = dict(package_type=package_type, azimuth=azimuth, elevation=elevation)
     package_delivery_plan_dict.update(drop_point_dict)
     return package_delivery_plan_dict
@@ -257,10 +256,10 @@ def get_time_window(main_time_window_length_range: [int], time_windows_length_di
     Assuming main_time_window_length isn't more than a month
     """
 
-    main_time_window_length = main_time_window_length_range.random(rand)
-    time_window_length = time_windows_length_distribution.random(rand)
+    main_time_window_length = main_time_window_length_range.calc_rand_in_range(rand)
+    time_window_length = time_windows_length_distribution.calc_rand_in_range(rand)
 
-    start_time = IntRange(params.BASE_HOUR, main_time_window_length - time_window_length).random(rand)
+    start_time = IntRange(params.BASE_HOUR, main_time_window_length - time_window_length).calc_rand_in_range(rand)
     end_time = start_time + time_window_length
     return dict(
         start_time=dict(year=params.BASE_YEAR, month=params.BASE_MONTH, day=params.BASE_DAY + int(start_time / 24),

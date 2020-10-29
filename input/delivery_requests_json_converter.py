@@ -18,12 +18,12 @@ from geometry import geo_factory
 
 def create_delivery_requests_from_file(file_path: Path) -> List[DeliveryRequest]:
     delivery_requests_dict = create_dict_from_json(file_path)
-    delivery_requests = [__create_delivery_request_from_dict(delivery_request_dict) for delivery_request_dict in
+    delivery_requests = [create_delivery_request_from_dict(delivery_request_dict) for delivery_request_dict in
                          delivery_requests_dict['delivery_requests']]
     return delivery_requests
 
 
-def __create_delivery_request_from_dict(delivery_request_dict: dict) -> DeliveryRequest:
+def create_delivery_request_from_dict(delivery_request_dict: dict) -> DeliveryRequest:
 
     start_time_dict = delivery_request_dict['time_window']['start_time']
     end_time_dict = delivery_request_dict['time_window']['end_time']
