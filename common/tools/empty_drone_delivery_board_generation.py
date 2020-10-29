@@ -39,7 +39,6 @@ def generate_empty_delivery_board():
 
 def main():
     empty_drone_delivery_board = generate_empty_delivery_board()
-    print('board')
 
 
 if __name__ == '__main__':
