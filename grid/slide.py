@@ -3,6 +3,7 @@ from typing import List
 
 from common.entities.package import PackageType
 from common.math.angle import Angle
+from geometry.geo2d import EmptyGeometry2D
 from geometry.geo_factory import create_point_2d
 from geometry.utils import PolygonUtils
 from grid.cell import Location
@@ -60,14 +61,15 @@ class Slide:
         return self._envelope_locations
 
     def _locate_envelope(self) -> List[Location]:
+        locations = []
         drop_point = create_point_2d(0, 0)
         polygon = self._service.drop_envelope(self._package_type, self._drone_azimuth, drop_point, self._drop_azimuth)
-
+        if isinstance(polygon, EmptyGeometry2D):
+            return locations
         required_area = PolygonUtils.convert_ratio_to_required_area(self._cell_resolution, self._cell_ratio_required)
         splitter_polygons = PolygonUtils.split_polygon(polygon, box_resolution=self._cell_resolution,
                                                        required_area=required_area)
 
-        locations = []
         for split_polygon in splitter_polygons:
             bbox = split_polygon.bbox
             min_x, min_y = bbox.min_x, bbox.min_y

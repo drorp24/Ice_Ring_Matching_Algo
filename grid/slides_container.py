@@ -40,8 +40,8 @@ class SlidesContainer:
 
         self._hash = make_hash()
         for slide in slides:
-            self._hash[slide.package_type][slide.drone_azimuth][
-                slide.drop_azimuth] = slide
+            self._hash[slide.package_type][slide.drone_azimuth.in_degrees()][
+                slide.drop_azimuth.in_degrees()] = slide
 
     @property
     def hash(self) -> defaultdict:
