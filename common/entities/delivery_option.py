@@ -4,8 +4,7 @@ from common.entities.keys import DeliveryOptionId
 
 class DeliveryOption:
 
-    def __init__(self, delivery_option_id: DeliveryOptionId, customer_deliveries: [CustomerDelivery]):
-        self._delivery_option_id = delivery_option_id
+    def __init__(self, customer_deliveries: [CustomerDelivery]):
         self._customer_deliveries = customer_deliveries if customer_deliveries is not None else []
 
     def __eq__(self, other):

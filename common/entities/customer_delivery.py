@@ -4,8 +4,7 @@ from common.entities.package_delivery_plan import PackageDeliveryPlan
 
 class CustomerDelivery:
 
-    def __init__(self, customer_delivery_id: CustomerDeliveryId, package_delivery_plans: [PackageDeliveryPlan]):
-        self._customer_delivery_id = customer_delivery_id
+    def __init__(self, package_delivery_plans: [PackageDeliveryPlan]):
         self._package_delivery_plans = package_delivery_plans
 
     def __eq__(self, other):
