@@ -39,11 +39,11 @@ class PolygonUtils:
 
     @staticmethod
     def convert_nearest_value_in_resolution(value: float, resolution: int) -> int:
-        return math.round(value / resolution) * resolution
+        return round(value / resolution) * resolution
 
     @staticmethod
     def split_polygon(polygon: Polygon2D, box_resolution: int, required_area: float) -> List[
-        Polygon2D]:
+            Polygon2D]:
 
         bounds = polygon.bbox
         min_x = math.floor(bounds.min_x / box_resolution) * box_resolution
@@ -61,6 +61,7 @@ class PolygonUtils:
                  range(min_x, max_x, box_resolution) for y in np.arange(min_y, max_y, box_resolution)]
         result = []
         for bbox in boxes:
+
             internal_intersection = polygon.calc_intersection(bbox)
 
             area = internal_intersection.calc_area()
@@ -76,7 +77,7 @@ class PolygonUtils:
 
     @staticmethod
     def split_polygon_recursive(polygon: Polygon2D, box_resolution: int, required_area: float, count=0) -> List[
-        Polygon2D]:
+            Polygon2D]:
 
         bounds = polygon.bbox
         min_x = PolygonUtils.convert_lower_value_in_resolution(bounds.min_x, box_resolution)

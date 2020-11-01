@@ -16,8 +16,8 @@ class BasicSlideTestCase(unittest.TestCase):
         cls.drop_azimuth = Angle(45, AngleUnit.DEGREE)
         cls.cell_resolution = 1
         cls.cell_ratio_required = 0.5
-        cls.drone_azimuth_resolution = 8
-        cls.drop_azimuth_resolution = 8
+        cls.drone_azimuth_resolution = 4
+        cls.drop_azimuth_resolution = 4
 
         cls.slide1 = create_slide(cls.envelope_service, PackageType.TINY, cls.drone_azimuth, cls.drop_azimuth,
                                   cls.cell_resolution, cls.cell_ratio_required)
@@ -38,11 +38,11 @@ class BasicSlideTestCase(unittest.TestCase):
                          Slide(self.envelope_service, PackageType.TINY, self.drone_azimuth, self.drop_azimuth,
                                self.cell_resolution, self.cell_ratio_required))
 
-    # def test_slide_container(self):
-    #     slide_1_locations = self.slides_container.get_envelope_locations(self.drone_azimuth, self.drop_azimuth,
-    #                                                                      PackageType.TINY)
-    #     slide_2_locations = self.slides_container.get_envelope_locations(self.drone_azimuth, self.drop_azimuth,
-    #                                                                      PackageType.MEDIUM)
-    #
-    #     self.assertEqual(self.slide1.envelope_locations, slide_1_locations)
-    #     self.assertEqual(self.slide2.envelope_locations, slide_2_locations)
+    def test_slide_container(self):
+        slide_1_locations = self.slides_container.get_envelope_locations(self.drone_azimuth, self.drop_azimuth,
+                                                                         PackageType.TINY)
+        slide_2_locations = self.slides_container.get_envelope_locations(self.drone_azimuth, self.drop_azimuth,
+                                                                         PackageType.MEDIUM)
+
+        self.assertEqual(self.slide1.envelope_locations, slide_1_locations)
+        self.assertEqual(self.slide2.envelope_locations, slide_2_locations)

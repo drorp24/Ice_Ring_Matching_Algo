@@ -35,7 +35,8 @@ def generate_slides_container(service: EnvelopeServicesInterface,
         for drone_azimuth_step in drone_azimuth_steps:
             for drop_azimuth_step in drop_azimuth_steps:
                 slide = create_slide(service,
-                                     package_type, drone_azimuth_step, drop_azimuth_step,
+                                     package_type, Angle(drone_azimuth_step, AngleUnit.DEGREE),
+                                     Angle(drop_azimuth_step, AngleUnit.DEGREE),
                                      cell_resolution, cell_ratio_required)
 
                 slides.append(slide)
