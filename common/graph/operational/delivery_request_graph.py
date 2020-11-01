@@ -22,7 +22,7 @@ class DeliveryRequestNode:
 
     @property
     def time_window(self):
-        return self.time_window()
+        return self.delivery_request.time_window
 
 
 class DeliveryRequestEdge:
@@ -39,11 +39,11 @@ class DeliveryRequestGraph:
 
     @property
     def nodes(self) -> List[DeliveryRequestNode]:
-        return self.internal_graph.nodes.data()
+        return self.internal_graph.nodes(data=False)
 
     @property
     def edges(self) -> List[DeliveryRequestEdge]:
-        return self.internal_graph.edges.data()
+        return self.internal_graph.edges.data(data=False)
 
     def is_empty(self):
         return self.internal_graph.nodes.__len__() == 0

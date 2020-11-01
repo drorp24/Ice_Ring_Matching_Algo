@@ -231,6 +231,13 @@ def __create_customer_delivery_dict(azimuth_distribution,
     return customer_delivery
 
 
+@dataclass
+class package_delivery_plan_distribution:
+    azimuth_distribution: IntDistribution
+    drop_points_distribution: PointDistribution
+
+
+
 def __create_package_delivery_plan_dict(azimuth_distribution,
                                         drop_points_distribution,
                                         elevation_distribution,
