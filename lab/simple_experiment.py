@@ -55,6 +55,10 @@ def draw_drone_arrival(drawer: Drawer2D, delivery_plan: PackageDeliveryPlan, dro
 def draw_drop_envelope(drawer: Drawer2D, delivery_plan: PackageDeliveryPlan, drone_azimuth: Angle, drop_envelope_service:EnvelopeServicesInterface):
     drop_envelope = drop_envelope_service.drop_envelope(delivery_plan.package_type,drone_azimuth,delivery_plan.drop_point,delivery_plan.azimuth)
     drawer.add_polygon2d(polygon2d=drop_envelope, edgecolor=Color.Green, facecolor=Color.Green)
+def draw_drop_envelope(drawer: Drawer2D, delivery_plan: PackageDeliveryPlan, drone_azimuth: Angle):
+    drop_envelope = delivery_plan.drop_envelope(drone_azimuth)
+    if not drop_envelope.is_empty():
+        drawer.add_polygon2d(polygon2d=drop_envelope, edgecolor=Color.Green, facecolor=Color.Green)
 
 
 def draw_delivery_envelope(drawer: Drawer2D, delivery_plan: PackageDeliveryPlan,

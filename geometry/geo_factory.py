@@ -1,7 +1,6 @@
 from __future__ import annotations
 
-from typing import List
-
+from typing import List, Union
 from matplotlib.patches import Ellipse
 
 from geometry.geo2d import Point2D, Vector2D, MultiPolygon2D, EmptyGeometry2D, Bbox2D
@@ -49,9 +48,12 @@ def create_bbox(min_x: float, min_y: float, max_x: float, max_y: float) -> Bbox2
     return _ShapelyBbox2D(min_point, max_point)
 
 
-def create_polygon_2d_from_ellipse(ellipse_center, ellipse_width, ellipse_height, ellipse_rotation) -> Polygon2D:
-    plt_ellipse = Ellipse(ellipse_center, ellipse_width, ellipse_height, ellipse_rotation)
+def create_polygon_2d_from_ellipse(ellipse_center: Point2D, ellipse_width: float, ellipse_height: float,
+                                   ellipse_rotation_deg: float, epsilon_dist=0.0001) -> Union[Polygon2D, EmptyGeometry2D]:
+    plt_ellipse = Ellipse(ellipse_center.xy(), ellipse_width, ellipse_height, ellipse_rotation_deg)
     vertices = plt_ellipse.get_verts()
+    if ellipse_width < epsilon_dist or ellipse_height < epsilon_dist:
+        return _ShapelyEmptyGeometry()
     return create_polygon_2d(GeometryUtils.convert_xy_array_to_points_list(vertices))
 
 
