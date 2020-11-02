@@ -4,13 +4,14 @@ from common.tools.fleet_property_sets import PlatformPropertySet, \
 from common.entities.drone import PlatformType, Configurations
 from common.entities.drone_formation import FormationSize
 import unittest
+from pathlib import Path
 
 
 class BasicFleetReaderTestCase(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.fleet_reader = FleetReader('TestFleet.json')
+        cls.fleet_reader = FleetReader(Path('TestFleet.json'))
 
     def test_platform_property_set(self):
         platform_property_set = self.fleet_reader.get_platform_properties(PlatformType.platform_1)

@@ -3,13 +3,14 @@ from common.entities.drone import PlatformType
 from common.entities.drone_formation import FormationSize
 from common.tools.fleet_partition import FleetPartition
 import unittest
+from pathlib import Path
 
 
 class FleetPartitionTestCase(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.fleet_reader = FleetReader('TestFleet.json')
+        cls.fleet_reader = FleetReader(Path('TestFleet.json'))
 
     def test_none_zero_formation_policy(self):
         platform_property_set = self.fleet_reader.get_platform_properties(PlatformType.platform_1)

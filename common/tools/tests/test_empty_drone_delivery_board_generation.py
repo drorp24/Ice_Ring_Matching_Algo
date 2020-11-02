@@ -3,13 +3,14 @@ import unittest
 from common.entities.drone_delivery_board import EmptyDroneDeliveryBoard
 from common.entities.drone_formation import DroneFormation
 from common.tools.fleet_reader import FleetReader
+from pathlib import Path
 
 
 class TestEmptyDroneDeliveryBoardGenerator(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.fleet_reader = FleetReader('TestFleet.json')
+        cls.fleet_reader = FleetReader(Path('TestFleet.json'))
 
     def test_empty_drone_delivery_board(self):
         empty_drone_delivery_board = generate_empty_delivery_board(self.fleet_reader)
