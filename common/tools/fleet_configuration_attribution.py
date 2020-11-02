@@ -1,15 +1,18 @@
-from common.tools.mip_solver import MIPSolver, MIPData, MIPParameters
-from common.tools.fleet_property_sets import PlatformPropertySet
-from common.entities.drone_formation import FormationSize, DroneFormation, FormationOptions, DroneFormationOptions, DroneFormations
-from common.entities.drone import PlatformType
-from common.tools.fleet_partition import FormationSizesAmounts, FleetPartition
 from dataclasses import dataclass
+from typing import Any
+
 import numpy as np
+
+from common.entities.drone import PlatformType
+from common.entities.drone_formation import FormationSize, DroneFormation, DroneFormationOptions, DroneFormations
+from common.tools.fleet_partition import FormationSizesAmounts
+from common.tools.fleet_property_sets import PlatformPropertySet
+from common.tools.mip_solver import MIPSolver, MIPData, MIPParameters
 
 
 @dataclass
 class ConfigurationAttributionParameters:
-    formation_sizes: [int]
+    formation_sizes: [FormationSize]
     formation_amounts: [int]
     configurations_policy: [float]
     fleet_size: int
@@ -28,7 +31,7 @@ class DroneFormationsPerTypeAmounts:
 
 class FleetConfigurationAttribution:
     configuration_attribution_parameters: ConfigurationAttributionParameters = \
-        ConfigurationAttributionParameters([], [], [], 0, 0, 0, 0, [], [], [])
+        ConfigurationAttributionParameters([], [], [], 0, 0, 0, PlatformType.platform_1, [], [], [])
 
     @classmethod
     def extract_parameters(cls, formation_sizes_amounts: FormationSizesAmounts,
@@ -37,7 +40,7 @@ class FleetConfigurationAttribution:
         cls.configuration_attribution_parameters.formation_amounts = list(formation_sizes_amounts.amounts.values())
         cls.configuration_attribution_parameters.formation_size_type = list(formation_sizes_amounts.amounts.keys())
         cls.configuration_attribution_parameters.formation_sizes = [
-            s.value for s in formation_sizes_amounts.amounts.keys()]
+            s for s in formation_sizes_amounts.amounts.keys()]
         cls.configuration_attribution_parameters.configurations = list(
             platform_property_set.configuration_policy.configurations_policy.keys())
         cls.configuration_attribution_parameters.configuration_options_size = len(
@@ -55,59 +58,62 @@ class FleetConfigurationAttribution:
             for i in range(0, len(cls.configuration_attribution_parameters.formation_amounts))]
 
     @classmethod
-    def _calc_number_variables(cls):
-        return int(sum(cls.configuration_attribution_parameters.formation_amounts) * \
+    def _calc_number_variables(cls) -> int:
+        return int(sum(cls.configuration_attribution_parameters.formation_amounts) *
                    cls.configuration_attribution_parameters.configuration_options_size)
 
     @classmethod
-    def _calc_configuration_options_constraints(cls):
+    def _calc_configuration_options_constraints(cls) -> Any:
         num_vars = cls._calc_number_variables()
         configuration_options_size = cls.configuration_attribution_parameters.configuration_options_size
         total_formation_size = cls.configuration_attribution_parameters.total_formation_size
-        constraints_coeffs = np.zeros((total_formation_size, num_vars))
+        constraints_coefficients = np.zeros(total_formation_size, num_vars)
         for i in range(total_formation_size):
-            constraints_coeffs[i, i * configuration_options_size: (i + 1) * configuration_options_size] = 1
-        return constraints_coeffs.tolist()
+            constraints_coefficients[i, i * configuration_options_size: (i + 1) * configuration_options_size] = 1
+        return constraints_coefficients.tolist()
 
     @classmethod
-    def _calc_configuration_options_bounds(cls):
+    def _calc_configuration_options_bounds(cls) -> Any:
         total_formation_size = cls.configuration_attribution_parameters.total_formation_size
         bounds = np.ones(total_formation_size)
         return bounds.tolist()
 
     @classmethod
-    def _calc_configuration_policy_constraints(cls):
+    def _calc_configuration_policy_constraints(cls) -> Any:
         num_vars = cls._calc_number_variables()
         configuration_options_size = cls.configuration_attribution_parameters.configuration_options_size
         formation_amounts = cls.configuration_attribution_parameters.formation_amounts
         formation_sizes = cls.configuration_attribution_parameters.formation_sizes
-        constraints_coeffs = np.zeros((configuration_options_size, num_vars))
+        constraints_coefficients = np.zeros(configuration_options_size, num_vars)
         for i in range(configuration_options_size):
             for j in range(len(formation_amounts) - 1):
-                constraints_coeffs[i,
-                i:int(formation_amounts[j] * configuration_options_size):configuration_options_size] = formation_sizes[j]
-                constraints_coeffs[i,
-                i + int(formation_amounts[j] * configuration_options_size)::configuration_options_size] = formation_sizes[j + 1]
-        return constraints_coeffs.tolist()
+                constraints_coefficients[i, i: int(formation_amounts[j] *
+                                                   configuration_options_size):configuration_options_size] =\
+                    formation_sizes[j]
+                constraints_coefficients[i, i + int(formation_amounts[j] *
+                                                    configuration_options_size)::configuration_options_size] = \
+                    formation_sizes[j + 1]
+        return constraints_coefficients.tolist()
 
     @classmethod
-    def _calc_configuration_policy_bounds(cls):
+    def _calc_configuration_policy_bounds(cls) -> [float]:
         weights = cls.configuration_attribution_parameters.configurations_policy
         fleet_size = cls.configuration_attribution_parameters.fleet_size
         bounds = [weight * fleet_size for weight in weights]
         return bounds
 
     @classmethod
-    def _calc_objective_coeffs(cls):
+    def _calc_objective_coefficients(cls) -> Any:
         num_vars = cls._calc_number_variables()
         configuration_options_size = cls.configuration_attribution_parameters.configuration_options_size
         formation_amounts = cls.configuration_attribution_parameters.formation_amounts
         formation_sizes = cls.configuration_attribution_parameters.formation_sizes
-        constraints_coeffs = np.zeros((num_vars))
+        constraints_coefficients = np.zeros(num_vars)
         for i in range(len(formation_amounts)):
-            constraints_coeffs[int(i * formation_amounts[i] * configuration_options_size):
-                               int((i + 1) * formation_amounts[i] * configuration_options_size)] = formation_sizes[i]
-        return constraints_coeffs.tolist()
+            constraints_coefficients[int(i * formation_amounts[i] * configuration_options_size):
+                                     int((i + 1) * formation_amounts[i] * configuration_options_size)] = \
+                formation_sizes[i]
+        return constraints_coefficients.tolist()
 
     @classmethod
     def _formulate_as_mip_problem(cls) -> MIPData:
@@ -116,11 +122,11 @@ class FleetConfigurationAttribution:
                     cls._calc_configuration_policy_constraints() + cls._calc_configuration_options_constraints(),
                 MIPParameters.inequality_bounds:
                     cls._calc_configuration_policy_bounds() + cls._calc_configuration_options_bounds(),
-                MIPParameters.objective_coeffs: cls._calc_objective_coeffs()}
+                MIPParameters.objective_coeffs: cls._calc_objective_coefficients()}
         return MIPData(data)
 
     @classmethod
-    def _get_formation_size_type(cls, index: int):
+    def _get_formation_size_type(cls, index: int) -> FormationSize:
         formation_amounts_intervals = cls.configuration_attribution_parameters.formation_amounts_intervals
         for interval in formation_amounts_intervals:
             if index in interval:
@@ -145,7 +151,7 @@ class FleetConfigurationAttribution:
         return DroneFormationsPerTypeAmounts(formation_amounts)
 
     @classmethod
-    def solve(cls):
+    def solve(cls) -> DroneFormationsPerTypeAmounts:
         mip_data = cls._formulate_as_mip_problem()
         variables = MIPSolver.set_variables(parameters=mip_data)
         mip_solver = MIPSolver()

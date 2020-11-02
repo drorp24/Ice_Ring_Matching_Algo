@@ -1,7 +1,3 @@
-import numpy as np
-import uuid
-from common.tools.fleet_property_sets import PlatformPropertySet
-from common.entities.drone_formation import FormationSize, DroneFormation, DroneFormationOptions, Configurations
 from ortools.linear_solver import pywraplp
 from dataclasses import dataclass
 from enum import Enum

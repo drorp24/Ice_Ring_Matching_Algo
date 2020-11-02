@@ -41,5 +41,3 @@ class FleetReader:
         return [self.get_platform_properties(PlatformType[platform_name]) for platform_name in platform_names]
 
 
-if __name__ == '__main__':
-    fleet_reader = FleetReader('Fleet.json')
