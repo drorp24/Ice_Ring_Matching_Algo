@@ -1,5 +1,5 @@
 from common.tools.fleet_reader import FleetReader
-from ..fleet_property_sets import PlatformPropertySet, PlatformFormationsSizePolicyPropertySet, \
+from common.tools.fleet_property_sets  import PlatformPropertySet, PlatformFormationsSizePolicyPropertySet, \
     PlatformConfigurationsPolicyPropertySet
 from common.entities.drone import PlatformType, Configurations
 from common.entities.drone_formation import FormationSize
