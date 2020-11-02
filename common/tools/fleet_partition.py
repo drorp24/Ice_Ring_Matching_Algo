@@ -47,15 +47,15 @@ class FleetPartition(object):
         return FormationSizesAmounts(formation_amounts)
 
     @classmethod
-    def _calc_objective_coeffs(cls) -> Any:
+    def _calc_objective_coefficients(cls) -> Any:
         formation_size_distribution = cls.fleet_partition_parameters.formation_size_distribution
         non_zero_indices = [i for i, e in enumerate(formation_size_distribution) if e != 0]
         num_vars = cls._calc_number_variables()
-        objective_coeffs = np.ones(num_vars)
+        objective_coefficients = np.ones(num_vars)
         if num_vars == len(non_zero_indices):
-            return objective_coeffs.tolist()
-        objective_coeffs[non_zero_indices] = 0
-        return objective_coeffs.tolist()
+            return objective_coefficients.tolist()
+        objective_coefficients[non_zero_indices] = 0
+        return objective_coefficients.tolist()
 
     @classmethod
     def _calc_inequality_constraints_coefficients(cls) -> Any:
@@ -95,11 +95,11 @@ class FleetPartition(object):
     @classmethod
     def _formulate_as_mip_problem(cls) -> MIPData:
         data = {MIPParameters.num_variables: cls._calc_number_variables(),
-                MIPParameters.equality_constraints_coeffs: cls._calc_equality_constraints_coefficients(),
-                MIPParameters.inequality_constraints_coeffs: cls._calc_inequality_constraints_coefficients(),
+                MIPParameters.equality_constraints_coefficients: cls._calc_equality_constraints_coefficients(),
+                MIPParameters.inequality_constraints_coefficients: cls._calc_inequality_constraints_coefficients(),
                 MIPParameters.inequality_bounds: cls._calc_inequality_bounds(),
                 MIPParameters.equality_bounds: cls._calc_equality_bounds(),
-                MIPParameters.objective_coeffs: cls._calc_objective_coeffs()}
+                MIPParameters.objective_coefficients: cls._calc_objective_coefficients()}
         return MIPData(data)
 
     @classmethod

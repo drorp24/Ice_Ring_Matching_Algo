@@ -26,7 +26,7 @@ class FleetReader:
         formations = [FormationSize[formation] for formation in formations_policy_json.keys()]
         return PlatformFormationsSizePolicyPropertySet(dict(zip(formations, formations_policy_json.values())))
 
-    def get_size(self, platform: PlatformType):
+    def get_size(self, platform: PlatformType) -> int:
         return self._json_data[platform.name][FleetJsonReaderConsts.size.name]
 
     def get_platform_properties(self, platform: PlatformType) -> PlatformPropertySet:

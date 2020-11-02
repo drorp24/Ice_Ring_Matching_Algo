@@ -12,7 +12,7 @@ from common.tools.mip_solver import MIPSolver, MIPData, MIPParameters
 
 @dataclass
 class ConfigurationAttributionParameters:
-    formation_sizes: [FormationSize]
+    formation_sizes: [int]
     formation_amounts: [int]
     configurations_policy: [float]
     fleet_size: int
@@ -40,7 +40,7 @@ class FleetConfigurationAttribution:
         cls.configuration_attribution_parameters.formation_amounts = list(formation_sizes_amounts.amounts.values())
         cls.configuration_attribution_parameters.formation_size_type = list(formation_sizes_amounts.amounts.keys())
         cls.configuration_attribution_parameters.formation_sizes = [
-            s for s in formation_sizes_amounts.amounts.keys()]
+            s.value for s in formation_sizes_amounts.amounts.keys()]
         cls.configuration_attribution_parameters.configurations = list(
             platform_property_set.configuration_policy.configurations_policy.keys())
         cls.configuration_attribution_parameters.configuration_options_size = len(
@@ -118,11 +118,11 @@ class FleetConfigurationAttribution:
     @classmethod
     def _formulate_as_mip_problem(cls) -> MIPData:
         data = {MIPParameters.num_variables: cls._calc_number_variables(),
-                MIPParameters.inequality_constraints_coeffs:
+                MIPParameters.inequality_constraints_coefficients:
                     cls._calc_configuration_policy_constraints() + cls._calc_configuration_options_constraints(),
                 MIPParameters.inequality_bounds:
                     cls._calc_configuration_policy_bounds() + cls._calc_configuration_options_bounds(),
-                MIPParameters.objective_coeffs: cls._calc_objective_coefficients()}
+                MIPParameters.objective_coefficients: cls._calc_objective_coefficients()}
         return MIPData(data)
 
     @classmethod

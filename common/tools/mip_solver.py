@@ -4,11 +4,11 @@ from enum import Enum
 
 
 class MIPParameters(Enum):
-    equality_constraints_coeffs = 1
-    inequality_constraints_coeffs = 2
+    equality_constraints_coefficients = 1
+    inequality_constraints_coefficients = 2
     equality_bounds = 3
     inequality_bounds = 4
-    objective_coeffs = 5
+    objective_coefficients = 5
     num_variables = 6
 
 
@@ -28,14 +28,14 @@ class MIPSolver:
 
     @classmethod
     def set_inequalities_constraints(cls, parameters: MIPData, variables: {}):
-        constraints_coeffs = parameters.data[MIPParameters.inequality_constraints_coeffs]
+        constraints_coeffs = parameters.data[MIPParameters.inequality_constraints_coefficients]
         bounds = parameters.data[MIPParameters.inequality_bounds]
         for k in range(len(constraints_coeffs)):
             constraint_expr = [constraints_coeffs[k][l] * variables[l] for l in range(len(variables))]
             cls.solver.Add(sum(constraint_expr) <= bounds[k])
 
     def set_equalities_constraints(cls, parameters: MIPData, variables: {}):
-        constraints_coeffs = parameters.data[MIPParameters.equality_constraints_coeffs]
+        constraints_coeffs = parameters.data[MIPParameters.equality_constraints_coefficients]
         bounds = parameters.data[MIPParameters.equality_bounds]
         for k in range(len(constraints_coeffs)):
             constraint_expr = [constraints_coeffs[k][l] * variables[l] for l in range(len(variables))]
@@ -43,7 +43,7 @@ class MIPSolver:
 
     @classmethod
     def set_objective_coeffs(cls, parameters: MIPData, variables: {}):
-        objective_coeffs = parameters.data[MIPParameters.objective_coeffs]
+        objective_coeffs = parameters.data[MIPParameters.objective_coefficients]
         for j in range(parameters.data[MIPParameters.num_variables]):
             cls.solver.Objective().SetCoefficient(variables[j], objective_coeffs[j])
 
