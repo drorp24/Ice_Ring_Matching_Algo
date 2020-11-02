@@ -1,6 +1,6 @@
 from common.tools.fleet_reader import FleetReader
-from common.tools.fleet_property_sets import PlatformPropertySet, \
-    PlatformFormationsSizePolicyPropertySet,PlatformConfigurationsPolicyPropertySet
+from ..fleet_property_sets import PlatformPropertySet, PlatformFormationsSizePolicyPropertySet, \
+    PlatformConfigurationsPolicyPropertySet
 from common.entities.drone import PlatformType, Configurations
 from common.entities.drone_formation import FormationSize
 import unittest
@@ -34,5 +34,3 @@ class BasicFleetReaderTestCase(unittest.TestCase):
         self.assertEqual(platform_configuration_policy.configurations_policy[Configurations.MEDIUM_X4], 0.4)
         self.assertEqual(platform_configuration_policy.configurations_policy[Configurations.SMALL_X8], 0.2)
         self.assertEqual(platform_configuration_policy.configurations_policy[Configurations.TINY_X16], 0.0)
-
-
