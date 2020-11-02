@@ -6,7 +6,8 @@ from common.math.angle import Angle
 from geometry.geo2d import EmptyGeometry2D
 from geometry.geo_factory import create_point_2d
 from geometry.utils import PolygonUtils
-from grid.cell import Location
+from grid.cell import GridLocation
+from grid.grid_service import GridService
 from services.envelope_services_interface import EnvelopeServicesInterface
 
 
@@ -57,10 +58,10 @@ class Slide:
         return self._cell_ratio_required
 
     @property
-    def envelope_locations(self) -> List[Location]:
+    def envelope_locations(self) -> List[GridLocation]:
         return self._envelope_locations
 
-    def _locate_envelope(self) -> List[Location]:
+    def _locate_envelope(self) -> List[GridLocation]:
         locations = []
         drop_point = create_point_2d(0, 0)
         polygon = self._service.drop_envelope(self._package_type, self._drone_azimuth, drop_point, self._drop_azimuth)
@@ -74,7 +75,6 @@ class Slide:
             bbox = split_polygon.bbox
             min_x, min_y = bbox.min_x, bbox.min_y
             min_x, min_y = math.floor(min_x / self._cell_resolution), math.floor(min_y / self._cell_resolution)
-
-            locations.append(Location(min_x, min_y))
+            locations.append(GridService.get_grid_location(min_x, min_y))
 
         return locations
