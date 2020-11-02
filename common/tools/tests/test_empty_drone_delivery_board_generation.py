@@ -15,5 +15,5 @@ class TestEmptyDroneDeliveryBoardGenerator(unittest.TestCase):
     def test_empty_drone_delivery_board(self):
         empty_drone_delivery_board = generate_empty_delivery_board(self.fleet_reader)
         self.assertIsInstance(empty_drone_delivery_board, EmptyDroneDeliveryBoard)
-        self.assertEqual(len(empty_drone_delivery_board.empty_drone_deliveries), 25)
+        self.assertEqual(len(empty_drone_delivery_board.empty_drone_deliveries), 24)
         self.assertIsInstance(empty_drone_delivery_board.empty_drone_deliveries[0].drone_formation, DroneFormation)
