@@ -36,7 +36,7 @@ class DroneConfiguration:
         self._package_types_map = package_types_map
 
     @property
-    def platform_type(self):
+    def platform_type(self) -> PlatformType:
         return self._platform_type
 
     @property
@@ -56,7 +56,7 @@ class Configurations(Enum):
     SMALL_X8 = _PackageTypesVolumeMap([0, 8, 0, 0])
     TINY_X16 = _PackageTypesVolumeMap([16, 0, 0, 0])
     LARGE_X4 = _PackageTypesVolumeMap([0, 0, 0, 4])
-    MEDIUM_X8 = _PackageTypesVolumeMap([0, 0, 4, 0])
+    MEDIUM_X8 = _PackageTypesVolumeMap([0, 0, 8, 0])
     SMALL_X16 = _PackageTypesVolumeMap([0, 16, 0, 0])
     TINY_X32 = _PackageTypesVolumeMap([32, 0, 0, 0])
 
