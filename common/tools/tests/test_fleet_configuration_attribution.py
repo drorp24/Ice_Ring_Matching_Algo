@@ -4,14 +4,14 @@ from common.entities.drone_formation import FormationSize, DroneFormations, Form
 from common.tools.fleet_partition import FleetPartition
 from common.tools.fleet_configuration_attribution import FleetConfigurationAttribution
 import unittest
-from pathlib import Path
+from common.tools.tests.path_utils import create_path_from_current_directory, Path
 
 
 class TestFleetConfigurationAttribution(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.fleet_reader = FleetReader(Path('TestFleet.json'))
+        cls.fleet_reader = FleetReader(create_path_from_current_directory(Path('TestFleet.json')))
 
     def test_fleet_configuration_with_none_zero_policy(self):
         platform_property_set = self.fleet_reader.get_platform_properties(PlatformType.platform_1)
@@ -58,7 +58,7 @@ class TestFleetConfigurationAttribution(unittest.TestCase):
         self.assertEqual(
             drone_formation_per_type_amounts.amounts[
                 DroneFormations.drone_formations_map[
-                    FormationOptions.TINY_PACKAGES][FormationSize.MEDIUM][PlatformType.platform_1]], 2)
+                    FormationOptions.TINY_PACKAGES][FormationSize.MEDIUM][PlatformType.platform_1]], 1)
 
     def test_fleet_configuration_with_zero_policy(self):
         platform_property_set = self.fleet_reader.get_platform_properties(PlatformType.platform_2)

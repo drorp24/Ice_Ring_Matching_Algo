@@ -67,7 +67,7 @@ class FleetConfigurationAttribution:
         num_vars = cls._calc_number_variables()
         configuration_options_size = cls.configuration_attribution_parameters.configuration_options_size
         total_formation_size = cls.configuration_attribution_parameters.total_formation_size
-        constraints_coefficients = np.zeros(total_formation_size, num_vars)
+        constraints_coefficients = np.zeros((total_formation_size, num_vars))
         for i in range(total_formation_size):
             constraints_coefficients[i, i * configuration_options_size: (i + 1) * configuration_options_size] = 1
         return constraints_coefficients.tolist()
@@ -84,7 +84,7 @@ class FleetConfigurationAttribution:
         configuration_options_size = cls.configuration_attribution_parameters.configuration_options_size
         formation_amounts = cls.configuration_attribution_parameters.formation_amounts
         formation_sizes = cls.configuration_attribution_parameters.formation_sizes
-        constraints_coefficients = np.zeros(configuration_options_size, num_vars)
+        constraints_coefficients = np.zeros((configuration_options_size, num_vars))
         for i in range(configuration_options_size):
             for j in range(len(formation_amounts) - 1):
                 constraints_coefficients[i, i: int(formation_amounts[j] *
