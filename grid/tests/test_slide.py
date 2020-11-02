@@ -46,3 +46,4 @@ class BasicSlideTestCase(unittest.TestCase):
 
         self.assertEqual(self.slide1.envelope_locations, slide_1_locations)
         self.assertEqual(self.slide2.envelope_locations, slide_2_locations)
+

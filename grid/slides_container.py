@@ -3,7 +3,7 @@ from typing import List
 
 from common.entities.package import PackageType
 from common.math.angle import Angle, AngleUnit
-from geometry.utils import PolygonUtils
+from geometry.polygon_utils import PolygonUtils
 from grid.cell import GridLocation
 from grid.slide import Slide
 from params import MAX_AZIMUTH_ANGLE

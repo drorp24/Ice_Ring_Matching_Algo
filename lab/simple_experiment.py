@@ -8,7 +8,7 @@ from common.entities.package_factory import package_delivery_plan_factory
 from common.math.angle import Angle, AngleUnit
 from geometry.geo2d import Point2D
 from geometry.geo_factory import create_point_2d, create_polygon_2d
-from geometry.utils import GeometryUtils
+from geometry.geometry_utils import GeometryUtils
 from services.envelope_services_interface import EnvelopeServicesInterface
 from services.mock_envelope_services import MockEnvelopeServices
 from visualization.color import Color

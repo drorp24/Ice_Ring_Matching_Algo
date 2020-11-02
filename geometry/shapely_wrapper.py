@@ -6,7 +6,7 @@ from shapely.geometry.base import BaseGeometry, EmptyGeometry
 
 from geometry.geo2d import Point2D, Vector2D, Polygon2D, MultiPolygon2D, LineString2D, LinearRing2D, EmptyGeometry2D, \
     Bbox2D
-from geometry.utils import GeometryUtils
+from geometry.geometry_utils import GeometryUtils
 
 EPSILON_FOR_EQUAL_AREA : float = 0.00001
 

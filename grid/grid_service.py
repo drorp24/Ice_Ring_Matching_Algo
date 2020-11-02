@@ -23,7 +23,7 @@ class GridService:
     # #                 pass
 
     @staticmethod
-    def get_grid_location(self, point: Point2D, cell_resolution: int) -> GridLocation:
+    def get_grid_location(point: Point2D, cell_resolution: int) -> GridLocation:
         return GridLocation(math.floor(point.x / cell_resolution), math.floor(point.y / cell_resolution))
 
     # def _get_location(self, grid_indecies: [int, int]) -> [int, int]:

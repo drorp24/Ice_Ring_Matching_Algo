@@ -1,11 +1,10 @@
 import math
 from typing import List
-
 from common.entities.package import PackageType
 from common.math.angle import Angle
-from geometry.geo2d import EmptyGeometry2D
+from geometry.geo2d import EmptyGeometry2D, Polygon2D
 from geometry.geo_factory import create_point_2d
-from geometry.utils import PolygonUtils
+from geometry.polygon_utils import PolygonUtils
 from grid.cell import GridLocation
 from grid.grid_service import GridService
 from services.envelope_services_interface import EnvelopeServicesInterface
@@ -21,8 +20,10 @@ class Slide:
         self._drop_azimuth = drop_azimuth
         self._cell_resolution = cell_resolution
         self._cell_ratio_required = cell_ratio_required
+        envelope_polygon = self._locate_envelope()
+        self._envelope_locations = self.envelope_to_grid_cells(envelope_polygon)
+        self._envelope_boundary = PolygonUtils.get_envelope_boundary(self._envelope_locations)
 
-        self._envelope_locations = self._locate_envelope()
 
     def __eq__(self, other):
         return (self.service == other.service) and \
@@ -61,20 +62,24 @@ class Slide:
     def envelope_locations(self) -> List[GridLocation]:
         return self._envelope_locations
 
-    def _locate_envelope(self) -> List[GridLocation]:
-        locations = []
+    def _locate_envelope(self) -> Polygon2D:
         drop_point = create_point_2d(0, 0)
         polygon = self._service.drop_envelope(self._package_type, self._drone_azimuth, drop_point, self._drop_azimuth)
-        if isinstance(polygon, EmptyGeometry2D):
+        return polygon
+
+    def envelope_to_grid_cells(self, envelope_polygon) -> List[GridLocation]:
+        locations = []
+        if isinstance(envelope_polygon, EmptyGeometry2D):
             return locations
         required_area = PolygonUtils.convert_ratio_to_required_area(self._cell_resolution, self._cell_ratio_required)
-        splitter_polygons = PolygonUtils.split_polygon(polygon, box_resolution=self._cell_resolution,
+        splitter_polygons = PolygonUtils.split_polygon(envelope_polygon, box_resolution=self._cell_resolution,
                                                        required_area=required_area)
 
         for split_polygon in splitter_polygons:
             bbox = split_polygon.bbox
             min_x, min_y = bbox.min_x, bbox.min_y
-            min_x, min_y = math.floor(min_x / self._cell_resolution), math.floor(min_y / self._cell_resolution)
-            locations.append(GridService.get_grid_location(min_x, min_y))
+            min_x_y_point = create_point_2d(math.floor(min_x / self._cell_resolution),
+                                            math.floor(min_y / self._cell_resolution))
+            locations.append(GridService.get_grid_location(min_x_y_point, self._cell_resolution))
 
         return locations

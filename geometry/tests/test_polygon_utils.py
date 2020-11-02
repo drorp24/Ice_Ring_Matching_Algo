@@ -2,7 +2,9 @@ import time
 import unittest
 
 from geometry.geo_factory import create_polygon_2d
-from geometry.utils import GeometryUtils, PolygonUtils
+from geometry.geometry_utils import GeometryUtils
+from geometry.polygon_utils import PolygonUtils
+from grid.cell import GridLocation
 
 
 class PolygonUtilsTestCase(unittest.TestCase):
@@ -152,3 +154,16 @@ class PolygonUtilsTestCase(unittest.TestCase):
     #     splited_polygon = PolygonUtils.split_polygon_iterative(polygon, box_resolution, required_area)
     #     print(f'large_box_test took {time.time() - start_time} seconds  with split_polygon1')
     #     # self.assertEqual(len(splited_polygon), polygon_side_length ** 2)
+
+
+    def test_get_envelope_boundary(self):
+        envelope_boundary = PolygonUtils.get_envelope_boundary(
+            [GridLocation(1, 1), GridLocation(1, 2), GridLocation(1, 3), GridLocation(2, 1), GridLocation(2, 2),
+             GridLocation(2, 3), GridLocation(3, 1), GridLocation(3, 2), GridLocation(3, 3)])
+        a = 1
+
+    def test_get_envelope_boundary1(self):
+        envelope_boundary = PolygonUtils.get_envelope_boundary(
+            [GridLocation(-1, -1), GridLocation(-1, -2), GridLocation(-1, -3), GridLocation(-2, -1), GridLocation(-2, -2),
+             GridLocation(-2, -3), GridLocation(-3, -1), GridLocation(-3, -2), GridLocation(-3, -3)])
+        a = 1
