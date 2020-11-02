@@ -1,7 +1,7 @@
-from common.entities.drone import DroneConfiguration, DroneConfigurationOptions, PlatformType, Configurations,\
+from common.entities.drone import DroneConfiguration, PlatformType, Configurations, \
     DroneConfigurations
 from common.entities.package import PackageType
-from enum import IntEnum, Enum
+from enum import IntEnum
 from enum import Enum, auto
 
 
@@ -94,8 +94,8 @@ class DroneFormationOptions:
 
 
 class DroneFormations:
-    drone_formations_map: {FormationOptions: {FormationSize: {PlatformType: DroneFormation}}} = {formation_option:
-        {formation_size:
+    drone_formations_map: {FormationOptions: {FormationSize: {PlatformType: DroneFormation}}} = {formation_option: {
+        formation_size:
             {
                 platform_type:
                     DroneFormationOptions.get_drone_formation(

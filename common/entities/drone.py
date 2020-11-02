@@ -76,7 +76,7 @@ class DroneConfigurationOptions:
     @classmethod
     def get_drone_configuration(cls, platform_type: PlatformType, configuration: Configurations) -> DroneConfiguration:
         index = cls.drone_configurations_map[platform_type].index(configuration)
-        return DroneConfiguration(platform_type, cls.drone_configurations_map[platform_type][index])
+        return DroneConfiguration(platform_type, cls.drone_configurations_map[platform_type][index].value)
 
 
 class DroneConfigurations:
