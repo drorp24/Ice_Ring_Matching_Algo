@@ -1,6 +1,7 @@
 import unittest
 from collections import Counter
 from random import Random
+from typing import List
 
 from common.entities.package import PackageType, PackageDistribution
 from common.entities.package_factory import package_delivery_plan_factory
@@ -117,11 +118,17 @@ class BasicPackageGeneration(unittest.TestCase):
         cls.pd = PackageDistribution({PackageType.TINY.name: 0.8, PackageType.SMALL.name: 0.4})
 
     def test_probability_of_package_generation_is_correct(self):
-        total_iterations = 100000
-        values_random_sample = list(map(lambda i: self.pd.choose_rand(Random(i)), range(total_iterations)))
-        c = dict(Counter(values_random_sample))
-        print(c)
-        self.assertAlmostEqual(c[PackageType.TINY.name], total_iterations * 0.66, delta=total_iterations*0.01)
-        self.assertAlmostEqual(c[PackageType.SMALL.name], total_iterations * 0.33, delta=total_iterations*0.01)
-        self.assertAlmostEqual(c[PackageType.MEDIUM.name], total_iterations * 0, delta=total_iterations*0.01)
-        self.assertAlmostEqual(c[PackageType.LARGE.name], total_iterations * 0, delta=total_iterations*0.01)
+        rand_samples = 100000
+        values_random_sample = list(map(lambda i: self.pd.choose_rand(Random(i)), range(rand_samples)))
+        sample_count = dict(Counter(values_random_sample))
+        expected_prob = {PackageType.TINY.name: 0.66,
+                         PackageType.SMALL.name: 0.33,
+                         PackageType.MEDIUM.name: 0.0,
+                         PackageType.LARGE.name: 0.0}
+        
+        for package in PackageType.get_all_names():
+            self.assert_samples_approx_expected(package, expected_prob, sample_count)
+
+    def assert_samples_approx_expected(self, package_name: str, expected_package_prob: dict, sample_count: dict):
+        package_sample_prob = sample_count.get(package_name, 0) / sum(sample_count.values())
+        self.assertAlmostEqual(package_sample_prob, expected_package_prob.get(package_name), delta=0.01)
