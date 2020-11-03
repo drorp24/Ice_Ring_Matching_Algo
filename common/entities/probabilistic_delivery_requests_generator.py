@@ -1,10 +1,10 @@
 from __future__ import annotations
+
 import string
 from dataclasses import dataclass
 from random import Random
 from typing import List
 
-import params
 from common.entities.package import PackageType
 from common.utils import json_file_handler
 from geometry.geo2d import Point2D

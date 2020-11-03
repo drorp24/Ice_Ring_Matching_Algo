@@ -1,8 +1,8 @@
 import unittest
 from collections import Counter
 from random import Random
-from typing import List
 
+from common.entities.base_entities.test.test_distribution import assert_samples_approx_expected
 from common.entities.package import PackageType, PackageDistribution
 from common.entities.package_factory import package_delivery_plan_factory
 from common.math.angle import Angle, AngleUnit
@@ -125,10 +125,6 @@ class BasicPackageGeneration(unittest.TestCase):
                          PackageType.SMALL.name: 0.33,
                          PackageType.MEDIUM.name: 0.0,
                          PackageType.LARGE.name: 0.0}
-        
-        for package in PackageType.get_all_names():
-            self.assert_samples_approx_expected(package, expected_prob, sample_count)
 
-    def assert_samples_approx_expected(self, package_name: str, expected_package_prob: dict, sample_count: dict):
-        package_sample_prob = sample_count.get(package_name, 0) / sum(sample_count.values())
-        self.assertAlmostEqual(package_sample_prob, expected_package_prob.get(package_name), delta=0.01)
+        for package in PackageType.get_all_names():
+            assert_samples_approx_expected(self, package, expected_prob, sample_count)

@@ -1,6 +1,11 @@
-from common.entities.package import PackageType
+from random import Random
+from typing import Union
+
+from common.entities.base_entities.distribution import ChoiceDistribution, UniformChoiceDistribution
+from common.entities.package import PackageType, PackageDistribution
 from geometry.geo2d import Point2D, Polygon2D
-from common.math.angle import Angle
+from common.math.angle import Angle, AngleUniformDistribution
+from geometry.geo_distribution import PointDistribution, MultiPointDistribution
 from geometry.geo_factory import create_polygon_2d_from_ellipse
 
 
@@ -53,3 +58,21 @@ class PackageDeliveryPlan:
                                               ellipse_width=envelope_width,
                                               ellipse_height=envelope_height,
                                               ellipse_rotation_deg=drone_azimuth.in_degrees())
+
+
+class PackageDeliveryPlanDistribution:
+
+    def __init__(self, drop_point_distribution: Union[MultiPointDistribution, PointDistribution],
+                 azimuth_distribution: AngleUniformDistribution,
+                 elevation_distribution: UniformChoiceDistribution,
+                 package_type_distribution: PackageDistribution):
+        self._drop_point_distribution = drop_point_distribution
+        self._azimuth_distribution = azimuth_distribution
+        self._elevation_distribution = elevation_distribution
+        self._package_type_distribution = package_type_distribution
+
+    def choose_rand(self, random: Random) -> PackageDeliveryPlan:
+        return PackageDeliveryPlan(self._drop_point_distribution.choose_rand(random),
+                                   self._azimuth_distribution.choose_rand(random),
+                                   self._elevation_distribution.choose_rand(random),
+                                   self._package_type_distribution.choose_rand(random))

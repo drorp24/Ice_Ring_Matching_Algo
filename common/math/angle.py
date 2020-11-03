@@ -1,7 +1,9 @@
 from __future__ import annotations
 import math
 from enum import Enum
+from random import Random
 
+from common.entities.base_entities.distribution import UniformDistribution, Range
 from geometry.geo2d import Vector2D
 from geometry.geo_factory import create_vector_2d
 
@@ -58,3 +60,12 @@ def _calc_first_cycle_equivalent(angle: Angle):
 
 def _calc_cyclic_value(value: float, cyclic_value: float) -> float:
     return ((value % cyclic_value) + cyclic_value) % cyclic_value
+
+
+class AngleUniformDistribution(UniformDistribution):
+
+    def __init__(self, start_angle: Angle, end_angle: Angle):
+        super().__init__(Range(start_angle.in_degrees(), end_angle.in_degrees()))
+
+    def choose_rand(self, random: Random) -> Angle:
+        return Angle(super(AngleUniformDistribution, self).choose_rand(random), AngleUnit.DEGREE)
