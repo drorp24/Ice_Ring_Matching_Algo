@@ -1,13 +1,15 @@
 import unittest
+from collections import Counter
+from random import Random
 
-from common.entities.package import PackageType
+from common.entities.package import PackageType, PackageDistribution
 from common.entities.package_factory import package_delivery_plan_factory
 from common.math.angle import Angle, AngleUnit
 from geometry.geo2d import Polygon2D
 from geometry.geo_factory import create_point_2d, create_polygon_2d_from_ellipse, create_empty_geometry_2d
 
 
-class BasicPackageGeneration(unittest.TestCase):
+class BasicPackageTestCase(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
@@ -106,3 +108,20 @@ class BasicPackageGeneration(unittest.TestCase):
         self.assertGreaterEqual(actual_drop_area, relative_epsilon_area)
         self.assertLessEqual(expected_envelope.calc_difference(actual_envelope).calc_area(), relative_epsilon_area)
         self.assertLessEqual(actual_envelope.calc_difference(expected_envelope).calc_area(), relative_epsilon_area)
+
+
+class BasicPackageGeneration(unittest.TestCase):
+
+    @classmethod
+    def setUpClass(cls) -> None:
+        cls.pd = PackageDistribution({PackageType.TINY.name: 0.8, PackageType.SMALL.name: 0.4})
+
+    def test_probability_of_package_generation_is_correct(self):
+        total_iterations = 100000
+        values_random_sample = list(map(lambda i: self.pd.choose_rand(Random(i)), range(total_iterations)))
+        c = dict(Counter(values_random_sample))
+        print(c)
+        self.assertAlmostEqual(c[PackageType.TINY.name], total_iterations * 0.66, delta=total_iterations*0.01)
+        self.assertAlmostEqual(c[PackageType.SMALL.name], total_iterations * 0.33, delta=total_iterations*0.01)
+        self.assertAlmostEqual(c[PackageType.MEDIUM.name], total_iterations * 0, delta=total_iterations*0.01)
+        self.assertAlmostEqual(c[PackageType.LARGE.name], total_iterations * 0, delta=total_iterations*0.01)

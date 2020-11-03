@@ -10,9 +10,9 @@ from common.entities.delivery_option import DeliveryOption
 from common.entities.delivery_request import DeliveryRequest
 from common.entities.package import PackageType
 from common.entities.package_delivery_plan import PackageDeliveryPlan
-from common.entities.probabilistic_delivery_requests_generator import create_delivery_requests_dict, \
-    get_time_window, create_delivery_requests_json, IntRange, WeightedIntRange, IntDistribution, PointDistribution, \
-    WeightedPointRange, FloatRange, PackageDistribution
+from common.entities.probabilistic_delivery_requests_generator import IntRange, IntDistribution, WeightedIntRange, \
+    WeightedPointRange, PointDistribution, FloatRange, PackageDistribution, create_delivery_requests_dict, \
+    create_delivery_requests_json, get_time_window
 from geometry.geo_factory import create_point_2d
 from input.delivery_requests_json_converter import create_delivery_requests_from_file
 from common.math.angle import Angle, AngleUnit
