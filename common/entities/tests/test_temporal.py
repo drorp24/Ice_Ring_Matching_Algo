@@ -41,3 +41,7 @@ class BasicDateTime(unittest.TestCase):
             'until': {'date': {'year': 2010, 'month': 10, 'day': 1}, 'time': {'hour': 7, 'minute': 12, 'second': 5}}}
         tw_obj_after_from = TimeWindowExtension.from_dict(tw1_hard_coded_dict)
         self.assertEqual(self.tw1, tw_obj_after_from)
+
+    def test_gt(self):
+        self.assertTrue(self.dt1 < self.dt2)
+        self.assertFalse(self.dt1 > self.dt2)

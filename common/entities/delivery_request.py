@@ -1,5 +1,9 @@
+from typing import List
+
 from time_window import TimeWindow
-from common.entities.delivery_option import DeliveryOption
+
+from common.entities.base_entities.distribution import UniformChoiceDistribution
+from common.entities.delivery_option import DeliveryOption, DeliveryOptionDistribution
 
 
 class DeliveryRequest:
@@ -25,3 +29,8 @@ class DeliveryRequest:
     @property
     def priority(self) -> int:
         return self._priority
+
+
+class DeliveryRequestDistribution(UniformChoiceDistribution):
+    def __init__(self, delivery_option_distributions: List[DeliveryOptionDistribution]):
+        super().__init__(delivery_option_distributions)

@@ -1,10 +1,10 @@
 from random import Random
 from typing import Union
 
-from common.entities.base_entities.distribution import ChoiceDistribution, UniformChoiceDistribution
+from common.entities.base_entities.distribution import UniformChoiceDistribution
 from common.entities.package import PackageType, PackageDistribution
-from geometry.geo2d import Point2D, Polygon2D
 from common.math.angle import Angle, AngleUniformDistribution
+from geometry.geo2d import Point2D, Polygon2D
 from geometry.geo_distribution import PointDistribution, MultiPointDistribution
 from geometry.geo_factory import create_polygon_2d_from_ellipse
 

@@ -1,8 +1,11 @@
 from __future__ import annotations
 from datetime import datetime, date, time
-from typing import Dict
+from random import Random
+from typing import Dict, List
 
 from time_window import TimeWindow
+
+from common.entities.base_entities.distribution import ChoiceDistribution, Distribution
 
 DATE = 'date'
 TIME = 'time'
@@ -88,3 +91,34 @@ class DateTimeExtension:
 
     def __eq__(self, other: DateTimeExtension):
         return self.internal_date_time == other.internal_date_time
+
+    def __gt__(self, other: DateTimeExtension):
+        return self.internal_date_time > other.internal_date_time
+
+
+class DateTimeDistribution(ChoiceDistribution):
+    def __init__(self, date_time_options: List[DateTimeExtension]):
+        super().__init__(date_time_options)
+
+
+class TimeWindowDistribution(Distribution):
+
+    def __init__(self, start_time_distribution: DateTimeDistribution, end_time_distribution: DateTimeDistribution):
+        self._start_time_distribution = start_time_distribution
+        self._end_time_distribution = end_time_distribution
+
+    def choose_rand(self, random: Random):
+        start_time_selected = self._start_time_distribution.choose_rand(random)
+        earliest_end_time = min(self._end_time_distribution.get_choices())
+        start_time_options = self._start_time_distribution.get_choices()
+        valid_start_times = list(filter(lambda start_time: start_time < earliest_end_time, start_time_options))
+        end_time_options = self._end_time_distribution.get_choices()
+        viable_end_time_list = list(filter(lambda e_t: e_t < start_time_selected, end_time_options))
+        if not valid_start_times or not viable_end_time_list:
+            raise NoViableTimesGivenDistribution
+        end_time_selected = DateTimeDistribution(viable_end_time_list).choose_rand(random)
+        return TimeWindowExtension(start_time_selected, end_time_selected)
+
+
+class NoViableTimesGivenDistribution(Exception):
+    pass

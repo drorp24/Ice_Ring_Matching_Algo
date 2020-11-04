@@ -1,4 +1,7 @@
-from common.entities.customer_delivery import CustomerDelivery
+from typing import List
+
+from common.entities.base_entities.distribution import UniformChoiceDistribution
+from common.entities.customer_delivery import CustomerDelivery, CustomerDeliveryDistribution
 
 
 class DeliveryOption:
@@ -12,3 +15,8 @@ class DeliveryOption:
     @property
     def customer_deliveries(self) -> [CustomerDelivery]:
         return self._customer_deliveries
+
+
+class DeliveryOptionDistribution(UniformChoiceDistribution):
+    def __init__(self, customer_delivery_distributions: List[CustomerDeliveryDistribution]):
+        super().__init__(customer_delivery_distributions)

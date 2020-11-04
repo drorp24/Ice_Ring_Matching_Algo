@@ -1,4 +1,5 @@
 from __future__ import annotations
+
 from abc import abstractmethod, ABC
 from dataclasses import dataclass
 from random import Random
@@ -17,6 +18,9 @@ class ChoiceDistribution(Distribution):
     def __init__(self, options_to_probability: dict):
         ChoiceDistribution.validate_legal_probs(options_to_probability)
         self.options_to_prob = options_to_probability
+
+    def get_choices(self) -> list:
+        return list(self.options_to_prob.keys())
 
     @staticmethod
     def get_safe_probabilities(probabilities: list):
@@ -47,8 +51,8 @@ class UniformChoiceDistribution(Distribution):
     def __init__(self, values: Union[List, Tuple]):
         self._values = values
 
-    def choose_rand(self, random: Random):
-        return random.choice(self._values)
+    def choose_rand(self, random: Random, num_to_choose: int = 1):
+        return random.choices(self._values, k=num_to_choose)
 
 
 class UniformDistribution(Distribution):
