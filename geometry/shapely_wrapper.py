@@ -171,6 +171,10 @@ class _ShapelyPolygon2D(_ShapelyGeometry, Polygon2D):
         return _ShapelyLinearRing2D(self.points)
 
     @property
+    def centroid(self) -> Point2D:
+        return _ShapelyUtils.convert_shapely_to_point_2d(self._shapely_obj.centroid)
+
+    @property
     def bbox(self) -> Bbox2D:
         min_x, min_y, max_x, max_y = self._shapely_obj.bounds
         return _ShapelyBbox2D(_ShapelyPoint2D(min_x, min_y), _ShapelyPoint2D(max_x, max_y))

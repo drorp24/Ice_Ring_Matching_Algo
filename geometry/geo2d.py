@@ -233,6 +233,10 @@ class Polygon2D(Geometry2D, Surface2D):
         raise NotImplementedError()
 
     @property
+    def centroid(self) -> Point2D:
+        raise NotImplementedError()
+
+    @property
     def bbox(self) -> Bbox2D:
         raise NotImplementedError()
 

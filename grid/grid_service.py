@@ -1,13 +1,17 @@
 import math
+from typing import List, Union
 
-from geometry.geo2d import Point2D, Bbox2D
-from grid.cell import GridLocation
+from geometry.geo2d import Point2D, EmptyGeometry2D, Polygon2D
+from geometry.geo_factory import create_point_2d
+from geometry.polygon_utils import PolygonUtils
+from grid.cell import GridLocation, NoneGridLocation
 
 
 class GridService:
 
     # def __init__(self, area: Bbox2D, resolution: int):
-    #     # _grid = numpy.zeros((ceil((area[0][1] - area[0][0])/resolution), ceil((area[1][1] - area[1][0])/resolution)))
+    #     # _grid = numpy.zeros((ceil((area[0][1] - area[0][0])/resolution), ceil((area[1][1] - area[1][
+    #     0])/resolution)))
     #     # _grid_position = [area[0][0], area[1][0]]
     #     # _x_length = ceil((area[0][1] - area[0][0]) / resolution)
     #     # _y_length = ceil((area[1][1] - area[1][0]) / resolution)
@@ -26,5 +30,31 @@ class GridService:
     def get_grid_location(point: Point2D, cell_resolution: int) -> GridLocation:
         return GridLocation(math.floor(point.x / cell_resolution), math.floor(point.y / cell_resolution))
 
-    # def _get_location(self, grid_indecies: [int, int]) -> [int, int]:
-    #     pass
+    @staticmethod
+    def polygon_to_grid_cells(polygon: Polygon2D, cell_resolution: int, cell_ratio_required: float) -> Union[
+        List[GridLocation], NoneGridLocation]:
+
+        if isinstance(polygon, EmptyGeometry2D):
+            return NoneGridLocation()
+
+        required_area = PolygonUtils.convert_ratio_to_required_area(cell_resolution, cell_ratio_required)
+        splitter_polygons = PolygonUtils.split_polygon(polygon, box_resolution=cell_resolution,
+                                                       required_area=required_area)
+        locations = []
+        for split_polygon in splitter_polygons:
+            bbox = split_polygon.bbox
+            min_x, min_y = bbox.min_x, bbox.min_y
+            min_x_y_point = create_point_2d(math.floor(min_x / cell_resolution),
+                                            math.floor(min_y / cell_resolution))
+            locations.append(GridService.get_grid_location(min_x_y_point, cell_resolution))
+
+        return locations
+
+
+    @staticmethod
+    def get_polygon_centroid_cell(polygon: Polygon2D, cell_resolution) -> Union[GridLocation, NoneGridLocation]:
+        if isinstance(polygon, EmptyGeometry2D):
+            return NoneGridLocation()
+
+        centroid = polygon.centroid
+        return GridService.get_grid_location(centroid, cell_resolution)

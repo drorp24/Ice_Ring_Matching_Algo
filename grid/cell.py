@@ -10,11 +10,18 @@ class GridLocation:
 
 
 @dataclass
+class NoneGridLocation(GridLocation):
+    row: int = None
+    column: int = None
+
+
+@dataclass
 class Cell:
     location: GridLocation
     data: CellData
 
 
+@dataclass
 class EnvelopeCell(Cell):
-    def __init__(self, grid_location: GridLocation, data: EnvelopeCellData):
-        super.__init__(grid_location, data)
+    location: EnvelopeCellData
+    data: CellData
