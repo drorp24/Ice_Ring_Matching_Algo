@@ -27,12 +27,8 @@ class GridService:
     # #                 pass
 
     @staticmethod
-    def get_grid_location(point: Point2D, cell_resolution: int) -> GridLocation:
-        return GridLocation(math.floor(point.x / cell_resolution), math.floor(point.y / cell_resolution))
-
-    @staticmethod
     def polygon_to_grid_cells(polygon: Polygon2D, cell_resolution: int, cell_ratio_required: float) -> Union[
-        List[GridLocation], NoneGridLocation]:
+            List[GridLocation], NoneGridLocation]:
 
         if isinstance(polygon, EmptyGeometry2D):
             return NoneGridLocation()
@@ -50,11 +46,10 @@ class GridService:
 
         return locations
 
+    @staticmethod
+    def get_grid_location(point: Point2D, cell_resolution: int) -> GridLocation:
+        return GridLocation(math.floor(point.x / cell_resolution), math.floor(point.y / cell_resolution))
 
     @staticmethod
-    def get_polygon_centroid_cell(polygon: Polygon2D, cell_resolution) -> Union[GridLocation, NoneGridLocation]:
-        if isinstance(polygon, EmptyGeometry2D):
-            return NoneGridLocation()
-
-        centroid = polygon.centroid
-        return GridService.get_grid_location(centroid, cell_resolution)
+    def get_polygon_centroid_grid_location(polygon: Polygon2D, cell_resolution: int) -> GridLocation:
+        return GridService.get_grid_location(polygon.centroid, cell_resolution)

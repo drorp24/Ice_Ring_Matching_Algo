@@ -112,43 +112,43 @@ class PolygonUtils:
                 final_result.append(g)
         return final_result
 
-    @staticmethod
-    def get_envelope_boundary(envelope_locations) -> List[GridLocation]:
-        envelope_boundary_locations = []
-        if not envelope_locations:
-            return envelope_boundary_locations
-        min_x = min([envelope_location.row for envelope_location in envelope_locations])
-        max_x = max([envelope_location.row for envelope_location in envelope_locations])
-        min_y = min([envelope_location.column for envelope_location in envelope_locations])
-        max_y = max([envelope_location.column for envelope_location in envelope_locations])
-        x_bounds = np.ones((max_x - min_x + 1, 2))
-        x_bounds[:, 0] *= max_y
-        x_bounds[:, 1] *= min_y
-        y_bounds = np.ones((max_y - min_y + 1, 2))
-        y_bounds[:, 0] *= max_x
-        y_bounds[:, 1] *= min_x
-
-        for location in envelope_locations:
-            index = location.row - min_x
-            x_bounds[index, 0] = min(x_bounds[index, 0], location.column)
-            x_bounds[index, 1] = max(x_bounds[index, 1], location.column)
-
-            index = location.column - min_y
-            y_bounds[index, 0] = min(y_bounds[index, 0], location.row)
-            y_bounds[index, 1] = max(y_bounds[index, 1], location.row)
-
-        for x_index, x_bound in enumerate(x_bounds):
-            envelope_boundary_locations.append(GridLocation(min_x + x_index, x_bound[0]))
-            envelope_boundary_locations.append(GridLocation(min_x + x_index, x_bound[1]))
-
-        for y_index, y_bound in enumerate(y_bounds):
-            x_index = int(y_bound[0]) - min_x
-            y_pos = min_y + y_index
-            if x_bounds[x_index, 0] != y_pos and x_bounds[x_index, 1] != y_pos:
-                envelope_boundary_locations.append(GridLocation(y_bound[0], y_pos))
-
-            x_index = int(y_bound[1]) - min_x
-            if x_bounds[x_index, 0] != y_pos and x_bounds[x_index, 1] != y_pos:
-                envelope_boundary_locations.append(GridLocation(y_bound[1], y_pos))
-
-        return envelope_boundary_locations
+    # @staticmethod
+    # def get_envelope_boundary(envelope_locations) -> List[GridLocation]:
+    #     envelope_boundary_locations = []
+    #     if not envelope_locations:
+    #         return envelope_boundary_locations
+    #     min_x = min([envelope_location.row for envelope_location in envelope_locations])
+    #     max_x = max([envelope_location.row for envelope_location in envelope_locations])
+    #     min_y = min([envelope_location.column for envelope_location in envelope_locations])
+    #     max_y = max([envelope_location.column for envelope_location in envelope_locations])
+    #     x_bounds = np.ones((max_x - min_x + 1, 2))
+    #     x_bounds[:, 0] *= max_y
+    #     x_bounds[:, 1] *= min_y
+    #     y_bounds = np.ones((max_y - min_y + 1, 2))
+    #     y_bounds[:, 0] *= max_x
+    #     y_bounds[:, 1] *= min_x
+    #
+    #     for location in envelope_locations:
+    #         index = location.row - min_x
+    #         x_bounds[index, 0] = min(x_bounds[index, 0], location.column)
+    #         x_bounds[index, 1] = max(x_bounds[index, 1], location.column)
+    #
+    #         index = location.column - min_y
+    #         y_bounds[index, 0] = min(y_bounds[index, 0], location.row)
+    #         y_bounds[index, 1] = max(y_bounds[index, 1], location.row)
+    #
+    #     for x_index, x_bound in enumerate(x_bounds):
+    #         envelope_boundary_locations.append(GridLocation(min_x + x_index, x_bound[0]))
+    #         envelope_boundary_locations.append(GridLocation(min_x + x_index, x_bound[1]))
+    #
+    #     for y_index, y_bound in enumerate(y_bounds):
+    #         x_index = int(y_bound[0]) - min_x
+    #         y_pos = min_y + y_index
+    #         if x_bounds[x_index, 0] != y_pos and x_bounds[x_index, 1] != y_pos:
+    #             envelope_boundary_locations.append(GridLocation(y_bound[0], y_pos))
+    #
+    #         x_index = int(y_bound[1]) - min_x
+    #         if x_bounds[x_index, 0] != y_pos and x_bounds[x_index, 1] != y_pos:
+    #             envelope_boundary_locations.append(GridLocation(y_bound[1], y_pos))
+    #
+    #     return envelope_boundary_locations

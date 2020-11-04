@@ -8,6 +8,10 @@ from geometry.geo2d import Polygon2D, Point2D, EmptyGeometry2D
 
 class EnvelopeServicesInterface(ABC):
 
+    @staticmethod
+    def is_valid_envelope(polygon: Polygon2D,required_area: float) -> bool:
+        raise NotImplementedError()
+
     @classmethod
     @abstractmethod
     def drop_envelope(cls, package_type: PackageType, drone_azimuth: Angle, drop_point: Point2D,
