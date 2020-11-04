@@ -19,7 +19,6 @@ class AngleUnit(Enum):
     def cyclic_value(self) -> float:
         return self._cyclic_value
 
-
 class Angle:
     def __init__(self, value: float, unit: AngleUnit):
         self.__value = _calc_cyclic_value(value, unit.cyclic_value)
@@ -50,6 +49,9 @@ class Angle:
 
     def __str__(self):
         return "Angle ({0}, {1})".format(self.__value, self.__unit)
+
+    def __hash__(self):
+        return hash(self.in_degrees())
 
 
 def _calc_first_cycle_equivalent(angle: Angle):

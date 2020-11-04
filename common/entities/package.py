@@ -61,6 +61,9 @@ class Package:
     def potential_drop_envelope(self) -> PotentialDropEnvelope:
         return self._potential_drop_envelope
 
+    def __str__(self):
+        return 'package of weight ' + self._weight
+
 
 class PackageType(Enum):
     TINY = Package(1)
@@ -74,9 +77,10 @@ class PackageType(Enum):
 
 
 class PackageDistribution(ChoiceDistribution):
-    def __init__(self, package_distribution: dict):
+    def __init__(self, package_distribution=None):
+        if package_distribution is None:
+            package_distribution = {}
         super().__init__({package_type: package_distribution.get(package_type, 0)
                           for package_type in PackageType.get_all_names()})
-
 
 

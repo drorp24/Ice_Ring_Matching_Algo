@@ -1,9 +1,11 @@
+from __future__ import annotations
+
 from random import Random
-from typing import Union
+from typing import Union, List
 
 from common.entities.base_entities.distribution import UniformChoiceDistribution
 from common.entities.package import PackageType, PackageDistribution
-from common.math.angle import Angle, AngleUniformDistribution
+from common.math.angle import Angle, AngleUniformDistribution, AngleUnit
 from geometry.geo2d import Point2D, Polygon2D
 from geometry.geo_distribution import PointDistribution, MultiPointDistribution
 from geometry.geo_factory import create_polygon_2d_from_ellipse
@@ -59,20 +61,44 @@ class PackageDeliveryPlan:
                                               ellipse_height=envelope_height,
                                               ellipse_rotation_deg=drone_azimuth.in_degrees())
 
+    def __hash__(self):
+        return hash((self.drop_point, self.azimuth, self.elevation, self.package_type))
+
+
+class PackageDeliveryPlanDefaults:
+
+    @staticmethod
+    def default_drop_point_distrib():
+        return PointDistribution(30, 40, 35, 45)
+
+    @staticmethod
+    def default_azimuth_distrib():
+        return AngleUniformDistribution(Angle(0, AngleUnit.DEGREE), Angle(355, AngleUnit.DEGREE))
+
+    @staticmethod
+    def default_elevation_distrib():
+        return AngleUniformDistribution(Angle(30, AngleUnit.DEGREE), Angle(90, AngleUnit.DEGREE))
+
+    @staticmethod
+    def default_package_distrib():
+        return PackageDistribution()
+
 
 class PackageDeliveryPlanDistribution:
 
-    def __init__(self, drop_point_distribution: Union[MultiPointDistribution, PointDistribution],
-                 azimuth_distribution: AngleUniformDistribution,
-                 elevation_distribution: UniformChoiceDistribution,
-                 package_type_distribution: PackageDistribution):
+    def __init__(self,
+                 drop_point_distribution: PointDistribution = PackageDeliveryPlanDefaults.default_drop_point_distrib(),
+                 azimuth_distribution: AngleUniformDistribution = PackageDeliveryPlanDefaults.default_azimuth_distrib(),
+                 elevation_distribution: UniformChoiceDistribution = PackageDeliveryPlanDefaults.default_elevation_distrib(),
+                 package_type_distribution: PackageDistribution = PackageDeliveryPlanDefaults.default_package_distrib()):
         self._drop_point_distribution = drop_point_distribution
         self._azimuth_distribution = azimuth_distribution
         self._elevation_distribution = elevation_distribution
         self._package_type_distribution = package_type_distribution
 
-    def choose_rand(self, random: Random) -> PackageDeliveryPlan:
-        return PackageDeliveryPlan(self._drop_point_distribution.choose_rand(random),
-                                   self._azimuth_distribution.choose_rand(random),
-                                   self._elevation_distribution.choose_rand(random),
-                                   self._package_type_distribution.choose_rand(random))
+    def choose_rand(self, random: Random, number_of_instances: int = 1) -> List[PackageDeliveryPlan]:
+        return [PackageDeliveryPlan(self._drop_point_distribution.choose_rand(random),
+                                    self._azimuth_distribution.choose_rand(random),
+                                    self._elevation_distribution.choose_rand(random),
+                                    self._package_type_distribution.choose_rand(random)) for i in
+                range(number_of_instances)]
