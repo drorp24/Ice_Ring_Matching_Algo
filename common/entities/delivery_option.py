@@ -2,10 +2,11 @@ from random import Random
 from typing import List
 
 from common.entities.base_entities.distribution import UniformChoiceDistribution
+from common.entities.base_entity import BaseEntity
 from common.entities.customer_delivery import CustomerDelivery, CustomerDeliveryDistribution
 
 
-class DeliveryOption:
+class DeliveryOption(BaseEntity):
 
     def __init__(self, customer_deliveries: [CustomerDelivery]):
         self._customer_deliveries = customer_deliveries if customer_deliveries is not None else []

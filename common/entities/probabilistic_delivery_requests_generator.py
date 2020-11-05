@@ -108,7 +108,7 @@
 # #     azimuth_distribution: IntDistribution = IntDistribution([WeightedIntRange(0, 360, 1)])
 # #     drop_points_distribution: PointDistribution = PointDistribution([
 # #         WeightedPointRange(FloatRange(0, 100), FloatRange(0, 100), 1)])
-# #     elevation_distribution: IntDistribution = IntDistribution([WeightedIntRange(0, 0, 1)])
+# #     pitch_distribution: IntDistribution = IntDistribution([WeightedIntRange(0, 0, 1)])
 # #     package_distribution: PackageDistribution = PackageDistribution([(PackageType.MEDIUM, 1)])
 #
 #
@@ -122,7 +122,7 @@
 #                                   priority_distribution: IntDistribution,
 #                                   drop_points_distribution: PointDistribution,
 #                                   azimuth_distribution: IntDistribution,
-#                                   elevation_distribution: IntDistribution,
+#                                   pitch_distribution: IntDistribution,
 #                                   package_distribution: PackageDistribution,
 #                                   random_seed=None):
 #     delivery_requests_dict = create_delivery_requests_dict(num_of_delivery_requests_range,
@@ -134,7 +134,7 @@
 #                                                            priority_distribution,
 #                                                            drop_points_distribution,
 #                                                            azimuth_distribution,
-#                                                            elevation_distribution,
+#                                                            pitch_distribution,
 #                                                            package_distribution,
 #                                                            random_seed)
 #
@@ -211,8 +211,8 @@
 #         package_type = pdp_distribution.package_distribution.calc_rand_in_range(rand)
 #         drop_point_dict = __create_drop_point_dict(pdp_distribution.drop_points_distribution, rand)
 #         azimuth = pdp_distribution.azimuth_distribution.calc_rand_in_range(rand)
-#         elevation = pdp_distribution.elevation_distribution.calc_rand_in_range(rand)
-#         package_delivery_plan_dict = dict(package_type=package_type, azimuth=azimuth, elevation=elevation)
+#         pitch = pdp_distribution.pitch_distribution.calc_rand_in_range(rand)
+#         package_delivery_plan_dict = dict(package_type=package_type, azimuth=azimuth, pitch=pitch)
 #         package_delivery_plan_dict.update(drop_point_dict)
 #         return package_delivery_plan_dict
 #

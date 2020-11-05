@@ -9,7 +9,7 @@ from typing import Dict, List, Union, Tuple
 class Distribution(ABC):
 
     @abstractmethod
-    def choose_rand(self, random: Random):
+    def choose_rand(self, random: Random, num_to_choose: int):
         raise NotImplementedError
 
 

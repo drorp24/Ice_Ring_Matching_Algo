@@ -25,23 +25,23 @@ class BasicDeliveryGeneration(unittest.TestCase):
                     CustomerDelivery([
                         PackageDeliveryPlan(drop_point=create_point_2d(5.0, 7.0),
                                             azimuth=Angle(45, AngleUnit.DEGREE),
-                                            elevation=Angle(30, AngleUnit.DEGREE),
+                                            pitch=Angle(30, AngleUnit.DEGREE),
                                             package_type=PackageType.MEDIUM)]),
                     CustomerDelivery([
                         PackageDeliveryPlan(drop_point=create_point_2d(5.0, 7.0),
                                             azimuth=Angle(55, AngleUnit.DEGREE),
-                                            elevation=Angle(40, AngleUnit.DEGREE),
+                                            pitch=Angle(40, AngleUnit.DEGREE),
                                             package_type=PackageType.LARGE)])]),
                 DeliveryOption([
                     CustomerDelivery([
                         PackageDeliveryPlan(drop_point=create_point_2d(5.0, 7.0),
                                             azimuth=Angle(45, AngleUnit.DEGREE),
-                                            elevation=Angle(30, AngleUnit.DEGREE),
+                                            pitch=Angle(30, AngleUnit.DEGREE),
                                             package_type=PackageType.MEDIUM)]),
                     CustomerDelivery([
                         PackageDeliveryPlan(drop_point=create_point_2d(5.0, 7.0),
                                             azimuth=Angle(55, AngleUnit.DEGREE),
-                                            elevation=Angle(40, AngleUnit.DEGREE),
+                                            pitch=Angle(40, AngleUnit.DEGREE),
                                             package_type=PackageType.LARGE)])])],
             time_window=TimeWindow(
                 datetime(2020, 1, 1,

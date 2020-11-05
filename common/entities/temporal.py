@@ -29,9 +29,17 @@ class TimeWindowExtension:
     def internal_time_window(self) -> TimeWindow:
         return self._time_window
 
+    @property
+    def since(self) -> DateTimeExtension:
+        return DateTimeExtension(self.internal_time_window.since)
+
+    @property
+    def until(self) -> DateTimeExtension:
+        return DateTimeExtension(self.internal_time_window.until)
+
     def to_dict(self) -> dict:
-        since = {SINCE: DateTimeExtension.from_dt(self.internal_time_window.since).to_dict()}
-        until = {UNTIL: DateTimeExtension.from_dt(self.internal_time_window.until).to_dict()}
+        since = {SINCE: self.since.to_dict()}
+        until = {UNTIL: self.until.to_dict()}
         return {**since, **until}
 
     @staticmethod
@@ -43,6 +51,9 @@ class TimeWindowExtension:
     def __eq__(self, other: TimeWindowExtension):
         return self.internal_time_window.since == other.internal_time_window.since and \
                self.internal_time_window.until == other.internal_time_window.until
+
+    def __repr__(self):
+        return 'TimeWindow: start_time={},end_time={}'.format(self.since.__repr__(), self.until.__repr__())
 
 
 class DateTimeExtension:
@@ -91,13 +102,16 @@ class DateTimeExtension:
         return {TIME: {HOUR: date_time.hour, MINUTE: date_time.minute, SECOND: date_time.second}}
 
     def add_time_delta(self, time_delta: TimeDeltaExtension) -> DateTimeExtension:
-        return DateTimeExtension(self.internal_date_time + time_delta.internal_delta)
+        return DateTimeExtension.from_dt(self.internal_date_time + time_delta.internal_delta)
 
     def __eq__(self, other: DateTimeExtension):
         return self.internal_date_time == other.internal_date_time
 
     def __gt__(self, other: DateTimeExtension):
         return self.internal_date_time > other.internal_date_time
+
+    def __repr__(self):
+        return self.internal_date_time.__repr__()
 
 
 class TimeDeltaExtension:
@@ -109,15 +123,23 @@ class TimeDeltaExtension:
     def internal_delta(self) -> timedelta:
         return self._time_delta
 
+    def to_dict(self):
+        return {'time_delta_sec': timedelta.seconds}
+
     def __eq__(self, other: TimeDeltaExtension):
-        return self.internal_delta == other.internal_delta
-    
+        return self.internal_delta.seconds == other.internal_delta.seconds
+
+    def __repr__(self):
+        return self.internal_delta.__repr__()
+
 
 _DEFAULT_DATE_TIME_MORNING = DateTimeExtension(dt_date=date(2021, 1, 1), dt_time=time(6, 0, 0))
 _DEFAULT_DATE_MID_DAY = DateTimeExtension(dt_date=date(2021, 1, 1), dt_time=time(12, 30, 0))
 _DEFAULT_DATE_TIME_NIGHT = DateTimeExtension(dt_date=date(2021, 1, 1), dt_time=time(23, 59, 0))
 
-_DEFAULT_TIME_DELTA_OPTIONS = [timedelta(hours=3), timedelta(minutes=30), timedelta(hours=2, minutes=20)]
+_DEFAULT_TIME_DELTA_OPTIONS = [TimeDeltaExtension(timedelta(hours=3)),
+                               TimeDeltaExtension(timedelta(minutes=30)),
+                               TimeDeltaExtension(timedelta(hours=2, minutes=20))]
 
 _DEFAULT_DT_OPTIONS = [_DEFAULT_DATE_TIME_MORNING, _DEFAULT_DATE_MID_DAY, _DEFAULT_DATE_TIME_NIGHT]
 
@@ -130,7 +152,7 @@ class DateTimeDistribution(UniformChoiceDistribution):
 
 
 class TimeDeltaDistribution(UniformChoiceDistribution):
-    def __init__(self, time_delta_list: List[timedelta]):
+    def __init__(self, time_delta_list: List[TimeDeltaExtension]):
         super().__init__(time_delta_list)
 
 
@@ -144,8 +166,7 @@ class TimeWindowDistribution(Distribution):
     def choose_rand(self, random: Random, num_to_choose: int = 1):
         start_times: List[DateTimeExtension] = self._start_date_time_distribution.choose_rand(random, num_to_choose)
         deltas: List[TimeDeltaExtension] = self._time_delta_distribution.choose_rand(random, num_to_choose)
-        return [TimeWindowExtension(start_time, start_time.add_time_delta(delta)) for (start_time, delta) in
-                zip(start_times, deltas)]
+        return [TimeWindowExtension(start_time, start_time.add_time_delta(delta)) for (start_time, delta) in zip(start_times, deltas)]
 
 
 class NoViableTimesGivenDistribution(Exception):

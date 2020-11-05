@@ -4,12 +4,13 @@ import statistics
 from enum import Enum
 
 from common.entities.base_entities.distribution import ChoiceDistribution
+from common.entities.base_entity import BaseEntity
 
 MAX_POTENTIAL_DROP_ENV_RADIUS_METERS: float = 1000.0
 MAX_DELTA_BETWEEN_MIN_AND_MAX_RADIUS: float = 100.0
 
 
-class PotentialDropEnvelope:
+class PotentialDropEnvelope(BaseEntity):
 
     def __init__(self, minimal_radius_meters: float, maximal_radius_meters: float):
         self._minimal_radius_meters = minimal_radius_meters
@@ -32,7 +33,7 @@ class PotentialDropEnvelope:
         return self.maximal_radius_meters - self.minimal_radius_meters
 
 
-class Package:
+class Package(BaseEntity):
 
     def __init__(self, weight: float):
         self._weight = weight

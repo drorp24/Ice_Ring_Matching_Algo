@@ -74,7 +74,7 @@ def main():
     drop_point = create_point_2d(1, 2)
     delivery_plan = package_delivery_plan_factory(drop_point,
                                                   azimuth=Angle(30, AngleUnit.DEGREE),
-                                                  elevation=Angle(80, AngleUnit.DEGREE),
+                                                  pitch=Angle(80, AngleUnit.DEGREE),
                                                   package_type=PackageType.TINY)
     drone_azimuth1 = Angle(delivery_plan.azimuth.in_degrees() + 45, AngleUnit.DEGREE)
     drawer1 = create_drawer2d()

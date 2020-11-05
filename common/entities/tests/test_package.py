@@ -21,7 +21,7 @@ class BasicPackageTestCase(unittest.TestCase):
         point = create_point_2d(1, 2)
         cls.pdp = package_delivery_plan_factory(point,
                                                 azimuth=Angle(30, AngleUnit.DEGREE),
-                                                elevation=Angle(80, AngleUnit.DEGREE),
+                                                pitch=Angle(80, AngleUnit.DEGREE),
                                                 package_type=PackageType.TINY)
 
     def test_package_weights(self):
@@ -39,14 +39,14 @@ class BasicPackageTestCase(unittest.TestCase):
     def test_2_package_delivery_plans_equal(self):
         expected_pdp = package_delivery_plan_factory(create_point_2d(1, 2),
                                                      azimuth=Angle(30, AngleUnit.DEGREE),
-                                                     elevation=Angle(80, AngleUnit.DEGREE),
+                                                     pitch=Angle(80, AngleUnit.DEGREE),
                                                      package_type=PackageType.TINY)
         self.assertEqual(self.pdp, expected_pdp)
 
     def test_2_package_delivery_plans_not_equal(self):
         expected_pdp = package_delivery_plan_factory(create_point_2d(1, 2),
                                                      azimuth=Angle(31, AngleUnit.DEGREE),
-                                                     elevation=Angle(80, AngleUnit.DEGREE),
+                                                     pitch=Angle(80, AngleUnit.DEGREE),
                                                      package_type=PackageType.TINY)
         self.assertNotEqual(self.pdp, expected_pdp)
 

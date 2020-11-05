@@ -2,10 +2,11 @@ from random import Random
 from typing import List
 
 from common.entities.base_entities.distribution import UniformChoiceDistribution
+from common.entities.base_entity import BaseEntity
 from common.entities.package_delivery_plan import PackageDeliveryPlan, PackageDeliveryPlanDistribution
 
 
-class CustomerDelivery:
+class CustomerDelivery(BaseEntity):
 
     def __init__(self, package_delivery_plans: List[PackageDeliveryPlan]):
         self._package_delivery_plans = package_delivery_plans

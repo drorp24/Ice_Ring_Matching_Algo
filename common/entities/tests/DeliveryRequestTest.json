@@ -8,7 +8,7 @@
           "drop_point_x": 0,
           "drop_point_y": 0,
           "azimuth": 0,
-          "elevation": 0,
+          "pitch": 0,
           "package_type": "Tiny"
         }]
       }
@@ -20,7 +20,7 @@
           "drop_point_x": 0,
           "drop_point_y": 0,
           "azimuth": 0,
-          "elevation": 0,
+          "pitch": 0,
           "package_type": "Tiny"
         }]
       }
@@ -54,7 +54,7 @@
           "drop_point_x": 0,
           "drop_point_y": 0,
           "azimuth": 0,
-          "elevation": 0,
+          "pitch": 0,
           "package_type": "Tiny"
         }]
       }
@@ -66,7 +66,7 @@
           "drop_point_x": 0,
           "drop_point_y": 0,
           "azimuth": 0,
-          "elevation": 0,
+          "pitch": 0,
           "package_type": "Tiny"
         }
         ]
@@ -100,7 +100,7 @@
           "drop_point_x": 0,
           "drop_point_y": 0,
           "azimuth": 0,
-          "elevation": 0,
+          "pitch": 0,
           "package_type": "Tiny"
         }]
       }
@@ -112,7 +112,7 @@
           "drop_point_x": 0,
           "drop_point_y": 0,
           "azimuth": 0,
-          "elevation": 0,
+          "pitch": 0,
           "package_type": "Tiny"
         }
         ]

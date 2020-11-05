@@ -40,7 +40,7 @@ class ProbabilisticDeliveryRequestsGenerationTest(unittest.TestCase):
                                                           WeightedPointRange(FloatRange(100.0, 200.0),
                                                                              FloatRange(0.0, 100.0), 0.3)])
         cls.azimuth_distribution = IntDistribution([WeightedIntRange(0, 359, 1)])
-        cls.elevation_distribution = IntDistribution([WeightedIntRange(90, 90, 0.5),
+        cls.pitch_distribution = IntDistribution([WeightedIntRange(90, 90, 0.5),
                                                       WeightedIntRange(30, 89, 0.5)])
         cls.package_distribution = PackageDistribution([(PackageType.TINY.name, 0.5),
                                                         (PackageType.SMALL.name, 0.3),
@@ -94,7 +94,7 @@ class ProbabilisticDeliveryRequestsGenerationTest(unittest.TestCase):
             priority_distribution=self.priority_distribution,
             drop_points_distribution=self.drop_points_distribution,
             azimuth_distribution=self.azimuth_distribution,
-            elevation_distribution=self.elevation_distribution,
+            pitch_distribution=self.pitch_distribution,
             package_distribution=self.package_distribution,
             random_seed=self.random_seed)
 
@@ -114,7 +114,7 @@ class ProbabilisticDeliveryRequestsGenerationTest(unittest.TestCase):
             priority_distribution=self.priority_distribution,
             drop_points_distribution=self.drop_points_distribution,
             azimuth_distribution=self.azimuth_distribution,
-            elevation_distribution=self.elevation_distribution,
+            pitch_distribution=self.pitch_distribution,
             package_distribution=self.package_distribution,
             random_seed=self.random_seed)
         delivery_request_dict2 = create_delivery_requests_dict(
@@ -127,7 +127,7 @@ class ProbabilisticDeliveryRequestsGenerationTest(unittest.TestCase):
             priority_distribution=self.priority_distribution,
             drop_points_distribution=self.drop_points_distribution,
             azimuth_distribution=self.azimuth_distribution,
-            elevation_distribution=self.elevation_distribution,
+            pitch_distribution=self.pitch_distribution,
             package_distribution=self.package_distribution,
             random_seed=self.random_seed)
 
@@ -144,7 +144,7 @@ class ProbabilisticDeliveryRequestsGenerationTest(unittest.TestCase):
             priority_distribution=self.priority_distribution,
             drop_points_distribution=self.drop_points_distribution,
             azimuth_distribution=self.azimuth_distribution,
-            elevation_distribution=self.elevation_distribution,
+            pitch_distribution=self.pitch_distribution,
             package_distribution=self.package_distribution)
         delivery_request_dict2 = create_delivery_requests_dict(
             num_of_delivery_requests_range=self.num_of_delivery_requests_range,
@@ -156,7 +156,7 @@ class ProbabilisticDeliveryRequestsGenerationTest(unittest.TestCase):
             priority_distribution=self.priority_distribution,
             drop_points_distribution=self.drop_points_distribution,
             azimuth_distribution=self.azimuth_distribution,
-            elevation_distribution=self.elevation_distribution,
+            pitch_distribution=self.pitch_distribution,
             package_distribution=self.package_distribution)
 
         self.assertNotEqual(delivery_request_dict1, delivery_request_dict2)
@@ -168,7 +168,7 @@ class ProbabilisticDeliveryRequestsGenerationTest(unittest.TestCase):
                     CustomerDelivery([
                         PackageDeliveryPlan(drop_point=create_point_2d(5.0, 7.0),
                                             azimuth=Angle(45, AngleUnit.DEGREE),
-                                            elevation=Angle(30, AngleUnit.DEGREE),
+                                            pitch=Angle(30, AngleUnit.DEGREE),
                                             package_type=PackageType.MEDIUM)])])],
             time_window=TimeWindow(
                 datetime(params.BASE_YEAR, params.BASE_MONTH, params.BASE_DAY,
@@ -189,7 +189,7 @@ class ProbabilisticDeliveryRequestsGenerationTest(unittest.TestCase):
             drop_points_distribution=PointDistribution([WeightedPointRange(FloatRange(5.0, 5.0),
                                                                            FloatRange(7.0, 7.0), 1)]),
             azimuth_distribution=IntDistribution([WeightedIntRange(45, 45, 1)]),
-            elevation_distribution=IntDistribution([WeightedIntRange(30, 30, 1)]),
+            pitch_distribution=IntDistribution([WeightedIntRange(30, 30, 1)]),
             package_distribution=PackageDistribution([(PackageType.MEDIUM.name, 1)]))
         request_from_json = create_delivery_requests_from_file(self.output_json_path)
 
@@ -208,7 +208,7 @@ class ProbabilisticDeliveryRequestsGenerationTest(unittest.TestCase):
             priority_distribution=self.priority_distribution,
             drop_points_distribution=self.drop_points_distribution,
             azimuth_distribution=self.azimuth_distribution,
-            elevation_distribution=self.elevation_distribution,
+            pitch_distribution=self.pitch_distribution,
             package_distribution=self.package_distribution)
         dr = create_delivery_requests_from_file(self.output_json_path)
 

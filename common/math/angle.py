@@ -2,6 +2,7 @@ from __future__ import annotations
 import math
 from enum import Enum
 from random import Random
+from typing import List
 
 from common.entities.base_entities.distribution import UniformDistribution, Range
 from geometry.geo2d import Vector2D
@@ -18,6 +19,7 @@ class AngleUnit(Enum):
     @property
     def cyclic_value(self) -> float:
         return self._cyclic_value
+
 
 class Angle:
     def __init__(self, value: float, unit: AngleUnit):
@@ -53,6 +55,9 @@ class Angle:
     def __hash__(self):
         return hash(self.in_degrees())
 
+    def __repr__(self):
+        return 'Angle: angle_deg={}'.format(self.in_degrees())
+
 
 def _calc_first_cycle_equivalent(angle: Angle):
     # convert the angle to be between 0 [deg] and 360 [deg]
@@ -69,5 +74,6 @@ class AngleUniformDistribution(UniformDistribution):
     def __init__(self, start_angle: Angle, end_angle: Angle):
         super().__init__(Range(start_angle.in_degrees(), end_angle.in_degrees()))
 
-    def choose_rand(self, random: Random) -> Angle:
-        return Angle(super(AngleUniformDistribution, self).choose_rand(random), AngleUnit.DEGREE)
+    def choose_rand(self, random: Random, num_to_choose: int = 1) -> List[Angle]:
+        return [Angle(angle_degree, AngleUnit.DEGREE) for angle_degree in
+                super(AngleUniformDistribution, self).choose_rand(random, num_to_choose)]
