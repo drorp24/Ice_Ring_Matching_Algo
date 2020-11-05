@@ -1,47 +1,36 @@
-from random import Random
-
-import math
-from common.utils import json_file_handler
-from common.entities.drone import PlatformType, DroneConfigurationType
-from common.entities.drone_formation import DroneFormationType, FormationSize
-
-_fleet_of_platform_types = {PlatformType.PLATFORM_1: 30, PlatformType.PLATFORM_2: 20}
-_formation_size_policy = {FormationSize.MINI: 0.5, FormationSize.MEDIUM: 0.5}
-_drone_configuration_policy = {PlatformType.PLATFORM_1: {DroneConfigurationType.PLATFORM_1_2X8: 0.4,
-                                                         DroneConfigurationType.PLATFORM_1_4X4: 0.4,
-                                                         DroneConfigurationType.PLATFORM_1_8X2: 0.1,
-                                                         DroneConfigurationType.PLATFORM_1_16X1: 0.1},
-                               PlatformType.PLATFORM_2: {DroneConfigurationType.PLATFORM_2_4X8: 0.4,
-                                                         DroneConfigurationType.PLATFORM_2_8X4: 0.4,
-                                                         DroneConfigurationType.PLATFORM_2_16X2: 0.1,
-                                                         DroneConfigurationType.PLATFORM_2_32X1: 0.1}}
+from common.entities.drone_delivery import EmptyDroneDelivery
+from common.entities.drone_delivery_board import EmptyDroneDeliveryBoard
+from common.tools.fleet_property_sets import PlatformPropertySet
+from common.tools.fleet_partition import FormationSizesAmounts, FleetPartition
+from common.tools.fleet_configuration_attribution import DroneFormationsPerTypeAmounts, FleetConfigurationAttribution
+from common.tools.fleet_reader import FleetReader
+import uuid
 
 
-def _get_configuration_distribution(platform_type: PlatformType) -> []:
-    weights = _drone_configuration_policy[platform_type].values()
-    total_weight = sum(weights)
-    distribution = [weight / total_weight for weight in weights]
-    return distribution
+def _calc_formation_amounts(platform_properties: PlatformPropertySet) -> FormationSizesAmounts:
+    FleetPartition.extract_parameters(platform_properties)
+    return FleetPartition.solve()
 
 
-def _get_formation_size_distribution() -> []:
-    weights = _formation_size_policy.values()
-    total_weight = sum(weights)
-    distribution = [weight / total_weight for weight in weights]
-    return distribution
+def _calc_drone_formation_amounts(formation_sizes_amounts: FormationSizesAmounts,
+                                  platform_properties: PlatformPropertySet) -> DroneFormationsPerTypeAmounts:
+    FleetConfigurationAttribution.extract_parameters(formation_sizes_amounts, platform_properties)
+    return FleetConfigurationAttribution.solve()
 
 
-def _get_population(distribution: [], platform_type: PlatformType) -> {}:
-    fleet_of_platform_type = _fleet_of_platform_types[platform_type]
-    population = [math.floor(fleet_of_platform_type * prob) for prob in distribution]
-    total_population = sum(population)
-    population_gap = fleet_of_platform_type - total_population
-    if population_gap > 0:
-        max_index = population.index(max(population))
-        population[max_index] += population_gap
-    platform_configuration_population = _drone_configuration_policy[platform_type]
-    for index, key in enumerate(platform_configuration_population.keys()):
-        platform_configuration_population[key] = population[index]
-    return platform_configuration_population
+def calc_drone_deliveries(platform_properties: PlatformPropertySet) -> [EmptyDroneDelivery]:
+    empty_deliveries = []
+    formation_sizes_amounts = _calc_formation_amounts(platform_properties)
+    drone_formations_per_type_amounts = _calc_drone_formation_amounts(formation_sizes_amounts, platform_properties)
+    for drone_formation, amount in drone_formations_per_type_amounts.amounts.items():
+        for i in range(amount):
+            empty_deliveries.append(EmptyDroneDelivery(str(uuid.uuid4()), drone_formation))
+    return empty_deliveries
 
 
+def generate_empty_delivery_board(fleet_reader: FleetReader) -> EmptyDroneDeliveryBoard:
+    platforms_properties = fleet_reader.get_platforms_properties()
+    total_drone_deliveries = []
+    for platform_property in platforms_properties:
+        total_drone_deliveries += calc_drone_deliveries(platform_property)
+    return EmptyDroneDeliveryBoard(total_drone_deliveries)
