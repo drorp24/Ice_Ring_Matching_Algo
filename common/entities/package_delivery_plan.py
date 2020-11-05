@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import itertools
 from random import Random
 from typing import Union, List
 
@@ -7,7 +8,7 @@ from common.entities.base_entities.distribution import UniformChoiceDistribution
 from common.entities.package import PackageType, PackageDistribution
 from common.math.angle import Angle, AngleUniformDistribution, AngleUnit
 from geometry.geo2d import Point2D, Polygon2D
-from geometry.geo_distribution import PointDistribution, MultiPointDistribution
+from geometry.geo_distribution import PointDistribution
 from geometry.geo_factory import create_polygon_2d_from_ellipse
 
 
@@ -64,41 +65,35 @@ class PackageDeliveryPlan:
     def __hash__(self):
         return hash((self.drop_point, self.azimuth, self.elevation, self.package_type))
 
+    def __str__(self):
+        return 'Package Delivery Plan: ' + str((self.drop_point, self.azimuth, self.elevation, self.package_type))
 
-class PackageDeliveryPlanDefaults:
 
-    @staticmethod
-    def default_drop_point_distrib():
-        return PointDistribution(30, 40, 35, 45)
+_DEFAULT_DROP_POINT_DISTRIB = PointDistribution(30, 40, 35, 45)
 
-    @staticmethod
-    def default_azimuth_distrib():
-        return AngleUniformDistribution(Angle(0, AngleUnit.DEGREE), Angle(355, AngleUnit.DEGREE))
+_DEFAULT_AZI_DISTRIB = AngleUniformDistribution(Angle(0, AngleUnit.DEGREE), Angle(355, AngleUnit.DEGREE))
 
-    @staticmethod
-    def default_elevation_distrib():
-        return AngleUniformDistribution(Angle(30, AngleUnit.DEGREE), Angle(90, AngleUnit.DEGREE))
+_DEFAULT_ELEVATION_DISTRIB = AngleUniformDistribution(Angle(30, AngleUnit.DEGREE), Angle(90, AngleUnit.DEGREE))
 
-    @staticmethod
-    def default_package_distrib():
-        return PackageDistribution()
+_DEFAULT_PACKAGE_DISTRIB = PackageDistribution()
 
 
 class PackageDeliveryPlanDistribution:
 
     def __init__(self,
-                 drop_point_distribution: PointDistribution = PackageDeliveryPlanDefaults.default_drop_point_distrib(),
-                 azimuth_distribution: AngleUniformDistribution = PackageDeliveryPlanDefaults.default_azimuth_distrib(),
-                 elevation_distribution: UniformChoiceDistribution = PackageDeliveryPlanDefaults.default_elevation_distrib(),
-                 package_type_distribution: PackageDistribution = PackageDeliveryPlanDefaults.default_package_distrib()):
+                 drop_point_distribution: PointDistribution = _DEFAULT_DROP_POINT_DISTRIB,
+                 azimuth_distribution: AngleUniformDistribution = _DEFAULT_AZI_DISTRIB,
+                 elevation_distribution: UniformChoiceDistribution = _DEFAULT_ELEVATION_DISTRIB,
+                 package_type_distribution: PackageDistribution = _DEFAULT_PACKAGE_DISTRIB):
         self._drop_point_distribution = drop_point_distribution
         self._azimuth_distribution = azimuth_distribution
         self._elevation_distribution = elevation_distribution
         self._package_type_distribution = package_type_distribution
 
-    def choose_rand(self, random: Random, number_of_instances: int = 1) -> List[PackageDeliveryPlan]:
-        return [PackageDeliveryPlan(self._drop_point_distribution.choose_rand(random),
-                                    self._azimuth_distribution.choose_rand(random),
-                                    self._elevation_distribution.choose_rand(random),
-                                    self._package_type_distribution.choose_rand(random)) for i in
-                range(number_of_instances)]
+    def choose_rand(self, random: Random, num_to_choose: int = 1) -> List[PackageDeliveryPlan]:
+        drop_points = self._drop_point_distribution.choose_rand(random, num_to_choose)
+        azimuths = self._azimuth_distribution.choose_rand(random, num_to_choose)
+        elevations = self._elevation_distribution.choose_rand(random, num_to_choose)
+        packages = self._package_type_distribution.choose_rand(random, num_to_choose)
+        return [PackageDeliveryPlan(dp, az, el, pk) for (dp, az, el, pk) in
+                zip(drop_points, azimuths, elevations, packages)]

@@ -1,11 +1,12 @@
 from __future__ import annotations
-from datetime import datetime, date, time
+
+from datetime import datetime, date, time, timedelta
 from random import Random
 from typing import Dict, List
 
 from time_window import TimeWindow
 
-from common.entities.base_entities.distribution import ChoiceDistribution, Distribution
+from common.entities.base_entities.distribution import Distribution, UniformChoiceDistribution
 
 DATE = 'date'
 TIME = 'time'
@@ -89,6 +90,9 @@ class DateTimeExtension:
     def extract_time_dict_from_datetime(date_time: datetime) -> Dict:
         return {TIME: {HOUR: date_time.hour, MINUTE: date_time.minute, SECOND: date_time.second}}
 
+    def add_time_delta(self, time_delta: TimeDeltaExtension) -> DateTimeExtension:
+        return DateTimeExtension(self.internal_date_time + time_delta.internal_delta)
+
     def __eq__(self, other: DateTimeExtension):
         return self.internal_date_time == other.internal_date_time
 
@@ -96,28 +100,52 @@ class DateTimeExtension:
         return self.internal_date_time > other.internal_date_time
 
 
-class DateTimeDistribution(ChoiceDistribution):
-    def __init__(self, date_time_options: List[DateTimeExtension]):
+class TimeDeltaExtension:
+    
+    def __init__(self, time_delta: timedelta = timedelta(hours=1)):
+        self._time_delta: timedelta = time_delta
+
+    @property
+    def internal_delta(self) -> timedelta:
+        return self._time_delta
+
+    def __eq__(self, other: TimeDeltaExtension):
+        return self.internal_delta == other.internal_delta
+    
+
+_DEFAULT_DATE_TIME_MORNING = DateTimeExtension(dt_date=date(2021, 1, 1), dt_time=time(6, 0, 0))
+_DEFAULT_DATE_MID_DAY = DateTimeExtension(dt_date=date(2021, 1, 1), dt_time=time(12, 30, 0))
+_DEFAULT_DATE_TIME_NIGHT = DateTimeExtension(dt_date=date(2021, 1, 1), dt_time=time(23, 59, 0))
+
+_DEFAULT_TIME_DELTA_OPTIONS = [timedelta(hours=3), timedelta(minutes=30), timedelta(hours=2, minutes=20)]
+
+_DEFAULT_DT_OPTIONS = [_DEFAULT_DATE_TIME_MORNING, _DEFAULT_DATE_MID_DAY, _DEFAULT_DATE_TIME_NIGHT]
+
+_DEFAULT_TIME_WINDOW = TimeWindowExtension(_DEFAULT_DATE_TIME_MORNING, _DEFAULT_DATE_TIME_NIGHT)
+
+
+class DateTimeDistribution(UniformChoiceDistribution):
+    def __init__(self, date_time_options: List[DateTimeExtension] = _DEFAULT_DT_OPTIONS):
         super().__init__(date_time_options)
+
+
+class TimeDeltaDistribution(UniformChoiceDistribution):
+    def __init__(self, time_delta_list: List[timedelta]):
+        super().__init__(time_delta_list)
 
 
 class TimeWindowDistribution(Distribution):
 
-    def __init__(self, start_time_distribution: DateTimeDistribution, end_time_distribution: DateTimeDistribution):
-        self._start_time_distribution = start_time_distribution
-        self._end_time_distribution = end_time_distribution
+    def __init__(self, start_time_distribution: DateTimeDistribution = DateTimeDistribution(_DEFAULT_DT_OPTIONS),
+                 time_delta_distribution: TimeDeltaDistribution = TimeDeltaDistribution(_DEFAULT_TIME_DELTA_OPTIONS)):
+        self._start_date_time_distribution = start_time_distribution
+        self._time_delta_distribution = time_delta_distribution
 
-    def choose_rand(self, random: Random):
-        start_time_selected = self._start_time_distribution.choose_rand(random)
-        earliest_end_time = min(self._end_time_distribution.get_choices())
-        start_time_options = self._start_time_distribution.get_choices()
-        valid_start_times = list(filter(lambda start_time: start_time < earliest_end_time, start_time_options))
-        end_time_options = self._end_time_distribution.get_choices()
-        viable_end_time_list = list(filter(lambda e_t: e_t < start_time_selected, end_time_options))
-        if not valid_start_times or not viable_end_time_list:
-            raise NoViableTimesGivenDistribution
-        end_time_selected = DateTimeDistribution(viable_end_time_list).choose_rand(random)
-        return TimeWindowExtension(start_time_selected, end_time_selected)
+    def choose_rand(self, random: Random, num_to_choose: int = 1):
+        start_times: List[DateTimeExtension] = self._start_date_time_distribution.choose_rand(random, num_to_choose)
+        deltas: List[TimeDeltaExtension] = self._time_delta_distribution.choose_rand(random, num_to_choose)
+        return [TimeWindowExtension(start_time, start_time.add_time_delta(delta)) for (start_time, delta) in
+                zip(start_times, deltas)]
 
 
 class NoViableTimesGivenDistribution(Exception):

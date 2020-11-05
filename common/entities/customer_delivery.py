@@ -18,6 +18,12 @@ class CustomerDelivery:
         return self._package_delivery_plans
 
 
+_DEFAULT_PDP_DISTRIB = [PackageDeliveryPlanDistribution()]
+
+
 class CustomerDeliveryDistribution(UniformChoiceDistribution):
-    def __init__(self, package_delivery_plan_distributions: List[PackageDeliveryPlanDistribution]):
+    def __init__(self, package_delivery_plan_distributions: List[PackageDeliveryPlanDistribution] = _DEFAULT_PDP_DISTRIB):
         super().__init__(package_delivery_plan_distributions)
+
+    def choose_rand(self, random: Random, num_to_choose: int = 1, num_pdp: int = 1) -> [CustomerDelivery]:
+        return [CustomerDelivery(distribution.choose_rand(random, num_pdp)) for distribution in super().choose_rand(random, num_to_choose)]

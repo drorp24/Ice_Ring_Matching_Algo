@@ -1,3 +1,4 @@
+from random import Random
 from typing import List
 
 from common.entities.base_entities.distribution import UniformChoiceDistribution
@@ -17,6 +18,15 @@ class DeliveryOption:
         return self._customer_deliveries
 
 
+_DEFAULT_CDD_DISTRIB = [CustomerDeliveryDistribution()]
+
+
 class DeliveryOptionDistribution(UniformChoiceDistribution):
-    def __init__(self, customer_delivery_distributions: List[CustomerDeliveryDistribution]):
+    def __init__(self, customer_delivery_distributions: List[CustomerDeliveryDistribution] = _DEFAULT_CDD_DISTRIB):
         super().__init__(customer_delivery_distributions)
+
+    def choose_rand(self, random: Random, num_to_choose: int = 1, num_cd: int = 1, num_pdp: int = 1) -> List[
+        CustomerDelivery]:
+        customer_delivery_distributions = super().choose_rand(random, num_to_choose)
+        return [CustomerDelivery(distrib.choose_rand(random, num_cd, num_pdp)) for distrib in
+                customer_delivery_distributions]
