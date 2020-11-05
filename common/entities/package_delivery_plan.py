@@ -1,8 +1,7 @@
 from __future__ import annotations
 
-import itertools
 from random import Random
-from typing import Union, List
+from typing import List
 
 from common.entities.base_entities.distribution import UniformChoiceDistribution
 from common.entities.base_entity import BaseEntity
