@@ -2,7 +2,7 @@ from __future__ import annotations
 from datetime import datetime, date, time
 from typing import Dict
 
-from time_window import TimeWindow
+from time_window import TimeWindow, time_window_to_timestamps
 
 DATE = 'date'
 TIME = 'time'
@@ -29,6 +29,9 @@ class TimeWindowExtension:
         since = {SINCE: DateTimeExtension.from_dt(self.internal_time_window.since).to_dict()}
         until = {UNTIL: DateTimeExtension.from_dt(self.internal_time_window.until).to_dict()}
         return {**since, **until}
+
+    def get_time_stamp(self) -> tuple(int,int):
+        return time_window_to_timestamps(self._time_window)
 
     @staticmethod
     def from_dict(time_window_dict: Dict) -> TimeWindowExtension:
