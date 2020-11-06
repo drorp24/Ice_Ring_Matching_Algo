@@ -31,11 +31,11 @@ class TimeWindowExtension:
 
     @property
     def since(self) -> DateTimeExtension:
-        return DateTimeExtension(self.internal_time_window.since)
+        return DateTimeExtension.from_dt(self.internal_time_window.since)
 
     @property
     def until(self) -> DateTimeExtension:
-        return DateTimeExtension(self.internal_time_window.until)
+        return DateTimeExtension.from_dt(self.internal_time_window.until)
 
     def to_dict(self) -> dict:
         since = {SINCE: self.since.to_dict()}

@@ -2,17 +2,15 @@ from pprint import pprint
 from random import Random
 from typing import List
 
-from time_window import TimeWindow
-
 from common.entities.base_entities.distribution import UniformChoiceDistribution, Distribution
 from common.entities.base_entity import BaseEntity
 from common.entities.delivery_option import DeliveryOption, DeliveryOptionDistribution
-from common.entities.temporal import TimeWindowDistribution
+from common.entities.temporal import TimeWindowDistribution, TimeWindowExtension
 
 
 class DeliveryRequest(BaseEntity):
 
-    def __init__(self, delivery_options: [DeliveryOption], time_window: TimeWindow, priority: int):
+    def __init__(self, delivery_options: [DeliveryOption], time_window: TimeWindowExtension, priority: int):
         self._delivery_options = delivery_options if delivery_options is not None else []
         self._time_window = time_window
         self._priority = priority
@@ -22,7 +20,7 @@ class DeliveryRequest(BaseEntity):
         return self._delivery_options
 
     @property
-    def time_window(self) -> TimeWindow:
+    def time_window(self) -> TimeWindowExtension:
         return self._time_window
 
     @property
@@ -71,4 +69,4 @@ class DeliveryRequestDistribution(Distribution):
 
 
 if __name__ == '__main__':
-    pprint(DeliveryRequestDistribution().choose_rand(Random()))
+    pprint(DeliveryRequestDistribution().choose_rand(Random(), 100))
