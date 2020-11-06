@@ -1,0 +1,14 @@
+{
+  "match_input":
+    {
+      "solver_name": "or_tools:automatic",
+      "dropped_penalty": 5,
+      "waiting_time_allowed_min": 10,
+      "max_total_drone_time_min": 30,
+      "count_time_from_zero": false,
+      "count_capacity_from_zero": true,
+      "count_priority_from_zero": true,
+      "first_solution_strategy": "or_tools:path_cheapest_arc",
+      "time_limit_sec": 30
+    }
+ }
