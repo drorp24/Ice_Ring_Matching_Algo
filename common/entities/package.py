@@ -78,10 +78,10 @@ class PackageType(Enum):
 
 
 class PackageDistribution(ChoiceDistribution):
-    def __init__(self, package_distribution=None):
-        if package_distribution is None:
-            package_distribution = {}
-        super().__init__({package_type: package_distribution.get(package_type, 0)
+    def __init__(self, package_distribution_dict=None):
+        if package_distribution_dict is None:
+            package_distribution_dict = {}
+        super().__init__({package_type: package_distribution_dict.get(package_type, 0)
                           for package_type in PackageType.get_all_names()})
 
 

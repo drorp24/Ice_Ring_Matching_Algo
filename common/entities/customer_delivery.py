@@ -1,9 +1,12 @@
+import operator
+from functools import reduce
 from random import Random
 from typing import List
 
-from common.entities.base_entities.distribution import UniformChoiceDistribution
+from common.entities.base_entities.distribution import UniformChoiceDistribution, Distribution
 from common.entities.base_entity import BaseEntity
 from common.entities.package_delivery_plan import PackageDeliveryPlan, PackageDeliveryPlanDistribution
+from common.utils import list_operation
 
 
 class CustomerDelivery(BaseEntity):
@@ -19,12 +22,10 @@ class CustomerDelivery(BaseEntity):
         return self._package_delivery_plans
 
 
-_DEFAULT_PDP_DISTRIB = [PackageDeliveryPlanDistribution()]
+class CustomerDeliveryDistribution(Distribution):
+    def __init__(self, package_delivery_plan_distributions: List[PackageDeliveryPlanDistribution]):
+        self._pdp_distributions = package_delivery_plan_distributions
 
-
-class CustomerDeliveryDistribution(UniformChoiceDistribution):
-    def __init__(self, package_delivery_plan_distributions: List[PackageDeliveryPlanDistribution] = _DEFAULT_PDP_DISTRIB):
-        super().__init__(package_delivery_plan_distributions)
-
-    def choose_rand(self, random: Random, num_to_choose: int = 1, num_pdp: int = 1) -> [CustomerDelivery]:
-        return [CustomerDelivery(distribution.choose_rand(random, num_pdp)) for distribution in super().choose_rand(random, num_to_choose)]
+    def choose_rand(self, random: Random, amount: int = 1, num_pdp: int = 1) -> List[CustomerDelivery]:
+        pdp_distributions = UniformChoiceDistribution(self._pdp_distributions).choose_rand(random, amount)
+        return [CustomerDelivery(pdp_dist.choose_rand(random, amount=num_pdp)) for pdp_dist in pdp_distributions]

@@ -9,7 +9,7 @@ from typing import Dict, List, Union, Tuple
 class Distribution(ABC):
 
     @abstractmethod
-    def choose_rand(self, random: Random, num_to_choose: int):
+    def choose_rand(self, random: Random, amount: int):
         raise NotImplementedError
 
 
@@ -32,10 +32,10 @@ class ChoiceDistribution(Distribution):
             probabilities = [prob / sum_probabilities for prob in probabilities]
         return probabilities
 
-    def choose_rand(self, random: Random, num_to_choose=1):
+    def choose_rand(self, random: Random, amount=1):
         values = list(self.options_to_prob.keys())
         probs = list(self.options_to_prob.values())
-        return random.choices(values, ChoiceDistribution.get_safe_probabilities(probs), k=num_to_choose)
+        return random.choices(values, ChoiceDistribution.get_safe_probabilities(probs), k=amount)
 
     def __str__(self):
         return str(self.options_to_prob)
@@ -51,8 +51,8 @@ class UniformChoiceDistribution(Distribution):
     def __init__(self, values: Union[List, Tuple]):
         self._values = values
 
-    def choose_rand(self, random: Random, num_to_choose: int = 1) -> List:
-        return random.choices(self._values, k=num_to_choose)
+    def choose_rand(self, random: Random, amount: int = 1) -> List:
+        return random.choices(self._values, k=amount)
 
 
 class UniformDistribution(Distribution):
@@ -60,9 +60,9 @@ class UniformDistribution(Distribution):
     def __init__(self, value_range: Range):
         self._value_range = value_range
 
-    def choose_rand(self, random: Random, num_to_choose: int = 1) -> List:
+    def choose_rand(self, random: Random, amount: int = 1) -> List:
         # uniform sample from within range chosen by probability
-        return [random.uniform(self._value_range.start, self._value_range.stop) for i in range(num_to_choose)]
+        return [random.uniform(self._value_range.start, self._value_range.stop) for i in range(amount)]
 
 
 class MultiUniformDistribution(Distribution):
@@ -70,9 +70,9 @@ class MultiUniformDistribution(Distribution):
     def __init__(self, range_to_probability: Dict):
         self._range_to_probability = range_to_probability
 
-    def choose_rand(self, random: Random, num_to_choose: int = 1) -> List:
+    def choose_rand(self, random: Random, amount: int = 1) -> List:
         # uniform sample from within range chosen by probability
-        return [self.calc_value_within_range_based_on_prob(random) for i in range(num_to_choose)]
+        return [self.calc_value_within_range_based_on_prob(random) for i in range(amount)]
 
     def calc_value_within_range_based_on_prob(self, random):
         range_to_sample_from: Range = ChoiceDistribution(self._range_to_probability).choose_rand(random)[0]

@@ -58,7 +58,7 @@ class TimeWindowExtension:
 
 class DateTimeExtension:
 
-    def __init__(self, dt_date: date = date(2000, 1, 1), dt_time: time = time(6, 0, 0)):
+    def __init__(self, dt_date: date, dt_time: time):
         self._date_time: datetime = datetime(year=dt_date.year, month=dt_date.month, day=dt_date.day, hour=dt_time.hour,
                                              minute=dt_time.minute, second=dt_time.second)
 
@@ -115,7 +115,7 @@ class DateTimeExtension:
 
 
 class TimeDeltaExtension:
-    
+
     def __init__(self, time_delta: timedelta = timedelta(hours=1)):
         self._time_delta: timedelta = time_delta
 
@@ -133,40 +133,34 @@ class TimeDeltaExtension:
         return self.internal_delta.__repr__()
 
 
-_DEFAULT_DATE_TIME_MORNING = DateTimeExtension(dt_date=date(2021, 1, 1), dt_time=time(6, 0, 0))
-_DEFAULT_DATE_MID_DAY = DateTimeExtension(dt_date=date(2021, 1, 1), dt_time=time(12, 30, 0))
-_DEFAULT_DATE_TIME_NIGHT = DateTimeExtension(dt_date=date(2021, 1, 1), dt_time=time(23, 59, 0))
-
-_DEFAULT_TIME_DELTA_OPTIONS = [TimeDeltaExtension(timedelta(hours=3)),
-                               TimeDeltaExtension(timedelta(minutes=30)),
-                               TimeDeltaExtension(timedelta(hours=2, minutes=20))]
-
-_DEFAULT_DT_OPTIONS = [_DEFAULT_DATE_TIME_MORNING, _DEFAULT_DATE_MID_DAY, _DEFAULT_DATE_TIME_NIGHT]
-
-_DEFAULT_TIME_WINDOW = TimeWindowExtension(_DEFAULT_DATE_TIME_MORNING, _DEFAULT_DATE_TIME_NIGHT)
-
-
 class DateTimeDistribution(UniformChoiceDistribution):
-    def __init__(self, date_time_options: List[DateTimeExtension] = _DEFAULT_DT_OPTIONS):
+    def __init__(self, date_time_options: List[DateTimeExtension]):
         super().__init__(date_time_options)
+
+    def choose_rand(self, random: Random, amount: int = 1) -> List[DateTimeExtension]:
+        return super().choose_rand(random, amount)
 
 
 class TimeDeltaDistribution(UniformChoiceDistribution):
     def __init__(self, time_delta_list: List[TimeDeltaExtension]):
         super().__init__(time_delta_list)
 
+    def choose_rand(self, random: Random, amount: int = 1) -> List[TimeDeltaExtension]:
+        return super().choose_rand(random, amount)
+
 
 class TimeWindowDistribution(Distribution):
 
-    def __init__(self, start_time_distribution: DateTimeDistribution = DateTimeDistribution(_DEFAULT_DT_OPTIONS),
-                 time_delta_distribution: TimeDeltaDistribution = TimeDeltaDistribution(_DEFAULT_TIME_DELTA_OPTIONS)):
+    def __init__(self, start_time_distribution: DateTimeDistribution,
+                 time_delta_distribution: TimeDeltaDistribution):
         self._start_date_time_distribution = start_time_distribution
         self._time_delta_distribution = time_delta_distribution
 
-    def choose_rand(self, random: Random, num_to_choose: int = 1):
-        start_times: List[DateTimeExtension] = self._start_date_time_distribution.choose_rand(random, num_to_choose)
-        deltas: List[TimeDeltaExtension] = self._time_delta_distribution.choose_rand(random, num_to_choose)
-        return [TimeWindowExtension(start_time, start_time.add_time_delta(delta)) for (start_time, delta) in zip(start_times, deltas)]
+    def choose_rand(self, random: Random, amount: int = 1) -> List[TimeWindowExtension]:
+        start_times: List[DateTimeExtension] = self._start_date_time_distribution.choose_rand(random, amount)
+        deltas: List[TimeDeltaExtension] = self._time_delta_distribution.choose_rand(random, amount)
+        return [TimeWindowExtension(start_time, start_time.add_time_delta(delta)) for (start_time, delta) in
+                zip(start_times, deltas)]
 
 
 class NoViableTimesGivenDistribution(Exception):

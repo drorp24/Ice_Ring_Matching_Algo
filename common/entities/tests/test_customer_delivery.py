@@ -20,5 +20,5 @@ class BasicPackageDeliveryPlan(unittest.TestCase):
             [cls.plan_delivery_distribution1, cls.plan_delivery_distribution2])
 
     def test_generate_package_delivery_plans_based_on_distribution(self):
-        print(self.package_delivery_distrib.choose_rand(random=Random(), num_to_choose=20))
+        print(self.package_delivery_distrib.choose_rand(random=Random(), amount=20))
 

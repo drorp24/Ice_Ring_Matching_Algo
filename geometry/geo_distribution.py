@@ -25,7 +25,7 @@ class MultiPointDistribution(ChoiceDistribution):
     def __init__(self, point_dist_to_prob: dict):
         self._point_dist_to_prob = point_dist_to_prob
 
-    def choose_rand(self, random: Random, num_to_choose: int = 1):
+    def choose_rand(self, random: Random, amount: int = 1):
         selected_point_distribution: PointDistribution = \
-            ChoiceDistribution(self._point_dist_to_prob).choose_rand(random, num_to_choose)
+            ChoiceDistribution(self._point_dist_to_prob).choose_rand(random, amount)
         return selected_point_distribution.choose_rand(random)

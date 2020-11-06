@@ -74,6 +74,6 @@ class AngleUniformDistribution(UniformDistribution):
     def __init__(self, start_angle: Angle, end_angle: Angle):
         super().__init__(Range(start_angle.in_degrees(), end_angle.in_degrees()))
 
-    def choose_rand(self, random: Random, num_to_choose: int = 1) -> List[Angle]:
+    def choose_rand(self, random: Random, amount: int = 1) -> List[Angle]:
         return [Angle(angle_degree, AngleUnit.DEGREE) for angle_degree in
-                super(AngleUniformDistribution, self).choose_rand(random, num_to_choose)]
+                super(AngleUniformDistribution, self).choose_rand(random, amount)]

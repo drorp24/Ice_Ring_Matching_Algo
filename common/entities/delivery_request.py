@@ -1,11 +1,17 @@
-from pprint import pprint
+from __future__ import annotations
+
 from random import Random
 from typing import List
 
 from common.entities.base_entities.distribution import UniformChoiceDistribution, Distribution
 from common.entities.base_entity import BaseEntity
+from common.entities.customer_delivery import CustomerDeliveryDistribution
 from common.entities.delivery_option import DeliveryOption, DeliveryOptionDistribution
+from common.entities.package import PackageDistribution
+from common.entities.package_delivery_plan import PackageDeliveryPlanDistribution
 from common.entities.temporal import TimeWindowDistribution, TimeWindowExtension
+from common.math.angle import AngleUniformDistribution
+from geometry.geo_distribution import PointDistribution
 
 
 class DeliveryRequest(BaseEntity):
@@ -33,40 +39,43 @@ class DeliveryRequest(BaseEntity):
                (self.priority == other.priority)
 
 
-_DEFAULT_DR_DISTRIB = UniformChoiceDistribution([DeliveryOptionDistribution()])
-
-_DEFAULT_TW_DISTRIB = TimeWindowDistribution()
-
-_DEFAULT_PRIORITY_OPTIONS = list(range(0, 100, 3))
-
-
 class PriorityDistribution(UniformChoiceDistribution):
-    def __init__(self):
-        super().__init__(_DEFAULT_PRIORITY_OPTIONS)
-
-
-_DEFAULT_PRIORITY_DISTRIB = PriorityDistribution()
+    def __init__(self, priorities: List[float]):
+        super().__init__(priorities)
 
 
 class DeliveryRequestDistribution(Distribution):
-    def __init__(self, delivery_option_distributions: UniformChoiceDistribution = _DEFAULT_DR_DISTRIB,
-                 time_window_distributions: TimeWindowDistribution = _DEFAULT_TW_DISTRIB,
-                 priority_distribution: PriorityDistribution = _DEFAULT_PRIORITY_DISTRIB):
-        self._delivery_option_distribution_options = delivery_option_distributions
+    def __init__(self, delivery_option_distributions: [DeliveryOptionDistribution],
+                 time_window_distributions: TimeWindowDistribution,
+                 priority_distribution: PriorityDistribution):
+        self._do_distribution_options = delivery_option_distributions
         self._time_window_distributions = time_window_distributions
         self._priority_distribution = priority_distribution
 
-    def choose_rand(self, random: Random, num_to_choose: int = 1, num_do: int = 1, num_cd: int = 1, num_pdp: int = 1) -> \
+    def choose_rand(self, random: Random, amount: int = 1, num_do: int = 1, num_cd: int = 1, num_pdp: int = 1) -> \
             List[DeliveryRequest]:
-        delivery_request_distributions = self._delivery_option_distribution_options.choose_rand(random, num_to_choose)
-        time_window = self._time_window_distributions.choose_rand(random, num_to_choose)
-        priority_distribution = self._priority_distribution.choose_rand(random, num_to_choose)
-        return [DeliveryRequest(
-            distrib.choose_rand(random=random, num_cd=num_cd, num_pdp=num_pdp, num_to_choose=num_do),
-            time_window[i],
-            priority_distribution[i])
-            for i, distrib in enumerate(delivery_request_distributions)]
+
+        do_distributions = UniformChoiceDistribution(self._do_distribution_options).choose_rand(random, amount)
+        time_window_distributions = self._time_window_distributions.choose_rand(random, amount)
+        priority_distribution = self._priority_distribution.choose_rand(random, amount)
+
+        return [DeliveryRequest(do_distributions[i].choose_rand(random=random, amount=num_do, num_cd=num_cd, num_pdp=num_pdp),
+                                time_window_distributions[i], priority_distribution[i]) for i in range(amount)]
 
 
-if __name__ == '__main__':
-    pprint(DeliveryRequestDistribution().choose_rand(Random(), 100))
+def generate_delivery_request_distribution(drop_point_distribution: PointDistribution,
+                                           azimuth_distribution: AngleUniformDistribution,
+                                           pitch_distribution: UniformChoiceDistribution,
+                                           package_type_distribution: PackageDistribution,
+                                           priority_distribution: PriorityDistribution,
+                                           time_window_distribution: TimeWindowDistribution):
+    pdp_distribution = PackageDeliveryPlanDistribution(drop_point_distribution=drop_point_distribution,
+                                                       azimuth_distribution=azimuth_distribution,
+                                                       pitch_distribution=pitch_distribution,
+                                                       package_type_distribution=package_type_distribution)
+    pdp_distribution = [pdp_distribution]
+    cd_distribution = [CustomerDeliveryDistribution(pdp_distribution)]
+    do_distribution = [DeliveryOptionDistribution(cd_distribution)]
+    return DeliveryRequestDistribution(delivery_option_distributions=do_distribution,
+                                       priority_distribution=priority_distribution,
+                                       time_window_distributions=time_window_distribution)
