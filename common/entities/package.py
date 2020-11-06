@@ -76,6 +76,9 @@ class PackageType(Enum):
     def get_all_names():
         return list(PackageType.__members__.keys())
 
+    def __dict__(self):
+        return {self.name: self.value}
+
 
 class PackageDistribution(ChoiceDistribution):
     def __init__(self, package_distribution_dict=None):
@@ -83,5 +86,3 @@ class PackageDistribution(ChoiceDistribution):
             package_distribution_dict = {}
         super().__init__({package_type: package_distribution_dict.get(package_type, 0)
                           for package_type in PackageType.get_all_names()})
-
-

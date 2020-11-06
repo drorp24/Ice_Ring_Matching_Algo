@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 from typing import Union, List
 
 
-class Geometry2D(ABC):
+class Geometry2D(ABC, object):
 
     @property
     @abstractmethod
@@ -132,7 +132,7 @@ class Point2D(Geometry2D):
         raise NotImplementedError()
 
     def __repr__(self):
-        return 'Point2d: x={},y={}'.format(self.x, self.y)
+        return 'point_2d: x={},y={}'.format(self.x, self.y)
 
 
 class Curve2D(Geometry2D):
@@ -215,6 +215,7 @@ class Polygon2D(Geometry2D, Surface2D):
         * The convention for initialization is  we utilize is NOT to duplicate the end points,
         the implementation will "close" the polygon loop.
     """
+
     @property
     @abstractmethod
     def type(self) -> str:
@@ -253,7 +254,6 @@ class Polygon2D(Geometry2D, Surface2D):
 
 
 class MultiPolygon2D(Geometry2D, Surface2D):
-
     """
         Multi-polygon represents a set of polygons.
         * The polygons can NOT overlap.

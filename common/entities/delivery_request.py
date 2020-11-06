@@ -54,13 +54,13 @@ class DeliveryRequestDistribution(Distribution):
 
     def choose_rand(self, random: Random, amount: int = 1, num_do: int = 1, num_cd: int = 1, num_pdp: int = 1) -> \
             List[DeliveryRequest]:
-
         do_distributions = UniformChoiceDistribution(self._do_distribution_options).choose_rand(random, amount)
         time_window_distributions = self._time_window_distributions.choose_rand(random, amount)
         priority_distribution = self._priority_distribution.choose_rand(random, amount)
 
-        return [DeliveryRequest(do_distributions[i].choose_rand(random=random, amount=num_do, num_cd=num_cd, num_pdp=num_pdp),
-                                time_window_distributions[i], priority_distribution[i]) for i in range(amount)]
+        return [DeliveryRequest(
+            do_distributions[i].choose_rand(random=random, amount=num_do, num_cd=num_cd, num_pdp=num_pdp),
+            time_window_distributions[i], priority_distribution[i]) for i in list(range(amount))]
 
 
 def generate_delivery_request_distribution(drop_point_distribution: PointDistribution,

@@ -16,12 +16,12 @@ DEFAULT_DROP_POINT_DISTRIB = PointDistribution(30, 40, 35, 45)
 DEFAULT_AZI_DISTRIB = AngleUniformDistribution(Angle(0, AngleUnit.DEGREE), Angle(355, AngleUnit.DEGREE))
 DEFAULT_PITCH_DISTRIB = AngleUniformDistribution(Angle(30, AngleUnit.DEGREE), Angle(90, AngleUnit.DEGREE))
 DEFAULT_PACKAGE_DISTRIB = PackageDistribution()
-DEFAULT_PDP_DISTRIB = [PackageDeliveryPlanDistribution(DEFAULT_DROP_POINT_DISTRIB,
+DEFAULT_PDP_DISTRIB = PackageDeliveryPlanDistribution(DEFAULT_DROP_POINT_DISTRIB,
                                                        DEFAULT_AZI_DISTRIB,
                                                        DEFAULT_PITCH_DISTRIB,
-                                                       DEFAULT_PACKAGE_DISTRIB)]
-DEFAULT_CDD_DISTRIB = CustomerDeliveryDistribution([DEFAULT_PDP_DISTRIB])
-DEFAULT_DO_DISTRIB = DeliveryOptionDistribution([DEFAULT_CDD_DISTRIB])
+                                                       DEFAULT_PACKAGE_DISTRIB)
+DEFAULT_CD_DISTRIB = CustomerDeliveryDistribution([DEFAULT_PDP_DISTRIB])
+DEFAULT_DO_DISTRIB = DeliveryOptionDistribution([DEFAULT_CD_DISTRIB])
 
 
 # --- date time default distributions ---

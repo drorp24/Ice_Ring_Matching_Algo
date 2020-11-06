@@ -48,7 +48,9 @@ class ChoiceDistribution(Distribution):
 
 class UniformChoiceDistribution(Distribution):
 
-    def __init__(self, values: Union[List, Tuple]):
+    def __init__(self, values: List):
+        if not isinstance(values, list):
+            values = [values]
         self._values = values
 
     def choose_rand(self, random: Random, amount: int = 1) -> List:

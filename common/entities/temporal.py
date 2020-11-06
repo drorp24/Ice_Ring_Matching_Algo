@@ -7,6 +7,7 @@ from typing import Dict, List
 from time_window import TimeWindow
 
 from common.entities.base_entities.distribution import Distribution, UniformChoiceDistribution
+from common.entities.base_entity import JSONable
 
 DATE = 'date'
 TIME = 'time'
@@ -20,7 +21,7 @@ SINCE = 'since'
 UNTIL = 'until'
 
 
-class TimeWindowExtension:
+class TimeWindowExtension(JSONable):
 
     def __init__(self, since: DateTimeExtension, until: DateTimeExtension):
         self._time_window = TimeWindow(since.internal_date_time, until.internal_date_time)
@@ -43,9 +44,9 @@ class TimeWindowExtension:
         return {**since, **until}
 
     @staticmethod
-    def from_dict(time_window_dict: Dict) -> TimeWindowExtension:
-        since = DateTimeExtension.from_dict(time_window_dict[SINCE])
-        until = DateTimeExtension.from_dict(time_window_dict[UNTIL])
+    def from_dict(input_dict: Dict) -> TimeWindowExtension:
+        since = DateTimeExtension.from_dict(input_dict[SINCE])
+        until = DateTimeExtension.from_dict(input_dict[UNTIL])
         return TimeWindowExtension(since, until)
 
     def __eq__(self, other: TimeWindowExtension):

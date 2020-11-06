@@ -68,6 +68,9 @@ class PackageDeliveryPlan(BaseEntity):
     def __str__(self):
         return 'Package Delivery Plan: ' + str((self.drop_point, self.azimuth, self.pitch, self.package_type))
 
+    def __repr__(self):
+        return 'package_delivery_plan: ' + (self.drop_point, self.azimuth, self.pitch, self.package_type).__repr__()
+
 
 class PackageDeliveryPlanDistribution(Distribution):
 
@@ -81,10 +84,10 @@ class PackageDeliveryPlanDistribution(Distribution):
         self._pitch_distribution = pitch_distribution
         self._package_type_distribution = package_type_distribution
 
-    def choose_rand(self, random: Random, num_to_choose: int = 1) -> List[PackageDeliveryPlan]:
-        drop_points = self._drop_point_distribution.choose_rand(random, num_to_choose)
-        azimuths = self._azimuth_distribution.choose_rand(random, num_to_choose)
-        pitchs = self._pitch_distribution.choose_rand(random, num_to_choose)
-        packages = self._package_type_distribution.choose_rand(random, num_to_choose)
+    def choose_rand(self, random: Random, amount: int = 1) -> List[PackageDeliveryPlan]:
+        drop_points = self._drop_point_distribution.choose_rand(random, amount)
+        azimuths = self._azimuth_distribution.choose_rand(random, amount)
+        pitchs = self._pitch_distribution.choose_rand(random, amount)
+        packages = self._package_type_distribution.choose_rand(random, amount)
         return [PackageDeliveryPlan(dp, az, el, pk) for (dp, az, el, pk) in
                 zip(drop_points, azimuths, pitchs, packages)]

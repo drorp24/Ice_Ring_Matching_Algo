@@ -1,12 +1,9 @@
-import operator
-from functools import reduce
 from random import Random
 from typing import List
 
 from common.entities.base_entities.distribution import UniformChoiceDistribution, Distribution
 from common.entities.base_entity import BaseEntity
 from common.entities.package_delivery_plan import PackageDeliveryPlan, PackageDeliveryPlanDistribution
-from common.utils import list_operation
 
 
 class CustomerDelivery(BaseEntity):
@@ -27,5 +24,5 @@ class CustomerDeliveryDistribution(Distribution):
         self._pdp_distributions = package_delivery_plan_distributions
 
     def choose_rand(self, random: Random, amount: int = 1, num_pdp: int = 1) -> List[CustomerDelivery]:
-        pdp_distributions = UniformChoiceDistribution(self._pdp_distributions).choose_rand(random, amount)
-        return [CustomerDelivery(pdp_dist.choose_rand(random, amount=num_pdp)) for pdp_dist in pdp_distributions]
+        pdp_distributions = UniformChoiceDistribution(self._pdp_distributions).choose_rand(random, amount=amount)
+        return [CustomerDelivery(pdp_distributions[i].choose_rand(random, amount=num_pdp)) for i in list(range(amount))]
