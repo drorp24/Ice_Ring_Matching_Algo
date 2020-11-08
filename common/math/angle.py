@@ -55,11 +55,13 @@ class Angle(object):
     def __hash__(self):
         return hash(self.in_degrees())
 
-    def __repr__(self):
-        return 'degrees: ' + str(self.in_degrees())
-
     def __dict__(self):
-        return {'degrees': self.in_degrees()}
+        return {'degree': self.in_degrees()}
+
+    def __repr__(self):
+        return str(self.__dict__())
+
+
 
 
 def _calc_first_cycle_equivalent(angle: Angle):

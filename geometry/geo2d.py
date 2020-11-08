@@ -131,9 +131,6 @@ class Point2D(Geometry2D):
     def __eq__(self, other) -> bool:
         raise NotImplementedError()
 
-    def __repr__(self):
-        return 'point_2d: x={},y={}'.format(self.x, self.y)
-
 
 class Curve2D(Geometry2D):
 

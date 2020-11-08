@@ -7,7 +7,7 @@ from typing import Dict, List
 from time_window import TimeWindow
 
 from common.entities.base_entities.distribution import Distribution, UniformChoiceDistribution
-from common.entities.base_entity import JSONable
+from common.entities.base_entity import BaseEntity
 
 DATE = 'date'
 TIME = 'time'
@@ -21,22 +21,22 @@ SINCE = 'since'
 UNTIL = 'until'
 
 
-class TimeWindowExtension(JSONable):
+class TimeWindowExtension(BaseEntity):
 
     def __init__(self, since: DateTimeExtension, until: DateTimeExtension):
-        self._time_window = TimeWindow(since.internal_date_time, until.internal_date_time)
+        self._time_window = TimeWindow(since._internal_date_time, until._internal_date_time)
 
     @property
-    def internal_time_window(self) -> TimeWindow:
+    def _internal_time_window(self) -> TimeWindow:
         return self._time_window
 
     @property
     def since(self) -> DateTimeExtension:
-        return DateTimeExtension.from_dt(self.internal_time_window.since)
+        return DateTimeExtension.from_dt(self._internal_time_window.since)
 
     @property
     def until(self) -> DateTimeExtension:
-        return DateTimeExtension.from_dt(self.internal_time_window.until)
+        return DateTimeExtension.from_dt(self._internal_time_window.until)
 
     def to_dict(self) -> dict:
         since = {SINCE: self.since.to_dict()}
@@ -44,20 +44,17 @@ class TimeWindowExtension(JSONable):
         return {**since, **until}
 
     @staticmethod
-    def from_dict(input_dict: Dict) -> TimeWindowExtension:
-        since = DateTimeExtension.from_dict(input_dict[SINCE])
-        until = DateTimeExtension.from_dict(input_dict[UNTIL])
+    def from_dict(time_window_dict: Dict) -> TimeWindowExtension:
+        since = DateTimeExtension.from_dict(time_window_dict[SINCE])
+        until = DateTimeExtension.from_dict(time_window_dict[UNTIL])
         return TimeWindowExtension(since, until)
 
     def __eq__(self, other: TimeWindowExtension):
-        return self.internal_time_window.since == other.internal_time_window.since and \
-               self.internal_time_window.until == other.internal_time_window.until
-
-    def __repr__(self):
-        return 'TimeWindow: start_time={},end_time={}'.format(self.since.__repr__(), self.until.__repr__())
+        return self._internal_time_window.since == other._internal_time_window.since and \
+               self._internal_time_window.until == other._internal_time_window.until
 
 
-class DateTimeExtension:
+class DateTimeExtension(BaseEntity):
 
     def __init__(self, dt_date: date, dt_time: time):
         self._date_time: datetime = datetime(year=dt_date.year, month=dt_date.month, day=dt_date.day, hour=dt_time.hour,
@@ -68,12 +65,20 @@ class DateTimeExtension:
         return DateTimeExtension(date_time.date(), date_time.time())
 
     @property
-    def internal_date_time(self) -> datetime:
+    def _internal_date_time(self) -> datetime:
         return self._date_time
 
+    @property
+    def date(self) -> date:
+        return self._date_time.date()
+
+    @property
+    def time(self) -> date:
+        return self._date_time.time()
+
     def to_dict(self) -> Dict:
-        date_dict = DateTimeExtension.extract_date_dict_from_datetime(self.internal_date_time)
-        time_dict = DateTimeExtension.extract_time_dict_from_datetime(self.internal_date_time)
+        date_dict = DateTimeExtension.extract_date_dict_from_datetime(self._internal_date_time)
+        time_dict = DateTimeExtension.extract_time_dict_from_datetime(self._internal_date_time)
         return {**date_dict, **time_dict}
 
     @staticmethod
@@ -103,35 +108,32 @@ class DateTimeExtension:
         return {TIME: {HOUR: date_time.hour, MINUTE: date_time.minute, SECOND: date_time.second}}
 
     def add_time_delta(self, time_delta: TimeDeltaExtension) -> DateTimeExtension:
-        return DateTimeExtension.from_dt(self.internal_date_time + time_delta.internal_delta)
+        return DateTimeExtension.from_dt(self._internal_date_time + time_delta._internal_delta)
 
     def __eq__(self, other: DateTimeExtension):
-        return self.internal_date_time == other.internal_date_time
+        return self._internal_date_time == other._internal_date_time
 
     def __gt__(self, other: DateTimeExtension):
-        return self.internal_date_time > other.internal_date_time
-
-    def __repr__(self):
-        return self.internal_date_time.__repr__()
+        return self._internal_date_time > other._internal_date_time
 
 
-class TimeDeltaExtension:
+class TimeDeltaExtension(BaseEntity):
 
     def __init__(self, time_delta: timedelta = timedelta(hours=1)):
         self._time_delta: timedelta = time_delta
 
     @property
-    def internal_delta(self) -> timedelta:
+    def _internal_delta(self) -> timedelta:
         return self._time_delta
 
     def to_dict(self):
         return {'time_delta_sec': timedelta.seconds}
 
     def __eq__(self, other: TimeDeltaExtension):
-        return self.internal_delta.seconds == other.internal_delta.seconds
+        return self._internal_delta.seconds == other._internal_delta.seconds
 
     def __repr__(self):
-        return self.internal_delta.__repr__()
+        return self._internal_delta.__repr__()
 
 
 class DateTimeDistribution(UniformChoiceDistribution):

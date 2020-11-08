@@ -7,7 +7,7 @@ from shapely.geometry.base import BaseGeometry, EmptyGeometry
 from geometry.geo2d import Point2D, Vector2D, Polygon2D, MultiPolygon2D, LineString2D, LinearRing2D, EmptyGeometry2D
 from geometry.utils import GeometryUtils
 
-EPSILON_FOR_EQUAL_AREA : float = 0.00001
+EPSILON_FOR_EQUAL_AREA: float = 0.00001
 
 
 class _ShapelyGeometry(object):
@@ -89,6 +89,12 @@ class _ShapelyPoint2D(_ShapelyGeometry, Point2D):
 
     def __hash__(self):
         return hash(self.to_tuple())
+
+    def __dict__(self):
+        return {'x': self.x, 'y': self.y}
+
+    def __repr__(self):
+        return str(self.__dict__())
 
 
 class _ShapelyLineString2D(_ShapelyGeometry, LineString2D):

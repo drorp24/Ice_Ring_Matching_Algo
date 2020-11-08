@@ -4,7 +4,7 @@ from random import Random
 
 from common.entities.base_entities.test.test_distribution import assert_samples_approx_expected
 from common.entities.package import PackageType, PackageDistribution
-from common.entities.package_factory import package_delivery_plan_factory
+from common.entities.package_delivery_plan import PackageDeliveryPlan
 from common.math.angle import Angle, AngleUnit
 from geometry.geo2d import Polygon2D
 from geometry.geo_factory import create_point_2d, create_polygon_2d_from_ellipse, create_empty_geometry_2d
@@ -19,10 +19,10 @@ class BasicPackageTestCase(unittest.TestCase):
         cls.p3 = PackageType.MEDIUM
         cls.p4 = PackageType.LARGE
         point = create_point_2d(1, 2)
-        cls.pdp = package_delivery_plan_factory(point,
-                                                azimuth=Angle(30, AngleUnit.DEGREE),
-                                                pitch=Angle(80, AngleUnit.DEGREE),
-                                                package_type=PackageType.TINY)
+        cls.pdp = PackageDeliveryPlan(point,
+                                      azimuth=Angle(30, AngleUnit.DEGREE),
+                                      pitch=Angle(80, AngleUnit.DEGREE),
+                                      package_type=PackageType.TINY)
 
     def test_package_weights(self):
         self.assertEqual(PackageType.TINY.value.weight, 1)
@@ -37,17 +37,17 @@ class BasicPackageTestCase(unittest.TestCase):
         self.assertEqual(self.pdp.package_type.value.weight, 1)
 
     def test_2_package_delivery_plans_equal(self):
-        expected_pdp = package_delivery_plan_factory(create_point_2d(1, 2),
-                                                     azimuth=Angle(30, AngleUnit.DEGREE),
-                                                     pitch=Angle(80, AngleUnit.DEGREE),
-                                                     package_type=PackageType.TINY)
+        expected_pdp = PackageDeliveryPlan(create_point_2d(1, 2),
+                                           azimuth=Angle(30, AngleUnit.DEGREE),
+                                           pitch=Angle(80, AngleUnit.DEGREE),
+                                           package_type=PackageType.TINY)
         self.assertEqual(self.pdp, expected_pdp)
 
     def test_2_package_delivery_plans_not_equal(self):
-        expected_pdp = package_delivery_plan_factory(create_point_2d(1, 2),
-                                                     azimuth=Angle(31, AngleUnit.DEGREE),
-                                                     pitch=Angle(80, AngleUnit.DEGREE),
-                                                     package_type=PackageType.TINY)
+        expected_pdp = PackageDeliveryPlan(create_point_2d(1, 2),
+                                           azimuth=Angle(31, AngleUnit.DEGREE),
+                                           pitch=Angle(80, AngleUnit.DEGREE),
+                                           package_type=PackageType.TINY)
         self.assertNotEqual(self.pdp, expected_pdp)
 
     def test_drop_envelope_when_same_drop_and_drone_azimuth(self):
@@ -119,7 +119,7 @@ class BasicPackageGeneration(unittest.TestCase):
 
     def test_probability_of_package_generation_is_correct(self):
         rand_samples = 100000
-        values_random_sample = list(map(lambda i: self.pd.choose_rand(Random(i)), range(rand_samples)))
+        values_random_sample = list(map(lambda i: self.pd.choose_rand(Random(i))[0], range(rand_samples)))
         sample_count = dict(Counter(values_random_sample))
         expected_prob = {PackageType.TINY.name: 0.66,
                          PackageType.SMALL.name: 0.33,

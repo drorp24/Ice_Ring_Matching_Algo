@@ -1,15 +1,18 @@
 from __future__ import annotations
 
+from datetime import timedelta, time, date
 from random import Random
 from typing import List
 
 from common.entities.base_entities.distribution import UniformChoiceDistribution, Distribution
 from common.entities.base_entity import BaseEntity
 from common.entities.customer_delivery import CustomerDeliveryDistribution
-from common.entities.delivery_option import DeliveryOption, DeliveryOptionDistribution
+from common.entities.delivery_option import DeliveryOption, DeliveryOptionDistribution, DEFAULT_CD_DISTRIB
 from common.entities.package import PackageDistribution
-from common.entities.package_delivery_plan import PackageDeliveryPlanDistribution
-from common.entities.temporal import TimeWindowDistribution, TimeWindowExtension
+from common.entities.package_delivery_plan import PackageDeliveryPlanDistribution, DEFAULT_DROP_POINT_DISTRIB, \
+    DEFAULT_PITCH_DISTRIB, DEFAULT_PACKAGE_DISTRIB, DEFAULT_AZI_DISTRIB
+from common.entities.temporal import TimeWindowDistribution, TimeWindowExtension, DateTimeDistribution, \
+    TimeDeltaExtension, TimeDeltaDistribution, DateTimeExtension
 from common.math.angle import AngleUniformDistribution
 from geometry.geo_distribution import PointDistribution
 
@@ -44,10 +47,26 @@ class PriorityDistribution(UniformChoiceDistribution):
         super().__init__(priorities)
 
 
+def create_default_time_window_for_delivery_request():
+    default_date_time_morning = DateTimeExtension(dt_date=date(2021, 1, 1), dt_time=time(6, 0, 0))
+    default_date_time_night = DateTimeExtension(dt_date=date(2021, 1, 1), dt_time=time(23, 59, 0))
+    default_time_delta_distrib = TimeDeltaDistribution([TimeDeltaExtension(timedelta(hours=3)),
+                                                        TimeDeltaExtension(timedelta(minutes=30))])
+    default_dt_options = [default_date_time_morning, default_date_time_night]
+    return TimeWindowDistribution(DateTimeDistribution(default_dt_options), default_time_delta_distrib)
+
+
+DEFAULT_DO_DISTRIB = DeliveryOptionDistribution([DEFAULT_CD_DISTRIB])
+
+DEFAULT_TW_DISRIB = create_default_time_window_for_delivery_request()
+
+DEFAULT_PRIORITY_DISTRIB = PriorityDistribution(list(range(0, 100, 3)))
+
+
 class DeliveryRequestDistribution(Distribution):
-    def __init__(self, delivery_option_distributions: [DeliveryOptionDistribution],
-                 time_window_distributions: TimeWindowDistribution,
-                 priority_distribution: PriorityDistribution):
+    def __init__(self, delivery_option_distributions: [DeliveryOptionDistribution] = [DEFAULT_DO_DISTRIB],
+                 time_window_distributions: TimeWindowDistribution = DEFAULT_TW_DISRIB,
+                 priority_distribution: PriorityDistribution = DEFAULT_PRIORITY_DISTRIB):
         self._do_distribution_options = delivery_option_distributions
         self._time_window_distributions = time_window_distributions
         self._priority_distribution = priority_distribution
@@ -63,12 +82,12 @@ class DeliveryRequestDistribution(Distribution):
             time_window_distributions[i], priority_distribution[i]) for i in list(range(amount))]
 
 
-def generate_delivery_request_distribution(drop_point_distribution: PointDistribution,
-                                           azimuth_distribution: AngleUniformDistribution,
-                                           pitch_distribution: UniformChoiceDistribution,
-                                           package_type_distribution: PackageDistribution,
-                                           priority_distribution: PriorityDistribution,
-                                           time_window_distribution: TimeWindowDistribution):
+def generate_dr_distribution(drop_point_distribution: PointDistribution = DEFAULT_DROP_POINT_DISTRIB,
+                             azimuth_distribution: AngleUniformDistribution = DEFAULT_AZI_DISTRIB,
+                             pitch_distribution: UniformChoiceDistribution = DEFAULT_PITCH_DISTRIB,
+                             package_type_distribution: PackageDistribution = DEFAULT_PACKAGE_DISTRIB,
+                             priority_distribution: PriorityDistribution = DEFAULT_PRIORITY_DISTRIB,
+                             time_window_distribution: TimeWindowDistribution = DEFAULT_TW_DISRIB):
     pdp_distribution = PackageDeliveryPlanDistribution(drop_point_distribution=drop_point_distribution,
                                                        azimuth_distribution=azimuth_distribution,
                                                        pitch_distribution=pitch_distribution,

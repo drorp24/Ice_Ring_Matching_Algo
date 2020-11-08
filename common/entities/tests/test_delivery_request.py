@@ -1,74 +1,41 @@
 import unittest
-from datetime import datetime
-from pathlib import Path
+from pprint import pprint
+from random import Random
 
-from time_window import TimeWindow
-
-from common.entities.customer_delivery import CustomerDelivery
-from common.entities.delivery_option import DeliveryOption
-from common.entities.delivery_request import DeliveryRequest
-from common.entities.package import PackageType
-from common.entities.package_delivery_plan import PackageDeliveryPlan
-from common.math.angle import Angle, AngleUnit
-from geometry.geo_factory import create_point_2d
-from input.delivery_requests_json_converter import create_delivery_requests_from_file
+from common.entities.delivery_request import generate_dr_distribution, PriorityDistribution
+from common.entities.delivery_request_generator import DeliveryRequestDatasetGenerator, DeliveryRequestDatasetStructure
 
 
-class BasicDeliveryGeneration(unittest.TestCase):
+class BasicDeliveryRequestGeneration(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.dr_from_file = create_delivery_requests_from_file(Path('DeliveryRequestTest.json'))
-        cls.dr_from_scratch = DeliveryRequest(
-            delivery_options=[
-                DeliveryOption([
-                    CustomerDelivery([
-                        PackageDeliveryPlan(drop_point=create_point_2d(5.0, 7.0),
-                                            azimuth=Angle(45, AngleUnit.DEGREE),
-                                            pitch=Angle(30, AngleUnit.DEGREE),
-                                            package_type=PackageType.MEDIUM)]),
-                    CustomerDelivery([
-                        PackageDeliveryPlan(drop_point=create_point_2d(5.0, 7.0),
-                                            azimuth=Angle(55, AngleUnit.DEGREE),
-                                            pitch=Angle(40, AngleUnit.DEGREE),
-                                            package_type=PackageType.LARGE)])]),
-                DeliveryOption([
-                    CustomerDelivery([
-                        PackageDeliveryPlan(drop_point=create_point_2d(5.0, 7.0),
-                                            azimuth=Angle(45, AngleUnit.DEGREE),
-                                            pitch=Angle(30, AngleUnit.DEGREE),
-                                            package_type=PackageType.MEDIUM)]),
-                    CustomerDelivery([
-                        PackageDeliveryPlan(drop_point=create_point_2d(5.0, 7.0),
-                                            azimuth=Angle(55, AngleUnit.DEGREE),
-                                            pitch=Angle(40, AngleUnit.DEGREE),
-                                            package_type=PackageType.LARGE)])])],
-            time_window=TimeWindow(
-                datetime(2020, 1, 1,
-                         6, 6, 6),
-                datetime(2020, 1, 1,
-                         8, 6, 6)),
-            priority=0)
+        cls.num_of_drs = 50
+        cls.num_of_do_per_dr = 15
+        cls.num_of_cd_per_do = 8
+        cls.num_of_pdp_per_cd = 3
 
-    def test_customer_delivery_length(self):
-        self.assertEqual(len(self.dr_from_file[0].delivery_options[0].customer_deliveries), 1)
+        dr_distribution = generate_dr_distribution(priority_distribution=PriorityDistribution([1, 2, 3, 4, 5]))
 
-    def test_2_customer_deliveries_equal(self):
-        self.assertEqual(self.dr_from_scratch.delivery_options[0].customer_deliveries[0],
-                         self.dr_from_scratch.delivery_options[1].customer_deliveries[0])
+        cls.ds = DeliveryRequestDatasetStructure(num_of_delivery_requests=cls.num_of_drs,
+                                                 num_of_delivery_options_per_delivery_request=cls.num_of_do_per_dr,
+                                                 num_of_customer_deliveries_per_delivery_option=cls.num_of_cd_per_do,
+                                                 num_of_package_delivery_plan_per_customer_delivery=cls.num_of_pdp_per_cd,
+                                                 delivery_request_distribution=dr_distribution)
+        cls.dr_dataset = DeliveryRequestDatasetGenerator.generate(cls.ds)
 
-    def test_2_customer_deliveries_not_equal(self):
-        self.assertNotEqual(self.dr_from_scratch.delivery_options[0].customer_deliveries[0],
-                            self.dr_from_scratch.delivery_options[0].customer_deliveries[1])
+    def test_num_of_drs(self):
+        self.assertEqual(len(self.dr_dataset), self.num_of_drs)
 
-    def test_delivery_option_length(self):
-        self.assertEqual(len(self.dr_from_file[0].delivery_options), 2)
+    def test_num_of_do_per_dr(self):
+        self.assertEqual(len(self.dr_dataset[0].delivery_options), self.num_of_do_per_dr)
 
-    def test_delivery_request_length(self):
-        self.assertEqual(len(self.dr_from_file), 3)
+    def test_num_of_cd_per_do(self):
+        self.assertEqual(len(self.dr_dataset[0].delivery_options[0].customer_deliveries), self.num_of_cd_per_do)
 
-    def test_delivery_request_time_window(self):
-        self.assertFalse(self.dr_from_file[0].time_window.since > self.dr_from_file[0].time_window.until)
+    def test_num_of_cd_per_do(self):
+        self.assertEqual(len(self.dr_dataset[0].delivery_options[0].customer_deliveries[0].package_delivery_plans),
+                         self.num_of_pdp_per_cd)
 
-    def test_delivery_request_priority(self):
-        self.assertEqual(self.dr_from_file[0].priority, 10)
+    def test_to_dict(self):
+        pprint(dict(self.dr_dist.__dict__()))

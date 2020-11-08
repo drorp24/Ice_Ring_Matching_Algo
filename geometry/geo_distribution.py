@@ -3,7 +3,6 @@ from random import Random
 from common.entities.base_entities.distribution import Distribution, UniformDistribution, Range, ChoiceDistribution
 from geometry.geo_factory import create_point_2d
 
-
 class PointDistribution(Distribution):
 
     def __init__(self, min_x: float, max_x: float, min_y: float, max_y: float):

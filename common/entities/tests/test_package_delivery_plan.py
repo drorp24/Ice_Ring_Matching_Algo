@@ -1,11 +1,12 @@
+import json
 import unittest
 from pprint import pprint
 from random import Random
 
-from common.entities.default_entities import DEFAULT_PDP_DISTRIB, DEFAULT_CD_DISTRIB, DEFAULT_DO_DISTRIB
+from common.entities.customer_delivery import DEFAULT_PDP_DISTRIB
 
 
-class BasicPackageDeliveryPlan(unittest.TestCase):
+class BasicPDPTestCase(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
@@ -26,3 +27,5 @@ class BasicPackageDeliveryPlan(unittest.TestCase):
         samples_from_distribution3 = self.package_delivery_distrib.choose_rand(Random(103), 100)
         self.assertNotEqual(samples_from_distribution1, samples_from_distribution3)
 
+    def test_to_dict(self):
+        pprint(self.package_delivery_distrib.choose_rand(Random(100), 1)[0].__dict__())
