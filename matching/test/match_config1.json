@@ -1,5 +1,5 @@
 {
-  "match_input":
+  "match_config":
     {
       "solver_name": "or_tools:automatic",
       "dropped_penalty": 5,

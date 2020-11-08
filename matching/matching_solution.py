@@ -86,6 +86,9 @@ class MatchingSolution:
     def total_capacity(self):
         return self._data_matched[MatchingSolutionData.total_capacity]
 
+    def delivery_board(self) -> 'DeliveryBoard':
+        pass
+
     def _save_routing(self):
         pass
 

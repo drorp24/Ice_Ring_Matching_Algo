@@ -31,8 +31,8 @@ class MatchConfigDecoder(json.JSONDecoder):
 
     @staticmethod
     def object_hook(dct):
-        if 'match_input' in dct:
-            return MatchConfig(dct['match_input'])
+        if 'match_config' in dct:
+            return MatchConfig(dct['match_config'])
         return dct
 
 
