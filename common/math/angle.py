@@ -1,5 +1,7 @@
 from __future__ import annotations
+
 import math
+from abc import ABC, abstractmethod
 from enum import Enum
 
 from geometry.geo2d import Vector2D
@@ -18,8 +20,33 @@ class AngleUnit(Enum):
         return self._cyclic_value
 
 
-class Angle:
+class BaseAngle(ABC):
+
+    @abstractmethod
+    def in_degrees(self) -> float:
+        raise NotImplementedError()
+
+    @abstractmethod
+    def in_radians(self) -> float:
+        raise NotImplementedError()
+
+    @abstractmethod
+    def to_direction(self) -> Vector2D:
+        raise NotImplementedError()
+
+    @abstractmethod
+    def calc_reverse(self) -> BaseAngle:
+        raise NotImplementedError()
+
+    @abstractmethod
+    def calc_abs_difference(self, other: Angle) -> BaseAngle:
+        raise NotImplementedError()
+
+
+class Angle(BaseAngle):
     def __init__(self, value: float, unit: AngleUnit):
+        super().__init__()
+
         self.__value = _calc_cyclic_value(value, unit.cyclic_value)
         self.__unit = unit
 
@@ -36,10 +63,10 @@ class Angle:
     def to_direction(self) -> Vector2D:
         return create_vector_2d(math.cos(self.in_radians()), math.sin(self.in_radians()))
 
-    def calc_reverse(self) -> Angle:
+    def calc_reverse(self) -> BaseAngle:
         return Angle(self.in_degrees() + AngleUnit.DEGREE.cyclic_value / 2, AngleUnit.DEGREE)
 
-    def calc_abs_difference(self, other: Angle) -> Angle:
+    def calc_abs_difference(self, other: Angle) -> BaseAngle:
         if self.__unit is not other.__unit:
             raise ValueError("error, angle units are not equal")
         angle_1 = _calc_first_cycle_equivalent(self)
@@ -48,6 +75,26 @@ class Angle:
 
     def __str__(self):
         return "Angle ({0}, {1})".format(self.__value, self.__unit)
+
+
+class NoneAngle(BaseAngle):
+    def in_degrees(self) -> float:
+        raise NotImplementedError()
+
+    def in_radians(self) -> float:
+        raise NotImplementedError()
+
+    def to_direction(self) -> Vector2D:
+        raise NotImplementedError()
+
+    def calc_reverse(self) -> BaseAngle:
+        raise NotImplementedError()
+
+    def calc_abs_difference(self, other: Angle) -> BaseAngle:
+        raise NotImplementedError()
+
+    def __init__(self):
+        super().__init__()
 
 
 def _calc_first_cycle_equivalent(angle: Angle):

@@ -3,7 +3,7 @@ from typing import List
 import numpy as np
 
 from common.entities.package import PackageType
-from common.math.angle import Angle, AngleUnit
+from common.math.angle import BaseAngle, AngleUnit, Angle
 from grid.slide import Slide
 from grid.slides_container import SlidesContainer
 from params import MAX_AZIMUTH_ANGLE, MIN_AZIMUTH_ANGLE
@@ -11,7 +11,7 @@ from services.envelope_services_interface import EnvelopeServicesInterface
 
 
 def create_slide(service: EnvelopeServicesInterface,
-                 package_type: PackageType, drone_azimuth: Angle, drop_azimuth: Angle,
+                 package_type: PackageType, drone_azimuth: BaseAngle, drop_azimuth: BaseAngle,
                  cell_resolution: int, cell_ratio_required: float):
     assert 0 <= cell_ratio_required <= 1
     return Slide(service,
@@ -25,18 +25,18 @@ def generate_slides_container(service: EnvelopeServicesInterface,
                               cell_resolution: int, cell_ratio_required: float) -> SlidesContainer:
     slides = []
 
-    drone_azimuth_delta_deg = Angle(MAX_AZIMUTH_ANGLE / drone_azimuth_resolution, AngleUnit.DEGREE)
-    drone_azimuth_steps = np.arange(MIN_AZIMUTH_ANGLE, MAX_AZIMUTH_ANGLE, drone_azimuth_delta_deg.in_degrees())
+    drone_azimuth_options = np.arange(MIN_AZIMUTH_ANGLE, MAX_AZIMUTH_ANGLE,
+                                      MAX_AZIMUTH_ANGLE / drone_azimuth_resolution)
 
-    drop_azimuth_deg = Angle(MAX_AZIMUTH_ANGLE / drop_azimuth_resolution, AngleUnit.DEGREE)
-    drop_azimuth_steps = np.arange(MIN_AZIMUTH_ANGLE, MAX_AZIMUTH_ANGLE, drop_azimuth_deg.in_degrees())
+    drop_azimuth_options = np.arange(MIN_AZIMUTH_ANGLE, MAX_AZIMUTH_ANGLE,
+                                     MAX_AZIMUTH_ANGLE / drop_azimuth_resolution)
 
     for package_type in package_types:
-        for drone_azimuth_step in drone_azimuth_steps:
-            for drop_azimuth_step in drop_azimuth_steps:
+        for drone_azimuth_option in drone_azimuth_options:
+            for drop_azimuth_option in drop_azimuth_options:
                 slide = create_slide(service,
-                                     package_type, Angle(drone_azimuth_step, AngleUnit.DEGREE),
-                                     Angle(drop_azimuth_step, AngleUnit.DEGREE),
+                                     package_type, Angle(drone_azimuth_option, AngleUnit.DEGREE),
+                                     Angle(drop_azimuth_option, AngleUnit.DEGREE),
                                      cell_resolution, cell_ratio_required)
 
                 slides.append(slide)

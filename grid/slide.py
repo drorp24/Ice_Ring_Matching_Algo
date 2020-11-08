@@ -1,7 +1,7 @@
 from typing import Union
 
 from common.entities.package import PackageType
-from common.math.angle import Angle
+from common.math.angle import Angle, BaseAngle
 from geometry.geo2d import EmptyGeometry2D
 from geometry.geo_factory import create_point_2d
 from grid.cell import GridLocation, NoneGridLocation
@@ -9,9 +9,10 @@ from grid.grid_service import GridService
 from services.envelope_services_interface import EnvelopeServicesInterface
 
 
+
 class Slide:
     def __init__(self, envelope_service: EnvelopeServicesInterface,
-                 package_type: PackageType, drone_azimuth: Angle, drop_azimuth: Angle,
+                 package_type: PackageType, drone_azimuth: BaseAngle, drop_azimuth: BaseAngle,
                  cell_resolution: int, required_area: float):
         self._envelope_service = envelope_service
         self._package_type = package_type
@@ -39,11 +40,11 @@ class Slide:
         return self._package_type
 
     @property
-    def drone_azimuth(self) -> Angle:
+    def drone_azimuth(self) -> BaseAngle:
         return self._drone_azimuth
 
     @property
-    def drop_azimuth(self) -> Angle:
+    def drop_azimuth(self) -> BaseAngle:
         return self._drop_azimuth
 
     @property
