@@ -17,7 +17,7 @@ class ExportOrtoolsGraph(ExportDeliveryGraph):
         for i, origin_delivery_request_node in enumerate(delivery_request_nodes):
             for j, destination_delivery_request_node in enumerate(delivery_request_nodes):
                 if i != j:
-                   priorities[i,j] = destination_delivery_request_node.priority
+                    priorities[i, j] = destination_delivery_request_node.priority
         return priorities
 
     def export_travel_times(self, delivery_request_graph: DeliveryRequestGraph) -> Any:
@@ -29,8 +29,10 @@ class ExportOrtoolsGraph(ExportDeliveryGraph):
                     travel_times[i, j] = delivery_request_graph.get_edge_attributes(start_node, end_node).cost
         return travel_times.tolist()
 
-    def export_basis_nodes_indices(self, delivery_request_graph: DeliveryRequestGraph) -> []:
-        return ()
+    def export_basis_nodes_indices(self, delivery_request_graph: DeliveryRequestGraph) -> List[int]:
+        return [0]
 
-    def export_delivery_request_nodes_indices(self, delivery_request_graph: DeliveryRequestGraph) -> []:
-        return ()
+    def export_delivery_request_nodes_indices(self, delivery_request_graph: DeliveryRequestGraph) -> List[int]:
+        nodes = delivery_request_graph.nodes
+        nodes_indices = [i + 1 for i, node in enumerate(nodes)]
+        return nodes_indices
