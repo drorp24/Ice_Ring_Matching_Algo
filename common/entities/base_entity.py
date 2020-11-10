@@ -3,6 +3,8 @@ from __future__ import annotations
 import json
 from abc import abstractmethod
 
+DEFAULT_TEST_FILE_JSON = 'jsons/test_file.json'
+
 
 class BaseEntity(object):
 
@@ -27,13 +29,13 @@ class BaseEntity(object):
 
 class JsonableBaseEntity(BaseEntity):
 
-    def to_json(self, file_path: str = 'jsons/test_file.json'):
+    def to_json(self, file_path: str = DEFAULT_TEST_FILE_JSON):
         with open(file_path, 'w') as f:
             dict_self = self.__dict__()
             json.dump(dict_self, f, sort_keys=True)
 
     @staticmethod
-    def json_to_dict(file_path: str = 'jsons/test_file.json'):
+    def json_to_dict(file_path: str = DEFAULT_TEST_FILE_JSON):
         with open(file_path, 'rb') as f:
             return json.load(f)
 

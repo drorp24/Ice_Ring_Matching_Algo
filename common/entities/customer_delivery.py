@@ -44,13 +44,3 @@ class CustomerDeliveryDistribution(Distribution):
         pdp_distributions = UniformChoiceDistribution(self._pdp_distributions).choose_rand(random, amount=amount)
         return [CustomerDelivery(pdp_distributions[i].choose_rand(random, amount=num_pdp)) for i in list(range(amount))]
 
-
-if __name__ == '__main__':
-    cd1 = CustomerDeliveryDistribution().choose_rand(Random(100), 22)[0]
-    dict1 = cd1.__dict__()
-    print(cd1)
-    pprint(dict1)
-    cd2 = CustomerDeliveryDistribution().dict_to_obj(dict1)
-    dict2 = cd2.__dict__()
-    print(cd2)
-    pprint(dict2)

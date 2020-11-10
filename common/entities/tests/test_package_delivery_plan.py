@@ -27,5 +27,5 @@ class BasicPDPTestCase(unittest.TestCase):
         samples_from_distribution3 = self.package_delivery_distrib.choose_rand(Random(103), 100)
         self.assertNotEqual(samples_from_distribution1, samples_from_distribution3)
 
-    def test_to_dict(self):
+    def print_example_of_package_delivery(self):
         pprint(self.package_delivery_distrib.choose_rand(Random(100), 1)[0].__dict__())

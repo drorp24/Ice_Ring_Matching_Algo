@@ -28,6 +28,3 @@ class DeliveryRequestDatasetGenerator:
                                       num_cd=dr_struct.num_of_customer_deliveries_per_delivery_option,
                                       num_pdp=dr_struct.num_of_package_delivery_plan_per_customer_delivery)
 
-
-if __name__ == '__main__':
-    pprint(DeliveryRequestDatasetGenerator.generate(DeliveryRequestDatasetStructure()))

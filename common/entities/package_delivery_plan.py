@@ -90,7 +90,7 @@ class PackageDeliveryPlanDistribution(Distribution):
     def __init__(self,
                  drop_point_distribution: PointDistribution = DEFAULT_DROP_POINT_DISTRIB,
                  azimuth_distribution: AngleUniformDistribution = DEFAULT_AZI_DISTRIB,
-                 pitch_distribution: UniformChoiceDistribution = DEFAULT_PITCH_DISTRIB,
+                 pitch_distribution: AngleUniformDistribution = DEFAULT_PITCH_DISTRIB,
                  package_type_distribution: PackageDistribution = DEFAULT_PACKAGE_DISTRIB):
         self._drop_point_distribution = drop_point_distribution
         self._azimuth_distribution = azimuth_distribution
@@ -106,12 +106,3 @@ class PackageDeliveryPlanDistribution(Distribution):
                 zip(drop_points, azimuths, pitchs, packages)]
 
 
-if __name__ == '__main__':
-    pdp1 = PackageDeliveryPlanDistribution().choose_rand(Random(100), 22)[0]
-    dict1 = pdp1.__dict__()
-    print(pdp1)
-    pprint(dict1)
-    pdp2 = PackageDeliveryPlan.dict_to_obj(dict1)
-    dict2 = pdp2.__dict__()
-    print(pdp2)
-    pprint(dict2)

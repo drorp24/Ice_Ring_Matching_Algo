@@ -1,5 +1,6 @@
 import unittest
 from collections import Counter
+from pprint import pprint
 from random import Random
 
 from common.entities.base_entities.test.test_distribution import assert_samples_approx_expected
@@ -128,3 +129,6 @@ class BasicPackageGeneration(unittest.TestCase):
 
         for package in PackageType.get_all_names():
             assert_samples_approx_expected(self, package, expected_prob, sample_count)
+
+    def print_example_package(self):
+        pprint(PackageType.TINY)

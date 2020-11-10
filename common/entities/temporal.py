@@ -24,7 +24,7 @@ UNTIL = 'until'
 class TimeWindowExtension(JsonableBaseEntity):
 
     def __init__(self, since: DateTimeExtension, until: DateTimeExtension):
-        self._time_window = TimeWindow(since._internal_date_time, until._internal_date_time)
+        self._time_window = TimeWindow(tm_since=since._internal_date_time, tm_until=until._internal_date_time)
 
     @property
     def _internal_time_window(self) -> TimeWindow:
@@ -72,11 +72,48 @@ class DateTimeExtension(BaseEntity):
     def time(self) -> date:
         return self._date_time.time()
 
+    # @staticmethod
+    # def from_dict(date_time_dict: Dict) -> DateTimeExtension:
+    #     date_instance = date_time_dict[DATE]
+    #     time_instance = date_time_dict[TIME]
+    #     return DateTimeExtension(date_instance, time_instance)
+
+    def __dict__(self):
+        val = self.to_dict()
+        val.update({'__class__': self.__class__.__name__})
+        return val
+
+    def to_dict(self) -> Dict:
+        date_dict = DateTimeExtension.extract_date_dict_from_datetime(self._internal_date_time)
+        time_dict = DateTimeExtension.extract_time_dict_from_datetime(self._internal_date_time)
+        return {**date_dict, **time_dict}
+
     @staticmethod
     def from_dict(date_time_dict: Dict) -> DateTimeExtension:
-        date_instance = date_time_dict[DATE]
-        time_instance = date_time_dict[TIME]
-        return DateTimeExtension(date_instance, time_instance)
+        date_instance = DateTimeExtension.extract_date_from_datetime_dict(date_time_dict)
+        time_instance = DateTimeExtension.extract_time_from_datetime_dict(date_time_dict)
+        return DateTimeExtension(dt_date=date_instance, dt_time=time_instance)
+
+    @staticmethod
+    def extract_date_from_datetime_dict(date_time_dict: Dict) -> date:
+        date_dict = date_time_dict[DATE]
+        date_instance = date(date_dict[YEAR], date_dict[MONTH], date_dict[DAY])
+        return date_instance
+
+    @staticmethod
+    def extract_time_from_datetime_dict(date_time_dict: Dict) -> time:
+        time_dict = date_time_dict[TIME]
+        time_instance = time(time_dict[HOUR], time_dict[MINUTE], time_dict[SECOND])
+        return time_instance
+
+    @staticmethod
+    def extract_date_dict_from_datetime(date_time: datetime) -> Dict:
+        return {DATE: {YEAR: date_time.year, MONTH: date_time.month, DAY: date_time.day}}
+
+    @staticmethod
+    def extract_time_dict_from_datetime(date_time: datetime) -> Dict:
+        return {TIME: {HOUR: date_time.hour, MINUTE: date_time.minute, SECOND: date_time.second}}
+
 
     def add_time_delta(self, time_delta: TimeDeltaExtension) -> DateTimeExtension:
         return DateTimeExtension.from_dt(self._internal_date_time + time_delta._internal_delta)
