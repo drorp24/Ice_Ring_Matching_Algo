@@ -23,7 +23,7 @@ class BasicDeliveryRequestGraphTestCases(unittest.TestCase):
         drg = DeliveryRequestGraph()
         drg.add_delivery_requests(self.dr_dataset_morning)
         drg.add_delivery_requests(self.dr_dataset_afternoon)
-        self.assertEqual(list([n.delivery_request for n in drg.nodes]), list(self.dr_dataset_morning) + list(self.dr_dataset_afternoon))
+        self.assertEqual(_get_dr_from_dr_graph(drg), list(self.dr_dataset_morning) + list(self.dr_dataset_afternoon))
 
     def test_delivery_request_set_internal_graph(self):
         drg1 = DeliveryRequestGraph()
@@ -31,7 +31,7 @@ class BasicDeliveryRequestGraphTestCases(unittest.TestCase):
         drg2 = DeliveryRequestGraph()
         drg2.set_internal_graph(drg1.internal_graph)
         self.assertFalse(drg1.is_empty())
-        self.assertEqual([n.delivery_request for n in drg1.nodes], [n.delivery_request for n in drg2.nodes])
+        self.assertEqual(_get_dr_from_dr_graph(drg1), _get_dr_from_dr_graph(drg2))
 
     def test_calc_subgraph_in_time_window(self):
         drg_full_day = DeliveryRequestGraph()
@@ -44,8 +44,8 @@ class BasicDeliveryRequestGraphTestCases(unittest.TestCase):
             until=DateTimeExtension(date(2021, 1, 1), time(13, 0, 0)))
         calculated_subgraph_within_time_window = drg_full_day.calc_subgraph_in_time_window(morning_time_window)
         self.assertTrue(isinstance(calculated_subgraph_within_time_window, DeliveryRequestGraph))
-        nodes_in_time_window_subgraph = [n.delivery_request for n in calculated_subgraph_within_time_window.nodes]
-        node_in_time_window_morning_graph = [n.delivery_request for n in drg_morning_subgraph_of_full_day.nodes]
+        nodes_in_time_window_subgraph = _get_dr_from_dr_graph(calculated_subgraph_within_time_window)
+        node_in_time_window_morning_graph = _get_dr_from_dr_graph(drg_morning_subgraph_of_full_day)
         self.assertEqual(nodes_in_time_window_subgraph, node_in_time_window_morning_graph)
 
     def test_calc_subgraph_below_priority(self):
@@ -57,10 +57,9 @@ class BasicDeliveryRequestGraphTestCases(unittest.TestCase):
         max_priority = 10
         calculated_subgraph_below_max_priority = drg_full_day.calc_subgraph_below_priority(max_priority)
         self.assertTrue(isinstance(calculated_subgraph_below_max_priority, DeliveryRequestGraph))
-        nodes_in_low_priority_subgraph = [n.delivery_request for n in calculated_subgraph_below_max_priority.nodes]
-        node_in_low_priority_graph = [n.delivery_request for n in drg_low_priority_subgraph_of_full_day.nodes]
+        nodes_in_low_priority_subgraph = _get_dr_from_dr_graph(calculated_subgraph_below_max_priority)
+        node_in_low_priority_graph = _get_dr_from_dr_graph(drg_low_priority_subgraph_of_full_day)
         self.assertEqual(nodes_in_low_priority_subgraph, node_in_low_priority_graph)
-
 
 
 def create_morning_dr_dataset():
@@ -111,3 +110,7 @@ def _create_high_priority_dr_distribution():
 
 def _create_low_priority_dr_distribution():
     return generate_dr_distribution(priority_distribution=PriorityDistribution([1, 2, 3, 4, 5]))
+
+
+def _get_dr_from_dr_graph(drg1):
+    return [n.delivery_request for n in drg1.nodes]
