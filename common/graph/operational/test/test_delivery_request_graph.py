@@ -23,15 +23,15 @@ class BasicDeliveryRequestGraphTestCases(unittest.TestCase):
         drg = DeliveryRequestGraph()
         drg.add_delivery_requests(self.dr_dataset_morning)
         drg.add_delivery_requests(self.dr_dataset_afternoon)
-        self.assertEqual(drg.nodes, self.dr_dataset_morning + self.dr_dataset_afternoon)
+        self.assertEqual(list([n.delivery_request for n in drg.nodes]), list(self.dr_dataset_morning) + list(self.dr_dataset_afternoon))
 
     def test_delivery_request_set_internal_graph(self):
         drg1 = DeliveryRequestGraph()
         drg1.add_delivery_requests(self.dr_dataset_random)
         drg2 = DeliveryRequestGraph()
         drg2.set_internal_graph(drg1.internal_graph)
-        self.assertFalse(drg1.is_empty)
-        self.assertEqual(drg1, drg2)
+        self.assertFalse(drg1.is_empty())
+        self.assertEqual([n.delivery_request for n in drg1.nodes], [n.delivery_request for n in drg2.nodes])
 
     def test_calc_subgraph_in_time_window(self):
         drg_full_day = DeliveryRequestGraph()
