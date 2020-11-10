@@ -61,8 +61,7 @@ class Package(JsonableBaseEntity):
     def _normalize_by_weight(value: float, weight: float) -> float:
         return value / weight
 
-    @property
-    def _potential_drop_envelope(self) -> PotentialDropEnvelope:
+    def calc_potential_drop_envelope(self) -> PotentialDropEnvelope:
         return self.__potential_drop_envelope
 
     def __str__(self):

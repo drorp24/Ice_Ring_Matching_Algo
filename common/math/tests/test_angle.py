@@ -21,8 +21,8 @@ class BasicAngleMathTestCase(unittest.TestCase):
         self.assertNotEqual(self.a1, Angle(91, AngleUnit.DEGREE))
 
     def test_convert_to_degree(self):
-        self.assertEqual(self.a2.degrees(), 45)
-        self.assertEqual(self.a1.degrees(), 90)
+        self.assertEqual(self.a2.degrees, 45)
+        self.assertEqual(self.a1.degrees, 90)
 
     def test_convert_to_radians(self):
         self.assertEqual(self.a1.radians(), 0.5 * math.pi)

@@ -36,5 +36,5 @@ class BasicDeliveryRequestGeneration(unittest.TestCase):
         self.assertEqual(len(self.dr_dataset[0].delivery_options[0].customer_deliveries[0].package_delivery_plans),
                          self.num_of_pdp_per_cd)
 
-    def test_to_dict(self):
+    def print_out_delivery_request_example(self):
         pprint(self.dr_dataset[0].__dict__())
