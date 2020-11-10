@@ -25,12 +25,12 @@ class BasicAngleMathTestCase(unittest.TestCase):
         self.assertEqual(self.a1.degrees, 90)
 
     def test_convert_to_radians(self):
-        self.assertEqual(self.a1.radians(), 0.5 * math.pi)
-        self.assertEqual(self.a2.radians(), 0.25 * math.pi)
+        self.assertEqual(self.a1.radians, 0.5 * math.pi)
+        self.assertEqual(self.a2.radians, 0.25 * math.pi)
 
     def test_convert_to_direction(self):
-        self.assertAlmostEqual(self.a1.to_direction().norm, 1, EPSILON)
-        self.assertAlmostEqual(self.a1.to_direction().dot(create_vector_2d(0, 1)), 1, EPSILON)
+        self.assertAlmostEqual(self.a1.to_direction().norm, 1.0, delta=EPSILON)
+        self.assertAlmostEqual(self.a1.to_direction().dot(create_vector_2d(0, 1)), 1.0, delta=EPSILON)
 
     def test_large_angle(self):
         self.assertEqual(Angle(810, AngleUnit.DEGREE), Angle(90, AngleUnit.DEGREE))
