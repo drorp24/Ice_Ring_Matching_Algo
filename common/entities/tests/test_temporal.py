@@ -27,7 +27,7 @@ class BasicDateTime(unittest.TestCase):
     def test_to_dict(self):
         dt1_dict = self.dt1.__dict__()
         expected_dict = {'__class__': 'DateTimeExtension',
-                         'date': {'day': 1, 'month': 10, 'year': 2010},
+                         'date': {'day': 1, 'month': 10, 'year': 2021},
                          'time': {'hour': 6, 'minute': 10, 'second': 5}}
         self.assertEqual(dt1_dict, expected_dict)
 
@@ -46,18 +46,18 @@ class BasicDateTime(unittest.TestCase):
         tw1_dict = self.tw1.__dict__()
         expected_dict = {'__class__': 'TimeWindowExtension',
                          'since': {'__class__': 'DateTimeExtension',
-                                   'date': {'day': 1, 'month': 10, 'year': 2010},
+                                   'date': {'day': 1, 'month': 10, 'year': 2021},
                                    'time': {'hour': 6, 'minute': 10, 'second': 5}},
                          'until': {'__class__': 'DateTimeExtension',
-                                   'date': {'day': 1, 'month': 10, 'year': 2010},
+                                   'date': {'day': 1, 'month': 10, 'year': 2021},
                                    'time': {'hour': 7, 'minute': 12, 'second': 5}}}
         self.assertDictEqual(tw1_dict, expected_dict)
 
     def test_time_window_from_dict(self):
         tw1_dict = {'__class__': 'TimeWindowExtension',
-                    'since': {'__class__': 'DateTimeExtension', 'date': {'day': 1, 'month': 10, 'year': 2010},
+                    'since': {'__class__': 'DateTimeExtension', 'date': {'day': 1, 'month': 10, 'year': 2021},
                               'time': {'hour': 6, 'minute': 10, 'second': 5}},
-                    'until': {'__class__': 'DateTimeExtension', 'date': {'day': 1, 'month': 10, 'year': 2010},
+                    'until': {'__class__': 'DateTimeExtension', 'date': {'day': 1, 'month': 10, 'year': 2021},
                               'time': {'hour': 7, 'minute': 12, 'second': 5}}}
         tw_obj_after_from = TimeWindowExtension.dict_to_obj(tw1_dict)
         self.assertEqual(self.tw1, tw_obj_after_from)

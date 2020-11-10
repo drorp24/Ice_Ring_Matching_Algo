@@ -6,7 +6,6 @@ from common.entities.delivery_request import DeliveryRequestDistribution
 from common.entities.drone_formation import DroneFormations, FormationSize, FormationOptions
 from common.entities.drone import PlatformType
 from common.entities.drone_delivery_board import EmptyDroneDeliveryBoard, DroneDeliveryBoard
-from common.entities.drone_formation import DroneFormationType
 
 
 class BasicDroneDeliveryGeneration(unittest.TestCase):
