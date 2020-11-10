@@ -1,6 +1,5 @@
 import unittest
 from datetime import date, time
-from pprint import pprint
 
 from common.entities.temporal import DateTimeExtension, TimeWindowExtension
 
@@ -9,9 +8,21 @@ class BasicDateTime(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.dt1 = DateTimeExtension(dt_date=date(2010, 10, 1), dt_time=time(6, 10, 5))
-        cls.dt2 = DateTimeExtension(dt_date=date(2010, 10, 1), dt_time=time(7, 12, 5))
+        cls.dt1 = DateTimeExtension(dt_date=date(2021, 10, 1), dt_time=time(6, 10, 5))
+        cls.dt2 = DateTimeExtension(dt_date=date(2021, 10, 1), dt_time=time(7, 12, 5))
+        cls.dt3 = DateTimeExtension(dt_date=date(2021, 10, 1), dt_time=time(8, 12, 5))
+        cls.dt4 = DateTimeExtension(dt_date=date(2021, 10, 1), dt_time=time(9, 12, 5))
         cls.tw1 = TimeWindowExtension(cls.dt1, cls.dt2)
+        cls.tw2 = TimeWindowExtension(cls.dt3, cls.dt4)
+        cls.tw3 = TimeWindowExtension(cls.dt2, cls.dt3)
+        cls.tw4 = TimeWindowExtension(cls.dt1, cls.dt4)
+
+    def test_contains(self):
+        self.assertTrue(self.dt1 in self.tw1)
+        self.assertFalse(self.dt1 in self.tw3)
+        self.assertTrue(self.tw2 in self.tw4)
+        self.assertFalse(self.tw4 in self.tw2)
+        self.assertTrue(self.tw1 in self.tw1)
 
     def test_to_dict(self):
         dt1_dict = self.dt1.__dict__()

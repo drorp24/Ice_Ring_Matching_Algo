@@ -5,6 +5,7 @@ from networkx import DiGraph, Graph, subgraph
 from time_window import TimeWindow
 
 from common.entities.delivery_request import DeliveryRequest
+from common.entities.temporal import TimeWindowExtension
 
 
 class DeliveryRequestNode:
@@ -21,15 +22,18 @@ class DeliveryRequestNode:
         return self.delivery_request.priority
 
     @property
-    def time_window(self):
+    def time_window(self) -> TimeWindowExtension:
         return self.delivery_request.time_window
 
 
 class DeliveryRequestEdge:
 
-    def __init__(self, start_request: DeliveryRequest, end_request: DeliveryRequest):
+    def __init__(self, start_request: DeliveryRequestNode, end_request: DeliveryRequestNode):
         self.start_node = start_request
         self.end_node = end_request
+
+    def to_tuple(self):
+        return self.start_node, self.end_node
 
 
 class DeliveryRequestGraph:
@@ -51,13 +55,16 @@ class DeliveryRequestGraph:
     def set_internal_graph(self, networkx_graph: DiGraph):
         self.internal_graph = networkx_graph
 
+    def add_delivery_requests(self, delivery_requests: [DeliveryRequest]):
+        self.add_delivery_request_nodes([DeliveryRequestNode(dr) for dr in delivery_requests])
+
     def add_delivery_request_nodes(self, delivery_request_nodes: [DeliveryRequestNode]):
         self.internal_graph.add_nodes_from(delivery_request_nodes)
 
     def add_delivery_request_edges(self, delivery_request_edges: [DeliveryRequestEdge]):
-        self.internal_graph.add_edges_from(delivery_request_edges)
+        self.internal_graph.add_edges_from([dr.to_tuple() for dr in delivery_request_edges])
 
-    def calc_subgraph_in_time_window(self, time_window_scope: TimeWindow):
+    def calc_subgraph_in_time_window(self, time_window_scope: TimeWindowExtension):
         nodes_at_time = [node for node in self.nodes if node.time_window in time_window_scope]
         extracted_subgraph = self.extract_subgraph_of_nodes(nodes_at_time)
         return DeliveryRequestGraph._create_from_extracted_subgraph(extracted_subgraph)
