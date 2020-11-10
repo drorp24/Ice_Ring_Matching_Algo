@@ -13,9 +13,9 @@ class BasicDistributionTestCase(unittest.TestCase):
         cls.mud = MultiUniformDistribution({Range(0, 10): 0.1, Range(10, 15): 0.9})
         cls.ucd = UniformChoiceDistribution(list(range(0, 10)))
 
-    def test_probability_of_package_generation_is_correct(self):
+    def test_probability_of_mud_generation_is_correct(self):
         rand_samples = 10000
-        samples = list(map(lambda i: self.mud.choose_rand(Random()), range(rand_samples)))
+        samples = list(map(lambda i: self.mud.choose_rand(Random())[0], range(rand_samples)))
         samples_in_range = list(map(lambda k: 0 < k < 10, samples))
         sample_prob = dict(Counter(samples_in_range))
         expected_prob = {0: 0.9, 1: 0.1}
