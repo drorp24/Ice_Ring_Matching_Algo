@@ -18,6 +18,13 @@ class DeliveryOption(BaseEntity):
     def customer_deliveries(self) -> [CustomerDelivery]:
         return self._customer_deliveries
 
+    @classmethod
+    def dict_to_obj(cls, dict_input):
+        assert (dict_input['__class__'] == cls.__name__)
+        return DeliveryOption(
+            customer_deliveries=[CustomerDelivery.dict_to_obj(cd_dict) for cd_dict in
+                                 dict_input['customer_deliveries']])
+
 
 DEFAULT_CD_DISTRIB = CustomerDeliveryDistribution([DEFAULT_PDP_DISTRIB])
 

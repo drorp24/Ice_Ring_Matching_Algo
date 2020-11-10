@@ -10,11 +10,11 @@ class BasicVectorTestCase(unittest.TestCase):
         cls.v1 = create_vector_2d(42, -42)
 
     def test_type(self):
-        self.assertEqual(self.v1.type, 'Vector')
+        self.assertEqual(self.v1._geo_type, 'Vector')
 
     def test_conversion_to_point(self):
         result = self.v1.to_point()
-        self.assertEqual(result.type, 'Point')
+        self.assertEqual(result._geo_type, 'Point')
         self.assertEqual((self.v1.x, self.v1.y), (result.x, result.y))
 
 
@@ -27,27 +27,27 @@ class BasicVectorMathTestCase(unittest.TestCase):
 
     def test_addition(self):
         result = self.v1.add(self.v2)
-        self.assertEqual(result.type, 'Vector')
+        self.assertEqual(result._geo_type, 'Vector')
         self.assertEqual(result, create_vector_2d(10, 45))
 
     def test_subtraction(self):
         result = self.v1.subtract(self.v2)
-        self.assertEqual(result.type, 'Vector')
+        self.assertEqual(result._geo_type, 'Vector')
         self.assertEqual(result, create_vector_2d(-10, 39))
 
     def test_int_multiplication(self):
         result = self.v1 * 2
-        self.assertEqual(result.type, 'Vector')
+        self.assertEqual(result._geo_type, 'Vector')
         self.assertEqual(result, create_vector_2d(0, 84))
 
     def test_float_multiplication(self):
         result = self.v1 * 1.01
-        self.assertEqual(result.type, 'Vector')
+        self.assertEqual(result._geo_type, 'Vector')
         self.assertEqual(result, create_vector_2d(0, 42.42))
 
     def test_reversal(self):
         result = self.v2.reverse()
-        self.assertEqual(result.type, 'Vector')
+        self.assertEqual(result._geo_type, 'Vector')
         self.assertEqual((result.x, result.y), (-10, -3))
 
     def test_dot(self):

@@ -8,7 +8,7 @@ class Geometry2D(ABC, object):
 
     @property
     @abstractmethod
-    def type(self) -> str:
+    def _geo_type(self) -> str:
         raise NotImplementedError()
 
 
@@ -20,7 +20,7 @@ class EmptyGeometry2D(Geometry2D):
 
     @property
     @abstractmethod
-    def type(self) -> str:
+    def _geo_type(self) -> str:
         raise NotImplementedError()
 
     @abstractmethod
@@ -35,7 +35,7 @@ class Vector2D(Geometry2D):
 
     @property
     @abstractmethod
-    def type(self) -> str:
+    def _geo_type(self) -> str:
         raise NotImplementedError()
 
     @property
@@ -94,7 +94,7 @@ class Point2D(Geometry2D):
 
     @property
     @abstractmethod
-    def type(self) -> str:
+    def _geo_type(self) -> str:
         raise NotImplementedError()
 
     @property
@@ -136,7 +136,7 @@ class Curve2D(Geometry2D):
 
     @property
     @abstractmethod
-    def type(self) -> str:
+    def _geo_type(self) -> str:
         raise NotImplementedError()
 
     @property
@@ -153,7 +153,7 @@ class LineString2D(Curve2D):
 
     @property
     @abstractmethod
-    def type(self) -> str:
+    def _geo_type(self) -> str:
         raise NotImplementedError()
 
     @property
@@ -178,7 +178,7 @@ class LinearRing2D(LineString2D):
 
     @property
     @abstractmethod
-    def type(self) -> str:
+    def _geo_type(self) -> str:
         raise NotImplementedError()
 
     @property
@@ -215,7 +215,7 @@ class Polygon2D(Geometry2D, Surface2D):
 
     @property
     @abstractmethod
-    def type(self) -> str:
+    def _geo_type(self) -> str:
         raise NotImplementedError()
 
     @property
@@ -259,7 +259,7 @@ class MultiPolygon2D(Geometry2D, Surface2D):
 
     @property
     @abstractmethod
-    def type(self) -> str:
+    def _geo_type(self) -> str:
         raise NotImplementedError()
 
     @abstractmethod

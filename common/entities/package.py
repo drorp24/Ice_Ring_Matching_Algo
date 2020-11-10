@@ -2,15 +2,18 @@ from __future__ import annotations
 
 import statistics
 from enum import Enum
+from pprint import pprint
+from random import Random
+from typing import List
 
 from common.entities.base_entities.distribution import ChoiceDistribution
-from common.entities.base_entity import BaseEntity
+from common.entities.base_entity import BaseEntity, JsonableBaseEntity
 
 MAX_POTENTIAL_DROP_ENV_RADIUS_METERS: float = 1000.0
 MAX_DELTA_BETWEEN_MIN_AND_MAX_RADIUS: float = 100.0
 
 
-class PotentialDropEnvelope(BaseEntity):
+class PotentialDropEnvelope(JsonableBaseEntity):
 
     def __init__(self, minimal_radius_meters: float, maximal_radius_meters: float):
         self._minimal_radius_meters = minimal_radius_meters
@@ -33,13 +36,17 @@ class PotentialDropEnvelope(BaseEntity):
         return self.maximal_radius_meters - self.minimal_radius_meters
 
 
-class Package(BaseEntity):
+class Package(JsonableBaseEntity):
 
     def __init__(self, weight: float):
         self._weight = weight
-        self._potential_drop_envelope = PotentialDropEnvelope(
+        self.__potential_drop_envelope = PotentialDropEnvelope(
             minimal_radius_meters=Package.calc_minimal_radius_meters(weight),
             maximal_radius_meters=Package.calc_max_radius_meters(weight))
+
+    @property
+    def weight(self) -> float:
+        return self._weight
 
     @staticmethod
     def calc_max_radius_meters(weight: float) -> float:
@@ -55,12 +62,8 @@ class Package(BaseEntity):
         return value / weight
 
     @property
-    def weight(self) -> float:
-        return self._weight
-
-    @property
-    def potential_drop_envelope(self) -> PotentialDropEnvelope:
-        return self._potential_drop_envelope
+    def _potential_drop_envelope(self) -> PotentialDropEnvelope:
+        return self.__potential_drop_envelope
 
     def __str__(self):
         return 'package of weight ' + self._weight
@@ -76,8 +79,17 @@ class PackageType(Enum):
     def get_all_names():
         return list(PackageType.__members__.keys())
 
+    @classmethod
+    def dict_to_obj(cls, input_dict):
+        split_package_type = input_dict['__enum__'].split('.')
+        assert(split_package_type[0] == 'PackageType')
+        return PackageType[split_package_type[1]]
+
     def __dict__(self):
-        return {self.name: self.value}
+        return {'__enum__': str(self)}
+
+    def __repr__(self):
+        return 'PackageType: ' + str(self.__dict__())
 
 
 class PackageDistribution(ChoiceDistribution):
@@ -86,3 +98,7 @@ class PackageDistribution(ChoiceDistribution):
             package_distribution_dict = {}
         super().__init__({package_type: package_distribution_dict.get(package_type, 0)
                           for package_type in PackageType.get_all_names()})
+
+    def choose_rand(self, random: Random, amount=1) -> List[PackageType]:
+        package_names = super().choose_rand(random=random, amount=amount)
+        return [PackageType[package_name] for package_name in package_names]

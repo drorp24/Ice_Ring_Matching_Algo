@@ -5,7 +5,7 @@ from random import Random
 from typing import List
 
 from common.entities.base_entities.distribution import UniformChoiceDistribution, Distribution
-from common.entities.base_entity import BaseEntity
+from common.entities.base_entity import BaseEntity, JsonableBaseEntity
 from common.entities.customer_delivery import CustomerDeliveryDistribution
 from common.entities.delivery_option import DeliveryOption, DeliveryOptionDistribution, DEFAULT_CD_DISTRIB
 from common.entities.package import PackageDistribution
@@ -17,7 +17,7 @@ from common.math.angle import AngleUniformDistribution
 from geometry.geo_distribution import PointDistribution
 
 
-class DeliveryRequest(BaseEntity):
+class DeliveryRequest(JsonableBaseEntity):
 
     def __init__(self, delivery_options: [DeliveryOption], time_window: TimeWindowExtension, priority: int):
         self._delivery_options = delivery_options if delivery_options is not None else []
@@ -35,6 +35,15 @@ class DeliveryRequest(BaseEntity):
     @property
     def priority(self) -> int:
         return self._priority
+
+    @classmethod
+    def dict_to_obj(cls, dict_input):
+        assert (dict_input['__class__'] == cls.__name__)
+        return DeliveryRequest(
+            delivery_options=[DeliveryOption.dict_to_obj(do_dict) for do_dict in dict_input['delivery_options']],
+            time_window=TimeWindowExtension.dict_to_obj(dict_input['time_window']),
+            priority=dict_input['priority']
+        )
 
     def __eq__(self, other):
         return (self.delivery_options == other.delivery_options) and \

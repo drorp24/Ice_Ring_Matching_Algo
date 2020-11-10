@@ -1,6 +1,5 @@
 import unittest
 from pprint import pprint
-from random import Random
 
 from common.entities.delivery_request import generate_dr_distribution, PriorityDistribution
 from common.entities.delivery_request_generator import DeliveryRequestDatasetGenerator, DeliveryRequestDatasetStructure
@@ -38,4 +37,4 @@ class BasicDeliveryRequestGeneration(unittest.TestCase):
                          self.num_of_pdp_per_cd)
 
     def test_to_dict(self):
-        pprint(dict(self.dr_dist.__dict__()))
+        pprint(self.dr_dataset[0].__dict__())
