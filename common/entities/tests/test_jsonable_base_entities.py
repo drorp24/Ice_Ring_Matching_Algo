@@ -30,7 +30,7 @@ class BasicPackageTestCase(unittest.TestCase):
         pdp_dict = JsonableBaseEntity.json_to_dict('jsons/pdp_test_file.json')
         self.assertEqual(self.pdp1, PackageDeliveryPlan.dict_to_obj(pdp_dict))
 
-    def test_cd_to_json(self):
+    def test_cd_to_dict(self):
         cd_dict1 = self.cd1.__dict__()
         cd2 = CustomerDelivery.dict_to_obj(cd_dict1)
         cd_dict2 = cd2.__dict__()
@@ -42,7 +42,7 @@ class BasicPackageTestCase(unittest.TestCase):
         cd_dict = JsonableBaseEntity.json_to_dict('jsons/cd_test_file.json')
         self.assertEqual(self.cd1, CustomerDelivery.dict_to_obj(cd_dict))
 
-    def test_do_to_json(self):
+    def test_do_to_dict(self):
         do_dict1 = self.do1.__dict__()
         do2 = DeliveryOption.dict_to_obj(do_dict1)
         do_dict2 = do2.__dict__()
@@ -54,7 +54,7 @@ class BasicPackageTestCase(unittest.TestCase):
         do_dict = JsonableBaseEntity.json_to_dict('jsons/do_test_file.json')
         self.assertEqual(self.do1, DeliveryOption.dict_to_obj(do_dict))
 
-    def test_dr_to_json(self):
+    def test_dr_to_dict(self):
         dr_dict1 = self.dr1.__dict__()
         dr2 = DeliveryRequest.dict_to_obj(dr_dict1)
         dr_dict2 = dr2.__dict__()
