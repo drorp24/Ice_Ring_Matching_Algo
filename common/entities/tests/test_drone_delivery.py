@@ -13,7 +13,7 @@ class BasicDroneDeliveryGeneration(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.dr = DeliveryRequestDistribution().choose_rand(Random(42),3)
+        cls.dr = DeliveryRequestDistribution().choose_rand(Random(42), 3)
 
         cls.empty_drone_delivery_1 = EmptyDroneDelivery("edd_1", DroneFormations.get_drone_formation(
             FormationSize.MINI, FormationOptions.TINY_PACKAGES, PlatformType.platform_1))
@@ -49,7 +49,7 @@ class BasicDroneDeliveryGeneration(unittest.TestCase):
         self.assertEqual(len(self.drone_delivery_1.delivery_requests), 2)
 
         self.assertEqual(self.drone_delivery_2.drone_formation, DroneFormations.get_drone_formation(
-            FormationSize.MEDIUM,FormationOptions.TINY_PACKAGES,  PlatformType.platform_1))
+            FormationSize.MEDIUM, FormationOptions.TINY_PACKAGES, PlatformType.platform_1))
         self.assertEqual(self.drone_delivery_2.attack_time, datetime(2020, 1, 23, 12, 30, 00))
         self.assertEqual(len(self.drone_delivery_2.delivery_requests), 1)
 
@@ -71,4 +71,3 @@ class BasicDroneDeliveryGeneration(unittest.TestCase):
         self.assertEqual(self.drone_delivery_board.drone_deliveries[1].drone_formation,
                          DroneFormations.get_drone_formation(
                              FormationSize.MEDIUM, FormationOptions.TINY_PACKAGES, PlatformType.platform_1))
-
