@@ -1,18 +1,64 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import List, Tuple
-from common.entities.drone_delivery import EmptyDroneDelivery
+from typing import List, Tuple, Union
+from common.entities.drone_loading_dock import DroneLoadingDock
 from networkx import DiGraph, Graph, subgraph
 from time_window import TimeWindow, time_window_to_timestamps
-
+from abc import ABC, abstractmethod
 from common.entities.delivery_request import DeliveryRequest
 
 
-class EmptyDroneDeliveryNode:
+class Node:
 
-    def __init__(self, empty_drone_delivery: EmptyDroneDelivery):
-        self.internal_node = empty_drone_delivery
+    def __init__(self, internal_node: Union[DeliveryRequest, DroneLoadingDock]):
+        self.internal_node = internal_node
+
+    @property
+    def internal_node(self):
+        return self.internal_node
+
+    def time_window(self) -> TimeWindow:
+        return self.internal_node.time_window
+
+    def priority(self) -> int:
+        return self.internal_node.priority
+
+    def get_time_window_as_time_stamps(self):
+        return g
+
+    def __hash__(self):
+        raise NotImplementedError()
+
+    def __eq__(self, other):
+        raise NotImplementedError()
+
+
+class DroneLoadingDockNode(Node):
+
+    @property
+    def internal_node(self) -> DroneLoadingDock:
+        return self.internal_node
+
+    def time_window(self) -> TimeWindow:
+        return self.internal_node.time_window
+
+    def priority(self) -> int:
+        return 0
+
+    def get_time_window_as_time_stamps(self):
+        return time_window_to_timestamps(self.internal_node.time_window)
+
+    def __hash__(self):
+        return hash(self.internal_node)
+
+    def __eq__(self, other):
+        if isinstance(other, DroneLoadingDockNode):
+            return self.internal_node == other.internal_node
+        return False
+
+    def __init__(self, drone_loading_dock: DroneLoadingDock):
+        self.internal_node = drone_loading_dock
 
 
 class DeliveryRequestNode:
