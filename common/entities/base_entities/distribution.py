@@ -3,7 +3,7 @@ from __future__ import annotations
 from abc import abstractmethod, ABC
 from dataclasses import dataclass
 from random import Random
-from typing import Dict, List, Union, Tuple
+from typing import Dict, List
 
 
 class Distribution(ABC):
