@@ -1,6 +1,7 @@
 from __future__ import annotations
-from datetime import datetime, date, time
-from typing import Dict
+from datetime import datetime, date, time, timedelta
+from random import Random
+from typing import Dict, Union, List, Tuple
 
 from time_window import TimeWindow
 
@@ -22,7 +23,7 @@ UNTIL = 'until'
 class TimeWindowExtension:
 
     def __init__(self, since: DateTimeExtension, until: DateTimeExtension):
-        self._time_window = TimeWindow(since.internal_date_time, until.internal_date_time)
+        self._time_window = TimeWindow(since._internal, until._internal)
 
     @property
     def internal_time_window(self) -> TimeWindow:
@@ -43,6 +44,9 @@ class TimeWindowExtension:
         since = DateTimeExtension.from_dict(dict_input[SINCE])
         until = DateTimeExtension.from_dict(dict_input[UNTIL])
         return TimeWindowExtension(since, until)
+
+    def get_time_stamp(self) -> Tuple[int, int]:
+        return self.internal_time_window.since.timestamp(), self.internal_time_window.until.timestamp()
 
     def __eq__(self, other: TimeWindowExtension):
         return self._internal.since == other._internal.since and \
@@ -76,6 +80,9 @@ class DateTimeExtension(BaseEntity):
     @property
     def time(self) -> date:
         return self._date_time.time()
+
+    def time_stamp(self) -> int:
+        return self._date_time.timestamp()
 
     def __dict__(self):
         val = self.to_dict()
