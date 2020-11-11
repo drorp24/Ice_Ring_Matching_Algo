@@ -20,6 +20,10 @@ def create_point_2d(x: float, y: float) -> Point2D:
     return _ShapelyPoint2D(x, y)
 
 
+def convert_dict_to_point_2d(input_dict: dict):
+    return _ShapelyPoint2D.dict_to_obj(dict_input=input_dict)
+
+
 def convert_to_point(vector: Vector2D) -> Point2D:
     return create_point_2d(vector.x, vector.y)
 
@@ -42,7 +46,8 @@ def create_multipolygon_2d(polygons: List[Polygon2D]) -> MultiPolygon2D:
 
 
 def create_polygon_2d_from_ellipse(ellipse_center: Point2D, ellipse_width: float, ellipse_height: float,
-                                   ellipse_rotation_deg: float, epsilon_dist=0.0001) -> Union[Polygon2D, EmptyGeometry2D]:
+                                   ellipse_rotation_deg: float, epsilon_dist=0.0001) -> Union[
+    Polygon2D, EmptyGeometry2D]:
     plt_ellipse = Ellipse(ellipse_center.xy(), ellipse_width, ellipse_height, ellipse_rotation_deg)
     vertices = plt_ellipse.get_verts()
     if ellipse_width < epsilon_dist or ellipse_height < epsilon_dist:

@@ -1,12 +1,13 @@
 from __future__ import annotations
+from typing import List
 
 from dataclasses import dataclass
 from typing import List, Tuple, Union
 from common.entities.drone_loading_dock import DroneLoadingDock
 from networkx import DiGraph, Graph, subgraph
-from time_window import TimeWindow, time_window_to_timestamps
-from abc import ABC, abstractmethod
+
 from common.entities.delivery_request import DeliveryRequest
+from common.entities.temporal import TimeWindowExtension
 
 
 class Node:
@@ -127,6 +128,9 @@ class DeliveryRequestEdge:
     def edge_attributes(self, value):
         self._edge_attributes = value
 
+    def to_tuple(self):
+        return self.start_node, self.end_node
+
 
 class DeliveryRequestGraph:
 
@@ -139,10 +143,7 @@ class DeliveryRequestGraph:
 
     @property
     def edges(self) -> List[DeliveryRequestEdge]:
-        internal_edges = self.internal_graph.edges.data()
-        edges = [DeliveryRequestEdge(internal_edge[0], internal_edge[1], internal_edge[2]["object"])
-                 for internal_edge in internal_edges]
-        return edges
+        return self.internal_graph.edges.data(data=False)
 
     def is_empty(self):
         return self.internal_graph.nodes.__len__() == 0
@@ -174,7 +175,7 @@ class DeliveryRequestGraph:
                                        for delivery_request_edge in delivery_request_edges]
         self.internal_graph.add_edges_from(delivery_request_edges_list)
 
-    def calc_subgraph_in_time_window(self, time_window_scope: TimeWindow):
+    def calc_subgraph_in_time_window(self, time_window_scope: TimeWindowExtension):
         nodes_at_time = [node for node in self.nodes if node.time_window in time_window_scope]
         extracted_subgraph = self.extract_subgraph_of_nodes(nodes_at_time)
         return DeliveryRequestGraph._create_from_extracted_subgraph(extracted_subgraph)

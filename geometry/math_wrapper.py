@@ -21,7 +21,7 @@ class _MathVector2D(Vector2D):
         return self._y
 
     @property
-    def type(self) -> str:
+    def _geo_type(self) -> str:
         return self._type
 
     @property

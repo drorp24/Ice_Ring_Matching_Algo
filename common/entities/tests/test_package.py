@@ -1,10 +1,11 @@
 import unittest
 from collections import Counter
+from pprint import pprint
 from random import Random
-from typing import List
 
+from common.entities.base_entities.test.test_distribution import assert_samples_approx_expected
 from common.entities.package import PackageType, PackageDistribution
-from common.entities.package_factory import package_delivery_plan_factory
+from common.entities.package_delivery_plan import PackageDeliveryPlan
 from common.math.angle import Angle, AngleUnit
 from geometry.geo2d import Polygon2D
 from geometry.geo_factory import create_point_2d, create_polygon_2d_from_ellipse, create_empty_geometry_2d
@@ -19,10 +20,10 @@ class BasicPackageTestCase(unittest.TestCase):
         cls.p3 = PackageType.MEDIUM
         cls.p4 = PackageType.LARGE
         point = create_point_2d(1, 2)
-        cls.pdp = package_delivery_plan_factory(point,
-                                                azimuth=Angle(30, AngleUnit.DEGREE),
-                                                elevation=Angle(80, AngleUnit.DEGREE),
-                                                package_type=PackageType.TINY)
+        cls.pdp = PackageDeliveryPlan(point,
+                                      azimuth=Angle(30, AngleUnit.DEGREE),
+                                      pitch=Angle(80, AngleUnit.DEGREE),
+                                      package_type=PackageType.TINY)
 
     def test_package_weights(self):
         self.assertEqual(PackageType.TINY.value.weight, 1)
@@ -37,66 +38,66 @@ class BasicPackageTestCase(unittest.TestCase):
         self.assertEqual(self.pdp.package_type.value.weight, 1)
 
     def test_2_package_delivery_plans_equal(self):
-        expected_pdp = package_delivery_plan_factory(create_point_2d(1, 2),
-                                                     azimuth=Angle(30, AngleUnit.DEGREE),
-                                                     elevation=Angle(80, AngleUnit.DEGREE),
-                                                     package_type=PackageType.TINY)
+        expected_pdp = PackageDeliveryPlan(create_point_2d(1, 2),
+                                           azimuth=Angle(30, AngleUnit.DEGREE),
+                                           pitch=Angle(80, AngleUnit.DEGREE),
+                                           package_type=PackageType.TINY)
         self.assertEqual(self.pdp, expected_pdp)
 
     def test_2_package_delivery_plans_not_equal(self):
-        expected_pdp = package_delivery_plan_factory(create_point_2d(1, 2),
-                                                     azimuth=Angle(31, AngleUnit.DEGREE),
-                                                     elevation=Angle(80, AngleUnit.DEGREE),
-                                                     package_type=PackageType.TINY)
+        expected_pdp = PackageDeliveryPlan(create_point_2d(1, 2),
+                                           azimuth=Angle(31, AngleUnit.DEGREE),
+                                           pitch=Angle(80, AngleUnit.DEGREE),
+                                           package_type=PackageType.TINY)
         self.assertNotEqual(self.pdp, expected_pdp)
 
     def test_drop_envelope_when_same_drop_and_drone_azimuth(self):
-        drone_azimuth = Angle(self.pdp.azimuth.in_degrees(), AngleUnit.DEGREE)
+        drone_azimuth = Angle(self.pdp.azimuth.degrees, AngleUnit.DEGREE)
         expected_envelope = create_polygon_2d_from_ellipse(ellipse_center=create_point_2d(-821.72, -473),
                                                            ellipse_width=100,
                                                            ellipse_height=100,
-                                                           ellipse_rotation_deg=drone_azimuth.in_degrees())
-        actual_envelope = self.pdp.drop_envelope(drone_azimuth)
+                                                           ellipse_rotation_deg=drone_azimuth.degrees)
+        actual_envelope = self.pdp.calc_drop_envelope(drone_azimuth)
         self.assertThatEnvelopesAreApproximatelyEqual(actual_envelope, expected_envelope)
 
     def test_drop_envelope_when_drop_and_drone_azimuth_delta_45_deg(self):
-        drone_azimuth = Angle(self.pdp.azimuth.in_degrees() + 45, AngleUnit.DEGREE)
+        drone_azimuth = Angle(self.pdp.azimuth.degrees + 45, AngleUnit.DEGREE)
         expected_envelope = create_polygon_2d_from_ellipse(ellipse_center=create_point_2d(-244.87, -915.63),
                                                            ellipse_width=100,
                                                            ellipse_height=70.71,
-                                                           ellipse_rotation_deg=drone_azimuth.in_degrees())
-        actual_envelope = self.pdp.drop_envelope(drone_azimuth)
+                                                           ellipse_rotation_deg=drone_azimuth.degrees)
+        actual_envelope = self.pdp.calc_drop_envelope(drone_azimuth)
         self.assertThatEnvelopesAreApproximatelyEqual(actual_envelope, expected_envelope)
 
     def test_drop_envelope_when_drop_and_drone_azimuth_delta_100_deg(self):
-        drone_azimuth = Angle(self.pdp.azimuth.in_degrees() + 100, AngleUnit.DEGREE)
-        actual_envelope = self.pdp.drop_envelope(drone_azimuth)
+        drone_azimuth = Angle(self.pdp.azimuth.degrees + 100, AngleUnit.DEGREE)
+        actual_envelope = self.pdp.calc_drop_envelope(drone_azimuth)
         self.assertEqual(actual_envelope, create_empty_geometry_2d())
 
     def test_delivery_envelope_when_same_drop_and_drone_azimuth(self):
         drone_location = create_point_2d(-821.72, -473)
-        drone_azimuth = Angle(self.pdp.azimuth.in_degrees(), AngleUnit.DEGREE)
+        drone_azimuth = Angle(self.pdp.azimuth.degrees, AngleUnit.DEGREE)
         expected_envelope = create_polygon_2d_from_ellipse(ellipse_center=create_point_2d(1, 2),
                                                            ellipse_width=100,
                                                            ellipse_height=100,
-                                                           ellipse_rotation_deg=drone_azimuth.in_degrees())
-        actual_envelope = self.pdp.delivery_envelope(drone_location, drone_azimuth)
+                                                           ellipse_rotation_deg=drone_azimuth.degrees)
+        actual_envelope = self.pdp.calc_delivery_envelope(drone_location, drone_azimuth)
         self.assertThatEnvelopesAreApproximatelyEqual(actual_envelope, expected_envelope)
 
     def test_delivery_envelope_when_drop_and_drone_azimuth_delta_45_deg(self):
         drone_location = create_point_2d(-244.87, -915.63)
-        drone_azimuth = Angle(self.pdp.azimuth.in_degrees() + 45, AngleUnit.DEGREE)
+        drone_azimuth = Angle(self.pdp.azimuth.degrees + 45, AngleUnit.DEGREE)
         expected_envelope = create_polygon_2d_from_ellipse(ellipse_center=create_point_2d(1, 2),
                                                            ellipse_width=100,
                                                            ellipse_height=70.71,
-                                                           ellipse_rotation_deg=drone_azimuth.in_degrees())
-        actual_envelope = self.pdp.delivery_envelope(drone_location, drone_azimuth)
+                                                           ellipse_rotation_deg=drone_azimuth.degrees)
+        actual_envelope = self.pdp.calc_delivery_envelope(drone_location, drone_azimuth)
         self.assertThatEnvelopesAreApproximatelyEqual(actual_envelope, expected_envelope)
 
     def test_delivery_envelope_when_drop_and_drone_azimuth_delta_91_deg(self):
         drone_location = create_point_2d(0, 0)
-        drone_azimuth = Angle(self.pdp.azimuth.in_degrees() + 91, AngleUnit.DEGREE)
-        actual_envelope = self.pdp.delivery_envelope(drone_location, drone_azimuth)
+        drone_azimuth = Angle(self.pdp.azimuth.degrees + 91, AngleUnit.DEGREE)
+        actual_envelope = self.pdp.calc_delivery_envelope(drone_location, drone_azimuth)
         self.assertEqual(actual_envelope, create_empty_geometry_2d())
 
     def assertThatEnvelopesAreApproximatelyEqual(self, actual_envelope: Polygon2D, expected_envelope: Polygon2D):
@@ -118,17 +119,16 @@ class BasicPackageGeneration(unittest.TestCase):
         cls.pd = PackageDistribution({PackageType.TINY.name: 0.8, PackageType.SMALL.name: 0.4})
 
     def test_probability_of_package_generation_is_correct(self):
-        rand_samples = 100000
-        values_random_sample = list(map(lambda i: self.pd.choose_rand(Random(i)), range(rand_samples)))
+        rand_samples = 10000
+        values_random_sample = list(map(lambda i: self.pd.choose_rand(Random(i))[0].name, range(rand_samples)))
         sample_count = dict(Counter(values_random_sample))
         expected_prob = {PackageType.TINY.name: 0.66,
                          PackageType.SMALL.name: 0.33,
                          PackageType.MEDIUM.name: 0.0,
                          PackageType.LARGE.name: 0.0}
-        
-        for package in PackageType.get_all_names():
-            self.assert_samples_approx_expected(package, expected_prob, sample_count)
 
-    def assert_samples_approx_expected(self, package_name: str, expected_package_prob: dict, sample_count: dict):
-        package_sample_prob = sample_count.get(package_name, 0) / sum(sample_count.values())
-        self.assertAlmostEqual(package_sample_prob, expected_package_prob.get(package_name), delta=0.01)
+        for package in PackageType.get_all_names():
+            assert_samples_approx_expected(self, package, expected_prob, sample_count)
+
+    def print_example_package(self):
+        pprint(PackageType.TINY)

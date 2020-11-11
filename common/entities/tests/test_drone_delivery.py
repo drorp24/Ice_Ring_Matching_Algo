@@ -1,7 +1,8 @@
 import unittest
 from datetime import datetime
+from random import Random
 
-from input.delivery_requests_json_converter import create_delivery_requests_from_file
+from common.entities.delivery_request import DeliveryRequestDistribution
 from common.entities.drone_delivery import DroneDelivery, EmptyDroneDelivery
 from common.entities.drone_formation import DroneFormations, FormationSize, FormationOptions
 from common.entities.drone import PlatformType
@@ -12,7 +13,7 @@ class BasicDroneDeliveryGeneration(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.dr = create_delivery_requests_from_file('DeliveryRequestTest.json')
+        cls.dr = DeliveryRequestDistribution().choose_rand(Random(42), 3)
 
         cls.empty_drone_delivery_1 = EmptyDroneDelivery("edd_1", DroneFormations.get_drone_formation(
             FormationSize.MINI, FormationOptions.TINY_PACKAGES, PlatformType.platform_1))
@@ -20,7 +21,7 @@ class BasicDroneDeliveryGeneration(unittest.TestCase):
             FormationSize.MEDIUM, FormationOptions.TINY_PACKAGES, PlatformType.platform_1))
 
         cls.drone_delivery_1 = DroneDelivery(cls.empty_drone_delivery_1.id,
-                                             cls.empty_drone_delivery_1.drone_formation, 
+                                             cls.empty_drone_delivery_1.drone_formation,
                                              datetime(2020, 1, 23, 11, 30, 00), [cls.dr[0], cls.dr[1]])
 
         cls.drone_delivery_2 = DroneDelivery(cls.empty_drone_delivery_2.id,
@@ -48,7 +49,7 @@ class BasicDroneDeliveryGeneration(unittest.TestCase):
         self.assertEqual(len(self.drone_delivery_1.delivery_requests), 2)
 
         self.assertEqual(self.drone_delivery_2.drone_formation, DroneFormations.get_drone_formation(
-            FormationSize.MEDIUM,FormationOptions.TINY_PACKAGES,  PlatformType.platform_1))
+            FormationSize.MEDIUM, FormationOptions.TINY_PACKAGES, PlatformType.platform_1))
         self.assertEqual(self.drone_delivery_2.attack_time, datetime(2020, 1, 23, 12, 30, 00))
         self.assertEqual(len(self.drone_delivery_2.delivery_requests), 1)
 
@@ -70,4 +71,3 @@ class BasicDroneDeliveryGeneration(unittest.TestCase):
         self.assertEqual(self.drone_delivery_board.drone_deliveries[1].drone_formation,
                          DroneFormations.get_drone_formation(
                              FormationSize.MEDIUM, FormationOptions.TINY_PACKAGES, PlatformType.platform_1))
-
