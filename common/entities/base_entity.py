@@ -19,7 +19,7 @@ class BaseEntity(object):
 
     def internal_dict(self, member):
         attribs = self.__getattribute__(member)
-        if isinstance(attribs, list):
+        if isinstance(attribs, list) or isinstance(attribs, set):
             return [attribute.__dict__() for i, attribute in enumerate(attribs)]
         try:
             return attribs.__dict__()

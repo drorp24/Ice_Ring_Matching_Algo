@@ -1,18 +1,16 @@
 from dataclasses import dataclass
-from pprint import pprint
 from random import Random
-from typing import Union, List
+from typing import List
 
-from common.entities.base_entities.distribution import Range
 from common.entities.delivery_request import DeliveryRequestDistribution, DeliveryRequest
 
 
 @dataclass
 class DeliveryRequestDatasetStructure:
-    num_of_delivery_requests: Union[int, Range] = 2
-    num_of_delivery_options_per_delivery_request: Union[int, Range] = 5
-    num_of_customer_deliveries_per_delivery_option: Union[int, Range] = 10
-    num_of_package_delivery_plan_per_customer_delivery: Union[int, Range] = 3
+    num_of_delivery_requests: int = 2
+    num_of_delivery_options_per_delivery_request: int = 5
+    num_of_customer_deliveries_per_delivery_option: int = 10
+    num_of_package_delivery_plan_per_customer_delivery: int = 3
     delivery_request_distribution: DeliveryRequestDistribution = DeliveryRequestDistribution()
 
 
@@ -26,4 +24,3 @@ class DeliveryRequestDatasetGenerator:
                                       num_do=dr_struct.num_of_delivery_options_per_delivery_request,
                                       num_cd=dr_struct.num_of_customer_deliveries_per_delivery_option,
                                       num_pdp=dr_struct.num_of_package_delivery_plan_per_customer_delivery)
-
