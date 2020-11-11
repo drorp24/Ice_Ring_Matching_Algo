@@ -14,7 +14,7 @@ from common.entities.package_delivery_plan import PackageDeliveryPlanDistributio
 from common.entities.temporal import TimeWindowDistribution, TimeWindowExtension, DateTimeDistribution, \
     TimeDeltaExtension, TimeDeltaDistribution, DateTimeExtension
 from common.math.angle import AngleUniformDistribution
-from geometry.geo_distribution import PointDistribution
+from geometry.geo_distribution import UniformPointInBboxDistribution
 
 
 class DeliveryRequest(JsonableBaseEntity):
@@ -91,7 +91,7 @@ class DeliveryRequestDistribution(Distribution):
             time_window_distributions[i], priority_distribution[i]) for i in list(range(amount))]
 
 
-def generate_dr_distribution(drop_point_distribution: PointDistribution = DEFAULT_DROP_POINT_DISTRIB,
+def generate_dr_distribution(drop_point_distribution: UniformPointInBboxDistribution = DEFAULT_DROP_POINT_DISTRIB,
                              azimuth_distribution: AngleUniformDistribution = DEFAULT_AZI_DISTRIB,
                              pitch_distribution: UniformChoiceDistribution = DEFAULT_PITCH_DISTRIB,
                              package_type_distribution: PackageDistribution = DEFAULT_PACKAGE_DISTRIB,

@@ -4,7 +4,7 @@ from common.entities.base_entities.distribution import Distribution, UniformDist
 from geometry.geo_factory import create_point_2d
 
 
-class PointDistribution(Distribution):
+class UniformPointInBboxDistribution(Distribution):
 
     def __init__(self, min_x: float, max_x: float, min_y: float, max_y: float):
         self._min_x = min_x  # TODO: refactor with Bounding Box
@@ -20,12 +20,12 @@ class PointDistribution(Distribution):
         return [create_point_2d(x, y) for (x, y) in zip(x_list, y_list)]
 
 
-class MultiPointDistribution(ChoiceDistribution):
+class MultiPointInBboxDistribution(ChoiceDistribution):
 
     def __init__(self, point_dist_to_prob: dict):
         self._point_dist_to_prob = point_dist_to_prob
 
     def choose_rand(self, random: Random, amount: int = 1):
-        selected_point_distribution: PointDistribution = \
+        selected_point_distribution: UniformPointInBboxDistribution = \
             ChoiceDistribution(self._point_dist_to_prob).choose_rand(random, amount)
         return selected_point_distribution.choose_rand(random)

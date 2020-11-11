@@ -8,7 +8,7 @@ from common.entities.base_entity import JsonableBaseEntity
 from common.entities.package import PackageType, PackageDistribution
 from common.math.angle import Angle, AngleUniformDistribution, AngleUnit
 from geometry.geo2d import Point2D, Polygon2D
-from geometry.geo_distribution import PointDistribution
+from geometry.geo_distribution import UniformPointInBboxDistribution
 from geometry.geo_factory import create_polygon_2d_from_ellipse, convert_dict_to_point_2d
 
 
@@ -77,7 +77,7 @@ class PackageDeliveryPlan(JsonableBaseEntity):
                (self.package_type == other.package_type)
 
 
-DEFAULT_DROP_POINT_DISTRIB = PointDistribution(30, 40, 35, 45)
+DEFAULT_DROP_POINT_DISTRIB = UniformPointInBboxDistribution(30, 40, 35, 45)
 DEFAULT_AZI_DISTRIB = AngleUniformDistribution(Angle(0, AngleUnit.DEGREE), Angle(355, AngleUnit.DEGREE))
 DEFAULT_PITCH_DISTRIB = AngleUniformDistribution(Angle(30, AngleUnit.DEGREE), Angle(90, AngleUnit.DEGREE))
 DEFAULT_PACKAGE_DISTRIB = PackageDistribution()
@@ -86,7 +86,7 @@ DEFAULT_PACKAGE_DISTRIB = PackageDistribution()
 class PackageDeliveryPlanDistribution(Distribution):
 
     def __init__(self,
-                 drop_point_distribution: PointDistribution = DEFAULT_DROP_POINT_DISTRIB,
+                 drop_point_distribution: UniformPointInBboxDistribution = DEFAULT_DROP_POINT_DISTRIB,
                  azimuth_distribution: AngleUniformDistribution = DEFAULT_AZI_DISTRIB,
                  pitch_distribution: AngleUniformDistribution = DEFAULT_PITCH_DISTRIB,
                  package_type_distribution: PackageDistribution = DEFAULT_PACKAGE_DISTRIB):
