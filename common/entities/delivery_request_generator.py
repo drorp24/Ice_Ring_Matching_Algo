@@ -17,8 +17,7 @@ class DeliveryRequestDatasetStructure:
 class DeliveryRequestDatasetGenerator:
 
     @staticmethod
-    def generate(dr_struct: DeliveryRequestDatasetStructure = DeliveryRequestDatasetStructure()) -> List[
-        DeliveryRequest]:
+    def generate(dr_struct: DeliveryRequestDatasetStructure = DeliveryRequestDatasetStructure()) -> List[DeliveryRequest]:
         dr_distrib = dr_struct.delivery_request_distribution
         return dr_distrib.choose_rand(random=Random(),
                                       amount=dr_struct.num_of_delivery_requests,
