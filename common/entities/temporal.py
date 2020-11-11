@@ -114,7 +114,6 @@ class DateTimeExtension(BaseEntity):
     def extract_time_dict_from_datetime(date_time: datetime) -> Dict:
         return {TIME: {HOUR: date_time.hour, MINUTE: date_time.minute, SECOND: date_time.second}}
 
-
     def add_time_delta(self, time_delta: TimeDeltaExtension) -> DateTimeExtension:
         return DateTimeExtension.from_dt(self._internal + time_delta._internal_delta)
 

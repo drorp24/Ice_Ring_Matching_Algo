@@ -1,8 +1,8 @@
 from __future__ import annotations
+
 from typing import List
 
 from networkx import DiGraph, Graph, subgraph
-from time_window import TimeWindow
 
 from common.entities.delivery_request import DeliveryRequest
 from common.entities.temporal import TimeWindowExtension

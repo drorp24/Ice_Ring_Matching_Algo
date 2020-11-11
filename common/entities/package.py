@@ -2,12 +2,11 @@ from __future__ import annotations
 
 import statistics
 from enum import Enum
-from pprint import pprint
 from random import Random
 from typing import List
 
 from common.entities.base_entities.distribution import ChoiceDistribution
-from common.entities.base_entity import BaseEntity, JsonableBaseEntity
+from common.entities.base_entity import JsonableBaseEntity
 
 MAX_POTENTIAL_DROP_ENV_RADIUS_METERS: float = 1000.0
 MAX_DELTA_BETWEEN_MIN_AND_MAX_RADIUS: float = 100.0
