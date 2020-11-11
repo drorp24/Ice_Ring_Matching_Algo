@@ -1,14 +1,12 @@
 from __future__ import annotations
 
-from pprint import pprint
 from random import Random
 from typing import List
 
-from common.entities.base_entities.distribution import UniformChoiceDistribution, Distribution
-from common.entities.base_entity import BaseEntity, JsonableBaseEntity
+from common.entities.base_entities.distribution import Distribution
+from common.entities.base_entity import JsonableBaseEntity
 from common.entities.package import PackageType, PackageDistribution
 from common.math.angle import Angle, AngleUniformDistribution, AngleUnit
-from geometry import geo_factory
 from geometry.geo2d import Point2D, Polygon2D
 from geometry.geo_distribution import PointDistribution
 from geometry.geo_factory import create_polygon_2d_from_ellipse, convert_dict_to_point_2d
@@ -104,5 +102,3 @@ class PackageDeliveryPlanDistribution(Distribution):
         packages = self._package_type_distribution.choose_rand(random, amount)
         return [PackageDeliveryPlan(dp, az, el, pk) for (dp, az, el, pk) in
                 zip(drop_points, azimuths, pitchs, packages)]
-
-
