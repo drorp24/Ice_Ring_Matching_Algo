@@ -25,6 +25,7 @@ class ChoiceDistribution(Distribution):
     @staticmethod
     def get_safe_probabilities(probabilities: list):
         # if all probabilities are zero, use equal probabilities
+        probabilities = [max(prob, 0) for prob in probabilities]
         sum_probabilities = sum(probabilities)
         if sum_probabilities == 0:
             probabilities = [1.0 / probabilities.__len__()] * probabilities.__len__()
