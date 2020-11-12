@@ -6,7 +6,7 @@ from common.entities.delivery_request import DeliveryRequestDistribution, genera
 from common.entities.delivery_request_generator import DeliveryRequestDatasetGenerator, DeliveryRequestDatasetStructure
 from common.entities.temporal import TimeWindowDistribution, DateTimeDistribution, DateTimeExtension, \
     TimeDeltaExtension, TimeDeltaDistribution, TimeWindowExtension
-from common.graph.operational.delivery_request_graph import Graph, Node, Edge
+from common.graph.operational.delivery_request_graph import DeliveryRequestGraph
 
 
 class BasicDeliveryRequestGraphTestCases(unittest.TestCase):
@@ -20,45 +20,43 @@ class BasicDeliveryRequestGraphTestCases(unittest.TestCase):
         cls.dr_dataset_low_priority = create_low_priority_dr_dataset()
 
     def test_delivery_request_graph_creation(self):
-        drg = Graph()
-        morning_nodes = [Node(delivery_request) for delivery_request in self.dr_dataset_morning]
-        afternoon_nodes = [Node(delivery_request) for delivery_request in self.dr_dataset_afternoon]
-        drg.add_nodes(morning_nodes)
-        drg.add_nodes(afternoon_nodes)
+        drg = DeliveryRequestGraph()
+        drg.add_delivery_requests(self.dr_dataset_morning)
+        drg.add_delivery_requests(self.dr_dataset_afternoon)
         self.assertEqual(_get_dr_from_dr_graph(drg), list(self.dr_dataset_morning) + list(self.dr_dataset_afternoon))
 
     def test_delivery_request_set_internal_graph(self):
-        drg1 = Graph()
+        drg1 = DeliveryRequestGraph()
         drg1.add_delivery_requests(self.dr_dataset_random)
-        drg2 = Graph()
-        drg2.set_internal_graph(drg1._internal_graph)
+        drg2 = DeliveryRequestGraph()
+        drg2.set_internal_graph(drg1.internal_graph)
         self.assertFalse(drg1.is_empty())
         self.assertEqual(_get_dr_from_dr_graph(drg1), _get_dr_from_dr_graph(drg2))
 
     def test_calc_subgraph_in_time_window(self):
-        drg_full_day = Graph()
+        drg_full_day = DeliveryRequestGraph()
         drg_full_day.add_delivery_requests(self.dr_dataset_morning)
         drg_full_day.add_delivery_requests(self.dr_dataset_afternoon)
-        drg_morning_subgraph_of_full_day = Graph()
+        drg_morning_subgraph_of_full_day = DeliveryRequestGraph()
         drg_morning_subgraph_of_full_day.add_delivery_requests(self.dr_dataset_morning)
         morning_time_window = TimeWindowExtension(
             since=DateTimeExtension(date(2021, 1, 1), time(6, 0, 0)),
             until=DateTimeExtension(date(2021, 1, 1), time(13, 0, 0)))
         calculated_subgraph_within_time_window = drg_full_day.calc_subgraph_in_time_window(morning_time_window)
-        self.assertTrue(isinstance(calculated_subgraph_within_time_window, Graph))
+        self.assertTrue(isinstance(calculated_subgraph_within_time_window, DeliveryRequestGraph))
         nodes_in_time_window_subgraph = _get_dr_from_dr_graph(calculated_subgraph_within_time_window)
         node_in_time_window_morning_graph = _get_dr_from_dr_graph(drg_morning_subgraph_of_full_day)
         self.assertEqual(nodes_in_time_window_subgraph, node_in_time_window_morning_graph)
 
     def test_calc_subgraph_below_priority(self):
-        drg_full_day = Graph()
+        drg_full_day = DeliveryRequestGraph()
         drg_full_day.add_delivery_requests(self.dr_dataset_top_priority)
         drg_full_day.add_delivery_requests(self.dr_dataset_low_priority)
-        drg_low_priority_subgraph_of_full_day = Graph()
+        drg_low_priority_subgraph_of_full_day = DeliveryRequestGraph()
         drg_low_priority_subgraph_of_full_day.add_delivery_requests(self.dr_dataset_low_priority)
         max_priority = 10
         calculated_subgraph_below_max_priority = drg_full_day.calc_subgraph_below_priority(max_priority)
-        self.assertTrue(isinstance(calculated_subgraph_below_max_priority, Graph))
+        self.assertTrue(isinstance(calculated_subgraph_below_max_priority, DeliveryRequestGraph))
         nodes_in_low_priority_subgraph = _get_dr_from_dr_graph(calculated_subgraph_below_max_priority)
         node_in_low_priority_graph = _get_dr_from_dr_graph(drg_low_priority_subgraph_of_full_day)
         self.assertEqual(nodes_in_low_priority_subgraph, node_in_low_priority_graph)
