@@ -5,7 +5,7 @@ from enum import Enum
 from random import Random
 from typing import List
 
-from common.entities.base_entities.distribution import ChoiceDistribution
+from common.entities.disribution.distribution import ChoiceDistribution
 from common.entities.base_entity import JsonableBaseEntity
 
 MAX_POTENTIAL_DROP_ENV_RADIUS_METERS: float = 1000.0

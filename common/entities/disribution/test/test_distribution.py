@@ -3,7 +3,7 @@ from collections import Counter
 from random import Random
 from typing import Union
 
-from common.entities.base_entities.distribution import MultiUniformDistribution, Range, UniformChoiceDistribution
+from common.entities.disribution.distribution import MultiUniformDistribution, Range, UniformChoiceDistribution
 
 
 class BasicDistributionTestCase(unittest.TestCase):
