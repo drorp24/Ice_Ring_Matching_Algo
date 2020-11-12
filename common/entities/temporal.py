@@ -6,7 +6,7 @@ from typing import Dict, List, Union
 
 from time_window import TimeWindow
 
-from common.entities.base_entities.distribution import Distribution, UniformChoiceDistribution
+from common.entities.disribution.distribution import Distribution, UniformChoiceDistribution
 from common.entities.base_entity import BaseEntity, JsonableBaseEntity
 
 DATE = 'date'

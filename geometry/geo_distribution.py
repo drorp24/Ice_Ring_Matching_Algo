@@ -1,6 +1,6 @@
 from random import Random
 
-from common.entities.base_entities.distribution import Distribution, UniformDistribution, Range, ChoiceDistribution
+from common.entities.disribution.distribution import Distribution, UniformDistribution, Range, ChoiceDistribution
 from geometry.geo_factory import create_point_2d
 
 

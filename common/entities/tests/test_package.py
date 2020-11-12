@@ -3,7 +3,7 @@ from collections import Counter
 from pprint import pprint
 from random import Random
 
-from common.entities.base_entities.test.test_distribution import assert_samples_approx_expected
+from common.entities.disribution.test.test_distribution import assert_samples_approx_expected
 from common.entities.package import PackageType, PackageDistribution
 from common.entities.package_delivery_plan import PackageDeliveryPlan
 from common.math.angle import Angle, AngleUnit

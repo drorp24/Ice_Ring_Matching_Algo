@@ -1,7 +1,7 @@
 from random import Random
 from typing import List
 
-from common.entities.base_entities.distribution import UniformChoiceDistribution, Distribution
+from common.entities.disribution.distribution import UniformChoiceDistribution, Distribution
 from common.entities.base_entity import JsonableBaseEntity
 from common.entities.customer_delivery import CustomerDelivery, CustomerDeliveryDistribution, DEFAULT_PDP_DISTRIB
 
