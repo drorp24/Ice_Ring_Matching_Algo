@@ -9,10 +9,9 @@ from common.entities.delivery_option import DeliveryOption
 from common.entities.delivery_request import DeliveryRequest
 from common.entities.package import PackageType
 from common.entities.package_delivery_plan import PackageDeliveryPlan
-from common.math.angle import NoneAngle, Angle
-from common.math.angle import NoneAngle, BaseAngle
+from common.math.angle import Angle
 from grid.azimuth_options import AzimuthOptions
-from grid.cell_data import CellData, EnvelopeCellData
+from grid.cell_data import  EnvelopeCellData
 from grid.grid_location import GridLocationServices, GridLocation
 from grid.grid_service import GridService
 from grid.slides_container import SlidesContainer

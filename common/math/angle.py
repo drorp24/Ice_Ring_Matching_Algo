@@ -25,31 +25,43 @@ class AngleUnit(Enum):
     def __hash__(self):
         return hash(self.name)
 
+#
+# class BaseAngle(ABC):
+#
+#     @abstractmethod
+#     def degrees(self) -> float:
+#         raise NotImplementedError()
+#
+#     @abstractmethod
+#     def radians(self) -> float:
+#         raise NotImplementedError()
+#
+#     @abstractmethod
+#     def to_direction(self) -> Vector2D:
+#         raise NotImplementedError()
+#
+#     @abstractmethod
+#     def calc_reverse(self) -> BaseAngle:
+#         raise NotImplementedError()
+#
+#     @abstractmethod
+#     def calc_abs_difference(self, other: Angle) -> BaseAngle:
+#         raise NotImplementedError()
+#
+#     @abstractmethod
+#     def __eq__(self, other: Angle):
+#         return False
+#
+#     @abstractmethod
+#     def __hash__(self):
+#         raise NotImplementedError()
+#
+#     @abstractmethod
+#     def __str__(self):
+#         raise NotImplementedError()
+#
 
-class BaseAngle(ABC, JsonableBaseEntity):
-
-    @abstractmethod
-    def degrees(self) -> float:
-        raise NotImplementedError()
-
-    @abstractmethod
-    def radians(self) -> float:
-        raise NotImplementedError()
-
-    @abstractmethod
-    def to_direction(self) -> Vector2D:
-        raise NotImplementedError()
-
-    @abstractmethod
-    def calc_reverse(self) -> BaseAngle:
-        raise NotImplementedError()
-
-    @abstractmethod
-    def calc_abs_difference(self, other: Angle) -> BaseAngle:
-        raise NotImplementedError()
-
-
-class Angle(BaseAngle):
+class Angle(JsonableBaseEntity):
 
     def __init__(self, value: float, unit: AngleUnit):
         super().__init__()
@@ -76,10 +88,10 @@ class Angle(BaseAngle):
     def to_direction(self) -> Vector2D:
         return create_vector_2d(math.cos(self.radians), math.sin(self.radians))
 
-    def calc_reverse(self) -> BaseAngle:
+    def calc_reverse(self) -> Angle:
         return Angle(self.degrees + AngleUnit.DEGREE.cyclic_value / 2, AngleUnit.DEGREE)
 
-    def calc_abs_difference(self, other: Angle) -> BaseAngle:
+    def calc_abs_difference(self, other: Angle) -> Angle:
         if self.__unit is not other.__unit:
             raise ValueError("error, angle units are not equal")
         angle_1 = _calc_first_cycle_equivalent(self)
@@ -92,25 +104,25 @@ class Angle(BaseAngle):
     def __hash__(self):
         return hash(self.degrees)
 
-
-class NoneAngle(BaseAngle):
-    def degrees(self) -> float:
-        raise NotImplementedError()
-
-    def radians(self) -> float:
-        raise NotImplementedError()
-
-    def to_direction(self) -> Vector2D:
-        raise NotImplementedError()
-
-    def calc_reverse(self) -> BaseAngle:
-        raise NotImplementedError()
-
-    def calc_abs_difference(self, other: Angle) -> BaseAngle:
-        raise NotImplementedError()
-
-    def __init__(self):
-        super().__init__()
+#
+# class NoneAngle(BaseAngle):
+#     def degrees(self) -> float:
+#         raise NotImplementedError()
+#
+#     def radians(self) -> float:
+#         raise NotImplementedError()
+#
+#     def to_direction(self) -> Vector2D:
+#         raise NotImplementedError()
+#
+#     def calc_reverse(self) -> BaseAngle:
+#         raise NotImplementedError()
+#
+#     def calc_abs_difference(self, other: Angle) -> BaseAngle:
+#         raise NotImplementedError()
+#
+#     def __init__(self):
+#         super().__init__()
 
 
 def _calc_first_cycle_equivalent(angle: Angle):

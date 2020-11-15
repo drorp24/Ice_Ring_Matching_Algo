@@ -24,7 +24,7 @@ class DeliveryRequest(JsonableBaseEntity):
         self._delivery_options = delivery_options if delivery_options is not None else []
         self._time_window = time_window
         self._priority = priority
-        self._id = uuid.uuid1()     # todo get id as an input
+        # self._id = uuid.uuid1()     # todo get id as an input
 
     @property
     def delivery_options(self) -> [DeliveryOption]:
@@ -38,9 +38,9 @@ class DeliveryRequest(JsonableBaseEntity):
     def priority(self) -> int:
         return self._priority
 
-    @property
-    def id(self) -> uuid:
-        return self._id
+    # @property
+    # def id(self) -> uuid:
+    #     return self._id
 
     @classmethod
     def dict_to_obj(cls, dict_input):
