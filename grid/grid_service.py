@@ -53,3 +53,6 @@ class GridService:
     @staticmethod
     def get_polygon_centroid_grid_location(polygon: Polygon2D, cell_resolution: int) -> GridLocation:
         return GridService.get_grid_location(polygon.centroid, cell_resolution)
+
+
+

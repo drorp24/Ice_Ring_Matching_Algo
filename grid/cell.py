@@ -9,8 +9,7 @@ from common.entities.customer_delivery import CustomerDelivery
 from common.entities.delivery_option import DeliveryOption
 from common.entities.delivery_request import DeliveryRequest
 from common.entities.package_delivery_plan import PackageDeliveryPlan
-from common.math.angle import NoneAngle
-from grid.cell_data import CellData, EnvelopeCellData
+from common.math.angle import NoneAngle, Angle
 from grid.grid_service import GridService
 from grid.slides_container import SlidesContainer
 from params import MAX_AZIMUTH_ANGLE, MIN_AZIMUTH_ANGLE
@@ -39,6 +38,10 @@ class GridLocation(BaseGridLocation):
     @property
     def column(self) -> int:
         return self._column
+
+    @property
+    def location(self) -> np.array:
+        return np.array(self.row, self.column)
 
     def __add__(self, other):
         return GridLocation(self.row + other.row, self.column + other.column)
@@ -83,12 +86,22 @@ class GridLocations:
 @dataclass
 class Cell:
     location: GridLocation
-    data: CellData
 
 
 @dataclass
 class EnvelopeCell(Cell):
-    data: EnvelopeCellData
+    drone_azimuth: Angle
+
+
+class CellServices:
+    ANGLE_DELTA_COST = 10
+
+    @staticmethod
+    def get_distance(cell1: EnvelopeCell, cell2: EnvelopeCell) -> float:
+        angle_delta = cell1.drone_azimuth.calc_abs_difference(cell2.drone_azimuth)
+        dist = np.linalg.norm(cell1.location.location - cell2.location.location)
+        angle_delta_cost = (math.cos(angle_delta.in_radians()) - 1)/-2
+        return dist + CellServices.ANGLE_DELTA_COST / (dist+1) * angle_delta_cost
 
 
 class _AzimuthOptions:
@@ -183,8 +196,12 @@ class DeliveryRequestEnvelopeCells:
         for delivery_option in delivery_request.delivery_options:
             delivery_option_envelope_cells = DeliveryOptionsEnvelopeCells(slides_container,
                                                                           delivery_option)
-
             self._delivery_request_envelope_cells.append(delivery_option_envelope_cells.azimuth_options_average())
+
+
+    @property
+    def delivery_request_envelope_cells(self) -> [_AzimuthOptions]:
+        return self._delivery_request_envelope_cells
 
 #
 # class DeliveryRequestEnvelopeCellsOld:

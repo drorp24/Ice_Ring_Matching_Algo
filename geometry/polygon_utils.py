@@ -5,7 +5,6 @@ import numpy as np
 
 from geometry import geo_factory
 from geometry.geo2d import Polygon2D, MultiPolygon2D
-from grid.cell import GridLocation
 
 
 class PolygonUtils:

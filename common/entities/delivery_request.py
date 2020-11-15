@@ -2,6 +2,7 @@ from attr import dataclass
 from time_window import TimeWindow
 from common.entities.delivery_option import DeliveryOption
 from common.entities.keys import DeliveryRequestId
+import uuid
 
 
 class DeliveryRequest:
@@ -10,6 +11,7 @@ class DeliveryRequest:
         self._delivery_options = delivery_options if delivery_options is not None else []
         self._time_window = time_window
         self._priority = priority
+        self._id = uuid.uuid1()     # todo get id as an input
 
     def __eq__(self, other):
         return (self.delivery_options == other.delivery_options) and \
@@ -27,3 +29,7 @@ class DeliveryRequest:
     @property
     def priority(self) -> int:
         return self._priority
+
+    @property
+    def id(self) -> uuid:
+        return self._id
