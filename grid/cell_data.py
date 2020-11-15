@@ -1,4 +1,5 @@
 from abc import ABC
+from typing import List
 
 from attr import dataclass
 
@@ -13,3 +14,4 @@ class CellData(ABC):
 @dataclass
 class EnvelopeCellData(CellData):
     drone_azimuth: Angle
+    package_delivery_plan_ids: List[int]
