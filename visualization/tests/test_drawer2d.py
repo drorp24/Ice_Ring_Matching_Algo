@@ -23,8 +23,8 @@ class DrawGeometriesTestCase(unittest.TestCase):
         cls.line_string1 = create_line_string_2d([cls.p3, cls.p6, cls.p7, cls.p8])
         cls.poly1 = create_polygon_2d([cls.p1, cls.p2, cls.p3, cls.p4])
         cls.linear_ring1 = create_linear_ring_2d([cls.p1, cls.p2, cls.p5, cls.p6])
-        cls.expected_image_path = Path('test_drawer2d_expected.png')
-        cls.result_image_path = Path('test_drawer2d_actual.png')
+        cls.expected_image_path = Path('visualization/tests/test_drawer2d_expected.png')
+        cls.result_image_path = Path('visualization/tests/test_drawer2d_expected.png')
 
     @classmethod
     def tearDownClass(cls) -> None:

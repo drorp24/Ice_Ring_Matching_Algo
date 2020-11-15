@@ -15,7 +15,7 @@ class BasicPolygonTestCase(unittest.TestCase):
         cls.poly1 = create_polygon_2d([cls.p1, cls.p2, cls.p3, cls.p4])
 
     def test_type(self):
-        self.assertEqual(self.poly1.type, 'Polygon')
+        self.assertEqual(self.poly1._geo_type, 'Polygon')
 
     def test_points(self):
         points_result = self.poly1.points
