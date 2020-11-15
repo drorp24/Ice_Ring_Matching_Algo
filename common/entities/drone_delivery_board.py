@@ -26,6 +26,9 @@ class DroneDeliveryBoard:
     def __init__(self, drone_deliveries: [DroneDelivery]):
         self._drone_deliveries = drone_deliveries
 
+    def __eq__(self, other):
+        return self._drone_deliveries == other.drone_deliveries
+
     @property
     def drone_deliveries(self) -> [DroneDelivery]:
         return self._drone_deliveries

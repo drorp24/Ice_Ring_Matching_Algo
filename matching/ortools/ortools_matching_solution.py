@@ -168,6 +168,6 @@ class ORToolsMatchingSolution(MatchingSolution):
                 if idx > 0 and node_index is not match_input.graph.depos:
                     delta_from_zero_time = self.node_service_time[vehicle_id][node_index][0]
                     time = match_input.graph.zero_time + timedelta(minutes=delta_from_zero_time)
-                    drone_delivery.add_matched_delivery_request(MatchedDeliveryRequest(match_input.graph.get_delivery_request(node_index), time))
+                    drone_delivery.add_matched_delivery_request(MatchedDeliveryRequest(match_input.graph.get_delivery_request(node_index - 1), time))
             drone_deliveries.append(drone_delivery)
         return DroneDeliveryBoard(drone_deliveries)
