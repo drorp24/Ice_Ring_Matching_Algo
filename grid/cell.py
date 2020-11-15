@@ -2,6 +2,8 @@ from itertools import repeat
 from typing import List
 
 from attr import dataclass
+import numpy as np
+import math
 
 from common.entities.delivery_option import DeliveryOption
 from common.entities.delivery_request import DeliveryRequest
@@ -14,76 +16,75 @@ from grid.cell_data import CellData, EnvelopeCellData
 from grid.grid_location import GridLocationServices, GridLocation
 from grid.grid_service import GridService
 from grid.slides_container import SlidesContainer
-from params import MAX_AZIMUTH_ANGLE, MIN_AZIMUTH_ANGLE
 
 
-class BaseGridLocation(ABC):
-
-    @abstractmethod
-    def __add__(self, other):
-        raise NotImplementedError()
-
-    @abstractmethod
-    def __sub__(self, other):
-        raise NotImplementedError()
-
-
-class GridLocation(BaseGridLocation):
-    def __init__(self, row: int, column: int):
-        self._row = row
-        self._column = column
-
-    @property
-    def row(self) -> int:
-        return self._row
-
-    @property
-    def column(self) -> int:
-        return self._column
-
-    @property
-    def location(self) -> np.array:
-        return np.array(self.row, self.column)
-
-    def __add__(self, other):
-        return GridLocation(self.row + other.row, self.column + other.column)
-
-    def __sub__(self, other):
-        return GridLocation(self.row - other.row, self.column - other.column)
-
-
-class NoneGridLocation(BaseGridLocation):
-    def __init__(self):
-        super().__init__(None, None)
-
-    def __add__(self, other):
-        return self
-
-    def __sub__(self, other):
-        return self
-
-
-class GridLocations:
-    def __init__(self, grid_locations: List[GridLocation]):
-        self._grid_locations = grid_locations
-
-    def append(self, value):
-        self._grid_locations.append(value)
-
-    def extend(self, other_grid_locations: List[GridLocation]):
-        self._grid_locations.extend(other_grid_locations)
-
-    def calc_average(self) -> GridLocation:
-        rows_values = []
-        columns_values = []
-
-        for grid_location in self._grid_locations:
-            rows_values.append(grid_location.row)
-            columns_values.append(grid_location.column)
-
-        return GridLocation(math.floor(np.mean(rows_values)),
-                            math.floor(np.mean(columns_values)))
-
+# class BaseGridLocation(ABC):
+#
+#     @abstractmethod
+#     def __add__(self, other):
+#         raise NotImplementedError()
+#
+#     @abstractmethod
+#     def __sub__(self, other):
+#         raise NotImplementedError()
+#
+#
+# class GridLocation(BaseGridLocation):
+#     def __init__(self, row: int, column: int):
+#         self._row = row
+#         self._column = column
+#
+#     @property
+#     def row(self) -> int:
+#         return self._row
+#
+#     @property
+#     def column(self) -> int:
+#         return self._column
+#
+#     @property
+#     def location(self) -> np.array:
+#         return np.array(self.row, self.column)
+#
+#     def __add__(self, other):
+#         return GridLocation(self.row + other.row, self.column + other.column)
+#
+#     def __sub__(self, other):
+#         return GridLocation(self.row - other.row, self.column - other.column)
+#
+#
+# class NoneGridLocation(BaseGridLocation):
+#     def __init__(self):
+#         super().__init__(None, None)
+#
+#     def __add__(self, other):
+#         return self
+#
+#     def __sub__(self, other):
+#         return self
+#
+#
+# class GridLocations:
+#     def __init__(self, grid_locations: List[GridLocation]):
+#         self._grid_locations = grid_locations
+#
+#     def append(self, value):
+#         self._grid_locations.append(value)
+#
+#     def extend(self, other_grid_locations: List[GridLocation]):
+#         self._grid_locations.extend(other_grid_locations)
+#
+#     def calc_average(self) -> GridLocation:
+#         rows_values = []
+#         columns_values = []
+#
+#         for grid_location in self._grid_locations:
+#             rows_values.append(grid_location.row)
+#             columns_values.append(grid_location.column)
+#
+#         return GridLocation(math.floor(np.mean(rows_values)),
+#                             math.floor(np.mean(columns_values)))
+#
 
 @dataclass
 class Cell:
