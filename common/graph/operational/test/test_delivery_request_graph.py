@@ -49,8 +49,6 @@ class BasicDeliveryRequestGraphTestCases(unittest.TestCase):
         self.assertEqual(returned_edges[6][0], edges[6].start_node)
         self.assertEqual(returned_edges[6][1], edges[6].end_node)
 
-
-
     def test_drone_loading_dock_set_internal_graph(self):
         drg1 = OperationalGraph()
         drg1.add_drone_loading_docks(self.dld_dataset_random)

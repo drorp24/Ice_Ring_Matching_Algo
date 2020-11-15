@@ -26,11 +26,7 @@ class CustomerDelivery(JsonableBaseEntity):
 
     def get_package_type_demand(self, package_type: PackageType) -> int:
         package_delivery_plans = self.package_delivery_plans
-        demand_counter = 0
-        for package_delivery_plan in package_delivery_plans:
-            if package_delivery_plan.package_type == package_type:
-                demand_counter += 1
-        return demand_counter
+        return len(list(filter(lambda x: x.package_type == package_type, package_delivery_plans)))
 
     @classmethod
     def dict_to_obj(cls, dict_input):
