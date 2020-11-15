@@ -44,12 +44,12 @@ class BasicDroneDeliveryGeneration(unittest.TestCase):
     def test_drone_delivery(self):
         self.assertEqual(self.drone_delivery_1.drone_formation, DroneFormations.get_drone_formation(
             FormationSize.MINI, FormationOptions.TINY_PACKAGES, PlatformType.platform_1))
-        self.assertEqual(self.drone_delivery_1.attack_time, datetime(2020, 1, 23, 11, 30, 00))
+        self.assertEqual(self.drone_delivery_1.delivery_time, datetime(2020, 1, 23, 11, 30, 00))
         self.assertEqual(len(self.drone_delivery_1.delivery_requests), 2)
 
         self.assertEqual(self.drone_delivery_2.drone_formation, DroneFormations.get_drone_formation(
             FormationSize.MEDIUM,FormationOptions.TINY_PACKAGES,  PlatformType.platform_1))
-        self.assertEqual(self.drone_delivery_2.attack_time, datetime(2020, 1, 23, 12, 30, 00))
+        self.assertEqual(self.drone_delivery_2.delivery_time, datetime(2020, 1, 23, 12, 30, 00))
         self.assertEqual(len(self.drone_delivery_2.delivery_requests), 1)
 
     def test_empty_drone_delivery_board(self):

@@ -1,6 +1,8 @@
-# from ice_ring.graph.graph_handler import GraphDataType
-from matching.matching_solution import MatchingSolution, MatchingSolutionData
+from datetime import datetime, timedelta
 
+from common.entities.drone_delivery import DroneDelivery, MatchedDeliveryRequest
+from common.entities.drone_delivery_board import DroneDeliveryBoard
+from matching.matching_solution import MatchingSolution, MatchingSolutionData
 from matching.matcher import Matcher
 
 
@@ -11,7 +13,7 @@ class ORToolsMatchingSolution(MatchingSolution):
 
     def _save_routing(self):
 
-        input = self._matching_handler.input
+        match_input = self._matching_handler.input
         routing = self._matching_handler.routing
         manager = self._matching_handler.manager
 
@@ -23,7 +25,7 @@ class ORToolsMatchingSolution(MatchingSolution):
                 self._data_matched[MatchingSolutionData.dropped_nodes].append(node)
         # Save solution details into matching_solution for plot and print usage
         time_dimension = routing.GetDimensionOrDie('Time')
-        for vehicle_id in range(input.empty_board.num_of_formations):
+        for vehicle_id in range(match_input.empty_board.num_of_formations):
             nodes_in_route = []
             node_service_time = {}
             node_route_load = {}
@@ -36,11 +38,11 @@ class ORToolsMatchingSolution(MatchingSolution):
                 node_index = manager.IndexToNode(index)
 
                 nodes_in_route.append(node_index)
-                route_load += input.graph.packeges_per_request[node_index]
+                route_load += match_input.graph.packages_per_request[node_index]
 
                 node_service_time[node_index] = (self._solution.Min(time_var),
                                                  self._solution.Max(time_var))
-                route_priority += input.graph.priorities[node_index]
+                route_priority += match_input.graph.priorities[node_index]
                 node_route_load[node_index] = route_load
                 node_route_priority[node_index] = route_priority
                 index = self._solution.Value(routing.NextVar(index))
@@ -133,7 +135,7 @@ class ORToolsMatchingSolution(MatchingSolution):
                 time_var = time_dimension.CumulVar(index)
                 node_index = manager.IndexToNode(index)
                 nodes_in_route.append(node_index)
-                route_load += input.graph.packeges_per_request[node_index]
+                route_load += input.graph.packages_per_request[node_index]
                 plan_output += ' {0} Time({1},{2}) Load({3})-> '.format(node_index, self._solution.Min(time_var),
                                                                         self._solution.Max(time_var), route_load)
                 # input["solution"][node_index] = (solution.Min(time_var), solution.Max(time_var))
@@ -153,3 +155,19 @@ class ORToolsMatchingSolution(MatchingSolution):
         print('Total time of all routes: {}min'.format(total_time))
         print('Total load of all routes: {}'.format(total_load))
         print("********* print_solution_debug end *************")
+
+    def delivery_board(self) -> DroneDeliveryBoard:
+        match_input = self._matching_handler.input
+        routing = self._matching_handler.routing
+
+        drone_deliveries = []
+        for vehicle_id, vehicle_route in enumerate(self.vehicle_route):
+            drone_delivery = DroneDelivery(match_input.empty_board.empty_drone_deliveries[vehicle_id].id,
+                                           match_input.empty_board.empty_drone_deliveries[vehicle_id].drone_formation)
+            for idx, node_index in enumerate(vehicle_route):
+                if idx > 0 and node_index is not match_input.graph.depos:
+                    delta_from_zero_time = self.node_service_time[vehicle_id][node_index][0]
+                    time = match_input.graph.zero_time + timedelta(minutes=delta_from_zero_time)
+                    drone_delivery.add_matched_delivery_request(MatchedDeliveryRequest(match_input.graph.get_delivery_request(node_index), time))
+            drone_deliveries.append(drone_delivery)
+        return DroneDeliveryBoard(drone_deliveries)

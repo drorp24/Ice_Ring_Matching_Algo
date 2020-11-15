@@ -9,6 +9,18 @@ class EmptyDroneDeliveryBoard:
     def empty_drone_deliveries(self) -> [EmptyDroneDelivery]:
         return self._empty_drone_deliveries
 
+    @property
+    def num_of_formations(self) -> [int]:
+        return len(self._empty_drone_deliveries)
+
+    @property
+    def formation_capacities(self) -> [int]:
+        capacities = []
+        for delivery in self._empty_drone_deliveries:
+            formation_volumes = delivery.drone_formation.get_package_type_volumes()
+            capacities.append(formation_volumes[0])
+        return capacities
+
 
 class DroneDeliveryBoard:
     def __init__(self, drone_deliveries: [DroneDelivery]):

@@ -1,5 +1,7 @@
 from datetime import datetime
 
+from attr import dataclass
+
 from common.entities.delivery_request import DeliveryRequest
 from common.entities.drone_formation import DroneFormation
 
@@ -18,17 +20,21 @@ class EmptyDroneDelivery:
         return self._drone_formation
 
 
+@dataclass
+class MatchedDeliveryRequest:
+    delivery_request: DeliveryRequest
+    delivery_time: datetime
+
+
 class DroneDelivery(EmptyDroneDelivery):
-    def __init__(self, id: str, drone_formation: DroneFormation, attack_time: datetime,
-                 delivery_requests: [DeliveryRequest]):
+    def __init__(self, id: str, drone_formation: DroneFormation):
         super().__init__(id, drone_formation)
-        self._attack_time = attack_time
-        self._delivery_requests = delivery_requests
+        self._matched_requests = []
 
     @property
-    def attack_time(self) -> datetime:
-        return self._attack_time
+    def matched_requests(self) -> [MatchedDeliveryRequest]:
+        return self._matched_requests
 
-    @property
-    def delivery_requests(self) -> [DeliveryRequest]:
-        return self._delivery_requests
+    def add_matched_delivery_request(self, matched_request: MatchedDeliveryRequest) -> None:
+        self._matched_requests.append(matched_request)
+

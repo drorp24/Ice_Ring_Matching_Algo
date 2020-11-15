@@ -26,7 +26,7 @@ class _PackageTypesVolumeMap:
         return self._dict[package_type]
 
     def get_package_types_volumes(self) -> [int]:
-        return self._dict.values()
+        return list(self._dict.values())
 
 
 class DroneConfiguration:

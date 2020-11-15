@@ -1,5 +1,7 @@
 import enum
 
+from common.entities.drone_delivery_board import DroneDeliveryBoard
+
 
 class MatchingSolutionData(enum.Enum):
     dropped_nodes = 'dropped_nodes'
@@ -86,7 +88,7 @@ class MatchingSolution:
     def total_capacity(self):
         return self._data_matched[MatchingSolutionData.total_capacity]
 
-    def delivery_board(self) -> 'DeliveryBoard':
+    def delivery_board(self) -> DroneDeliveryBoard:
         pass
 
     def _save_routing(self):

@@ -1,0 +1,143 @@
+{
+  "delivery_requests":
+  [
+    {
+    "delivery_options": [{
+      "customer_deliveries" : [{
+        "package_delivery_plans" :[{
+          "drop_point_x": 0,
+          "drop_point_y": 0,
+          "azimuth": 0,
+          "elevation": 0,
+          "package_type": "Tiny"
+        }]
+      }
+      ]
+    },
+    {
+      "customer_deliveries" :  [{
+        "package_delivery_plans" :[{
+          "drop_point_x": 0,
+          "drop_point_y": 0,
+          "azimuth": 0,
+          "elevation": 0,
+          "package_type": "Tiny"
+        }]
+      }
+      ]
+    }],
+
+    "time_window": {
+      "start_time": {
+        "year": 2020,
+        "month": 1,
+        "day": 23,
+        "hour": 11,
+        "minute": 30,
+        "second": 0
+      },
+      "end_time": {
+        "year": 2020,
+        "month": 1,
+        "day": 23,
+        "hour": 11,
+        "minute": 35,
+        "second": 0
+      }
+    },
+    "priority": 1
+  },
+    {
+    "delivery_options": [{
+      "customer_deliveries" : [{
+        "package_delivery_plans" :[{
+          "drop_point_x": 0,
+          "drop_point_y": 0,
+          "azimuth": 0,
+          "elevation": 0,
+          "package_type": "Tiny"
+        }]
+      }
+      ]
+    },
+    {
+      "customer_deliveries" :  [{
+        "package_delivery_plans" :[{
+          "drop_point_x": 0,
+          "drop_point_y": 0,
+          "azimuth": 0,
+          "elevation": 0,
+          "package_type": "Tiny"
+        }
+        ]
+      }
+      ]
+    }],
+    "time_window": {
+      "start_time": {
+        "year": 2020,
+        "month": 1,
+        "day": 23,
+        "hour": 11,
+        "minute": 35,
+        "second": 0
+      },
+      "end_time": {
+        "year": 2020,
+        "month": 1,
+        "day": 23,
+        "hour": 11,
+        "minute": 40,
+        "second": 0
+      }
+    },
+    "priority": 2
+  },
+    {
+    "delivery_options": [{
+      "customer_deliveries" : [{
+        "package_delivery_plans" :[{
+          "drop_point_x": 0,
+          "drop_point_y": 0,
+          "azimuth": 0,
+          "elevation": 0,
+          "package_type": "Tiny"
+        }]
+      }
+      ]
+    },
+    {
+      "customer_deliveries" :  [{
+        "package_delivery_plans" :[{
+          "drop_point_x": 0,
+          "drop_point_y": 0,
+          "azimuth": 0,
+          "elevation": 0,
+          "package_type": "Tiny"
+        }
+        ]
+      }
+      ]
+    }],
+    "time_window": {
+      "start_time": {
+        "year": 2020,
+        "month": 1,
+        "day": 23,
+        "hour": 11,
+        "minute": 45,
+        "second": 0
+      },
+      "end_time": {
+        "year": 2020,
+        "month": 1,
+        "day": 23,
+        "hour": 11,
+        "minute": 50,
+        "second": 0
+      }
+    },
+    "priority": 3
+  }
+  ]
+}

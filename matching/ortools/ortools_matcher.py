@@ -73,7 +73,7 @@ class ORToolsMatcher:
     def _demand_callback(self, from_index):
         # Convert from routing variable Index to demands NodeIndex.
         from_node = self._manager.IndexToNode(from_index)
-        return self._input.graph.packeges_per_request[from_node]
+        return self._input.graph.packages_per_request[from_node]
 
     def _solve(self):
         # Solve the problem.
@@ -109,7 +109,7 @@ class ORToolsMatcher:
         self._routing.AddDimensionWithVehicleCapacity(
             demand_callback_index,
             0,  # null capacity slack
-            self._input.empty_board.vehicle_capacities,  # vehicle maximum capacities
+            self._input.empty_board.formation_capacities,  # vehicle maximum capacities
             self._input.config.count_capacity_from_zero,  # start cumul to zero
             'Capacity')
 
