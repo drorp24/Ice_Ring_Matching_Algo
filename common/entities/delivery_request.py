@@ -50,6 +50,9 @@ class DeliveryRequest(JsonableBaseEntity):
                (self.time_window == other.time_window) and \
                (self.priority == other.priority)
 
+    def __hash__(self):
+        return hash((tuple(self._delivery_options), self._time_window, self._priority))
+
 
 class PriorityDistribution(UniformChoiceDistribution):
     def __init__(self, priorities: List[float]):

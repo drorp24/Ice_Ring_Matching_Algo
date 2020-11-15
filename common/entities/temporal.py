@@ -49,14 +49,20 @@ class TimeWindowExtension:
         return self.internal_time_window.since.timestamp(), self.internal_time_window.until.timestamp()
 
     def __eq__(self, other: TimeWindowExtension):
-        return self._internal.since == other._internal.since and \
-               self._internal.until == other._internal.until
+        return self.internal_time_window.since == other.internal_time_window.since and \
+               self.internal_time_window.until == other.internal_time_window.until
+
+    def __hash__(self):
+        return hash(self._time_window)
 
     def __contains__(self, temporal: Union[DateTimeExtension, TimeWindowExtension]):
+        if isinstance(temporal, DateTimeExtension):
+            temporal = TimeWindowExtension(temporal, temporal)
         try:
-            return temporal._internal in self._internal
+            return temporal.internal_time_window in self.internal_time_window
         except:
-            return temporal.since._internal in self._internal and temporal.until._internal in self._internal
+            return temporal.internal_time_window.since._internal in self.internal_time_window and\
+                   temporal.internal_time_window.until._internal in self.internal_time_window
 
 
 class DateTimeExtension(BaseEntity):

@@ -1,9 +1,14 @@
+from random import Random
+from typing import List
+
 from geometry.geo2d import Point2D
-from geometry.geo_factory import create_point_2d
-from enum import Enum
+from common.entities.base_entities.distribution import Distribution
+from geometry.geo_distribution import UniformPointInBboxDistribution
+
+DEFAULT_DRONE_LOCATIONS_DISTRIB = UniformPointInBboxDistribution(0, 100, 0, 100)
 
 
-class _DroneLoadingStation:
+class DroneLoadingStation:
 
     def __init__(self, location: Point2D):
         self._location = location
@@ -12,8 +17,20 @@ class _DroneLoadingStation:
     def location(self) -> Point2D:
         return self._location
 
+    def __eq__(self, other):
+        return self.__class__ == other.__class__ and self.location == other.location
 
-class LoadingStations(Enum):
-    station_1 = _DroneLoadingStation(create_point_2d(0.0, 0.0))
-    station_2 = _DroneLoadingStation(create_point_2d(100.0, 0.0))
-    station_3 = _DroneLoadingStation(create_point_2d(0.0, 100.0))
+    def __hash__(self):
+        return hash(self._location)
+
+
+class DroneLoadingStationDistribution(Distribution):
+
+    def __init__(self,
+                 drone_station_locations_distributions: UniformPointInBboxDistribution =
+                 DEFAULT_DRONE_LOCATIONS_DISTRIB):
+        self._drone_station_locations_distributions = drone_station_locations_distributions
+
+    def choose_rand(self, random: Random, amount: int = 1) -> List[DroneLoadingStation]:
+        locations = self._drone_station_locations_distributions.choose_rand(random, amount)
+        return list(map(DroneLoadingStation, locations))

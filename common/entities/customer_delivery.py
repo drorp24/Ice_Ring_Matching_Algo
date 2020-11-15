@@ -4,6 +4,7 @@ from typing import List
 
 from common.entities.base_entities.distribution import UniformChoiceDistribution, Distribution
 from common.entities.base_entity import JsonableBaseEntity
+from common.entities.package import PackageType
 from common.entities.package_delivery_plan import PackageDeliveryPlan, PackageDeliveryPlanDistribution, \
     DEFAULT_DROP_POINT_DISTRIB, DEFAULT_AZI_DISTRIB, DEFAULT_PITCH_DISTRIB, DEFAULT_PACKAGE_DISTRIB
 
@@ -19,6 +20,17 @@ class CustomerDelivery(JsonableBaseEntity):
 
     def __eq__(self, other):
         return self.package_delivery_plans == other.package_delivery_plans
+
+    def __hash__(self):
+        return hash(tuple(self._package_delivery_plans))
+
+    def get_package_type_demand(self, package_type: PackageType) -> int:
+        package_delivery_plans = self.package_delivery_plans
+        demand_counter = 0
+        for package_delivery_plan in package_delivery_plans:
+            if package_delivery_plan.package_type == package_type:
+                demand_counter += 1
+        return demand_counter
 
     @classmethod
     def dict_to_obj(cls, dict_input):
