@@ -14,12 +14,12 @@ class MockEnvelopeServices(EnvelopeServicesInterface):
                        drop_azimuth: Angle) -> Union[Polygon2D, EmptyGeometry2D]:
         envelope_width = package_type.value.calc_potential_drop_envelope().calc_delta_between_radii()
         envelope_height = envelope_width * drop_azimuth.to_direction().dot(drone_azimuth.to_direction())
-        if drop_azimuth.calc_abs_difference(drone_azimuth).degrees() >= 90:
+        if drop_azimuth.calc_abs_difference(drone_azimuth).degrees >= 90:
             envelope_height = 0
         return create_polygon_2d_from_ellipse(ellipse_center=envelope_center,
                                               ellipse_width=envelope_width,
                                               ellipse_height=envelope_height,
-                                              ellipse_rotation_deg=drone_azimuth.degrees())
+                                              ellipse_rotation_deg=drone_azimuth.degrees)
 
     @classmethod
     def calc_drop_envelope(cls, package_type: PackageType, drone_azimuth: Angle, drop_point: Point2D,

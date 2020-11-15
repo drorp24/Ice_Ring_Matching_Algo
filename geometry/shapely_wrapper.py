@@ -241,6 +241,7 @@ class _ShapelyBbox2D(_ShapelyPolygon2D, Bbox2D):
                           min_point
                           ])
 
+
     @property
     def min_x(self) -> float:
         return self._min_point.x
