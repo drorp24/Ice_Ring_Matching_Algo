@@ -29,11 +29,11 @@ class AngleUnit(Enum):
 class BaseAngle(ABC, JsonableBaseEntity):
 
     @abstractmethod
-    def in_degrees(self) -> float:
+    def degrees(self) -> float:
         raise NotImplementedError()
 
     @abstractmethod
-    def in_radians(self) -> float:
+    def radians(self) -> float:
         raise NotImplementedError()
 
     @abstractmethod
@@ -49,7 +49,7 @@ class BaseAngle(ABC, JsonableBaseEntity):
         raise NotImplementedError()
 
 
-class Angle(BaseAngle)
+class Angle(BaseAngle):
 
     def __init__(self, value: float, unit: AngleUnit):
         super().__init__()
@@ -94,10 +94,10 @@ class Angle(BaseAngle)
 
 
 class NoneAngle(BaseAngle):
-    def in_degrees(self) -> float:
+    def degrees(self) -> float:
         raise NotImplementedError()
 
-    def in_radians(self) -> float:
+    def radians(self) -> float:
         raise NotImplementedError()
 
     def to_direction(self) -> Vector2D:

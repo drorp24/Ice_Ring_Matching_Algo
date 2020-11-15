@@ -1,13 +1,10 @@
-from common.entities.package import PackageType
-from geometry.geo2d import Point2D
-from common.math.angle import Angle
 from __future__ import annotations
 
 from random import Random
 from typing import List
 
-from common.entities.disribution.distribution import Distribution
 from common.entities.base_entity import JsonableBaseEntity
+from common.entities.disribution.distribution import Distribution
 from common.entities.package import PackageType, PackageDistribution
 from common.math.angle import Angle, AngleUniformDistribution, AngleUnit
 from geometry.geo2d import Point2D, Polygon2D
@@ -47,25 +44,6 @@ class PackageDeliveryPlan(JsonableBaseEntity):
                                    pitch=Angle.dict_to_obj(dict_input['pitch']),
                                    package_type=PackageType.dict_to_obj(dict_input['package_type']))
 
-    def calc_drop_envelope(self, drone_azimuth: Angle) -> Polygon2D:
-        average_radius = self.package_type.value.calc_potential_drop_envelope().average_radius_meters
-        envelope_center = self._drop_point.add_vector(drone_azimuth.calc_reverse().to_direction() * average_radius)
-        return self._calc_envelope(envelope_center, drone_azimuth)
-
-    def calc_delivery_envelope(self, drone_location: Point2D, drone_azimuth: Angle) -> Polygon2D:
-        average_radius = self.package_type.value.calc_potential_drop_envelope().average_radius_meters
-        envelope_center = drone_location.add_vector(drone_azimuth.to_direction() * average_radius)
-        return self._calc_envelope(envelope_center, drone_azimuth)
-
-    def _calc_envelope(self, envelope_center: Point2D, drone_azimuth: Angle) -> Polygon2D:
-        envelope_width = self.package_type.value.calc_potential_drop_envelope().calc_delta_between_radii()
-        envelope_height = envelope_width * self._azimuth.to_direction().dot(drone_azimuth.to_direction())
-        if self._azimuth.calc_abs_difference(drone_azimuth).degrees >= 90:
-            envelope_height = 0
-        return create_polygon_2d_from_ellipse(ellipse_center=envelope_center,
-                                              ellipse_width=envelope_width,
-                                              ellipse_height=envelope_height,
-                                              ellipse_rotation_deg=drone_azimuth.degrees)
 
     def __hash__(self):
         return hash((self.drop_point, self.azimuth, self.pitch, self.package_type))

@@ -5,7 +5,6 @@ from shapely.geometry import Point, Polygon, LineString, LinearRing, MultiPolygo
 from shapely.geometry.base import BaseGeometry, EmptyGeometry
 
 from common.entities.base_entity import JsonableBaseEntity
-from geometry.utils import GeometryUtils
 from geometry.geo2d import Point2D, Vector2D, Polygon2D, MultiPolygon2D, LineString2D, LinearRing2D, EmptyGeometry2D, \
     Bbox2D
 from geometry.geometry_utils import GeometryUtils
