@@ -3,7 +3,7 @@ from __future__ import annotations
 from random import Random
 from typing import List
 
-from common.entities.base_entities.distribution import Distribution
+from common.entities.disribution.distribution import Distribution
 from common.entities.base_entity import JsonableBaseEntity
 from common.entities.package import PackageType, PackageDistribution
 from common.math.angle import Angle, AngleUniformDistribution, AngleUnit
