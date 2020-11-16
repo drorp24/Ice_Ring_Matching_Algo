@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from common.graph.operational.delivery_request_graph import *
 
 
-class ExportGraph(ABC):
+class GraphExporter(ABC):
 
     @abstractmethod
     def export_time_windows(self, graph: OperationalGraph):

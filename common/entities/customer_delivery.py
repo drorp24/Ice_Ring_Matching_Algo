@@ -1,4 +1,3 @@
-from pprint import pprint
 from random import Random
 from typing import List
 
@@ -24,7 +23,7 @@ class CustomerDelivery(JsonableBaseEntity):
     def __hash__(self):
         return hash(tuple(self._package_delivery_plans))
 
-    def get_package_type_demand(self, package_type: PackageType) -> int:
+    def get_amount_of_package_type(self, package_type: PackageType) -> int:
         package_delivery_plans = self.package_delivery_plans
         return len(list(filter(lambda x: x.package_type == package_type, package_delivery_plans)))
 

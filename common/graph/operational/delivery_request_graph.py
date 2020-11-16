@@ -13,11 +13,11 @@ from common.entities.temporal import TimeWindowExtension
 class OperationalNode:
 
     def __init__(self, internal_node: Union[DeliveryRequest, DroneLoadingDock]):
-        self._internal_node = internal_node
+        self._internal = internal_node
 
     @property
     def internal_node(self) -> Union[DeliveryRequest, DroneLoadingDock]:
-        return self._internal_node
+        return self._internal
 
     @property
     def priority(self) -> int:
@@ -31,9 +31,10 @@ class OperationalNode:
         return self.__class__ == other.__class__ and self.internal_node == other.internal_node
 
     def __hash__(self):
-        return hash(self._internal_node)
+        return hash(self._internal)
 
 
+@dataclass
 class OperationalEdgeAttributes:
 
     def __init__(self, cost: int):
@@ -62,7 +63,9 @@ class OperationalGraph:
 
     @property
     def edges(self) -> List[OperationalEdge]:
-        return self.internal_graph.edges.data(data=True)
+        internal_edges = self.internal_graph.edges.data(data=True)
+        return [OperationalEdge(edge[0], edge[1], OperationalEdgeAttributes(edge[2]["cost"])) for edge in
+                internal_edges]
 
     def is_empty(self):
         return self.internal_graph.nodes.__len__() == 0
@@ -80,8 +83,6 @@ class OperationalGraph:
         self.internal_graph.add_nodes_from(operational_nodes)
 
     def add_operational_edges(self, operational_edges: [OperationalEdge]):
-        #for edge in operational_edges:
-        #    self.internal_graph.add_edge(edge.start_node, edge.end_node, object=edge.attributes)
         self.internal_graph.add_edges_from([dr.to_tuple() for dr in operational_edges])
 
     def calc_subgraph_in_time_window(self, time_window_scope: TimeWindowExtension):

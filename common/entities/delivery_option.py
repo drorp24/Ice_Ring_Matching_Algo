@@ -22,12 +22,10 @@ class DeliveryOption(JsonableBaseEntity):
     def customer_deliveries(self) -> [CustomerDelivery]:
         return self._customer_deliveries
 
-    def get_package_type_demand(self, package_type: PackageType) -> int:
+    def get_amount_of_package_type(self, package_type: PackageType) -> int:
         customer_deliveries = self.customer_deliveries
-        demand = 0
-        for customer_delivery in customer_deliveries:
-            demand += customer_delivery.get_package_type_demand(package_type)
-        return demand
+        demands = list(map(lambda x: x.get_amount_of_package_type(package_type), customer_deliveries))
+        return sum(demands)
 
     @classmethod
     def dict_to_obj(cls, dict_input):

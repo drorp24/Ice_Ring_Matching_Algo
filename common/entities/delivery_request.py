@@ -46,7 +46,7 @@ class DeliveryRequest(JsonableBaseEntity):
         )
 
     def __eq__(self, other):
-        return (self.delivery_options == other.delivery_options) and \
+        return (self.__class__ == other.__class__ and self.delivery_options == other.delivery_options) and \
                (self.time_window == other.time_window) and \
                (self.priority == other.priority)
 
