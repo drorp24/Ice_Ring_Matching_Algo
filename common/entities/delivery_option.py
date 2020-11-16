@@ -6,6 +6,7 @@ from common.entities.base_entity import JsonableBaseEntity
 from common.entities.customer_delivery import CustomerDelivery, CustomerDeliveryDistribution, DEFAULT_PDP_DISTRIB
 from geometry.geo2d import Point2D
 from geometry.geo_factory import calc_centroid
+from common.entities.package import PackageType
 
 
 class DeliveryOption(JsonableBaseEntity):
@@ -19,6 +20,11 @@ class DeliveryOption(JsonableBaseEntity):
 
     def calc_centroid(self) -> Point2D:
         return calc_centroid([cd.calc_centroid() for cd in self.customer_deliveries])
+
+    def get_amount_of_package_type(self, package_type: PackageType) -> int:
+        customer_deliveries = self.customer_deliveries
+        demands = list(map(lambda x: x.get_amount_of_package_type(package_type), customer_deliveries))
+        return sum(demands)
 
     @classmethod
     def dict_to_obj(cls, dict_input):

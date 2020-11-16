@@ -6,6 +6,8 @@ from common.entities.delivery_request import DeliveryRequestDistribution, genera
 from common.entities.delivery_request_generator import DeliveryRequestDatasetGenerator, DeliveryRequestDatasetStructure
 from common.entities.temporal import TimeWindowDistribution, DateTimeDistribution, DateTimeExtension, \
     TimeDeltaExtension, TimeDeltaDistribution, TimeWindowExtension
+from common.graph.operational.delivery_request_graph import OperationalEdge, \
+    OperationalEdgeAttributes, OperationalNode
 from common.graph.operational.delivery_request_graph import OperationalGraph
 from common.graph.operational.graph_creator import create_locally_connected_dr_graph
 from geometry.geo_distribution import UniformPointInBboxDistribution
@@ -16,6 +18,7 @@ class BasicDeliveryRequestGraphTestCases(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.dr_dataset_random = DeliveryRequestDistribution().choose_rand(Random(100), 10)
+        cls.dld_dataset_random = DroneLoadingDockDistribution().choose_rand(Random(100), 3)
         cls.dr_dataset_morning = create_morning_dr_dataset()
         cls.dr_dataset_afternoon = create_afternoon_dr_dataset()
         cls.dr_dataset_top_priority = create_top_priority_dr_dataset()
@@ -34,7 +37,36 @@ class BasicDeliveryRequestGraphTestCases(unittest.TestCase):
         drg = OperationalGraph()
         drg.add_delivery_requests(self.dr_dataset_morning)
         drg.add_delivery_requests(self.dr_dataset_afternoon)
-        self.assertEqual(_get_dr_from_dr_graph(drg), list(self.dr_dataset_morning) + list(self.dr_dataset_afternoon))
+        drg.add_drone_loading_docks(self.dld_dataset_random)
+        self.assertEqual(_get_dr_from_dr_graph(drg), list(self.dr_dataset_morning) + list(self.dr_dataset_afternoon)
+                         + list(self.dld_dataset_random))
+
+    def test_graph_creation_with_edges(self):
+        drg = OperationalGraph()
+        drg.add_delivery_requests(self.dr_dataset_morning)
+        drg.add_drone_loading_docks(self.dld_dataset_random)
+        edges = []
+        for dk in self.dld_dataset_random:
+            for dl in self.dr_dataset_morning:
+                edges.append(OperationalEdge(OperationalNode(dk), OperationalNode(dl),
+                                             OperationalEdgeAttributes(Random().choice(range(10)))))
+        drg.add_operational_edges(edges)
+        returned_edges = list(drg.edges)
+        self.assertEqual(len(drg.edges), len(edges))
+        self.assertEqual(returned_edges[0].start_node, edges[0].start_node)
+        self.assertEqual(returned_edges[0].end_node, edges[0].end_node)
+        self.assertEqual(returned_edges[5].start_node, edges[5].start_node)
+        self.assertEqual(returned_edges[5].end_node, edges[5].end_node)
+        self.assertEqual(returned_edges[6].start_node, edges[6].start_node)
+        self.assertEqual(returned_edges[6].end_node, edges[6].end_node)
+
+    def test_drone_loading_dock_set_internal_graph(self):
+        drg1 = OperationalGraph()
+        drg1.add_drone_loading_docks(self.dld_dataset_random)
+        drg2 = OperationalGraph()
+        drg2.set_internal_graph(drg1._internal_graph)
+        self.assertFalse(drg1.is_empty())
+        self.assertEqual(_get_dr_from_dr_graph(drg1), _get_dr_from_dr_graph(drg2))
 
     def test_delivery_request_set_internal_graph(self):
         drg1 = OperationalGraph()
@@ -132,7 +164,7 @@ def _create_low_priority_dr_distribution():
 
 
 def _get_dr_from_dr_graph(drg1):
-    return [n.delivery_request for n in drg1.nodes]
+    return [n.internal_node for n in drg1.nodes]
 
 
 def _create_region_1_dr_distribution():

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from typing import List
+from dataclasses import dataclass
+from typing import List, Union
 
 from networkx import DiGraph, Graph, subgraph
 
@@ -10,30 +11,44 @@ from common.entities.temporal import TimeWindowExtension
 
 class OperationalNode:
 
-    def __init__(self, delivery_request: DeliveryRequest):
-        self._internal_node = delivery_request
+    def __init__(self, internal_node: Union[DeliveryRequest, DroneLoadingDock]):
+        self._internal = internal_node
 
     @property
-    def delivery_request(self) -> DeliveryRequest:
-        return self._internal_node
+    def internal_node(self) -> Union[DeliveryRequest, DroneLoadingDock]:
+        return self._internal
 
     @property
-    def priority(self):
-        return self.delivery_request.priority
+    def priority(self) -> int:
+        return self.internal_node.priority
 
     @property
     def time_window(self) -> TimeWindowExtension:
-        return self.delivery_request.time_window
+        return self.internal_node.time_window
+
+    def __eq__(self, other):
+        return self.__class__ == other.__class__ and self.internal_node == other.internal_node
+
+    def __hash__(self):
+        return hash(self._internal)
 
 
-class OperationalEdge:
+@dataclass
+class OperationalEdgeAttributes:
 
-    def __init__(self, start_request: OperationalNode, end_request: OperationalNode):
-        self._start_node = start_request
-        self._end_node = end_request
+    def __init__(self, cost: int):
+        self.cost = cost
+
+
+class OperationalEdge(object):
+
+    def __init__(self, start_node: OperationalNode, end_node: OperationalNode, attributes: OperationalEdgeAttributes):
+        self.start_node = start_node
+        self.end_node = end_node
+        self.attributes = attributes
 
     def to_tuple(self):
-        return self._start_node, self._end_node
+        return self.start_node, self.end_node, self.attributes.__dict__
 
     def __hash__(self):
         return self.to_tuple().__hash__()
@@ -50,7 +65,9 @@ class OperationalGraph:
 
     @property
     def edges(self) -> List[OperationalEdge]:
-        return self._internal_graph.edges.data(data=False)
+        internal_edges = self._internal_graph.edges.data(data=True)
+        return [OperationalEdge(edge[0], edge[1], OperationalEdgeAttributes(edge[2]["cost"])) for edge in
+                internal_edges]
 
     def is_empty(self):
         return self._internal_graph.nodes.__len__() == 0
@@ -58,14 +75,17 @@ class OperationalGraph:
     def set_internal_graph(self, networkx_graph: DiGraph):
         self._internal_graph = networkx_graph
 
+    def add_drone_loading_docks(self, drone_loading_docks: [DroneLoadingDock]):
+        self.add_operational_nodes([OperationalNode(dl) for dl in drone_loading_docks])
+
     def add_delivery_requests(self, delivery_requests: [DeliveryRequest]):
-        self.add_delivery_request_nodes([OperationalNode(dr) for dr in delivery_requests])
+        self.add_operational_nodes([OperationalNode(dr) for dr in delivery_requests])
 
-    def add_delivery_request_nodes(self, delivery_request_nodes: [OperationalNode]):
-        self._internal_graph.add_nodes_from(delivery_request_nodes)
+    def add_operational_nodes(self, operational_nodes: [OperationalNode]):
+        self._internal_graph.add_nodes_from(operational_nodes)
 
-    def add_delivery_request_edges(self, delivery_request_edges: [OperationalEdge]):
-        self._internal_graph.add_edges_from([dr.to_tuple() for dr in delivery_request_edges])
+    def add_operational_edges(self, operational_edges: [OperationalEdge]):
+        self._internal_graph.add_edges_from([dr.to_tuple() for dr in operational_edges])
 
     def calc_subgraph_in_time_window(self, time_window_scope: TimeWindowExtension):
         nodes_at_time = [node for node in self.nodes if node.time_window in time_window_scope]

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from datetime import datetime, date, time, timedelta
 from random import Random
-from typing import Dict, List, Union
+from typing import Dict, List, Union, Tuple
 
 from time_window import TimeWindow
 
@@ -45,6 +45,9 @@ class TimeWindowExtension(JsonableBaseEntity):
         until = DateTimeExtension.from_dict(dict_input[UNTIL])
         return TimeWindowExtension(since, until)
 
+    def get_time_stamp(self) -> Tuple[int, int]:
+        return self._internal.since.timestamp(), self._internal.until.timestamp()
+
     def __eq__(self, other: TimeWindowExtension):
         return self._internal.since == other._internal.since and \
                self._internal.until == other._internal.until
@@ -53,10 +56,13 @@ class TimeWindowExtension(JsonableBaseEntity):
         return hash(self._internal)
 
     def __contains__(self, temporal: Union[DateTimeExtension, TimeWindowExtension]):
+        if isinstance(temporal, DateTimeExtension):
+            temporal = TimeWindowExtension(temporal, temporal)
         try:
             return temporal._internal in self._internal
         except:
-            return temporal.since._internal in self._internal and temporal.until._internal in self._internal
+            return temporal._internal.since._internal in self._internal and\
+                   temporal._internal.until._internal in self._internal
 
 
 class DateTimeExtension(BaseEntity):
@@ -80,6 +86,9 @@ class DateTimeExtension(BaseEntity):
     @property
     def time(self) -> date:
         return self._date_time.time()
+
+    def time_stamp(self) -> int:
+        return self._date_time.timestamp()
 
     def __dict__(self):
         val = self.to_dict()
