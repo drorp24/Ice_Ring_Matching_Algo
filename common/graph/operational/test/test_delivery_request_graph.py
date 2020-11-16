@@ -1,5 +1,6 @@
 import unittest
 from datetime import time, date, timedelta
+from math import sqrt
 from random import Random
 
 from common.entities.delivery_request import DeliveryRequestDistribution, generate_dr_distribution, PriorityDistribution
@@ -29,10 +30,17 @@ class BasicDeliveryRequestGraphTestCases(unittest.TestCase):
 
     def test_local_graph_generation_should_be_fully_connected(self):
         region_dataset = self.dr_dataset_local_region_1
-        g = create_locally_connected_dr_graph(region_dataset, max_dist_to_connect=100)
-        num_nodes = len(g.nodes)
+        graph = create_locally_connected_dr_graph(region_dataset, max_cost_to_connect=100*2/sqrt(2))
+        num_nodes = len(graph.nodes)
         self.assertEqual(len(region_dataset), num_nodes)
-        self.assertEqual((num_nodes * (num_nodes - 1)), len(g.edges))
+        self.assertEqual((num_nodes * (num_nodes - 1)), len(graph.edges))
+
+    def test_local_graph_generation_two_separate_clique(self):
+        region_dataset = self.dr_dataset_local_region_1 + self.dr_dataset_local_region_2
+        graph = create_locally_connected_dr_graph(region_dataset, max_cost_to_connect=100*2/sqrt(2))
+        num_nodes = len(graph.nodes)
+        self.assertEqual(len(region_dataset), num_nodes)
+        self.assertEqual(2*(num_nodes/2 * (num_nodes/2 - 1)), len(graph.edges))
 
     def test_delivery_request_graph_creation(self):
         drg = OperationalGraph()
@@ -109,37 +117,37 @@ class BasicDeliveryRequestGraphTestCases(unittest.TestCase):
 def create_local_data_in_region_1():
     dr_struct = DeliveryRequestDatasetStructure(num_of_delivery_requests=10,
                                                 delivery_request_distribution=(_create_region_1_dr_distribution()))
-    return DeliveryRequestDatasetGenerator.generate(dr_struct)
+    return DeliveryRequestDatasetGenerator.generate(dr_struct, random=Random(42))
 
 
 def create_local_data_in_region_2():
     dr_struct = DeliveryRequestDatasetStructure(num_of_delivery_requests=10,
                                                 delivery_request_distribution=(_create_region_2_dr_distribution()))
-    return DeliveryRequestDatasetGenerator.generate(dr_struct)
+    return DeliveryRequestDatasetGenerator.generate(dr_struct, random=Random(42))
 
 
 def create_morning_dr_dataset():
     dr_struct = DeliveryRequestDatasetStructure(num_of_delivery_requests=10,
                                                 delivery_request_distribution=(_create_morning_dr_distribution()))
-    return DeliveryRequestDatasetGenerator.generate(dr_struct)
+    return DeliveryRequestDatasetGenerator.generate(dr_struct, random=Random(42))
 
 
 def create_afternoon_dr_dataset():
     dr_struct = DeliveryRequestDatasetStructure(num_of_delivery_requests=5,
                                                 delivery_request_distribution=(_create_afternoon_dr_distribution()))
-    return DeliveryRequestDatasetGenerator.generate(dr_struct)
+    return DeliveryRequestDatasetGenerator.generate(dr_struct, random=Random(42))
 
 
 def create_top_priority_dr_dataset():
     dr_struct = DeliveryRequestDatasetStructure(num_of_delivery_requests=4,
                                                 delivery_request_distribution=(_create_high_priority_dr_distribution()))
-    return DeliveryRequestDatasetGenerator.generate(dr_struct)
+    return DeliveryRequestDatasetGenerator.generate(dr_struct, random=Random(42))
 
 
 def create_low_priority_dr_dataset():
     dr_struct = DeliveryRequestDatasetStructure(num_of_delivery_requests=6,
                                                 delivery_request_distribution=(_create_low_priority_dr_distribution()))
-    return DeliveryRequestDatasetGenerator.generate(dr_struct)
+    return DeliveryRequestDatasetGenerator.generate(dr_struct, random=Random(42))
 
 
 def _create_morning_dr_distribution():

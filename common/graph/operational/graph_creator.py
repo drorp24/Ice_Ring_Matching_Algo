@@ -1,23 +1,31 @@
+from math import ceil
+from typing import List
+
 from common.entities.delivery_request import DeliveryRequest
 from common.graph.operational.delivery_request_graph import OperationalGraph, OperationalEdge, OperationalEdgeAttributes
 
 
-def create_locally_connected_dr_graph(delivery_requests: [DeliveryRequest], max_dist_to_connect: float = 100.0):
+def create_locally_connected_dr_graph(dr_connection_options: [DeliveryRequest], max_cost_to_connect):
     drg = OperationalGraph()
     edges = []
-    drg.add_operational_nodes(delivery_requests)
-    for start_dr in delivery_requests:
-        end_dr_options = calc_dr_within_radius(start_dr, delivery_requests, max_dist_to_connect)
+    drg.add_operational_nodes(dr_connection_options)
+    for start_dr in dr_connection_options:
+        end_dr_options = calc_under_cost(dr_connection_options, start_dr, max_cost_to_connect)
         for end_dr in end_dr_options:
-            edges.append(OperationalEdge(start_dr, end_dr, OperationalEdgeAttributes(calc_cost(end_dr, start_dr))))
+            cost = calc_discrete_cost(start_dr, end_dr)
+            edges.append(OperationalEdge(start_dr, end_dr, OperationalEdgeAttributes(cost)))
     drg.add_operational_edges(edges)
     return drg
 
 
-def calc_cost(end_dr, start_dr):
-    return start_dr.calc_centroid().calc_distance_to_point(end_dr.calc_centroid())
+def calc_under_cost(potential_drs: [DeliveryRequest], start_dr: DeliveryRequest, cost_thresh) -> List:
+    return list(filter(lambda target_dr: is_within_cost_range(start_dr, target_dr, max_cost=cost_thresh), potential_drs))
 
 
-def calc_dr_within_radius(target_dr: DeliveryRequest, drs: [DeliveryRequest], radius: float):
-    target_point = target_dr.calc_centroid()
-    return list(filter(lambda dr: 0 < target_point.calc_distance_to_point(dr.calc_centroid()) < radius, drs))
+def is_within_cost_range(start_dr: DeliveryRequest, target_dr: DeliveryRequest,
+                         max_cost: float = 1.0, min_cost: float = 0.0) -> bool:
+    return min_cost < calc_discrete_cost(start_dr, target_dr) <= max_cost
+
+
+def calc_discrete_cost(start_dr: DeliveryRequest, end_dr: DeliveryRequest) -> int:
+    return ceil(start_dr.calc_centroid().calc_distance_to_point(end_dr.calc_centroid()))
