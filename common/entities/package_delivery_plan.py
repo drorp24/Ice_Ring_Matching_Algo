@@ -2,23 +2,30 @@ from __future__ import annotations
 
 from random import Random
 from typing import List
+from uuid import UUID
 
 from common.entities.base_entity import JsonableBaseEntity
 from common.entities.disribution.distribution import Distribution
 from common.entities.package import PackageType, PackageDistribution
 from common.math.angle import Angle, AngleUniformDistribution, AngleUnit
-from geometry.geo2d import Point2D, Polygon2D
+from common.utils.uuid_utils import convert_str_to_uuid
+from geometry.geo2d import Point2D
 from geometry.geo_distribution import UniformPointInBboxDistribution
-from geometry.geo_factory import create_polygon_2d_from_ellipse, convert_dict_to_point_2d
+from geometry.geo_factory import convert_dict_to_point_2d
 
 
 class PackageDeliveryPlan(JsonableBaseEntity):
 
-    def __init__(self, drop_point: Point2D, azimuth: Angle, pitch: Angle, package_type: PackageType):
+    def __init__(self, id: UUID, drop_point: Point2D, azimuth: Angle, pitch: Angle, package_type: PackageType):
+        self._id = id
         self._drop_point = drop_point
         self._azimuth = azimuth
         self._pitch = pitch
         self._package_type = package_type
+
+    @property
+    def id(self) -> UUID:
+        return self._id
 
     @property
     def drop_point(self) -> Point2D:
@@ -39,20 +46,21 @@ class PackageDeliveryPlan(JsonableBaseEntity):
     @classmethod
     def dict_to_obj(cls, dict_input):
         assert (dict_input['__class__'] == cls.__name__)
-        return PackageDeliveryPlan(drop_point=convert_dict_to_point_2d(dict_input['drop_point']),
+        return PackageDeliveryPlan(id=convert_str_to_uuid(dict_input['id']),
+                                   drop_point=convert_dict_to_point_2d(dict_input['drop_point']),
                                    azimuth=Angle.dict_to_obj(dict_input['azimuth']),
                                    pitch=Angle.dict_to_obj(dict_input['pitch']),
                                    package_type=PackageType.dict_to_obj(dict_input['package_type']))
 
-
     def __hash__(self):
-        return hash((self.drop_point, self.azimuth, self.pitch, self.package_type))
+        return hash((self.id, self.drop_point, self.azimuth, self.pitch, self.package_type))
 
     def __str__(self):
-        return 'Package Delivery Plan: ' + str((self.drop_point, self.azimuth, self.pitch, self.package_type))
+        return 'Package Delivery Plan: ' + str((self.id, self.drop_point, self.azimuth, self.pitch, self.package_type))
 
     def __eq__(self, other):
-        return (self.drop_point == other.drop_point) and \
+        return (self.id == other.id) and \
+               (self.drop_point == other.drop_point) and \
                (self.azimuth == other.azimuth) and \
                (self.pitch == other.pitch) and \
                (self.package_type == other.package_type)
@@ -81,5 +89,6 @@ class PackageDeliveryPlanDistribution(Distribution):
         azimuths = self._azimuth_distribution.choose_rand(random, amount)
         pitchs = self._pitch_distribution.choose_rand(random, amount)
         packages = self._package_type_distribution.choose_rand(random, amount)
-        return [PackageDeliveryPlan(dp, az, el, pk) for (dp, az, el, pk) in
+        uuid_seed = random.getrandbits(128)
+        return [PackageDeliveryPlan(UUID(int=uuid_seed), dp, az, el, pk) for (dp, az, el, pk) in
                 zip(drop_points, azimuths, pitchs, packages)]
