@@ -28,12 +28,11 @@ class BasicDroneDeliveryGeneration(unittest.TestCase):
                                                                 datetime(2020, 1, 23, 12, 30, 00))
 
         cls.drone_delivery_1 = DroneDelivery(cls.empty_drone_delivery_1.id,
-                                             cls.empty_drone_delivery_1.drone_formation)
-        cls.drone_delivery_1.add_matched_delivery_request(cls.matched_delivery_request_1)
-        cls.drone_delivery_1.add_matched_delivery_request(cls.matched_delivery_request_2)
+                                             cls.empty_drone_delivery_1.drone_formation,
+                                             [cls.matched_delivery_request_1, cls.matched_delivery_request_2])
         cls.drone_delivery_2 = DroneDelivery(cls.empty_drone_delivery_2.id,
-                                             cls.empty_drone_delivery_2.drone_formation)
-        cls.drone_delivery_2.add_matched_delivery_request(cls.matched_delivery_request_3)
+                                             cls.empty_drone_delivery_2.drone_formation,
+                                             [cls.matched_delivery_request_3])
 
         cls.empty_drone_delivery_board = EmptyDroneDeliveryBoard(
             [cls.empty_drone_delivery_1, cls.empty_drone_delivery_2])
@@ -92,11 +91,8 @@ class BasicDroneDeliveryGeneration(unittest.TestCase):
 
     def test_2_drone_deliveries_are_equal(self):
         actual_drone_delivery = DroneDelivery(self.empty_drone_delivery_1.id,
-                                              self.empty_drone_delivery_1.drone_formation)
-        actual_drone_delivery.add_matched_delivery_request(
-            MatchedDeliveryRequest(self.delivery_requests[0], datetime(2020, 1, 23, 11, 30, 00)))
-        actual_drone_delivery.add_matched_delivery_request(
-            MatchedDeliveryRequest(self.delivery_requests[1], datetime(2020, 1, 23, 11, 30, 00)))
+                                              self.empty_drone_delivery_1.drone_formation,
+                                              [self.matched_delivery_request_1, self.matched_delivery_request_2])
         self.assertEqual(self.drone_delivery_1, actual_drone_delivery)
 
     def test_2_drone_delivery_boards_are_equal(self):

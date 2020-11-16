@@ -1,9 +1,9 @@
-from datetime import datetime, timedelta
+from datetime import timedelta
 
 from common.entities.drone_delivery import DroneDelivery, MatchedDeliveryRequest
 from common.entities.drone_delivery_board import DroneDeliveryBoard
-from matching.matching_solution import MatchingSolution, MatchingSolutionData
 from matching.matcher import Matcher
+from matching.matching_solution import MatchingSolution, MatchingSolutionData
 
 
 class ORToolsMatchingSolution(MatchingSolution):
@@ -91,7 +91,8 @@ class ORToolsMatchingSolution(MatchingSolution):
                     time = self.node_service_time[vehicle_id][node_index]
                     route_load = self.node_route_load[vehicle_id][node_index]
                     route_priority = self.node_route_priority[vehicle_id][node_index]
-                plan_output += ' {0} Time({1},{2}) Load({3}) priority({4})'.format(node_index, time[0], time[1], route_load, route_priority)
+                plan_output += ' {0} Time({1},{2}) Load({3}) priority({4})'.format(node_index, time[0], time[1],
+                                                                                   route_load, route_priority)
                 if idx < len(vehicle_route) - 1:
                     plan_output += '->'
 
@@ -108,7 +109,7 @@ class ORToolsMatchingSolution(MatchingSolution):
     def _print_solution_debug(self):
         # print solution based on the solution received
 
-        input = self._matching_handler.input
+        match_input = self._matching_handler.input
         routing = self._matching_handler.routing
         manager = self._matching_handler.manager
 
@@ -121,12 +122,12 @@ class ORToolsMatchingSolution(MatchingSolution):
                 continue
             if self._solution.Value(routing.NextVar(node)) == node:
                 dropped_nodes += ' {}'.format(manager.IndexToNode(node))
-                # input["dropped"].append(node)
+                # match_input["dropped"].append(node)
         print(dropped_nodes)
         time_dimension = routing.GetDimensionOrDie('Time')
         total_time = 0
         total_load = 0
-        for vehicle_id in range(input.empty_board.num_of_formations):
+        for vehicle_id in range(match_input.empty_board.num_of_formations):
             nodes_in_route = []
             index = routing.Start(vehicle_id)
             plan_output = 'Route for vehicle {}:\n'.format(vehicle_id)
@@ -135,14 +136,14 @@ class ORToolsMatchingSolution(MatchingSolution):
                 time_var = time_dimension.CumulVar(index)
                 node_index = manager.IndexToNode(index)
                 nodes_in_route.append(node_index)
-                route_load += input.graph.packages_per_request[node_index]
+                route_load += match_input.graph.packages_per_request[node_index]
                 plan_output += ' {0} Time({1},{2}) Load({3})-> '.format(node_index, self._solution.Min(time_var),
                                                                         self._solution.Max(time_var), route_load)
-                # input["solution"][node_index] = (solution.Min(time_var), solution.Max(time_var))
+                # match_input["solution"][node_index] = (solution.Min(time_var), solution.Max(time_var))
                 print("route_load", route_load)
                 index = self._solution.Value(routing.NextVar(index))
             time_var = time_dimension.CumulVar(index)
-            # input["route"].append(nodes_in_route)
+            # match_input["route"].append(nodes_in_route)
 
             plan_output += '{0} Time({1},{2}) Load({3})\n'.format(manager.IndexToNode(index),
                                                                   self._solution.Min(time_var),
@@ -158,16 +159,17 @@ class ORToolsMatchingSolution(MatchingSolution):
 
     def delivery_board(self) -> DroneDeliveryBoard:
         match_input = self._matching_handler.input
-        routing = self._matching_handler.routing
-
+        empty_drone_deliveries = match_input.empty_board.empty_drone_deliveries
         drone_deliveries = []
         for vehicle_id, vehicle_route in enumerate(self.vehicle_route):
-            drone_delivery = DroneDelivery(match_input.empty_board.empty_drone_deliveries[vehicle_id].id,
-                                           match_input.empty_board.empty_drone_deliveries[vehicle_id].drone_formation)
+            matched_requests = []
             for idx, node_index in enumerate(vehicle_route):
                 if idx > 0 and node_index is not match_input.graph.depos:
                     delta_from_zero_time = self.node_service_time[vehicle_id][node_index][0]
                     time = match_input.graph.zero_time + timedelta(minutes=delta_from_zero_time)
-                    drone_delivery.add_matched_delivery_request(MatchedDeliveryRequest(match_input.graph.get_delivery_request(node_index - 1), time))
-            drone_deliveries.append(drone_delivery)
+                    matched_requests.append(
+                        MatchedDeliveryRequest(match_input.graph.get_delivery_request(node_index - 1), time))
+            drone_deliveries.append(DroneDelivery(empty_drone_deliveries[vehicle_id].id,
+                                                  empty_drone_deliveries[vehicle_id].drone_formation,
+                                                  matched_requests))
         return DroneDeliveryBoard(drone_deliveries)

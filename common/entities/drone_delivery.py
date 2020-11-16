@@ -33,9 +33,9 @@ class MatchedDeliveryRequest:
 
 
 class DroneDelivery(EmptyDroneDelivery):
-    def __init__(self, id: str, drone_formation: DroneFormation):
+    def __init__(self, id: str, drone_formation: DroneFormation, matched_requests: [MatchedDeliveryRequest]):
         super().__init__(id, drone_formation)
-        self._matched_requests = []
+        self._matched_requests = matched_requests
 
     def __eq__(self, other):
         return super().__eq__(other) and self._matched_requests == other.matched_requests
@@ -43,7 +43,3 @@ class DroneDelivery(EmptyDroneDelivery):
     @property
     def matched_requests(self) -> [MatchedDeliveryRequest]:
         return self._matched_requests
-
-    def add_matched_delivery_request(self, matched_request: MatchedDeliveryRequest) -> None:
-        self._matched_requests.append(matched_request)
-
