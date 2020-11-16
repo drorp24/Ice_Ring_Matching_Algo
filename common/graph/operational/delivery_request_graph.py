@@ -6,6 +6,7 @@ from typing import List, Union
 from networkx import DiGraph, Graph, subgraph
 
 from common.entities.delivery_request import DeliveryRequest
+from common.entities.drone_loading_dock import DroneLoadingDock
 from common.entities.temporal import TimeWindowExtension
 
 

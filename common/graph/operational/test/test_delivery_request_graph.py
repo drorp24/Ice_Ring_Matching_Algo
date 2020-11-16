@@ -4,6 +4,7 @@ from random import Random
 
 from common.entities.delivery_request import DeliveryRequestDistribution, generate_dr_distribution, PriorityDistribution
 from common.entities.delivery_request_generator import DeliveryRequestDatasetGenerator, DeliveryRequestDatasetStructure
+from common.entities.drone_loading_dock import DroneLoadingDockDistribution
 from common.entities.temporal import TimeWindowDistribution, DateTimeDistribution, DateTimeExtension, \
     TimeDeltaExtension, TimeDeltaDistribution, TimeWindowExtension
 from common.graph.operational.delivery_request_graph import OperationalEdge, \

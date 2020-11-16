@@ -1,7 +1,7 @@
 from datetime import date, timedelta, time
 from random import Random
 
-from common.entities.base_entities.distribution import Distribution
+from common.entities.disribution.distribution import Distribution
 from common.entities.drone import PlatformType, PlatformTypeDistribution
 from common.entities.drone_loading_station import DroneLoadingStation, DroneLoadingStationDistribution
 from common.entities.temporal import TimeWindowExtension, TimeWindowDistribution, DateTimeExtension, \
