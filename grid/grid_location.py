@@ -14,6 +14,11 @@ class BaseGridLocation(ABC):
         raise NotImplementedError()
 
 
+    @abstractmethod
+    def __eq__(self, other):
+        raise NotImplementedError()
+
+
 class GridLocation(BaseGridLocation):
     def __init__(self, row: int, column: int):
         self._row = row
@@ -33,6 +38,9 @@ class GridLocation(BaseGridLocation):
     def __sub__(self, other):
         return GridLocation(self.row - other.row, self.column - other.column)
 
+    def __eq__(self, other):
+        return self.row==other.row and self.column==other.column
+
     def as_list(self):
         return [self._row, self._column]
 
@@ -47,6 +55,8 @@ class NoneGridLocation(BaseGridLocation):
     def __sub__(self, other):
         return self
 
+    def __eq__(self, other):
+        return isinstance(other, NoneGridLocation)
 
 class GridLocationServices:
     @staticmethod
