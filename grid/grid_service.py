@@ -4,7 +4,8 @@ from typing import List, Union
 from geometry.geo2d import Point2D, EmptyGeometry2D, Polygon2D
 from geometry.geo_factory import create_point_2d
 from geometry.polygon_utils import PolygonUtils
-from grid.cell import GridLocation, NoneGridLocation
+from grid.cell import GridLocation
+from grid.grid_location import NoneGridLocation
 
 
 class GridService:

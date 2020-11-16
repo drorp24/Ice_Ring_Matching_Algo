@@ -2,7 +2,7 @@ from collections import defaultdict
 from typing import List
 
 from common.entities.package import PackageType
-from common.math.angle import Angle, AngleUnit, BaseAngle
+from common.math.angle import Angle, AngleUnit
 from geometry.polygon_utils import PolygonUtils
 from grid.cell import GridLocation
 from grid.slide import Slide
@@ -55,15 +55,15 @@ class SlidesContainer:
     def get_drop_azimuth_resolution(self) -> int:
         return self._drop_azimuth_resolution
 
-    def get_envelope_location(self, drone_azimuth: BaseAngle, drop_azimuth: BaseAngle,
+    def get_envelope_location(self, drone_azimuth: Angle, drop_azimuth: BaseAngle,
                                package_type: PackageType) -> GridLocation:
 
         round_drone_azimuth = PolygonUtils.convert_nearest_value_in_resolution(
-                drone_azimuth.in_degrees(),
-                int(self._drone_azimuth_delta_deg.in_degrees()))
+                drone_azimuth.degrees,
+                int(self._drone_azimuth_delta_deg.degrees))
 
         round_drop_azimuth = PolygonUtils.convert_nearest_value_in_resolution(
                 drop_azimuth.in_degrees(),
-                int(self._drop_azimuth_delta_deg.in_degrees()))
+                int(self._drop_azimuth_delta_deg.degrees))
 
         return self._hash[package_type][round_drone_azimuth][round_drop_azimuth].envelope_location
