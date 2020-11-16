@@ -1,5 +1,4 @@
 import unittest
-from pprint import pprint
 
 from common.entities.delivery_request import generate_dr_distribution, PriorityDistribution
 from common.entities.delivery_request_generator import DeliveryRequestDatasetGenerator, DeliveryRequestDatasetStructure

@@ -4,6 +4,8 @@ from typing import List
 from common.entities.disribution.distribution import UniformChoiceDistribution, Distribution
 from common.entities.base_entity import JsonableBaseEntity
 from common.entities.customer_delivery import CustomerDelivery, CustomerDeliveryDistribution, DEFAULT_PDP_DISTRIB
+from geometry.geo2d import Point2D
+from geometry.geo_factory import calc_centroid
 
 
 class DeliveryOption(JsonableBaseEntity):
@@ -11,12 +13,12 @@ class DeliveryOption(JsonableBaseEntity):
     def __init__(self, customer_deliveries: [CustomerDelivery]):
         self._customer_deliveries = customer_deliveries if customer_deliveries is not None else []
 
-    def __eq__(self, other):
-        return self.customer_deliveries == other.customer_deliveries
-
     @property
     def customer_deliveries(self) -> [CustomerDelivery]:
         return self._customer_deliveries
+
+    def calc_centroid(self) -> Point2D:
+        return calc_centroid([cd.calc_centroid() for cd in self.customer_deliveries])
 
     @classmethod
     def dict_to_obj(cls, dict_input):
@@ -24,6 +26,12 @@ class DeliveryOption(JsonableBaseEntity):
         return DeliveryOption(
             customer_deliveries=[CustomerDelivery.dict_to_obj(cd_dict) for cd_dict in
                                  dict_input['customer_deliveries']])
+
+    def __eq__(self, other):
+        return self.customer_deliveries == other.customer_deliveries
+
+    def __hash__(self):
+        return hash(tuple(self.customer_deliveries))
 
 
 DEFAULT_CD_DISTRIB = CustomerDeliveryDistribution([DEFAULT_PDP_DISTRIB])

@@ -49,6 +49,9 @@ class TimeWindowExtension(JsonableBaseEntity):
         return self._internal.since == other._internal.since and \
                self._internal.until == other._internal.until
 
+    def __hash__(self):
+        return hash(self._internal)
+
     def __contains__(self, temporal: Union[DateTimeExtension, TimeWindowExtension]):
         try:
             return temporal._internal in self._internal
@@ -83,6 +86,9 @@ class DateTimeExtension(BaseEntity):
         val.update({'__class__': self.__class__.__name__})
         return val
 
+    def __hash__(self):
+        return hash(self._internal)
+
     def to_dict(self) -> Dict:
         date_dict = DateTimeExtension.extract_date_dict_from_datetime(self._internal)
         time_dict = DateTimeExtension.extract_time_dict_from_datetime(self._internal)
@@ -115,7 +121,7 @@ class DateTimeExtension(BaseEntity):
         return {TIME: {HOUR: date_time.hour, MINUTE: date_time.minute, SECOND: date_time.second}}
 
     def add_time_delta(self, time_delta: TimeDeltaExtension) -> DateTimeExtension:
-        return DateTimeExtension.from_dt(self._internal + time_delta._internal_delta)
+        return DateTimeExtension.from_dt(self._internal + time_delta._internal)
 
     def __eq__(self, other: DateTimeExtension):
         return self._internal == other._internal
@@ -130,14 +136,17 @@ class TimeDeltaExtension(BaseEntity):
         self._time_delta: timedelta = time_delta
 
     @property
-    def _internal_delta(self) -> timedelta:
+    def _internal(self) -> timedelta:
         return self._time_delta
 
     def __eq__(self, other: TimeDeltaExtension):
-        return self._internal_delta.seconds == other._internal_delta.seconds
+        return self._internal.seconds == other._internal.seconds
 
     def __repr__(self):
-        return self._internal_delta.__repr__()
+        return self._internal.__repr__()
+
+    def __hash__(self):
+        return hash(self._internal)
 
 
 class DateTimeDistribution(UniformChoiceDistribution):
