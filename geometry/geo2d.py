@@ -288,7 +288,7 @@ class Bbox2D(Polygon2D):
 
     @property
     @abstractmethod
-    def type(self) -> str:
+    def _geo_type(self) -> str:
         raise NotImplementedError()
 
     @property
