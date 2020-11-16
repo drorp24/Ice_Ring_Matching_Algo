@@ -84,6 +84,8 @@ from grid.slides_container import SlidesContainer
 #         return GridLocation(math.floor(np.mean(rows_values)),
 #                             math.floor(np.mean(columns_values)))
 #
+from params import MAX_PITCH_DEGREES
+
 
 @dataclass
 class Cell:
@@ -102,7 +104,7 @@ class CellServices:
     def get_distance(cell1: EnvelopeCell, cell2: EnvelopeCell) -> float:
         angle_delta = cell1.drone_azimuth.calc_abs_difference(cell2.drone_azimuth)
         dist = np.linalg.norm(cell1.location.location - cell2.location.location)
-        angle_delta_cost = (math.cos(angle_delta.in_radians()) - 1)/-2
+        angle_delta_cost = (math.cos(angle_delta.radians) - 1)/-2
         return dist + CellServices.ANGLE_DELTA_COST / (dist+1) * angle_delta_cost
 
 
@@ -141,7 +143,7 @@ class DeliveryRequestEnvelopeCells:
                             repeat(package_delivery_plan.package_type),
                             AzimuthOptions(slides_container.get_drone_azimuth_resolution).values,
                             map(DeliveryRequestEnvelopeCells._get_drop_azimuth,
-                                AzimuthOptions(slides_container.get_drone_azimuth_resolution).values),
+                                AzimuthOptions(slides_container.get_drone_azimuth_resolution).values),repeat(package_delivery_plan.azimuth), repeat(package_delivery_plan.pitch)
                             )))
 
     @staticmethod
@@ -152,5 +154,5 @@ class DeliveryRequestEnvelopeCells:
                                                       package_type)
 
     @staticmethod
-    def _get_drop_azimuth(drone_azimuth: Angle, drop_azimuth: Angle) -> Angle:
-        return drop_azimuth if None else (drone_azimuth, drone_azimuth)
+    def _get_drop_azimuth(drone_azimuth: Angle, drop_azimuth: Angle, drop_pitch: Angle) -> Angle:
+        return drop_azimuth if drop_pitch == MAX_PITCH_DEGREES else drone_azimuth
