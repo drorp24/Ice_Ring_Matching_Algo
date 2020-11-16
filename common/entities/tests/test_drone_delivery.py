@@ -1,8 +1,8 @@
 import unittest
 from datetime import datetime
-from pathlib import Path
+from random import Random
 
-from input.delivery_requests_json_converter import create_delivery_requests_from_file
+from common.entities.delivery_request import DeliveryRequestDistribution
 from common.entities.drone_delivery import DroneDelivery, EmptyDroneDelivery, MatchedDeliveryRequest
 from common.entities.drone_formation import DroneFormations, FormationSize, FormationOptions
 from common.entities.drone import PlatformType
@@ -13,7 +13,7 @@ class BasicDroneDeliveryGeneration(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.delivery_requests = create_delivery_requests_from_file(Path('DeliveryRequestTest.json'))
+        cls.delivery_requests = DeliveryRequestDistribution().choose_rand(Random(42), 3)
 
         cls.empty_drone_delivery_1 = EmptyDroneDelivery("edd_1", DroneFormations.get_drone_formation(
             FormationSize.MINI, FormationOptions.TINY_PACKAGES, PlatformType.platform_1))
@@ -37,6 +37,7 @@ class BasicDroneDeliveryGeneration(unittest.TestCase):
 
         cls.empty_drone_delivery_board = EmptyDroneDeliveryBoard(
             [cls.empty_drone_delivery_1, cls.empty_drone_delivery_2])
+
         cls.drone_delivery_board = DroneDeliveryBoard([cls.drone_delivery_1, cls.drone_delivery_2])
 
     def test_delivery_requests_quantity(self):

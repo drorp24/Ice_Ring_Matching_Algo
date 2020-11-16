@@ -4,13 +4,14 @@ from typing import List, Tuple, Union
 from shapely.geometry import Point, Polygon, LineString, LinearRing, MultiPolygon
 from shapely.geometry.base import BaseGeometry, EmptyGeometry
 
+from common.entities.base_entity import JsonableBaseEntity
 from geometry.geo2d import Point2D, Vector2D, Polygon2D, MultiPolygon2D, LineString2D, LinearRing2D, EmptyGeometry2D
 from geometry.utils import GeometryUtils
 
-EPSILON_FOR_EQUAL_AREA : float = 0.00001
+EPSILON_FOR_EQUAL_AREA: float = 0.00001
 
 
-class _ShapelyGeometry(object):
+class _ShapelyGeometry(JsonableBaseEntity):
 
     def __init__(self, shapely_obj: BaseGeometry):
         self.__shapely_obj = shapely_obj
@@ -20,7 +21,7 @@ class _ShapelyGeometry(object):
         return self.__shapely_obj
 
     @property
-    def type(self) -> str:
+    def _geo_type(self) -> str:
         return self._shapely_obj.type
 
     def is_empty(self) -> bool:
@@ -34,7 +35,7 @@ class _ShapelyEmptyGeometry(_ShapelyGeometry, EmptyGeometry2D):
 
     @property
     def _shapely_obj(self) -> EmptyGeometry:
-        return self._shapely_obj
+        return super()._shapely_obj
 
     def calc_area(self) -> float:
         return 0
@@ -55,6 +56,11 @@ class _ShapelyPoint2D(_ShapelyGeometry, Point2D):
     @property
     def y(self) -> float:
         return self._shapely_obj.y
+
+    @classmethod
+    def dict_to_obj(cls, dict_input) -> Point2D:
+        assert (dict_input['__class__'] == cls.__name__)
+        return _ShapelyPoint2D(dict_input['x'], dict_input['y'])
 
     def xy(self) -> (float, float):
         return self.x, self.y
@@ -201,7 +207,7 @@ class _ShapelyPolygon2D(_ShapelyGeometry, Polygon2D):
         return _ShapelyUtils.convert_shapely_to_surface_2d(internal_geometry)
 
     def __str__(self):
-        return self.type + [p.__str__() for p in self.points].__str__()
+        return self._geo_type + [p.__str__() for p in self.points].__str__()
 
     def __eq__(self, other):
         return _ShapelyPolygon2D.is_approximately_equal_by_symmetric_difference(self, other)
@@ -239,7 +245,7 @@ class _ShapelyMultiPolygon2D(_ShapelyGeometry, MultiPolygon2D):
         return self in other_polygonal_geometry.to_polygons() and other_polygonal_geometry in self.to_polygons()
 
     def __str__(self):
-        return self.type + [polygon.__str__ for polygon in self.to_polygons()].__str__()
+        return type(self).__name__ + [polygon.__str__ for polygon in self.to_polygons()].__str__()
 
 
 class _ShapelyUtils:
