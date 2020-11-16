@@ -1,12 +1,10 @@
 import math
-from typing import List, Union
+from typing import List, Union, Optional
 
 from geometry.geo2d import Point2D, EmptyGeometry2D, Polygon2D
 from geometry.geo_factory import create_point_2d
 from geometry.polygon_utils import PolygonUtils
 from grid.cell import GridLocation
-from grid.grid_location import NoneGridLocation
-
 
 class GridService:
 
@@ -28,8 +26,7 @@ class GridService:
     # #                 pass
 
     @staticmethod
-    def polygon_to_grid_cells(polygon: Polygon2D, cell_resolution: int, cell_ratio_required: float) -> Union[
-            List[GridLocation], NoneGridLocation]:
+    def polygon_to_grid_cells(polygon: Polygon2D, cell_resolution: int, cell_ratio_required: float) -> Optional[List[GridLocation]]:
 
         if isinstance(polygon, EmptyGeometry2D):
             return NoneGridLocation()

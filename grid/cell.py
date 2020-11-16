@@ -1,6 +1,7 @@
 import math
 from itertools import repeat
 from typing import List, KeysView, ValuesView
+from uuid import UUID
 
 import numpy as np
 from attr import dataclass
@@ -72,12 +73,25 @@ class DeliveryRequestEnvelopeCells:
     @staticmethod
     def _get_delivery_request_envelope_cells(slides_container: SlidesContainer, delivery_option: DeliveryOption) -> \
             List[EnvelopeCell]:
-        average_location = list(map(GridLocationServices.calc_average, list(zip(*(
-            list(map(DeliveryRequestEnvelopeCells._scale_grid_locations, repeat(slides_container),
-                     delivery_option.package_delivery_plans)))))))
+        scale_grid_locations = list(map(DeliveryRequestEnvelopeCells._scale_grid_locations, repeat(slides_container),
+                                        delivery_option.package_delivery_plans))
 
-        return list(map(EnvelopeCell, average_location,
+        average_locations = list(map(GridLocationServices.calc_average, list(zip(*scale_grid_locations))))
+
+        average_uuids = list(map(DeliveryRequestEnvelopeCells._get_average_uuids,
+                                 scale_grid_locations, delivery_option.package_delivery_plans))
+
+        return list(map(EnvelopeCell, average_locations,
                         AzimuthOptions(slides_container.get_drone_azimuth_resolution).values))
+
+    @staticmethod
+    def _calc_average(grid_locations: List[GridLocation]):
+
+        list(map(GridLocationServices.calc_average, grid_locations))
+
+    @staticmethod
+    def _get_average_uuids(grid_locations: List[GridLocation],package_delivery_plan: PackageDeliveryPlan):
+
 
     @staticmethod
     def _scale_grid_locations(slides_container: SlidesContainer,
