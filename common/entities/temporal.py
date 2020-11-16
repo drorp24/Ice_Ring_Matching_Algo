@@ -1,7 +1,8 @@
 from __future__ import annotations
+
 from datetime import datetime, date, time, timedelta
 from random import Random
-from typing import Dict, Union, List, Tuple
+from typing import Dict, List, Union, Tuple
 
 from time_window import TimeWindow
 
@@ -20,19 +21,18 @@ SINCE = 'since'
 UNTIL = 'until'
 
 
-class TimeWindowExtension:
+class TimeWindowExtension(JsonableBaseEntity):
 
     def __init__(self, since: DateTimeExtension, until: DateTimeExtension):
-        self._time_window = TimeWindow(since._internal, until._internal)
+        self._time_window = TimeWindow(tm_since=since._internal, tm_until=until._internal)
 
     @property
-    def internal_time_window(self) -> TimeWindow:
+    def _internal(self) -> TimeWindow:
         return self._time_window
 
-    def to_dict(self) -> dict:
-        since = {SINCE: DateTimeExtension.from_dt(self.internal_time_window.since).to_dict()}
-        until = {UNTIL: DateTimeExtension.from_dt(self.internal_time_window.until).to_dict()}
-        return {**since, **until}
+    @property
+    def since(self) -> DateTimeExtension:
+        return DateTimeExtension.from_dt(self._internal.since)
 
     @property
     def until(self) -> DateTimeExtension:
@@ -46,11 +46,11 @@ class TimeWindowExtension:
         return TimeWindowExtension(since, until)
 
     def get_time_stamp(self) -> Tuple[int, int]:
-        return self.internal_time_window.since.timestamp(), self.internal_time_window.until.timestamp()
+        return self._internal.since.timestamp(), self._internal.until.timestamp()
 
     def __eq__(self, other: TimeWindowExtension):
-        return self.internal_time_window.since == other.internal_time_window.since and \
-               self.internal_time_window.until == other.internal_time_window.until
+        return self._internal.since == other._internal.since and \
+               self._internal.until == other._internal.until
 
     def __hash__(self):
         return hash(self._time_window)
@@ -59,10 +59,10 @@ class TimeWindowExtension:
         if isinstance(temporal, DateTimeExtension):
             temporal = TimeWindowExtension(temporal, temporal)
         try:
-            return temporal.internal_time_window in self.internal_time_window
+            return temporal._internal in self._internal
         except:
-            return temporal.internal_time_window.since._internal in self.internal_time_window and\
-                   temporal.internal_time_window.until._internal in self.internal_time_window
+            return temporal._internal.since._internal in self._internal and\
+                   temporal._internal.until._internal in self._internal
 
 
 class DateTimeExtension(BaseEntity):

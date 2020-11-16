@@ -42,12 +42,12 @@ class BasicDeliveryRequestGraphTestCases(unittest.TestCase):
         drg.add_operational_edges(edges)
         returned_edges = list(drg.edges)
         self.assertEqual(len(drg.edges), len(edges))
-        self.assertEqual(returned_edges[0][0], edges[0].start_node)
-        self.assertEqual(returned_edges[0][1], edges[0].end_node)
-        self.assertEqual(returned_edges[5][0], edges[5].start_node)
-        self.assertEqual(returned_edges[5][1], edges[5].end_node)
-        self.assertEqual(returned_edges[6][0], edges[6].start_node)
-        self.assertEqual(returned_edges[6][1], edges[6].end_node)
+        self.assertEqual(returned_edges[0].start_node, edges[0].start_node)
+        self.assertEqual(returned_edges[0].end_node, edges[0].end_node)
+        self.assertEqual(returned_edges[5].start_node, edges[5].start_node)
+        self.assertEqual(returned_edges[5].end_node, edges[5].end_node)
+        self.assertEqual(returned_edges[6].start_node, edges[6].start_node)
+        self.assertEqual(returned_edges[6].end_node, edges[6].end_node)
 
     def test_drone_loading_dock_set_internal_graph(self):
         drg1 = OperationalGraph()
