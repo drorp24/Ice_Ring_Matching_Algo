@@ -18,7 +18,7 @@ class BasicPolygonBboxTestCase(unittest.TestCase):
         cls.p4 = create_point_2d(cls.min_x, cls.min_y)
 
     def test_type(self):
-         self.assertEqual(self.bbox.type, 'Polygon')
+         self.assertEqual(self.bbox._geo_type, 'Polygon')
 
     def test_points(self):
         points_result = self.bbox.points

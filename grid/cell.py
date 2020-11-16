@@ -1,5 +1,5 @@
 from itertools import repeat
-from typing import List, Optional
+from typing import List
 
 from attr import dataclass
 import numpy as np
@@ -145,12 +145,12 @@ class DeliveryRequestEnvelopeCells:
                             )))
 
     @staticmethod
-    def _get_envelope_location(self, slides_container: SlidesContainer, package_type: PackageType,
+    def _get_envelope_location(slides_container: SlidesContainer, package_type: PackageType,
                                drone_azimuth: Angle,
                                drop_azimuth: Angle) -> GridLocation:
         return slides_container.get_envelope_location(drone_azimuth, drop_azimuth,
                                                       package_type)
 
     @staticmethod
-    def _get_drop_azimuth(drone_azimuth: Optional[Angle], drop_azimuth: Angle) -> Angle:
+    def _get_drop_azimuth(drone_azimuth: Angle, drop_azimuth: Angle) -> Angle:
         return drop_azimuth if None else (drone_azimuth, drone_azimuth)
