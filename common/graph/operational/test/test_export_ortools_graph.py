@@ -17,7 +17,7 @@ class BasicOrtoolsExporterTestCases(unittest.TestCase):
         cls.dld_dataset_random = DroneLoadingDockDistribution().choose_rand(Random(100), 3)
         cls.edges = cls.generate_edges()
         cls.graph_exporter = OrtoolsGraphExporter()
-        cls.operational_graph = OperationalGraph()
+        cls.operational_graph = OperationalGraph(cls.dr_dataset_random[0].time_window.since)
         cls.operational_graph.add_delivery_requests(cls.dr_dataset_random)
         cls.operational_graph.add_drone_loading_docks(cls.dld_dataset_random)
         cls.operational_graph.add_operational_edges(cls.edges)

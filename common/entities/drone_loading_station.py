@@ -2,7 +2,7 @@ from random import Random
 from typing import List
 
 from geometry.geo2d import Point2D
-from common.entities.base_entities.distribution import Distribution
+from common.entities.disribution.distribution import Distribution
 from geometry.geo_distribution import UniformPointInBboxDistribution
 
 DEFAULT_DRONE_LOCATIONS_DISTRIB = UniformPointInBboxDistribution(0, 100, 0, 100)

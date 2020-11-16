@@ -58,7 +58,7 @@ class OperationalGraph:
 
     def __init__(self, zero_time: datetime):
         self.internal_graph = DiGraph()
-        self.zero_time = zero_time
+        self._zero_time = zero_time
 
     @property
     def nodes(self) -> List[OperationalNode]:
@@ -103,10 +103,10 @@ class OperationalGraph:
 
     @staticmethod
     def _create_from_extracted_subgraph(extracted_subgraph: subgraph):
-        delivery_request_subgraph = OperationalGraph()
+        delivery_request_subgraph = OperationalGraph(datetime(2021, 1, 1))
         delivery_request_subgraph.set_internal_graph(extracted_subgraph)
         return delivery_request_subgraph
 
     @property
     def zero_time(self) -> datetime:
-        return self.zero_time
+        return self._zero_time

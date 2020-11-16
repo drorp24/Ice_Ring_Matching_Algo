@@ -24,5 +24,5 @@ class BasicDroneLoadingStationGeneration(unittest.TestCase):
             self.assertGreaterEqual(station.location.x, 5)
             self.assertLessEqual(station.location.x, 10)
             self.assertGreaterEqual(station.location.y, 5)
-            self.assertLessEqual(station.loacation.y, 10)
+            self.assertLessEqual(station.location.y, 10)
 

@@ -1,7 +1,7 @@
 from enum import Enum
 from random import Random
 
-from common.entities.base_entities.distribution import Distribution, ChoiceDistribution
+from common.entities.disribution.distribution import Distribution, ChoiceDistribution
 from common.entities.package import PackageType
 
 

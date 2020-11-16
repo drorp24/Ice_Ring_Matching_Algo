@@ -1,9 +1,11 @@
 # from ice_ring.diagnoses.monitor import Monitor
 # from ice_ring.graph.graph_handler import GraphDataType
 # from ice_ring.matching.matching_solution import MatchingSolution
+from dataclasses import dataclass
 
 from ortools.constraint_solver import pywrapcp
 
+from common.graph.operational.export_ortools_graph import OrtoolsGraphExporter
 from matching.matcher import MatchInput
 from matching.matching_solution import MatchingSolution
 from matching.ortools.ortools_matching_solution import ORToolsMatchingSolution
@@ -16,19 +18,13 @@ class ORToolsMatcher:
         if match_input.empty_board.num_of_formations is None:
             return
         self._input = match_input
-
+        self._graph_exporter = OrtoolsGraphExporter()
         self._set_manager()
-
         self._set_routing()
-
         self._add_priority_objective()
-
         self._add_demand_constraints()
-
         self._add_time_constraints()
-
         self._add_dropped_penalty()
-
         self._set_parameters()
 
     def match(self) -> MatchingSolution:

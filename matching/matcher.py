@@ -10,7 +10,7 @@ from pathlib import Path
 from sys import platform
 
 from common.entities.drone_delivery_board import EmptyDroneDeliveryBoard
-from common.graph.operational.delivery_request_graph import DeliveryRequestGraph
+from common.graph.operational.export_graph import GraphExporter, OperationalGraph
 from matching.matching_solution import MatchingSolution
 
 
@@ -97,15 +97,9 @@ class MatchConfig:
 
 @dataclass
 class MatchInput:
-    graph: DeliveryRequestGraph
+    graph: OperationalGraph
     empty_board: EmptyDroneDeliveryBoard
     config: MatchConfig
-
-
-@dataclass
-class MatchOutput:
-    graph: DeliveryRequestGraph
-    empty_board: EmptyDroneDeliveryBoard
 
 
 class Matcher:

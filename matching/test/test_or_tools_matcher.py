@@ -8,13 +8,14 @@ from common.entities.drone import PlatformType
 from common.entities.drone_delivery import DroneDelivery, EmptyDroneDelivery, MatchedDeliveryRequest
 from common.entities.drone_delivery_board import DroneDeliveryBoard, EmptyDroneDeliveryBoard
 from common.entities.drone_formation import FormationSize, FormationOptions, DroneFormations
+from common.graph.operational.delivery_request_graph import OperationalGraph
 from matching.matcher import MatchInput, MatchConfig
 from matching.ortools.ortools_matcher import ORToolsMatcher
 
 
 class TestORToolsMatcher(TestCase):
     @staticmethod
-    def create_graph_mock(delivery_requests):
+    def create_graph(delivery_requests):
         def mock_get_delivery_request(node_index):
             return delivery_requests[node_index]
 
@@ -60,9 +61,10 @@ class TestORToolsMatcher(TestCase):
     @classmethod
     def setUpClass(cls):
         cls.delivery_requests = DeliveryRequestDistribution().choose_rand(Random(42), 3)
-        small_graph = cls.create_graph_mock(cls.delivery_requests)  # TODO: create real graph
+        small_graph = OperationalGraph(datetime(2020, 1, 23, 11, 30, 00))
+        # small_graph = cls.create_graph(cls.delivery_requests)  # TODO: create real graph
         empty_board = cls.create_empty_drone_delivery_board()
-        config = MatchConfig.from_file(Path('match_config1.json'))
+        config = MatchConfig.from_file(Path('matching/test/match_config1.json'))
 
         cls.small_match_input = MatchInput(small_graph, empty_board, config)
         cls.expected_matched_board = cls.create_drone_delivery_board(empty_board.empty_drone_deliveries[0],
