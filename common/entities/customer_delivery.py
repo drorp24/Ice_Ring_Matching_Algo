@@ -1,7 +1,7 @@
 from random import Random
 from typing import List
 
-from common.entities.base_entity import JsonableBaseEntity
+from common.entities.base_entity import JsonableBaseEntity, Localizable
 from common.entities.disribution.distribution import UniformChoiceDistribution, Distribution
 from common.entities.package import PackageType
 from common.entities.package_delivery_plan import PackageDeliveryPlan, PackageDeliveryPlanDistribution, \
@@ -10,7 +10,7 @@ from geometry.geo2d import Point2D
 from geometry.geo_factory import calc_centroid
 
 
-class CustomerDelivery(JsonableBaseEntity):
+class CustomerDelivery(JsonableBaseEntity, Localizable):
 
     def __init__(self, package_delivery_plans: List[PackageDeliveryPlan]):
         self._package_delivery_plans = package_delivery_plans
@@ -19,7 +19,7 @@ class CustomerDelivery(JsonableBaseEntity):
     def package_delivery_plans(self) -> [PackageDeliveryPlan]:
         return self._package_delivery_plans
 
-    def calc_centroid(self) -> Point2D:
+    def calc_location(self) -> Point2D:
         return calc_centroid([pdp.drop_point for pdp in self._package_delivery_plans])
 
     def get_amount_of_package_type(self, package_type: PackageType) -> int:

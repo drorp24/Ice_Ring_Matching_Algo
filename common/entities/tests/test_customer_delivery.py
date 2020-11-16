@@ -29,11 +29,11 @@ class BasicPackageDeliveryPlan(unittest.TestCase):
     def test_calc_centroid(self):
         dist1 = [self.plan_delivery_distribution1]
         cd = CustomerDeliveryDistribution(dist1).choose_rand(Random(42), amount=1, num_pdp=10)[0]
-        self.assertEqual(create_point_2d(10, 11), cd.calc_centroid())
+        self.assertEqual(create_point_2d(10, 11), cd.calc_location())
 
         dist2 = [self.plan_delivery_distribution2]
         cd = CustomerDeliveryDistribution(dist2).choose_rand(Random(42), amount=1, num_pdp=10)[0]
-        self.assertEqual(create_point_2d(210, 211), cd.calc_centroid())
+        self.assertEqual(create_point_2d(210, 211), cd.calc_location())
 
     def print_example_customer_delivery(self):
         pprint(self.cd_dist.choose_rand(Random(100), 50)[0].__dict__())

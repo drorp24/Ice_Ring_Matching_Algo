@@ -20,6 +20,10 @@ class OperationalNode:
         return self._internal
 
     @property
+    def internal_type(self):
+        return type(self.internal_node)
+
+    @property
     def priority(self) -> int:
         return self.internal_node.priority
 
@@ -35,7 +39,7 @@ class OperationalNode:
 
 
 @dataclass
-class OperationalEdgeAttributes:
+class OperationalEdgeAttribs:
 
     def __init__(self, cost: int):
         self.cost = cost
@@ -43,7 +47,7 @@ class OperationalEdgeAttributes:
 
 class OperationalEdge(object):
 
-    def __init__(self, start_node: OperationalNode, end_node: OperationalNode, attributes: OperationalEdgeAttributes):
+    def __init__(self, start_node: OperationalNode, end_node: OperationalNode, attributes: OperationalEdgeAttribs):
         self.start_node = start_node
         self.end_node = end_node
         self.attributes = attributes
@@ -67,7 +71,7 @@ class OperationalGraph:
     @property
     def edges(self) -> List[OperationalEdge]:
         internal_edges = self._internal_graph.edges.data(data=True)
-        return [OperationalEdge(edge[0], edge[1], OperationalEdgeAttributes(edge[2]["cost"])) for edge in
+        return [OperationalEdge(edge[0], edge[1], OperationalEdgeAttribs(edge[2]["cost"])) for edge in
                 internal_edges]
 
     def is_empty(self):

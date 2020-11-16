@@ -8,10 +8,10 @@ from common.entities.delivery_request_generator import DeliveryRequestDatasetGen
 from common.entities.drone_loading_dock import DroneLoadingDockDistribution
 from common.entities.temporal import TimeWindowDistribution, DateTimeDistribution, DateTimeExtension, \
     TimeDeltaExtension, TimeDeltaDistribution, TimeWindowExtension
-from common.graph.operational.delivery_request_graph import OperationalEdge, \
-    OperationalEdgeAttributes, OperationalNode
-from common.graph.operational.delivery_request_graph import OperationalGraph
-from common.graph.operational.graph_creator import create_locally_connected_dr_graph
+from common.graph.operational.operational_graph import OperationalEdge, \
+    OperationalEdgeAttribs, OperationalNode
+from common.graph.operational.operational_graph import OperationalGraph
+from common.graph.operational.graph_creator import add_locally_connected_dr_graph, add_fully_connected_loading_docks
 from geometry.geo_distribution import UniformPointInBboxDistribution
 
 
@@ -30,17 +30,28 @@ class BasicDeliveryRequestGraphTestCases(unittest.TestCase):
 
     def test_local_graph_generation_should_be_fully_connected(self):
         region_dataset = self.dr_dataset_local_region_1
-        graph = create_locally_connected_dr_graph(region_dataset, max_cost_to_connect=100*2/sqrt(2))
+        graph = OperationalGraph()
+        add_locally_connected_dr_graph(graph, region_dataset, max_cost_to_connect=100 * 2 / sqrt(2))
         num_nodes = len(graph.nodes)
         self.assertEqual(len(region_dataset), num_nodes)
         self.assertEqual((num_nodes * (num_nodes - 1)), len(graph.edges))
 
     def test_local_graph_generation_two_separate_clique(self):
         region_dataset = self.dr_dataset_local_region_1 + self.dr_dataset_local_region_2
-        graph = create_locally_connected_dr_graph(region_dataset, max_cost_to_connect=100*2/sqrt(2))
+        graph = OperationalGraph()
+        add_locally_connected_dr_graph(graph, region_dataset, max_cost_to_connect=100 * 2 / sqrt(2))
         num_nodes = len(graph.nodes)
         self.assertEqual(len(region_dataset), num_nodes)
-        self.assertEqual(2*(num_nodes/2 * (num_nodes/2 - 1)), len(graph.edges))
+        self.assertEqual(2 * (num_nodes / 2 * (num_nodes / 2 - 1)), len(graph.edges))
+
+    def test_add_full_connection_to_loading_dock(self):
+        regional_dr_dataset = self.dr_dataset_local_region_1
+        graph = OperationalGraph()
+        graph.add_delivery_requests(regional_dr_dataset)
+        dld_dataset = DroneLoadingDockDistribution().choose_rand(Random(42), 3)
+        add_fully_connected_loading_docks(graph, dld_dataset)
+        self.assertEqual(len(regional_dr_dataset) + len(dld_dataset), len(graph.nodes))
+        self.assertEqual(2 * len(regional_dr_dataset) * len(dld_dataset), len(graph.edges))
 
     def test_delivery_request_graph_creation(self):
         drg = OperationalGraph()
@@ -58,7 +69,7 @@ class BasicDeliveryRequestGraphTestCases(unittest.TestCase):
         for dk in self.dld_dataset_random:
             for dl in self.dr_dataset_morning:
                 edges.append(OperationalEdge(OperationalNode(dk), OperationalNode(dl),
-                                             OperationalEdgeAttributes(Random().choice(range(10)))))
+                                             OperationalEdgeAttribs(Random().choice(range(10)))))
         drg.add_operational_edges(edges)
         returned_edges = list(drg.edges)
         self.assertEqual(len(drg.edges), len(edges))
