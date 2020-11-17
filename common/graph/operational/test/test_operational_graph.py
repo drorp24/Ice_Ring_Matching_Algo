@@ -44,7 +44,7 @@ class BasicDeliveryRequestGraphTestCases(unittest.TestCase):
         self.assertEqual(len(region_dataset), num_nodes)
         self.assertEqual(2 * (num_nodes / 2 * (num_nodes / 2 - 1)), len(graph.edges))
 
-    def test_add_full_connection_to_loading_dock(self):
+    def test_add_full_connection_between_loading_docks_and_delivery_requests(self):
         regional_dr_dataset = self.dr_dataset_local_region_1
         graph = OperationalGraph()
         graph.add_delivery_requests(regional_dr_dataset)
