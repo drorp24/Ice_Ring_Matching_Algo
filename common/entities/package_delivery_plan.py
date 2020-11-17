@@ -4,7 +4,7 @@ from random import Random
 from typing import List
 
 from common.entities.disribution.distribution import Distribution
-from common.entities.base_entity import JsonableBaseEntity
+from common.entities.base_entity import JsonableBaseEntity, Localizable
 from common.entities.package import PackageType, PackageDistribution
 from common.math.angle import Angle, AngleUniformDistribution, AngleUnit
 from geometry.geo2d import Point2D, Polygon2D
@@ -12,7 +12,7 @@ from geometry.geo_distribution import UniformPointInBboxDistribution
 from geometry.geo_factory import create_polygon_2d_from_ellipse, convert_dict_to_point_2d
 
 
-class PackageDeliveryPlan(JsonableBaseEntity):
+class PackageDeliveryPlan(JsonableBaseEntity, Localizable):
 
     def __init__(self, drop_point: Point2D, azimuth: Angle, pitch: Angle, package_type: PackageType):
         self._drop_point = drop_point
@@ -35,6 +35,9 @@ class PackageDeliveryPlan(JsonableBaseEntity):
     @property
     def package_type(self) -> PackageType:
         return self._package_type
+
+    def calc_location(self) -> Point2D:
+        return self.drop_point
 
     @classmethod
     def dict_to_obj(cls, dict_input):

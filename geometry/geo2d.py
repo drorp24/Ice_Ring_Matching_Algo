@@ -131,6 +131,9 @@ class Point2D(Geometry2D):
     def __eq__(self, other) -> bool:
         raise NotImplementedError()
 
+    def __add__(self, other) -> Point2D:
+        raise NotImplementedError()
+
 
 class Curve2D(Geometry2D):
 
