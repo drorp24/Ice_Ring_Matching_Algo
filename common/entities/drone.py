@@ -23,7 +23,7 @@ class _PackageTypesVolumeMap:
         return self._dict
 
     def get_package_types(self) -> [PackageType]:
-        return self._dict.keys()
+        return list(self._dict.keys())
 
     def get_package_type_volume(self, package_type: PackageType) -> int:
         return self._dict[package_type]
@@ -95,7 +95,7 @@ class DroneConfigurations:
 
 class PlatformTypeDistribution(Distribution):
 
-    def __init__(self, platform_type_options: {PlatformType, int} = None):
+    def __init__(self, platform_type_options: {PlatformType, int}=None):
         if platform_type_options is None:
             platform_type_options = {platform_type: 1 for platform_type in PlatformType}
         self._platform_type_options = platform_type_options
