@@ -1,18 +1,6 @@
-import numpy as np
-from abc import abstractmethod, ABC
 from typing import List
 
-
-
-# class BaseGridLocation(ABC):
-#
-#     @abstractmethod
-#     def __add__(self, other):
-#         raise NotImplementedError()
-#
-#     @abstractmethod
-#     def __sub__(self, other):
-#         raise NotImplementedError()
+import numpy as np
 
 
 class GridLocation(object):
@@ -35,24 +23,10 @@ class GridLocation(object):
         return GridLocation(self.row - other.row, self.column - other.column)
 
     def __eq__(self, other):
-        return self.row==other.row and self.column==other.column
+        return self.row == other.row and self.column == other.column
 
     def as_list(self):
         return [self._row, self._column]
-
-
-# class NoneGridLocation(BaseGridLocation):
-#     def __init__(self):
-#         super().__init__(None, None)
-#
-#     def __add__(self, other):
-#         return self
-#
-#     def __sub__(self, other):
-#         return self
-#    def __eq__(self, other):
-#       return isinstance(other, NoneGridLocation)
-
 
 
 class GridLocationServices:

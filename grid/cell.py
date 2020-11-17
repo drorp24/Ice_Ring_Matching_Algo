@@ -1,15 +1,15 @@
 import math
 from itertools import repeat
 from typing import List, KeysView, ValuesView
-from uuid import UUID
 
 import numpy as np
 from attr import dataclass
+from optional import Optional
 
 from common.entities.delivery_option import DeliveryOption
 from common.entities.delivery_request import DeliveryRequest
 from common.entities.package import PackageType
-from common.entities.package_delivery_plan import PackageDeliveryPlan
+from common.entities.package_delivery_plan import PackageDeliveryPlan, PackageDeliveryPlanList
 from common.math.angle import Angle
 from grid.azimuth_options import AzimuthOptions
 from grid.grid_location import GridLocationServices, GridLocation
@@ -23,10 +23,9 @@ class Cell:
     location: GridLocation
 
 
-@dataclass
 class EnvelopeCell(Cell):
     drone_azimuth: Angle
-    package_delivery_plan_ids: List[int]
+    package_delivery_plans: PackageDeliveryPlanList
 
 
 class CellServices:
@@ -73,33 +72,43 @@ class DeliveryRequestEnvelopeCells:
     @staticmethod
     def _get_delivery_request_envelope_cells(slides_container: SlidesContainer, delivery_option: DeliveryOption) -> \
             List[EnvelopeCell]:
-        scale_grid_locations = list(map(DeliveryRequestEnvelopeCells._scale_grid_locations, repeat(slides_container),
-                                        delivery_option.package_delivery_plans))
+        scale_grid_locations = list(
+            map(DeliveryRequestEnvelopeCells._get_scaled_grid_locations, repeat(slides_container),
+                delivery_option.package_delivery_plans))
 
-        average_locations = list(map(GridLocationServices.calc_average, list(zip(*scale_grid_locations))))
+        indices_to_calc_average = list(
+            map(DeliveryRequestEnvelopeCells._get_indices_to_calc_average, list(zip(*scale_grid_locations))))
+
+        average_locations = list(
+            map(DeliveryRequestEnvelopeCells._calc_average, indices_to_calc_average, list(zip(*scale_grid_locations))))
 
         average_uuids = list(map(DeliveryRequestEnvelopeCells._get_average_uuids,
-                                 scale_grid_locations, delivery_option.package_delivery_plans))
+                                 repeat(delivery_option.package_delivery_plans), indices_to_calc_average))
 
-        return list(map(EnvelopeCell, average_locations,
+        return list(map(EnvelopeCell, average_locations, average_uuids,
                         AzimuthOptions(slides_container.get_drone_azimuth_resolution).values))
 
     @staticmethod
-    def _calc_average(grid_locations: List[GridLocation]):
-
-        list(map(GridLocationServices.calc_average, grid_locations))
-
-    @staticmethod
-    def _get_average_uuids(grid_locations: List[GridLocation],package_delivery_plan: PackageDeliveryPlan):
-
+    def _get_indices_to_calc_average(grid_locations: List[Optional.of(GridLocation)]) -> List[int]:
+        return [index for index, grid_location in enumerate(grid_locations) if
+                grid_location != Optional.empty()]
 
     @staticmethod
-    def _scale_grid_locations(slides_container: SlidesContainer,
-                              package_delivery_plan: PackageDeliveryPlan) -> List[GridLocation]:
+    def _calc_average(indices_to_calc: List[int], grid_locations: List[GridLocation]) -> GridLocation:
+        return GridLocationServices.calc_average(list(map(grid_locations.__getitem__, indices_to_calc)))
+
+    @staticmethod
+    def _get_average_uuids(indices_to_calc: List[int],
+                           package_delivery_plans: List[PackageDeliveryPlan]) -> PackageDeliveryPlanList:
+        return PackageDeliveryPlanList(list(map(package_delivery_plans.__getitem__, indices_to_calc)))
+
+    @staticmethod
+    def _get_scaled_grid_locations(slides_container: SlidesContainer,
+                                   package_delivery_plan: PackageDeliveryPlan) -> List[Optional.of(GridLocation)]:
         drop_point_grid_location = GridService.get_grid_location(package_delivery_plan.drop_point,
                                                                  slides_container.get_drone_azimuth_resolution)
 
-        return list(map(sum, repeat(drop_point_grid_location),
+        return list(map(DeliveryRequestEnvelopeCells._scale_to_grid, repeat(drop_point_grid_location),
                         map(DeliveryRequestEnvelopeCells._get_envelope_location, repeat(slides_container),
                             repeat(package_delivery_plan.package_type),
                             AzimuthOptions(slides_container.get_drone_azimuth_resolution).values,
@@ -109,9 +118,15 @@ class DeliveryRequestEnvelopeCells:
                             )))
 
     @staticmethod
+    def _scale_to_grid(drop_point_grid_location: GridLocation, envelope_grid_location: GridLocation) -> Optional.of(
+        GridLocation):
+        return Optional.of(envelope_grid_location).if_present(
+            drop_point_grid_location + envelope_grid_location).or_else(Optional.empty())
+
+    @staticmethod
     def _get_envelope_location(slides_container: SlidesContainer, package_type: PackageType,
                                drone_azimuth: Angle,
-                               drop_azimuth: Angle) -> GridLocation:
+                               drop_azimuth: Angle) -> Optional.of(GridLocation):
         return slides_container.get_envelope_location(drone_azimuth, drop_azimuth,
                                                       package_type)
 

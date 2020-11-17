@@ -1,13 +1,11 @@
-from typing import Union
+from optional import Optional
 
 from common.entities.package import PackageType
 from common.math.angle import Angle
-from geometry.geo2d import EmptyGeometry2D
 from geometry.geo_factory import create_point_2d
-from grid.grid_location import NoneGridLocation, GridLocation
+from grid.grid_location import GridLocation
 from grid.grid_service import GridService
 from services.envelope_services_interface import EnvelopeServicesInterface
-
 
 
 class Slide:
@@ -56,16 +54,16 @@ class Slide:
         return self._required_area
 
     @property
-    def envelope_location(self) -> GridLocation:
+    def envelope_location(self) -> Optional.of(GridLocation):
         return self._envelope_location
 
-    def calc_envelope_location(self) -> GridLocation:
-
+    def calc_envelope_location(self) -> Optional.of(GridLocation):
         drop_point = create_point_2d(0, 0)
-        envelope_polygon = self._envelope_service.calc_drop_envelope(self._package_type, self._drone_azimuth, drop_point,
-                                                                self._drop_azimuth)
+        envelope_polygon = self._envelope_service.calc_drop_envelope(self._package_type, self._drone_azimuth,
+                                                                     drop_point,
+                                                                     self._drop_azimuth)
 
         if not self._envelope_service.is_valid_envelope(envelope_polygon, self._required_area):
-            return NoneGridLocation()
+            return Optional.empty()
 
         return GridService.get_polygon_centroid_grid_location(envelope_polygon, self._cell_resolution)

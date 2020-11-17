@@ -66,6 +66,18 @@ class PackageDeliveryPlan(JsonableBaseEntity):
                (self.package_type == other.package_type)
 
 
+class PackageDeliveryPlanList:
+    def __init__(self, package_delivery_plans: List[PackageDeliveryPlan]):
+        self._package_delivery_plans = package_delivery_plans
+
+    @property
+    def package_delivery_plans(self):
+        return self._package_delivery_plans
+
+    def package_delivery_plans_ids(self) -> List[UUID]:
+        return [package_delivery_plan.id for package_delivery_plan in self._package_delivery_plans]
+
+
 DEFAULT_DROP_POINT_DISTRIB = UniformPointInBboxDistribution(30, 40, 35, 45)
 DEFAULT_AZI_DISTRIB = AngleUniformDistribution(Angle(0, AngleUnit.DEGREE), Angle(355, AngleUnit.DEGREE))
 DEFAULT_PITCH_DISTRIB = AngleUniformDistribution(Angle(30, AngleUnit.DEGREE), Angle(90, AngleUnit.DEGREE))
