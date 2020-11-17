@@ -5,7 +5,7 @@ from random import Random
 from typing import List
 
 from common.entities.disribution.distribution import UniformChoiceDistribution, Distribution
-from common.entities.base_entity import JsonableBaseEntity
+from common.entities.base_entity import JsonableBaseEntity, Localizable
 from common.entities.customer_delivery import CustomerDeliveryDistribution
 from common.entities.delivery_option import DeliveryOption, DeliveryOptionDistribution, DEFAULT_CD_DISTRIB
 from common.entities.package import PackageDistribution
@@ -14,10 +14,12 @@ from common.entities.package_delivery_plan import PackageDeliveryPlanDistributio
 from common.entities.temporal import TimeWindowDistribution, TimeWindowExtension, DateTimeDistribution, \
     TimeDeltaExtension, TimeDeltaDistribution, DateTimeExtension
 from common.math.angle import AngleUniformDistribution
+from geometry.geo2d import Point2D
 from geometry.geo_distribution import UniformPointInBboxDistribution
+from geometry.geo_factory import calc_centroid
 
 
-class DeliveryRequest(JsonableBaseEntity):
+class DeliveryRequest(JsonableBaseEntity, Localizable):
 
     def __init__(self, delivery_options: [DeliveryOption], time_window: TimeWindowExtension, priority: int):
         self._delivery_options = delivery_options if delivery_options is not None else []
@@ -36,6 +38,9 @@ class DeliveryRequest(JsonableBaseEntity):
     def priority(self) -> int:
         return self._priority
 
+    def calc_location(self) -> Point2D:
+        return calc_centroid([do.calc_location() for do in self.delivery_options])
+
     @classmethod
     def dict_to_obj(cls, dict_input):
         assert (dict_input['__class__'] == cls.__name__)
@@ -46,12 +51,13 @@ class DeliveryRequest(JsonableBaseEntity):
         )
 
     def __eq__(self, other):
-        return (self.__class__ == other.__class__ and self.delivery_options == other.delivery_options) and \
+        return (self.__class__ == other.__class__) and \
+               (self.delivery_options == other.delivery_options) and \
                (self.time_window == other.time_window) and \
                (self.priority == other.priority)
 
     def __hash__(self):
-        return hash((tuple(self._delivery_options), self._time_window, self._priority))
+        return hash((tuple(self.delivery_options), self.time_window, self.priority))
 
 
 class PriorityDistribution(UniformChoiceDistribution):

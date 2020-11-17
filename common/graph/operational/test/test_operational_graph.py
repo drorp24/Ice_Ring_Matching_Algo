@@ -1,5 +1,6 @@
 import unittest
 from datetime import time, date, timedelta
+from math import sqrt
 from random import Random
 
 from common.entities.delivery_request import DeliveryRequestDistribution, generate_dr_distribution, PriorityDistribution
@@ -7,8 +8,11 @@ from common.entities.delivery_request_generator import DeliveryRequestDatasetGen
 from common.entities.drone_loading_dock import DroneLoadingDockDistribution
 from common.entities.temporal import TimeWindowDistribution, DateTimeDistribution, DateTimeExtension, \
     TimeDeltaExtension, TimeDeltaDistribution, TimeWindowExtension
-from common.graph.operational.delivery_request_graph import OperationalGraph, OperationalEdge, \
-    OperationalEdgeAttributes, OperationalNode
+from common.graph.operational.operational_graph import OperationalEdge, \
+    OperationalEdgeAttribs, OperationalNode
+from common.graph.operational.operational_graph import OperationalGraph
+from common.graph.operational.graph_creator import add_locally_connected_dr_graph, add_fully_connected_loading_docks
+from geometry.geo_distribution import UniformPointInBboxDistribution
 
 
 class BasicDeliveryRequestGraphTestCases(unittest.TestCase):
@@ -21,6 +25,33 @@ class BasicDeliveryRequestGraphTestCases(unittest.TestCase):
         cls.dr_dataset_afternoon = create_afternoon_dr_dataset()
         cls.dr_dataset_top_priority = create_top_priority_dr_dataset()
         cls.dr_dataset_low_priority = create_low_priority_dr_dataset()
+        cls.dr_dataset_local_region_1 = create_local_data_in_region_1()
+        cls.dr_dataset_local_region_2 = create_local_data_in_region_2()
+
+    def test_local_graph_generation_should_be_fully_connected(self):
+        region_dataset = self.dr_dataset_local_region_1
+        graph = OperationalGraph()
+        add_locally_connected_dr_graph(graph, region_dataset, max_cost_to_connect=100 * 2 / sqrt(2))
+        num_nodes = len(graph.nodes)
+        self.assertEqual(len(region_dataset), num_nodes)
+        self.assertEqual((num_nodes * (num_nodes - 1)), len(graph.edges))
+
+    def test_local_graph_generation_two_separate_clique(self):
+        region_dataset = self.dr_dataset_local_region_1 + self.dr_dataset_local_region_2
+        graph = OperationalGraph()
+        add_locally_connected_dr_graph(graph, region_dataset, max_cost_to_connect=100 * 2 / sqrt(2))
+        num_nodes = len(graph.nodes)
+        self.assertEqual(len(region_dataset), num_nodes)
+        self.assertEqual(2 * (num_nodes / 2 * (num_nodes / 2 - 1)), len(graph.edges))
+
+    def test_add_full_connection_between_loading_docks_and_delivery_requests(self):
+        regional_dr_dataset = self.dr_dataset_local_region_1
+        graph = OperationalGraph()
+        graph.add_delivery_requests(regional_dr_dataset)
+        dld_dataset = DroneLoadingDockDistribution().choose_rand(Random(42), 3)
+        add_fully_connected_loading_docks(graph, dld_dataset)
+        self.assertEqual(len(regional_dr_dataset) + len(dld_dataset), len(graph.nodes))
+        self.assertEqual(2 * len(regional_dr_dataset) * len(dld_dataset), len(graph.edges))
 
     def test_delivery_request_graph_creation(self):
         drg = OperationalGraph()
@@ -38,7 +69,7 @@ class BasicDeliveryRequestGraphTestCases(unittest.TestCase):
         for dk in self.dld_dataset_random:
             for dl in self.dr_dataset_morning:
                 edges.append(OperationalEdge(OperationalNode(dk), OperationalNode(dl),
-                                             OperationalEdgeAttributes(Random().choice(range(10)))))
+                                             OperationalEdgeAttribs(Random().choice(range(10)))))
         drg.add_operational_edges(edges)
         returned_edges = list(drg.edges)
         self.assertEqual(len(drg.edges), len(edges))
@@ -53,7 +84,7 @@ class BasicDeliveryRequestGraphTestCases(unittest.TestCase):
         drg1 = OperationalGraph()
         drg1.add_drone_loading_docks(self.dld_dataset_random)
         drg2 = OperationalGraph()
-        drg2.set_internal_graph(drg1.internal_graph)
+        drg2.set_internal_graph(drg1._internal_graph)
         self.assertFalse(drg1.is_empty())
         self.assertEqual(_get_dr_from_dr_graph(drg1), _get_dr_from_dr_graph(drg2))
 
@@ -61,7 +92,7 @@ class BasicDeliveryRequestGraphTestCases(unittest.TestCase):
         drg1 = OperationalGraph()
         drg1.add_delivery_requests(self.dr_dataset_random)
         drg2 = OperationalGraph()
-        drg2.set_internal_graph(drg1.internal_graph)
+        drg2.set_internal_graph(drg1._internal_graph)
         self.assertFalse(drg1.is_empty())
         self.assertEqual(_get_dr_from_dr_graph(drg1), _get_dr_from_dr_graph(drg2))
 
@@ -94,32 +125,40 @@ class BasicDeliveryRequestGraphTestCases(unittest.TestCase):
         self.assertEqual(nodes_in_low_priority_subgraph, node_in_low_priority_graph)
 
 
-def create_morning_dr_dataset():
-    dr_distribution = _create_morning_dr_distribution()
+def create_local_data_in_region_1():
     dr_struct = DeliveryRequestDatasetStructure(num_of_delivery_requests=10,
-                                                delivery_request_distribution=dr_distribution)
-    return DeliveryRequestDatasetGenerator.generate(dr_struct)
+                                                delivery_request_distribution=(_create_region_1_dr_distribution()))
+    return DeliveryRequestDatasetGenerator.generate(dr_struct, random=Random(42))
+
+
+def create_local_data_in_region_2():
+    dr_struct = DeliveryRequestDatasetStructure(num_of_delivery_requests=10,
+                                                delivery_request_distribution=(_create_region_2_dr_distribution()))
+    return DeliveryRequestDatasetGenerator.generate(dr_struct, random=Random(42))
+
+
+def create_morning_dr_dataset():
+    dr_struct = DeliveryRequestDatasetStructure(num_of_delivery_requests=10,
+                                                delivery_request_distribution=(_create_morning_dr_distribution()))
+    return DeliveryRequestDatasetGenerator.generate(dr_struct, random=Random(42))
 
 
 def create_afternoon_dr_dataset():
-    dr_distribution = _create_afternoon_dr_distribution()
     dr_struct = DeliveryRequestDatasetStructure(num_of_delivery_requests=5,
-                                                delivery_request_distribution=dr_distribution)
-    return DeliveryRequestDatasetGenerator.generate(dr_struct)
+                                                delivery_request_distribution=(_create_afternoon_dr_distribution()))
+    return DeliveryRequestDatasetGenerator.generate(dr_struct, random=Random(42))
 
 
 def create_top_priority_dr_dataset():
-    dr_distribution = _create_high_priority_dr_distribution()
     dr_struct = DeliveryRequestDatasetStructure(num_of_delivery_requests=4,
-                                                delivery_request_distribution=dr_distribution)
-    return DeliveryRequestDatasetGenerator.generate(dr_struct)
+                                                delivery_request_distribution=(_create_high_priority_dr_distribution()))
+    return DeliveryRequestDatasetGenerator.generate(dr_struct, random=Random(42))
 
 
 def create_low_priority_dr_dataset():
-    dr_distribution = _create_low_priority_dr_distribution()
     dr_struct = DeliveryRequestDatasetStructure(num_of_delivery_requests=6,
-                                                delivery_request_distribution=dr_distribution)
-    return DeliveryRequestDatasetGenerator.generate(dr_struct)
+                                                delivery_request_distribution=(_create_low_priority_dr_distribution()))
+    return DeliveryRequestDatasetGenerator.generate(dr_struct, random=Random(42))
 
 
 def _create_morning_dr_distribution():
@@ -146,3 +185,13 @@ def _create_low_priority_dr_distribution():
 
 def _get_dr_from_dr_graph(drg1):
     return [n.internal_node for n in drg1.nodes]
+
+
+def _create_region_1_dr_distribution():
+    return generate_dr_distribution(
+        drop_point_distribution=UniformPointInBboxDistribution(min_x=100, max_x=200, min_y=50, max_y=150))
+
+
+def _create_region_2_dr_distribution():
+    return generate_dr_distribution(
+        drop_point_distribution=UniformPointInBboxDistribution(min_x=1100, max_x=1200, min_y=150, max_y=1150))

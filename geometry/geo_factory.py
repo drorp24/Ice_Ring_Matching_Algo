@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+from functools import reduce
 from typing import List, Union
+
 from matplotlib.patches import Ellipse
 
 from geometry.geo2d import Point2D, Vector2D, MultiPolygon2D, EmptyGeometry2D
@@ -61,3 +63,7 @@ def create_line_string_2d(points: List[Point2D]) -> LineString2D:
 
 def create_linear_ring_2d(points: List[Point2D]) -> LinearRing2D:
     return _ShapelyLinearRing2D(points)
+
+
+def calc_centroid(points: [Point2D]) -> Point2D:
+    return (reduce(lambda p, j: p + j, points).to_vector() * (1.0 / points.__len__())).to_point()
