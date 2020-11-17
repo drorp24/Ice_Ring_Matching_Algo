@@ -4,7 +4,6 @@ import unittest
 from geometry.geo_factory import create_polygon_2d
 from geometry.geometry_utils import GeometryUtils
 from geometry.polygon_utils import PolygonUtils
-from grid.cell import GridLocation
 
 
 class PolygonUtilsTestCase(unittest.TestCase):
@@ -115,7 +114,6 @@ class PolygonUtilsTestCase(unittest.TestCase):
         box_resolution = 1
         splited_polygon = PolygonUtils.split_polygon(polygon, box_resolution, required_area)
         print(f'large_box_test took {time.time() - start_time} seconds  with split_polygon1')
-
 
     def test_split_polygon_large_box_ra1_br1_iterative_split_polygon_negative_values(self):
         start_time = time.time()

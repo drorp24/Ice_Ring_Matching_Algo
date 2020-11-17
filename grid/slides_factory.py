@@ -3,14 +3,15 @@ from typing import List
 import numpy as np
 
 from common.entities.package import PackageType
-from common.math.angle import BaseAngle, AngleUnit, Angle
+from common.math.angle import AngleUnit, Angle
 from grid.slide import Slide
 from grid.slides_container import SlidesContainer
+from params import MIN_AZIMUTH_DEGREES, MAX_AZIMUTH_DEGREES
 from services.envelope_services_interface import EnvelopeServicesInterface
 
 
 def create_slide(service: EnvelopeServicesInterface,
-                 package_type: PackageType, drone_azimuth: BaseAngle, drop_azimuth: BaseAngle,
+                 package_type: PackageType, drone_azimuth: Angle, drop_azimuth: Angle,
                  cell_resolution: int, cell_ratio_required: float):
     assert 0 <= cell_ratio_required <= 1
     return Slide(service,
@@ -24,11 +25,11 @@ def generate_slides_container(service: EnvelopeServicesInterface,
                               cell_resolution: int, cell_ratio_required: float) -> SlidesContainer:
     slides = []
 
-    drone_azimuth_options = np.arange(MIN_AZIMUTH_ANGLE, MAX_AZIMUTH_ANGLE,
-                                      MAX_AZIMUTH_ANGLE / drone_azimuth_resolution)
+    drone_azimuth_options = np.arange(MIN_AZIMUTH_DEGREES, MAX_AZIMUTH_DEGREES,
+                                      MAX_AZIMUTH_DEGREES / drone_azimuth_resolution)
 
-    drop_azimuth_options = np.arange(MIN_AZIMUTH_ANGLE, MAX_AZIMUTH_ANGLE,
-                                     MAX_AZIMUTH_ANGLE / drop_azimuth_resolution)
+    drop_azimuth_options = np.arange(MIN_AZIMUTH_DEGREES, MAX_AZIMUTH_DEGREES,
+                                     MAX_AZIMUTH_DEGREES / drop_azimuth_resolution)
 
     for package_type in package_types:
         for drone_azimuth_option in drone_azimuth_options:

@@ -1,14 +1,13 @@
 from __future__ import annotations
 
-import uuid
 from datetime import timedelta, time, date
 from random import Random
 from typing import List
 
-from common.entities.disribution.distribution import UniformChoiceDistribution, Distribution
 from common.entities.base_entity import JsonableBaseEntity
 from common.entities.customer_delivery import CustomerDeliveryDistribution
 from common.entities.delivery_option import DeliveryOption, DeliveryOptionDistribution, DEFAULT_CD_DISTRIB
+from common.entities.disribution.distribution import UniformChoiceDistribution, Distribution
 from common.entities.package import PackageDistribution
 from common.entities.package_delivery_plan import PackageDeliveryPlanDistribution, DEFAULT_DROP_POINT_DISTRIB, \
     DEFAULT_PITCH_DISTRIB, DEFAULT_PACKAGE_DISTRIB, DEFAULT_AZI_DISTRIB
@@ -26,7 +25,7 @@ class DeliveryRequest(JsonableBaseEntity):
         self._delivery_options = delivery_options if delivery_options is not None else []
         self._time_window = time_window
         self._priority = priority
-        self._id = uuid.uuid1()     # todo get id as an input
+        # self._id = uuid.uuid1()     # todo get id as an input
 
     @property
     def delivery_options(self) -> [DeliveryOption]:
@@ -43,9 +42,9 @@ class DeliveryRequest(JsonableBaseEntity):
     def calc_location(self) -> Point2D:
         return calc_centroid([do.calc_location() for do in self.delivery_options])
 
-    @property
-    def id(self) -> uuid:
-        return self._id
+    # @property
+    # def id(self) -> uuid:
+    #     return self._id
 
     @classmethod
     def dict_to_obj(cls, dict_input):

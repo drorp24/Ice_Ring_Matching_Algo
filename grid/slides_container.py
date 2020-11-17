@@ -6,7 +6,7 @@ from optional import Optional
 from common.entities.package import PackageType
 from common.math.angle import Angle, AngleUnit
 from geometry.polygon_utils import PolygonUtils
-from grid.cell import GridLocation
+from grid.grid_location import GridLocation
 from grid.slide import Slide
 from params import MAX_AZIMUTH_DEGREES
 

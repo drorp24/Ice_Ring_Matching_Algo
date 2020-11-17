@@ -20,7 +20,6 @@ class Slide:
         self._required_area = required_area
 
         self._envelope_location = self.calc_envelope_location()
-        # self._envelope_boundary = PolygonUtils.get_envelope_boundary(self._envelope_locations)
 
     def __eq__(self, other):
         return (self.package_type == other.package_type) and \

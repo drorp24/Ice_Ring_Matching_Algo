@@ -6,14 +6,14 @@ from optional import Optional
 from geometry.geo2d import Point2D, EmptyGeometry2D, Polygon2D
 from geometry.geo_factory import create_point_2d
 from geometry.polygon_utils import PolygonUtils
-from grid.cell import GridLocation
+from grid.grid_location import GridLocation
 
 
 class GridService:
 
     @staticmethod
     def polygon_to_grid_cells(polygon: Polygon2D, cell_resolution: int, cell_ratio_required: float) -> \
-            Optional.of[List[GridLocation]]:
+            Optional.of(List[GridLocation]):
 
         if isinstance(polygon, EmptyGeometry2D):
             return Optional.empty()

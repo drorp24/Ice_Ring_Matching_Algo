@@ -118,8 +118,8 @@ class DeliveryRequestEnvelopeCells:
                             )))
 
     @staticmethod
-    def _scale_to_grid(drop_point_grid_location: GridLocation, envelope_grid_location: GridLocation) -> Optional.of(
-        GridLocation):
+    def _scale_to_grid(drop_point_grid_location: GridLocation, envelope_grid_location: GridLocation) -> \
+            Optional.of(GridLocation):
         return Optional.of(envelope_grid_location).if_present(
             drop_point_grid_location + envelope_grid_location).or_else(Optional.empty())
 

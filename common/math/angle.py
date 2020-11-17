@@ -1,12 +1,12 @@
 from __future__ import annotations
+
 import math
-from abc import ABC, abstractmethod
 from enum import Enum
 from random import Random
 from typing import List
 
-from common.entities.disribution.distribution import UniformDistribution, Range
 from common.entities.base_entity import JsonableBaseEntity
+from common.entities.disribution.distribution import UniformDistribution, Range
 from geometry.geo2d import Vector2D
 from geometry.geo_factory import create_vector_2d
 
@@ -25,41 +25,6 @@ class AngleUnit(Enum):
     def __hash__(self):
         return hash(self.name)
 
-#
-# class BaseAngle(ABC):
-#
-#     @abstractmethod
-#     def degrees(self) -> float:
-#         raise NotImplementedError()
-#
-#     @abstractmethod
-#     def radians(self) -> float:
-#         raise NotImplementedError()
-#
-#     @abstractmethod
-#     def to_direction(self) -> Vector2D:
-#         raise NotImplementedError()
-#
-#     @abstractmethod
-#     def calc_reverse(self) -> BaseAngle:
-#         raise NotImplementedError()
-#
-#     @abstractmethod
-#     def calc_abs_difference(self, other: Angle) -> BaseAngle:
-#         raise NotImplementedError()
-#
-#     @abstractmethod
-#     def __eq__(self, other: Angle):
-#         return False
-#
-#     @abstractmethod
-#     def __hash__(self):
-#         raise NotImplementedError()
-#
-#     @abstractmethod
-#     def __str__(self):
-#         raise NotImplementedError()
-#
 
 class Angle(JsonableBaseEntity):
 
@@ -103,26 +68,6 @@ class Angle(JsonableBaseEntity):
 
     def __hash__(self):
         return hash(self.degrees)
-
-#
-# class NoneAngle(BaseAngle):
-#     def degrees(self) -> float:
-#         raise NotImplementedError()
-#
-#     def radians(self) -> float:
-#         raise NotImplementedError()
-#
-#     def to_direction(self) -> Vector2D:
-#         raise NotImplementedError()
-#
-#     def calc_reverse(self) -> BaseAngle:
-#         raise NotImplementedError()
-#
-#     def calc_abs_difference(self, other: Angle) -> BaseAngle:
-#         raise NotImplementedError()
-#
-#     def __init__(self):
-#         super().__init__()
 
 
 def _calc_first_cycle_equivalent(angle: Angle):

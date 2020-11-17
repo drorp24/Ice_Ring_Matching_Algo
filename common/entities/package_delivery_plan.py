@@ -4,14 +4,14 @@ from random import Random
 from typing import List
 from uuid import UUID
 
-from common.entities.disribution.distribution import Distribution
 from common.entities.base_entity import JsonableBaseEntity, Localizable
+from common.entities.disribution.distribution import Distribution
 from common.entities.package import PackageType, PackageDistribution
 from common.math.angle import Angle, AngleUniformDistribution, AngleUnit
 from common.utils.uuid_utils import convert_str_to_uuid
 from geometry.geo2d import Point2D
 from geometry.geo_distribution import UniformPointInBboxDistribution
-from geometry.geo_factory import create_polygon_2d_from_ellipse, convert_dict_to_point_2d
+from geometry.geo_factory import convert_dict_to_point_2d
 
 
 class PackageDeliveryPlan(JsonableBaseEntity, Localizable):
@@ -54,8 +54,6 @@ class PackageDeliveryPlan(JsonableBaseEntity, Localizable):
                                    azimuth=Angle.dict_to_obj(dict_input['azimuth']),
                                    pitch=Angle.dict_to_obj(dict_input['pitch']),
                                    package_type=PackageType.dict_to_obj(dict_input['package_type']))
-
-
 
     def __hash__(self):
         return hash((self.id, self.drop_point, self.azimuth, self.pitch, self.package_type))
