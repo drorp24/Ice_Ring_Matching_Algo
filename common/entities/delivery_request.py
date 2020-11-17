@@ -15,7 +15,9 @@ from common.entities.package_delivery_plan import PackageDeliveryPlanDistributio
 from common.entities.temporal import TimeWindowDistribution, TimeWindowExtension, DateTimeDistribution, \
     TimeDeltaExtension, TimeDeltaDistribution, DateTimeExtension
 from common.math.angle import AngleUniformDistribution
+from geometry.geo2d import Point2D
 from geometry.geo_distribution import UniformPointInBboxDistribution
+from geometry.geo_factory import calc_centroid
 
 
 class DeliveryRequest(JsonableBaseEntity):
@@ -38,6 +40,9 @@ class DeliveryRequest(JsonableBaseEntity):
     def priority(self) -> int:
         return self._priority
 
+    def calc_location(self) -> Point2D:
+        return calc_centroid([do.calc_location() for do in self.delivery_options])
+
     @property
     def id(self) -> uuid:
         return self._id
@@ -52,9 +57,13 @@ class DeliveryRequest(JsonableBaseEntity):
         )
 
     def __eq__(self, other):
-        return (self.delivery_options == other.delivery_options) and \
+        return (self.__class__ == other.__class__) and \
+               (self.delivery_options == other.delivery_options) and \
                (self.time_window == other.time_window) and \
                (self.priority == other.priority)
+
+    def __hash__(self):
+        return hash((tuple(self.delivery_options), self.time_window, self.priority))
 
 
 class PriorityDistribution(UniformChoiceDistribution):

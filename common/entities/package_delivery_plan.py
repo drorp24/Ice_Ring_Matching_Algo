@@ -4,17 +4,17 @@ from random import Random
 from typing import List
 from uuid import UUID
 
-from common.entities.base_entity import JsonableBaseEntity
 from common.entities.disribution.distribution import Distribution
+from common.entities.base_entity import JsonableBaseEntity, Localizable
 from common.entities.package import PackageType, PackageDistribution
 from common.math.angle import Angle, AngleUniformDistribution, AngleUnit
 from common.utils.uuid_utils import convert_str_to_uuid
 from geometry.geo2d import Point2D
 from geometry.geo_distribution import UniformPointInBboxDistribution
-from geometry.geo_factory import convert_dict_to_point_2d
+from geometry.geo_factory import create_polygon_2d_from_ellipse, convert_dict_to_point_2d
 
 
-class PackageDeliveryPlan(JsonableBaseEntity):
+class PackageDeliveryPlan(JsonableBaseEntity, Localizable):
 
     def __init__(self, id: UUID, drop_point: Point2D, azimuth: Angle, pitch: Angle, package_type: PackageType):
         self._id = id
@@ -43,6 +43,9 @@ class PackageDeliveryPlan(JsonableBaseEntity):
     def package_type(self) -> PackageType:
         return self._package_type
 
+    def calc_location(self) -> Point2D:
+        return self.drop_point
+
     @classmethod
     def dict_to_obj(cls, dict_input):
         assert (dict_input['__class__'] == cls.__name__)
@@ -51,6 +54,26 @@ class PackageDeliveryPlan(JsonableBaseEntity):
                                    azimuth=Angle.dict_to_obj(dict_input['azimuth']),
                                    pitch=Angle.dict_to_obj(dict_input['pitch']),
                                    package_type=PackageType.dict_to_obj(dict_input['package_type']))
+
+    def calc_drop_envelope(self, drone_azimuth: Angle) -> Polygon2D:
+        average_radius = self.package_type.value.calc_potential_drop_envelope().average_radius_meters
+        envelope_center = self._drop_point.add_vector(drone_azimuth.calc_reverse().to_direction() * average_radius)
+        return self._calc_envelope(envelope_center, drone_azimuth)
+
+    def calc_delivery_envelope(self, drone_location: Point2D, drone_azimuth: Angle) -> Polygon2D:
+        average_radius = self.package_type.value.calc_potential_drop_envelope().average_radius_meters
+        envelope_center = drone_location.add_vector(drone_azimuth.to_direction() * average_radius)
+        return self._calc_envelope(envelope_center, drone_azimuth)
+
+    def _calc_envelope(self, envelope_center: Point2D, drone_azimuth: Angle) -> Polygon2D:
+        envelope_width = self.package_type.value.calc_potential_drop_envelope().calc_delta_between_radii()
+        envelope_height = envelope_width * self._azimuth.to_direction().dot(drone_azimuth.to_direction())
+        if self._azimuth.calc_abs_difference(drone_azimuth).degrees >= 90:
+            envelope_height = 0
+        return create_polygon_2d_from_ellipse(ellipse_center=envelope_center,
+                                              ellipse_width=envelope_width,
+                                              ellipse_height=envelope_height,
+                                              ellipse_rotation_deg=drone_azimuth.degrees)
 
     def __hash__(self):
         return hash((self.id, self.drop_point, self.azimuth, self.pitch, self.package_type))
