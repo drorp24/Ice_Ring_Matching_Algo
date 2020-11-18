@@ -23,9 +23,10 @@ class Cell:
     location: GridLocation
 
 
+@dataclass
 class EnvelopeCell(Cell):
     drone_azimuth: Angle
-    package_delivery_plans: PackageDeliveryPlanList
+    package_delivery_plans : PackageDeliveryPlanList = PackageDeliveryPlanList([])
 
 
 class CellServices:
@@ -34,7 +35,8 @@ class CellServices:
     @staticmethod
     def get_distance(cell1: EnvelopeCell, cell2: EnvelopeCell) -> float:
         angle_delta = cell1.drone_azimuth.calc_abs_difference(cell2.drone_azimuth)
-        dist = np.linalg.norm(cell1.location - cell2.location)
+        location_delta = cell1.location - cell2.location
+        dist = np.linalg.norm([location_delta.row,location_delta.column])
         angle_delta_cost = (math.cos(angle_delta.radians) - 1) / -2
         return dist + CellServices.ANGLE_DELTA_COST / (dist + 1) * angle_delta_cost
 
@@ -89,7 +91,7 @@ class DeliveryRequestEnvelopeCells:
                         AzimuthOptions(slides_container.get_drone_azimuth_resolution).values))
 
     @staticmethod
-    def _get_indices_to_calc_average(grid_locations: List[Optional.of(GridLocation)]) -> List[int]:
+    def _get_indices_to_calc_average(grid_locations: [Optional.of(GridLocation)]) -> List[int]:
         return [index for index, grid_location in enumerate(grid_locations) if
                 grid_location != Optional.empty()]
 
@@ -104,7 +106,7 @@ class DeliveryRequestEnvelopeCells:
 
     @staticmethod
     def _get_scaled_grid_locations(slides_container: SlidesContainer,
-                                   package_delivery_plan: PackageDeliveryPlan) -> List[Optional.of(GridLocation)]:
+                                   package_delivery_plan: PackageDeliveryPlan) -> [Optional.of(GridLocation)]:
         drop_point_grid_location = GridService.get_grid_location(package_delivery_plan.drop_point,
                                                                  slides_container.get_drone_azimuth_resolution)
 
