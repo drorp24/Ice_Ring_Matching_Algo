@@ -1,15 +1,35 @@
 import unittest
+from random import Random
 
 from geometry.geo_factory import create_point_2d, create_polygon_2d
+from grid.grid import DeliveryRequestsGrid
 from grid.grid_location import GridLocation, GridLocationServices
 from grid.grid_service import GridService
+
+from common.entities.delivery_request import generate_dr_distribution
+from common.entities.delivery_request_generator import DeliveryRequestDatasetGenerator, DeliveryRequestDatasetStructure
+from geometry.geo_distribution import UniformPointInBboxDistribution
+from grid.slides_container import SlidesContainer
 
 
 class BasicGridTestCase(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        pass
+        cls.dr_dataset_1 = create_local_data_in_region_1()
+        cls.dr_dataset_2 = create_local_data_in_region_2()
+        # TODO: init SlidesContainer member correctly.
+        cls.delivery_requests_grid_1 = DeliveryRequestsGrid(SlidesContainer(), cls.dr_dataset_1)
+        cls.delivery_requests_grid_2 = DeliveryRequestsGrid(SlidesContainer(), cls.dr_dataset_2)
 
+    def test_delivery_requests(self):
+        delivery_requests = self.delivery_requests_grid.delivery_requests_envelope_cells.keys()
+        self.assertTrue(set(delivery_requests.issubset(self.dr_dataset)))
+
+    def test_zero_distance(self):
+        self.assertEqual(self.delivery_requests_grid_2.get_distance(self.dr_dataset_2[0], self.dr_dataset_2[1], 0, 0), 0)
+
+    def test_non_zero_distance(self):
+        self.assertGreater(self.delivery_requests_grid_1.get_distance(self.dr_dataset_1[0], self.dr_dataset_1[1], 0, 0), 0)
 
 class BasicGridLocationTestCase(unittest.TestCase):
 
@@ -55,3 +75,31 @@ class BasicGridServiceTestCase(unittest.TestCase):
     def test_get_polygon_centroid_grid_location(self):
         grid_location = GridService.get_polygon_centroid_grid_location(self.poly1, 2)
         self.assertEqual(self.grid_location_1, grid_location)
+
+
+def create_local_data_in_region_1():
+    dr_struct = DeliveryRequestDatasetStructure(num_of_delivery_requests=10,
+                                                num_of_delivery_options_per_delivery_request=1,
+                                                num_of_customer_deliveries_per_delivery_option=2,
+                                                num_of_package_delivery_plan_per_customer_delivery=3,
+                                                delivery_request_distribution=(_create_region_1_dr_distribution()))
+    return DeliveryRequestDatasetGenerator.generate(dr_struct, random=Random(42))
+
+
+def create_local_data_in_region_2():
+    dr_struct = DeliveryRequestDatasetStructure(num_of_delivery_requests=2,
+                                                num_of_delivery_options_per_delivery_request=1,
+                                                num_of_customer_deliveries_per_delivery_option=1,
+                                                num_of_package_delivery_plan_per_customer_delivery=1,
+                                                delivery_request_distribution=(_create_region_2_dr_distribution()))
+    return DeliveryRequestDatasetGenerator.generate(dr_struct, random=Random(42))
+
+
+def _create_region_1_dr_distribution():
+    return generate_dr_distribution(
+        drop_point_distribution=UniformPointInBboxDistribution(min_x=10, max_x=1200, min_y=10, max_y=1150))
+
+
+def _create_region_2_dr_distribution():
+    return generate_dr_distribution(
+        drop_point_distribution=UniformPointInBboxDistribution(min_x=1100, max_x=1100, min_y=1150, max_y=1150))
