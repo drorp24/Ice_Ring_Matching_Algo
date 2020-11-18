@@ -2,11 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from typing import List, Union
-
 from networkx import DiGraph, Graph, subgraph
-
-from datetime import datetime
-
 from common.entities.delivery_request import DeliveryRequest
 from common.entities.drone_loading_dock import DroneLoadingDock
 from common.entities.temporal import TimeWindowExtension
@@ -56,9 +52,8 @@ class OperationalEdge(object):
 
 class OperationalGraph:
 
-    def __init__(self, zero_time: datetime):
+    def __init__(self):
         self.internal_graph = DiGraph()
-        self._zero_time = zero_time
 
     @property
     def nodes(self) -> List[OperationalNode]:
@@ -86,7 +81,7 @@ class OperationalGraph:
         self.internal_graph.add_nodes_from(operational_nodes)
 
     def add_operational_edges(self, operational_edges: [OperationalEdge]):
-        self.internal_graph.add_edges_from([dr.to_tuple() for dr in operational_edges])
+        self.internal_graph.add_edges_from([edge.to_tuple() for edge in operational_edges])
 
     def calc_subgraph_in_time_window(self, time_window_scope: TimeWindowExtension):
         nodes_at_time = [node for node in self.nodes if node.time_window in time_window_scope]
@@ -103,10 +98,6 @@ class OperationalGraph:
 
     @staticmethod
     def _create_from_extracted_subgraph(extracted_subgraph: subgraph):
-        delivery_request_subgraph = OperationalGraph(datetime(2021, 1, 1))
+        delivery_request_subgraph = OperationalGraph()
         delivery_request_subgraph.set_internal_graph(extracted_subgraph)
         return delivery_request_subgraph
-
-    @property
-    def zero_time(self) -> datetime:
-        return self._zero_time

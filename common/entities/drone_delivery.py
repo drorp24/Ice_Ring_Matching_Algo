@@ -1,14 +1,12 @@
-from datetime import datetime
-
 from dataclasses import dataclass
-
 from common.entities.delivery_request import DeliveryRequest
 from common.entities.drone_formation import DroneFormation
+from common.entities.temporal import DateTimeExtension
 
 
 class EmptyDroneDelivery:
-    def __init__(self, id: str, drone_formation: DroneFormation):
-        self._id = id
+    def __init__(self, id_: str, drone_formation: DroneFormation):
+        self._id = id_
         self._drone_formation = drone_formation
 
     def __eq__(self, other):
@@ -26,15 +24,15 @@ class EmptyDroneDelivery:
 @dataclass
 class MatchedDeliveryRequest:
     delivery_request: DeliveryRequest
-    delivery_time: datetime
+    delivery_time: DateTimeExtension
 
     def __eq__(self, other):
         return self.delivery_request == other.delivery_request and self.delivery_time == other.delivery_time
 
 
 class DroneDelivery(EmptyDroneDelivery):
-    def __init__(self, id: str, drone_formation: DroneFormation, matched_requests: [MatchedDeliveryRequest]):
-        super().__init__(id, drone_formation)
+    def __init__(self, id_: str, drone_formation: DroneFormation, matched_requests: [MatchedDeliveryRequest]):
+        super().__init__(id_, drone_formation)
         self._matched_requests = matched_requests
 
     def __eq__(self, other):

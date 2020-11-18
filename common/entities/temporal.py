@@ -46,7 +46,10 @@ class TimeWindowExtension(JsonableBaseEntity):
         return TimeWindowExtension(since, until)
 
     def get_time_stamp(self) -> Tuple[int, int]:
-        return self._internal.since.timestamp(), self._internal.until.timestamp()
+        return int(self._internal.since.timestamp()), int(self._internal.until.timestamp())
+
+    def get_relative_time_in_min(self, zero_time: DateTimeExtension) -> (float, float):
+        return self.since.get_time_delta(zero_time).in_minutes(), self.until.get_time_delta(zero_time).in_minutes()
 
     def __eq__(self, other: TimeWindowExtension):
         return self._internal.since == other._internal.since and \
@@ -129,6 +132,9 @@ class DateTimeExtension(BaseEntity):
     def add_time_delta(self, time_delta: TimeDeltaExtension) -> DateTimeExtension:
         return DateTimeExtension.from_dt(self._internal + time_delta._internal_delta)
 
+    def get_time_delta(self, from_time: DateTimeExtension) -> TimeDeltaExtension:
+        return TimeDeltaExtension(self._internal - from_time._internal)
+
     def __eq__(self, other: DateTimeExtension):
         return self._internal == other._internal
 
@@ -150,6 +156,9 @@ class TimeDeltaExtension(BaseEntity):
 
     def __repr__(self):
         return self._internal_delta.__repr__()
+
+    def in_minutes(self) -> float:
+        return self._internal_delta.total_seconds() / 60
 
 
 class DateTimeDistribution(UniformChoiceDistribution):

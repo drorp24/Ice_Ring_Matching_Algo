@@ -56,25 +56,25 @@ class ORToolsMatcher:
         """Returns the priority of the node."""
         # Convert from routing variable Index to priorities NodeIndex.
         from_node = self._manager.IndexToNode(from_index)
-        return self._input.priorities[from_node]
+        return self._graph_exporter.export_priorities(self._input.graph)[from_node]
 
     # Create and register a transit callback.
     def _time_callback(self, from_index, to_index):
         # Convert from routing variable Index to time matrix NodeIndex.
         from_node = self._manager.IndexToNode(from_index)
         to_node = self._manager.IndexToNode(to_index)
-        return self._input.graph.travel_weights[from_node][to_node]
+        return self._graph_exporter.export_travel_times(self._input.graph)[from_node][to_node]
 
     # Add Capacity constraint.
     def _demand_callback(self, from_index):
         # Convert from routing variable Index to demands NodeIndex.
         from_node = self._manager.IndexToNode(from_index)
-        return self._input.graph.packages_per_request[from_node]
+        package_type = self._input.empty_board.empty_drone_deliveries[0].drone_formation.get_package_types()[0]
+        return self._graph_exporter.export_package_type_demands(self._input.graph, package_type)[from_node]
 
     def _solve(self):
         # Solve the problem.
         solution = self._routing.SolveWithParameters(self._search_parameters)
-        #print(function_name(self, inspect.currentframe()), "solution objective value=", solution.ObjectiveValue())
         return solution
 
     def _add_priority_objective(self):
@@ -95,9 +95,10 @@ class ORToolsMatcher:
         self._routing = pywrapcp.RoutingModel(self._manager)
 
     def _set_manager(self):
-        self._manager = pywrapcp.RoutingIndexManager(len(self._input.graph.travel_weights),
+        travel_times = self._graph_exporter.export_travel_times(self._input.graph)
+        self._manager = pywrapcp.RoutingIndexManager(len(travel_times),
                                                      self._input.empty_board.num_of_formations,
-                                                     self._input.graph.depos)
+                                                     self._graph_exporter.export_basis_nodes_indices(self._input.graph)[0])
 
     def _add_demand_constraints(self):
         # Register Demand Callback
@@ -123,8 +124,9 @@ class ORToolsMatcher:
             self._input.config.count_time_from_zero,  # Don't force start cumul to zero.
             time)
         time_dimension = self._routing.GetDimensionOrDie(time)
+        time_windows = self._graph_exporter.export_time_windows(self._input.graph, self._input.config.zero_time)
         # Add time window constraints for each location except depot.
-        for location_idx, time_window in enumerate(self._input.graph.time_windows):
+        for location_idx, time_window in enumerate(time_windows):
             if location_idx == 0:
                 continue
             index = self._manager.NodeToIndex(location_idx)
@@ -132,8 +134,8 @@ class ORToolsMatcher:
         # Add time window constraints for each vehicle start node.
         for vehicle_id in range(len(self._input.empty_board.empty_drone_deliveries)):
             index = self._routing.Start(vehicle_id)
-            time_dimension.CumulVar(index).SetRange(self._input.graph.time_windows[0][0],
-                                                    self._input.graph.time_windows[0][1])
+            time_dimension.CumulVar(index).SetRange(time_windows[0][0],
+                                                    time_windows[0][1])
         # Instantiate route start and end times to produce feasible times.
         for i in range(len(self._input.empty_board.empty_drone_deliveries)):
             self._routing.AddVariableMinimizedByFinalizer(

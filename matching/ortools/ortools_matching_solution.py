@@ -2,6 +2,7 @@ from datetime import timedelta
 
 from common.entities.drone_delivery import DroneDelivery, MatchedDeliveryRequest
 from common.entities.drone_delivery_board import DroneDeliveryBoard
+from common.entities.temporal import TimeDeltaExtension
 from matching.matcher import Matcher
 from matching.matching_solution import MatchingSolution, MatchingSolutionData
 
@@ -38,11 +39,13 @@ class ORToolsMatchingSolution(MatchingSolution):
                 node_index = manager.IndexToNode(index)
 
                 nodes_in_route.append(node_index)
-                route_load += match_input.graph.packages_per_request[node_index]
+                package_type = match_input.empty_board.empty_drone_deliveries[0].drone_formation.get_package_types()[0]
+                package_type_demands = self._matching_handler._graph_exporter.export_package_type_demands(match_input.graph, package_type)
+                route_load += package_type_demands[node_index]
 
                 node_service_time[node_index] = (self._solution.Min(time_var),
                                                  self._solution.Max(time_var))
-                route_priority += match_input.graph.priorities[node_index]
+                route_priority += self._matching_handler._graph_exporter.export_priorities(match_input.graph)[node_index]
                 node_route_load[node_index] = route_load
                 node_route_priority[node_index] = route_priority
                 index = self._solution.Value(routing.NextVar(index))
@@ -164,11 +167,11 @@ class ORToolsMatchingSolution(MatchingSolution):
         for vehicle_id, vehicle_route in enumerate(self.vehicle_route):
             matched_requests = []
             for idx, node_index in enumerate(vehicle_route):
-                if idx > 0 and node_index is not match_input.graph.depos:
+                if idx > 0 and node_index is not self._matching_handler._graph_exporter.export_basis_nodes_indices(match_input.graph)[0]:
                     delta_from_zero_time = self.node_service_time[vehicle_id][node_index][0]
-                    time = match_input.graph.zero_time + timedelta(minutes=delta_from_zero_time)
+                    time = match_input.config.zero_time.add_time_delta(TimeDeltaExtension(timedelta(minutes=delta_from_zero_time)))
                     matched_requests.append(
-                        MatchedDeliveryRequest(match_input.graph.get_delivery_request(node_index - 1), time))
+                        MatchedDeliveryRequest(self._matching_handler._graph_exporter.get_delivery_request(match_input.graph, node_index), time))
             drone_deliveries.append(DroneDelivery(empty_drone_deliveries[vehicle_id].id,
                                                   empty_drone_deliveries[vehicle_id].drone_formation,
                                                   matched_requests))

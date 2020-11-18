@@ -1,6 +1,19 @@
 {
   "match_config":
     {
+      "zero_time": {
+        "__class__": "DateTimeExtension",
+        "date": {
+          "day": 23,
+          "month": 1,
+          "year": 2020
+        },
+        "time": {
+          "hour": 11,
+          "minute": 30,
+          "second": 0
+        }
+      },
       "solver_name": "or_tools:automatic",
       "dropped_penalty": 5,
       "waiting_time_allowed_min": 10,

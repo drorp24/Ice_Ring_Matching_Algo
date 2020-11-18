@@ -23,7 +23,7 @@ class BasicDeliveryRequestGraphTestCases(unittest.TestCase):
         cls.dr_dataset_low_priority = create_low_priority_dr_dataset()
 
     def test_delivery_request_graph_creation(self):
-        drg = OperationalGraph(self.dr_dataset_morning[0].time_window.since)
+        drg = OperationalGraph()
         drg.add_delivery_requests(self.dr_dataset_morning)
         drg.add_delivery_requests(self.dr_dataset_afternoon)
         drg.add_drone_loading_docks(self.dld_dataset_random)
@@ -31,7 +31,7 @@ class BasicDeliveryRequestGraphTestCases(unittest.TestCase):
                          + list(self.dld_dataset_random))
 
     def test_graph_creation_with_edges(self):
-        drg = OperationalGraph(self.dr_dataset_morning[0].time_window.since)
+        drg = OperationalGraph()
         drg.add_delivery_requests(self.dr_dataset_morning)
         drg.add_drone_loading_docks(self.dld_dataset_random)
         edges = []
@@ -50,17 +50,17 @@ class BasicDeliveryRequestGraphTestCases(unittest.TestCase):
         self.assertEqual(returned_edges[6].end_node, edges[6].end_node)
 
     def test_drone_loading_dock_set_internal_graph(self):
-        drg1 = OperationalGraph(self.dr_dataset_morning[0].time_window.since)
+        drg1 = OperationalGraph()
         drg1.add_drone_loading_docks(self.dld_dataset_random)
-        drg2 = OperationalGraph(self.dr_dataset_morning[0].time_window.since)
+        drg2 = OperationalGraph()
         drg2.set_internal_graph(drg1.internal_graph)
         self.assertFalse(drg1.is_empty())
         self.assertEqual(_get_dr_from_dr_graph(drg1), _get_dr_from_dr_graph(drg2))
 
     def test_delivery_request_set_internal_graph(self):
-        drg1 = OperationalGraph(self.dr_dataset_morning[0].time_window.since)
+        drg1 = OperationalGraph()
         drg1.add_delivery_requests(self.dr_dataset_random)
-        drg2 = OperationalGraph(self.dr_dataset_morning[0].time_window.since)
+        drg2 = OperationalGraph()
         drg2.set_internal_graph(drg1.internal_graph)
         self.assertFalse(drg1.is_empty())
         self.assertEqual(_get_dr_from_dr_graph(drg1), _get_dr_from_dr_graph(drg2))
@@ -69,10 +69,10 @@ class BasicDeliveryRequestGraphTestCases(unittest.TestCase):
         morning_time_window = TimeWindowExtension(
             since=DateTimeExtension(date(2021, 1, 1), time(6, 0, 0)),
             until=DateTimeExtension(date(2021, 1, 1), time(13, 0, 0)))
-        drg_full_day = OperationalGraph(morning_time_window.since)
+        drg_full_day = OperationalGraph()
         drg_full_day.add_delivery_requests(self.dr_dataset_morning)
         drg_full_day.add_delivery_requests(self.dr_dataset_afternoon)
-        drg_morning_subgraph_of_full_day = OperationalGraph(morning_time_window.since)
+        drg_morning_subgraph_of_full_day = OperationalGraph()
         drg_morning_subgraph_of_full_day.add_delivery_requests(self.dr_dataset_morning)
         calculated_subgraph_within_time_window = drg_full_day.calc_subgraph_in_time_window(morning_time_window)
         self.assertTrue(isinstance(calculated_subgraph_within_time_window, OperationalGraph))
@@ -81,10 +81,10 @@ class BasicDeliveryRequestGraphTestCases(unittest.TestCase):
         self.assertEqual(nodes_in_time_window_subgraph, node_in_time_window_morning_graph)
 
     def test_calc_subgraph_below_priority(self):
-        drg_full_day = OperationalGraph(datetime(2021, 1, 1))
+        drg_full_day = OperationalGraph()
         drg_full_day.add_delivery_requests(self.dr_dataset_top_priority)
         drg_full_day.add_delivery_requests(self.dr_dataset_low_priority)
-        drg_low_priority_subgraph_of_full_day = OperationalGraph(datetime(2021, 1, 1))
+        drg_low_priority_subgraph_of_full_day = OperationalGraph()
         drg_low_priority_subgraph_of_full_day.add_delivery_requests(self.dr_dataset_low_priority)
         max_priority = 10
         calculated_subgraph_below_max_priority = drg_full_day.calc_subgraph_below_priority(max_priority)

@@ -1,16 +1,10 @@
 import enum
 import json
-import time
-
-# from ice_ring.diagnoses.monitor import Monitor
-# from ice_ring.graph.graph_handler import GraphDataType
-# from ice_ring.matching.matching_solution import MatchingSolution
 from dataclasses import dataclass
 from pathlib import Path
-from sys import platform
-
 from common.entities.drone_delivery_board import EmptyDroneDeliveryBoard
-from common.graph.operational.export_graph import GraphExporter, OperationalGraph
+from common.entities.temporal import DateTimeExtension
+from common.graph.operational.export_graph import OperationalGraph
 from matching.matching_solution import MatchingSolution
 
 
@@ -38,6 +32,7 @@ class MatchConfigDecoder(json.JSONDecoder):
 
 class MatchConfig:
     def __init__(self, match_config_dict):
+        self._zero_time = DateTimeExtension.from_dict(match_config_dict['zero_time'])
         self._solver = str.upper(match_config_dict['solver_name'].partition(':')[2])
         self._dropped_penalty = match_config_dict['dropped_penalty']
         self._waiting_time_allowed_min = match_config_dict['waiting_time_allowed_min']
@@ -93,6 +88,10 @@ class MatchConfig:
     @property
     def time_limit_sec(self):
         return self._time_limit_sec
+
+    @property
+    def zero_time(self) -> DateTimeExtension:
+        return self._zero_time
 
 
 @dataclass
