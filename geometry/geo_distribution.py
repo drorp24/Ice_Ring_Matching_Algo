@@ -9,7 +9,7 @@ from geometry.geo_factory import create_point_2d
 class UniformPointInBboxDistribution(Distribution):
 
     def __init__(self, min_x: float, max_x: float, min_y: float, max_y: float):
-        self._min_x = min_x  # TODO: refactor with Bounding Box
+        self._min_x = min_x
         self._min_y = min_y
         self._max_x = max_x
         self._max_y = max_y
