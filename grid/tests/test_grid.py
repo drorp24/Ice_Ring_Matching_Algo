@@ -1,7 +1,7 @@
 import unittest
 
 from geometry.geo_factory import create_point_2d, create_polygon_2d
-from grid.grid_location import GridLocation
+from grid.grid_location import GridLocation, GridLocationServices
 from grid.grid_service import GridService
 
 
@@ -9,6 +9,30 @@ class BasicGridTestCase(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         pass
+
+
+class BasicGridLocationTestCase(unittest.TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        cls.row = 10
+        cls.column = 15
+
+        cls.grid_location_1 = GridLocation(10, 15)
+        cls.grid_location_2 = GridLocation(20, 10)
+        cls.grid_location_3 = GridLocation(60, 5)
+
+        cls.grid_location_avg = GridLocation(30, 10)
+
+    def test_grid_location(self):
+        self.assertEqual(self.row, self.grid_location_1.row)
+        self.assertEqual(self.column, self.grid_location_1.column)
+
+    def test_grid_location_calc_average(self):
+        average_grid_location = GridLocationServices.calc_average(
+            [self.grid_location_1, self.grid_location_2, self.grid_location_3])
+
+        self.assertEqual(self.grid_location_avg, average_grid_location)
 
 
 class BasicGridServiceTestCase(unittest.TestCase):
