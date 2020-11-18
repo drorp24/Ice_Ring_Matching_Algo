@@ -77,7 +77,13 @@ class PackageDeliveryPlanList:
     def package_delivery_plans(self):
         return self._package_delivery_plans
 
-    def package_delivery_plans_ids(self) -> List[UUID]:
+    def __getitem__(self, item):
+        return self._package_delivery_plans[item]
+
+    def __eq__(self, other):
+        return self.package_delivery_plans == other.package_delivery_plans
+
+    def ids(self) -> List[UUID]:
         return [package_delivery_plan.id for package_delivery_plan in self._package_delivery_plans]
 
 
