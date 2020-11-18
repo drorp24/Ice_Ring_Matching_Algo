@@ -1,13 +1,14 @@
 from __future__ import annotations
 
+from abc import ABC, abstractmethod
 from datetime import datetime, date, time, timedelta
 from random import Random
 from typing import Dict, List, Union, Tuple
 
 from time_window import TimeWindow
 
+from common.entities.base_entity import JsonableBaseEntity, BaseEntity
 from common.entities.disribution.distribution import Distribution, UniformChoiceDistribution
-from common.entities.base_entity import BaseEntity, JsonableBaseEntity
 
 DATE = 'date'
 TIME = 'time'
@@ -19,6 +20,14 @@ MINUTE = 'minute'
 SECOND = 'second'
 SINCE = 'since'
 UNTIL = 'until'
+
+
+class Temporal(ABC):
+
+    @property
+    @abstractmethod
+    def time_window(self):
+        raise NotImplementedError()
 
 
 class TimeWindowExtension(JsonableBaseEntity):
@@ -46,6 +55,9 @@ class TimeWindowExtension(JsonableBaseEntity):
 
     def get_time_stamp(self) -> Tuple[int, int]:
         return self.get_internal().since.timestamp(), self.get_internal().until.timestamp()
+
+    def overlaps(self, other: TimeWindowExtension) -> bool:
+        return self.get_internal().overlaps(other.get_internal())
 
     def __eq__(self, other: TimeWindowExtension):
         return self.get_internal().since == other.get_internal().since and \

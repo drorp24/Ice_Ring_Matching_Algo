@@ -1,16 +1,16 @@
 from datetime import date, timedelta, time
 from random import Random
 
-from common.entities.base_entity import Localizable
 from common.entities.disribution.distribution import Distribution
 from common.entities.drone import PlatformType, PlatformTypeDistribution
 from common.entities.drone_loading_station import DroneLoadingStation, DroneLoadingStationDistribution
 from common.entities.temporal import TimeWindowExtension, TimeWindowDistribution, DateTimeExtension, \
-    TimeDeltaDistribution, TimeDeltaExtension, DateTimeDistribution
+    TimeDeltaDistribution, TimeDeltaExtension, DateTimeDistribution, Temporal
 from geometry.geo2d import Point2D
+from geometry.utils import Localizable
 
 
-class DroneLoadingDock(Localizable):
+class DroneLoadingDock(Localizable, Temporal):
 
     def __init__(self, drone_loading_station: DroneLoadingStation,
                  platform_type: PlatformType,
