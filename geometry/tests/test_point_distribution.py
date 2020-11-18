@@ -37,5 +37,5 @@ class BasicPointTestCase(unittest.TestCase):
         num_in_bbox_1 = len(list(filter(lambda p: p in bbox_1, points)))
         num_in_bbox_2 = len(list(filter(lambda p: p in bbox_2, points)))
 
-        self.assertAlmostEqual(num_in_bbox_1 / len(points), 0.8, 4)
-        self.assertAlmostEqual(num_in_bbox_2 / len(points), 0.2, 4)
+        self.assertEqual(num_in_bbox_1 / len(points), 0.8)
+        self.assertEqual(num_in_bbox_2 / len(points), 0.2)
