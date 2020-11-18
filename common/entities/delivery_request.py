@@ -42,10 +42,6 @@ class DeliveryRequest(JsonableBaseEntity):
     def calc_location(self) -> Point2D:
         return calc_centroid([do.calc_location() for do in self.delivery_options])
 
-    # @property
-    # def id(self) -> uuid:
-    #     return self._id
-
     @classmethod
     def dict_to_obj(cls, dict_input):
         assert (dict_input['__class__'] == cls.__name__)
