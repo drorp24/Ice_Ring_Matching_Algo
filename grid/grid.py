@@ -13,7 +13,7 @@ class DeliveryRequestsGrid(DeliveryRequestDistanceServiceInterface):
             self._create_delivery_requests_envelope_cells(slides_container, delivery_requests)
 
     @staticmethod
-    def _create_delivery_requests_envelope_cells(self, slides_container, delivery_requests):
+    def _create_delivery_requests_envelope_cells(slides_container, delivery_requests):
         return {delivery_request: DeliveryRequestEnvelopeCells(slides_container, delivery_request)
                 for delivery_request in delivery_requests}
 
