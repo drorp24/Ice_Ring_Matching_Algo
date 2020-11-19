@@ -42,7 +42,7 @@ DEFAULT_PDP_DISTRIB = PackageDeliveryPlanDistribution(DEFAULT_DROP_POINT_DISTRIB
 
 
 class CustomerDeliveryDistribution(Distribution):
-    def __init__(self, package_delivery_plan_distributions=None):
+    def __init__(self, package_delivery_plan_distributions: [PackageDeliveryPlanDistribution] = None):
         if package_delivery_plan_distributions is None:
             package_delivery_plan_distributions = [DEFAULT_PDP_DISTRIB]
         self._pdp_distributions = package_delivery_plan_distributions
@@ -50,4 +50,3 @@ class CustomerDeliveryDistribution(Distribution):
     def choose_rand(self, random: Random, amount: int = 1, num_pdp: int = 1) -> List[CustomerDelivery]:
         pdp_distributions = UniformChoiceDistribution(self._pdp_distributions).choose_rand(random, amount=amount)
         return [CustomerDelivery(pdp_distributions[i].choose_rand(random, amount=num_pdp)) for i in list(range(amount))]
-

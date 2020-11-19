@@ -3,6 +3,7 @@ from random import Random
 from unittest import TestCase
 from datetime import datetime
 
+from common.entities.customer_delivery import CustomerDeliveryDistribution
 from common.entities.delivery_option import DeliveryOptionDistribution
 from common.entities.delivery_request import DeliveryRequest
 from common.entities.drone import PlatformType
@@ -11,6 +12,8 @@ from common.entities.drone_delivery_board import DroneDeliveryBoard, EmptyDroneD
 from common.entities.drone_formation import FormationSize, FormationOptions, DroneFormations
 from common.entities.drone_loading_dock import DroneLoadingDock
 from common.entities.drone_loading_station import DroneLoadingStation
+from common.entities.package import PackageDistribution, PackageType
+from common.entities.package_delivery_plan import PackageDeliveryPlanDistribution
 from common.entities.temporal import TimeWindowExtension, DateTimeExtension
 from common.graph.operational.delivery_request_graph import OperationalGraph, OperationalEdge, OperationalNode, \
     OperationalEdgeAttributes
@@ -33,7 +36,11 @@ class TestORToolsMatcher(TestCase):
 
     @staticmethod
     def create_delivery_requests():
-        delivery_options = DeliveryOptionDistribution().choose_rand(Random(42), amount=1)
+        pdp_dist = PackageDeliveryPlanDistribution(
+            package_type_distribution=PackageDistribution({PackageType.TINY.name: 1}))
+        delivery_options = DeliveryOptionDistribution([CustomerDeliveryDistribution(pdp_dist)]).choose_rand(Random(42),
+                                                                                                            amount=1,
+                                                                                                            num_pdp=1)
         delivery_request_1 = DeliveryRequest(delivery_options=delivery_options,
                                              time_window=TimeWindowExtension(
                                                  since=DateTimeExtension.from_dt(datetime(2020, 1, 23, 11, 30, 00)),
@@ -52,9 +59,9 @@ class TestORToolsMatcher(TestCase):
         loading_dock = DroneLoadingDock(DroneLoadingStation(create_point_2d(0, 0)),
                                         PlatformType.platform_1,
                                         TimeWindowExtension(since=DateTimeExtension.from_dt(
-                                                                datetime(2020, 1, 23, 11, 30, 00)),
-                                                            until=DateTimeExtension.from_dt(
-                                                                datetime(2020, 1, 23, 16, 30, 00))))
+                                            datetime(2020, 1, 23, 11, 30, 00)),
+                                            until=DateTimeExtension.from_dt(
+                                                datetime(2020, 1, 23, 16, 30, 00))))
         graph.add_drone_loading_docks([loading_dock])
         graph.add_delivery_requests(delivery_requests)
         graph.add_operational_edges([OperationalEdge(start_node=OperationalNode(loading_dock),
