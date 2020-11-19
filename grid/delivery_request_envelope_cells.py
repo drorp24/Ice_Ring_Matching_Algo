@@ -1,5 +1,5 @@
 from itertools import repeat
-from typing import List, KeysView, ValuesView
+from typing import List
 
 from optional import Optional
 
@@ -10,6 +10,7 @@ from common.entities.package_delivery_plan import PackageDeliveryPlan, PackageDe
 from common.math.angle import Angle, AngleUnit
 from grid.azimuth_options import AzimuthOptions
 from grid.cell import EnvelopeCell
+from grid.cell_services import CellServices
 from grid.grid_location import GridLocation, GridLocationServices
 from grid.grid_service import GridService
 from grid.slides_container import SlidesContainer
@@ -63,7 +64,7 @@ class DeliveryRequestEnvelopeCells:
                                  repeat(delivery_option.package_delivery_plans)))
 
         return list(map(EnvelopeCell, average_locations,
-                        AzimuthOptions(slides_container.get_drone_azimuth_resolution).values,average_uuids))
+                        AzimuthOptions(slides_container.get_drone_azimuth_resolution).values, average_uuids))
 
     @staticmethod
     def _get_indices_to_calc_average(grid_locations: [Optional.of(GridLocation)]) -> List[int]:
@@ -89,7 +90,7 @@ class DeliveryRequestEnvelopeCells:
                         map(DeliveryRequestEnvelopeCells._get_envelope_location, repeat(slides_container),
                             repeat(package_delivery_plan.package_type),
                             AzimuthOptions(slides_container.get_drone_azimuth_resolution).values,
-                            map(DeliveryRequestEnvelopeCells._get_drop_azimuth,
+                            map(CellServices.get_drop_azimuth,
                                 AzimuthOptions(slides_container.get_drone_azimuth_resolution).values,
                                 repeat(package_delivery_plan.azimuth), repeat(package_delivery_plan.pitch)
                                 ))))
@@ -107,6 +108,4 @@ class DeliveryRequestEnvelopeCells:
         return slides_container.get_envelope_location(drone_azimuth, drop_azimuth,
                                                       package_type)
 
-    @staticmethod
-    def _get_drop_azimuth(drone_azimuth: Angle, drop_azimuth: Angle, drop_pitch: Angle) -> Angle:
-        return drop_azimuth if drop_pitch == Angle(MAX_PITCH_DEGREES, AngleUnit.DEGREE) else drone_azimuth
+

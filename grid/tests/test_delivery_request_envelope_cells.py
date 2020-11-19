@@ -15,6 +15,7 @@ from grid.cell import Cell, EnvelopeCell
 from grid.delivery_request_envelope_cells import DeliveryRequestEnvelopeCellsDict, DeliveryRequestEnvelopeCells
 from grid.grid_location import GridLocation
 from grid.slides_factory import generate_slides_container
+from params import MAX_PITCH_DEGREES
 from services.mock_envelope_services import MockEnvelopeServices
 
 
@@ -57,21 +58,38 @@ class BasicDeliveryRequestEnvelopeCellsTestCase(unittest.TestCase):
 
         cls.delivery_requests_envelope_cells = DeliveryRequestEnvelopeCells(cls.slides_container, dr_1)
         cls.delivery_requests_envelope_cells_dict_do_1 = cls.delivery_requests_envelope_cells.cells[0]
-        # for ec in delivery_requests_envelope_cells_dict_do_1.values():
-        #     print(ec.location.row, ec.location.column)
-        #     print(ec.drone_azimuth.__str__())
+
 
     def test_drone_azimuth(self):
         self.assertEqual(self.delivery_requests_envelope_cells_dict_do_1.keys(),
                          AzimuthOptions(self.slides_container.get_drone_azimuth_resolution).values)
 
-    # def test_envelope_cells(self):
-    #     expected_average_location
-    #     self.assertEqual(self.delivery_requests_envelope_cells_dict_do_1[Angle(0.AngleUnit.DEGREE)].location,
-    #                           expected_average_location)
-    #     # for ec in self.delivery_requests_envelope_cells_dict_do_1.values():
-    #     #     self.assertEqual(ec.location,
-    #     #                      expected_average_location)
+    def test_envelope_cells(self):
+        pass
+        # pdp_1_drop_azimuth = CellServices.get_drop_azimuth(self.pdp_1.drop_azimuth if self.pdp_1.drop_pitch == Angle(MAX_PITCH_DEGREES,
+        #                                                                              AngleUnit.DEGREE) else \
+        #     self.pdp_1.drone_azimuth
+        #
+        #     pdp_1_envelope_location = slides_container.get_envelope_location(drone_azimuth_from_azoption,
+        #                                                                      pdp_1_drop_azimuth,
+        #                                                                      cls.pdp_1.package_type)
+        #
+        #     drop_point_grid_location = GridService.get_grid_location(package_delivery_plan.drop_point,
+        #                                                              slides_container.get_drone_azimuth_resolution)
+        #
+        #     expected_average_location = GridLocationServices.calc_average(
+        #         list(map(grid_locations.__getitem__, indices_to_calc)))
+        #
+        #     self.assertEqual(self.delivery_requests_envelope_cells_dict_do_1[Angle(0, AngleUnit.DEGREE)].location,
+        #                      expected_average_location)
+        #     # for ec in self.delivery_requests_envelope_cells_dict_do_1.values():
+        #     #     self.assertEqual(ec.location,
+        #     #                      expected_average_location)
+
+
+
+
+
 
 
 class BasicDeliveryRequestEnvelopeCellsDictTestCase(unittest.TestCase):
