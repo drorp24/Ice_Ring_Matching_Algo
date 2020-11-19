@@ -4,15 +4,16 @@ from typing import List
 import numpy as np
 
 from common.math.angle import AngleUnit, Angle
+from params import MAX_AZIMUTH_DEGREES, MIN_AZIMUTH_DEGREES
 
 
 class AzimuthOptions:
 
     def __init__(self, azimuth_resolution: int):
         self._values = [Angle(value=angle, unit=AngleUnit.DEGREE)
-                        for angle in (np.arange(0, AngleUnit.DEGREE.value,
+                        for angle in (np.arange(MIN_AZIMUTH_DEGREES, MAX_AZIMUTH_DEGREES,
                                                 math.floor(
-                                                    AngleUnit.DEGREE.value
+                                                    MAX_AZIMUTH_DEGREES
                                                     / azimuth_resolution)))]
 
     @property

@@ -37,7 +37,7 @@ class DeliveryOption(JsonableBaseEntity):
     @property
     def package_delivery_plans(self) -> List[PackageDeliveryPlan]:
         return list(itertools.chain.from_iterable(
-            package_delivery_plan.package_delivery_plans for package_delivery_plan in self._customer_deliveries))
+            customer_delivery.package_delivery_plans for customer_delivery in self.customer_deliveries))
 
     @classmethod
     def dict_to_obj(cls, dict_input):

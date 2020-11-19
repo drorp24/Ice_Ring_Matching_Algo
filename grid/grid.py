@@ -1,8 +1,8 @@
 from typing import List
-import numpy as np
 
 from common.entities.delivery_request import DeliveryRequest
-from grid.cell import DeliveryRequestEnvelopeCells, CellServices, AzimuthOptions
+from grid.cell_services import CellServices
+from grid.delivery_request_envelope_cells import DeliveryRequestEnvelopeCells
 from grid.slides_container import SlidesContainer
 from services.delivery_request_distance_service_interface import DeliveryRequestDistanceServiceInterface
 
@@ -24,7 +24,7 @@ class DeliveryRequestsGrid(DeliveryRequestDistanceServiceInterface):
                 delivery_request1].delivery_request_envelope_cells[delivery_request1_selected_option]
         delivery_request2_envelope_cells = self.delivery_requests_envelope_cells[
             delivery_request2].delivery_request_envelope_cells[delivery_request2_selected_option]
-        delivery_request1_envelope_cells
+        
         delivery_request_1_cells = delivery_request1_envelope_cells.values()
         delivery_request_2_cells = delivery_request2_envelope_cells.values()
         return sum([CellServices.get_distance(cell_1, cell_2) for cell_1, cell_2 in

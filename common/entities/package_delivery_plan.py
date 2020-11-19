@@ -83,6 +83,9 @@ class PackageDeliveryPlanList:
     def __eq__(self, other):
         return self.package_delivery_plans == other.package_delivery_plans
 
+    def __hash__(self):
+        return hash(map(hash, self.package_delivery_plans))
+
     def ids(self) -> List[UUID]:
         return [package_delivery_plan.id for package_delivery_plan in self._package_delivery_plans]
 

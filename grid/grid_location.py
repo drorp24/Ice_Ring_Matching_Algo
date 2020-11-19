@@ -23,6 +23,9 @@ class GridLocation(object):
         return GridLocation(self.row - other.row, self.column - other.column)
 
     def __eq__(self, other):
+        if not isinstance(other,GridLocation):
+            return False
+
         return self.row == other.row and self.column == other.column
 
     def as_list(self):
