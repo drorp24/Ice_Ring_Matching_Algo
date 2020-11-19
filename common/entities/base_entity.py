@@ -1,9 +1,7 @@
 from __future__ import annotations
 
 import json
-from abc import abstractmethod, ABC
-
-from geometry.geo2d import Point2D
+from abc import abstractmethod
 
 DEFAULT_TEST_FILE_JSON = 'jsons/test_file.json'
 
@@ -44,11 +42,4 @@ class JsonableBaseEntity(BaseEntity):
     @classmethod
     @abstractmethod
     def dict_to_obj(cls, dict_input):
-        raise NotImplementedError
-
-
-class Localizable(ABC):
-
-    @abstractmethod
-    def calc_location(self) -> Point2D:
         raise NotImplementedError
