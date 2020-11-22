@@ -12,10 +12,11 @@ from common.math.angle import Angle, AngleUnit
 from geometry.geo_factory import create_point_2d
 from grid.azimuth_options import AzimuthOptions
 from grid.cell import Cell, EnvelopeCell
+from grid.cell_services import CellServices
 from grid.delivery_request_envelope_cells import DeliveryRequestEnvelopeCellsDict, DeliveryRequestEnvelopeCells
-from grid.grid_location import GridLocation
+from grid.grid_location import GridLocation, GridLocationServices
+from grid.grid_service import GridService
 from grid.slides_factory import generate_slides_container
-from params import MAX_PITCH_DEGREES
 from services.mock_envelope_services import MockEnvelopeServices
 
 
@@ -35,30 +36,30 @@ class BasicDeliveryRequestEnvelopeCellsTestCase(unittest.TestCase):
                                                          cls.drop_azimuth_resolution,
                                                          cls.cell_resolution,
                                                          cls.cell_ratio_required)
+        print(cls.slides_container)
 
-        pdp_1 = PackageDeliveryPlan(id=UUID(int=42),
-                                    drop_point=create_point_2d(1, 2),
-                                    azimuth=Angle(135, AngleUnit.DEGREE),
-                                    pitch=Angle(90, AngleUnit.DEGREE),
-                                    package_type=PackageType.TINY)
+        cls.pdp_1 = PackageDeliveryPlan(id=UUID(int=42),
+                                        drop_point=create_point_2d(1, 2),
+                                        azimuth=Angle(135, AngleUnit.DEGREE),
+                                        pitch=Angle(90, AngleUnit.DEGREE),
+                                        package_type=PackageType.TINY)
 
-        pdp_2 = PackageDeliveryPlan(id=UUID(int=43),
-                                    drop_point=create_point_2d(1, 3),
-                                    azimuth=Angle(135, AngleUnit.DEGREE),
-                                    pitch=Angle(45, AngleUnit.DEGREE),
-                                    package_type=PackageType.TINY)
+        cls.pdp_2 = PackageDeliveryPlan(id=UUID(int=43),
+                                        drop_point=create_point_2d(1, 3),
+                                        azimuth=Angle(135, AngleUnit.DEGREE),
+                                        pitch=Angle(45, AngleUnit.DEGREE),
+                                        package_type=PackageType.TINY)
 
-        do_1 = DeliveryOption([CustomerDelivery([pdp_1, pdp_2])])
+        cls.do_1 = DeliveryOption([CustomerDelivery([cls.pdp_1, cls.pdp_2])])
 
-        dr_1 = DeliveryRequest(delivery_options=[do_1],
-                               time_window=TimeWindowExtension(
-                                   DateTimeExtension(dt_date=date(2021, 1, 1), dt_time=time(6, 0, 0)),
-                                   DateTimeExtension(dt_date=date(2021, 1, 1), dt_time=time(6, 0, 0))),
-                               priority=1)
+        cls.dr_1 = DeliveryRequest(delivery_options=[cls.do_1],
+                                   time_window=TimeWindowExtension(
+                                       DateTimeExtension(dt_date=date(2021, 1, 1), dt_time=time(6, 0, 0)),
+                                       DateTimeExtension(dt_date=date(2021, 1, 1), dt_time=time(6, 0, 0))),
+                                   priority=1)
 
-        cls.delivery_requests_envelope_cells = DeliveryRequestEnvelopeCells(cls.slides_container, dr_1)
+        cls.delivery_requests_envelope_cells = DeliveryRequestEnvelopeCells(cls.slides_container, cls.dr_1)
         cls.delivery_requests_envelope_cells_dict_do_1 = cls.delivery_requests_envelope_cells.cells[0]
-
 
     def test_drone_azimuth(self):
         self.assertEqual(self.delivery_requests_envelope_cells_dict_do_1.keys(),
@@ -66,30 +67,37 @@ class BasicDeliveryRequestEnvelopeCellsTestCase(unittest.TestCase):
 
     def test_envelope_cells(self):
         pass
-        # pdp_1_drop_azimuth = CellServices.get_drop_azimuth(self.pdp_1.drop_azimuth if self.pdp_1.drop_pitch == Angle(MAX_PITCH_DEGREES,
-        #                                                                              AngleUnit.DEGREE) else \
-        #     self.pdp_1.drone_azimuth
+        # drone_azimuth = Angle(45.0, AngleUnit.DEGREE)
+        # pdp_1_drop_azimuth = CellServices.get_drop_azimuth(drone_azimuth, self.pdp_1.azimuth,
+        #                                                    self.pdp_1.pitch)
         #
-        #     pdp_1_envelope_location = slides_container.get_envelope_location(drone_azimuth_from_azoption,
-        #                                                                      pdp_1_drop_azimuth,
-        #                                                                      cls.pdp_1.package_type)
+        # pdp_2_drop_azimuth = CellServices.get_drop_azimuth(drone_azimuth, self.pdp_2.azimuth,
+        #                                                    self.pdp_2.pitch)
         #
-        #     drop_point_grid_location = GridService.get_grid_location(package_delivery_plan.drop_point,
-        #                                                              slides_container.get_drone_azimuth_resolution)
+        # pdp_1_envelope_location = self.slides_container.get_envelope_location(drone_azimuth,
+        #                                                                       pdp_1_drop_azimuth,
+        #                                                                       self.pdp_1.package_type)
         #
-        #     expected_average_location = GridLocationServices.calc_average(
-        #         list(map(grid_locations.__getitem__, indices_to_calc)))
+        # pdp_2_envelope_location = self.slides_container.get_envelope_location(drone_azimuth,
+        #                                                                       pdp_2_drop_azimuth,
+        #                                                                       self.pdp_2.package_type)
         #
+        # pdp_1_drop_point_grid_location = GridService.get_grid_location(self.pdp_1.drop_point,
+        #                                                                self.slides_container.get_drone_azimuth_resolution)
+        #
+        # pdp_2_drop_point_grid_location = GridService.get_grid_location(self.pdp_2.drop_point,
+        #                                                                self.slides_container.get_drone_azimuth_resolution)
+        #
+        # pdp_1_scale_to_grid = GridService.scale_to_grid(pdp_1_drop_point_grid_location, pdp_1_envelope_location)
+        # pdp_2_scale_to_grid = GridService.scale_to_grid(pdp_2_drop_point_grid_location, pdp_2_envelope_location)
+        #
+        # expected_average_location = GridLocationServices.calc_average([])
+
         #     self.assertEqual(self.delivery_requests_envelope_cells_dict_do_1[Angle(0, AngleUnit.DEGREE)].location,
         #                      expected_average_location)
         #     # for ec in self.delivery_requests_envelope_cells_dict_do_1.values():
         #     #     self.assertEqual(ec.location,
         #     #                      expected_average_location)
-
-
-
-
-
 
 
 class BasicDeliveryRequestEnvelopeCellsDictTestCase(unittest.TestCase):

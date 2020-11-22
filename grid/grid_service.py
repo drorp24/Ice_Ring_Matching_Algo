@@ -38,3 +38,10 @@ class GridService:
     @staticmethod
     def get_polygon_centroid_grid_location(polygon: Polygon2D, cell_resolution: int) -> GridLocation:
         return GridService.get_grid_location(polygon.centroid, cell_resolution)
+
+    @staticmethod
+    def scale_to_grid(drop_point_grid_location: GridLocation, envelope_grid_location: Optional.of(GridLocation)) -> \
+            Optional.of(GridLocation):
+
+        scale_to_grid_location = drop_point_grid_location + envelope_grid_location
+        return scale_to_grid_location if scale_to_grid_location != drop_point_grid_location else Optional.empty()

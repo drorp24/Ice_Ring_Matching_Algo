@@ -1,15 +1,19 @@
 import unittest
 from random import Random
 
+from optional import Optional
+
+from common.entities.delivery_request import generate_dr_distribution
+from common.entities.delivery_request_generator import DeliveryRequestDatasetGenerator, DeliveryRequestDatasetStructure
+from common.entities.package import PackageType
+from geometry.geo_distribution import UniformPointInBboxDistribution
 from geometry.geo_factory import create_point_2d, create_polygon_2d
 from grid.grid import DeliveryRequestsGrid
 from grid.grid_location import GridLocation, GridLocationServices
 from grid.grid_service import GridService
-
-from common.entities.delivery_request import generate_dr_distribution
-from common.entities.delivery_request_generator import DeliveryRequestDatasetGenerator, DeliveryRequestDatasetStructure
-from geometry.geo_distribution import UniformPointInBboxDistribution
 from grid.slides_container import SlidesContainer
+from grid.slides_factory import generate_slides_container
+from services.mock_envelope_services import MockEnvelopeServices
 
 
 class BasicGridTestCase(unittest.TestCase):
@@ -17,19 +21,35 @@ class BasicGridTestCase(unittest.TestCase):
     def setUpClass(cls):
         cls.dr_dataset_1 = create_local_data_in_region_1()
         cls.dr_dataset_2 = create_local_data_in_region_2()
-        # TODO: init SlidesContainer member correctly.
-        cls.delivery_requests_grid_1 = DeliveryRequestsGrid(SlidesContainer(), cls.dr_dataset_1)
-        cls.delivery_requests_grid_2 = DeliveryRequestsGrid(SlidesContainer(), cls.dr_dataset_2)
+
+        cls.envelope_service = MockEnvelopeServices()
+        cls.cell_resolution = 1
+        cls.cell_ratio_required = 0.5
+        cls.drone_azimuth_resolution = 8
+        cls.drop_azimuth_resolution = 8
+        cls.package_types = [package_type for package_type in PackageType]
+        cls.slides_container = generate_slides_container(MockEnvelopeServices(),
+                                                         cls.package_types,
+                                                         cls.drone_azimuth_resolution,
+                                                         cls.drop_azimuth_resolution,
+                                                         cls.cell_resolution,
+                                                         cls.cell_ratio_required)
+
+        cls.delivery_requests_grid_1 = DeliveryRequestsGrid(cls.slides_container, cls.dr_dataset_1)
+        cls.delivery_requests_grid_2 = DeliveryRequestsGrid(cls.slides_container, cls.dr_dataset_2)
 
     def test_delivery_requests(self):
         delivery_requests = self.delivery_requests_grid.delivery_requests_envelope_cells.keys()
         self.assertTrue(set(delivery_requests.issubset(self.dr_dataset)))
 
     def test_zero_distance(self):
-        self.assertEqual(self.delivery_requests_grid_2.get_distance(self.dr_dataset_2[0], self.dr_dataset_2[1], 0, 0), 0)
+        self.assertEqual(self.delivery_requests_grid_2.get_distance(self.dr_dataset_2[0], self.dr_dataset_2[1], 0, 0),
+                         0)
 
     def test_non_zero_distance(self):
-        self.assertGreater(self.delivery_requests_grid_1.get_distance(self.dr_dataset_1[0], self.dr_dataset_1[1], 0, 0), 0)
+        self.assertGreater(self.delivery_requests_grid_1.get_distance(self.dr_dataset_1[0], self.dr_dataset_1[1], 0, 0),
+                           0)
+
 
 class BasicGridLocationTestCase(unittest.TestCase):
 
@@ -68,6 +88,10 @@ class BasicGridServiceTestCase(unittest.TestCase):
         cls.p5 = create_point_2d(40.0, 0.0)
         cls.poly1 = create_polygon_2d([cls.p2, cls.p3, cls.p4, cls.p5])
 
+        cls.envelope_grid_location_1 = GridLocation(2, 2)
+        cls.scale_to_grid_location_1 = GridService.scale_to_grid(cls.grid_location_1, cls.envelope_grid_location_1)
+        cls.scale_to_grid_location_2 = GridService.scale_to_grid(cls.grid_location_1, Optional.empty())
+
     def test_get_grid_location(self):
         grid_location = GridService.get_grid_location(self.p1, 2)
         self.assertEqual(self.grid_location_1, grid_location)
@@ -75,6 +99,11 @@ class BasicGridServiceTestCase(unittest.TestCase):
     def test_get_polygon_centroid_grid_location(self):
         grid_location = GridService.get_polygon_centroid_grid_location(self.poly1, 2)
         self.assertEqual(self.grid_location_1, grid_location)
+
+    def test_scale_to_grid(self):
+        expected_scale_to_grid_location = GridLocation(12, 12)
+        self.assertEqual(expected_scale_to_grid_location, self.scale_to_grid_location_1)
+        self.assertEqual(Optional.empty(), self.scale_to_grid_location_2)
 
 
 def create_local_data_in_region_1():

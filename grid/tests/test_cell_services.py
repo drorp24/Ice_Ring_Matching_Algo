@@ -72,9 +72,9 @@ class BasicCellServiceTestCase(unittest.TestCase):
         expected_drop_azimuth_1 = CellServices.get_drop_azimuth(expected_drone_azimuth, self.pdp_1.azimuth,
                                                                 self.pdp_1.pitch)
         self.assertEqual(expected_drop_azimuth_1,
-                         expected_drone_azimuth)
+                         self.pdp_1.azimuth)
 
         expected_drop_azimuth_2 = CellServices.get_drop_azimuth(expected_drone_azimuth, self.pdp_2.azimuth,
                                                                 self.pdp_2.pitch)
         self.assertEqual(expected_drop_azimuth_2,
-                         self.pdp_2.azimuth)
+                         expected_drone_azimuth)

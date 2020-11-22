@@ -20,4 +20,4 @@ class CellServices:
 
     @staticmethod
     def get_drop_azimuth(drone_azimuth: Angle, drop_azimuth: Angle, drop_pitch: Angle) -> Angle:
-        return drop_azimuth if drop_pitch == Angle(MAX_PITCH_DEGREES, AngleUnit.DEGREE) else drone_azimuth
+        return drone_azimuth if drop_pitch == Angle(MAX_PITCH_DEGREES, AngleUnit.DEGREE) else drop_azimuth

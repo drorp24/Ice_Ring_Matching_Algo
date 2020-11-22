@@ -86,26 +86,17 @@ class DeliveryRequestEnvelopeCells:
         drop_point_grid_location = GridService.get_grid_location(package_delivery_plan.drop_point,
                                                                  slides_container.get_drone_azimuth_resolution)
 
-        return list(map(DeliveryRequestEnvelopeCells._scale_to_grid, repeat(drop_point_grid_location),
-                        map(DeliveryRequestEnvelopeCells._get_envelope_location, repeat(slides_container),
-                            repeat(package_delivery_plan.package_type),
+        return list(map(GridService.scale_to_grid, repeat(drop_point_grid_location),
+                        map(slides_container.get_envelope_location,
                             AzimuthOptions(slides_container.get_drone_azimuth_resolution).values,
                             map(CellServices.get_drop_azimuth,
                                 AzimuthOptions(slides_container.get_drone_azimuth_resolution).values,
                                 repeat(package_delivery_plan.azimuth), repeat(package_delivery_plan.pitch)
-                                ))))
+                                ),
+                            repeat(package_delivery_plan.package_type)
+                            )))
 
-    @staticmethod
-    def _scale_to_grid(drop_point_grid_location: GridLocation, envelope_grid_location: Optional.of(GridLocation)) -> \
-            Optional.of(GridLocation):
-        return drop_point_grid_location + envelope_grid_location if envelope_grid_location != Optional.empty() \
-            else Optional.empty()
 
-    @staticmethod
-    def _get_envelope_location(slides_container: SlidesContainer, package_type: PackageType,
-                               drone_azimuth: Angle,
-                               drop_azimuth: Angle) -> Optional.of(GridLocation):
-        return slides_container.get_envelope_location(drone_azimuth, drop_azimuth,
-                                                      package_type)
+
 
 
