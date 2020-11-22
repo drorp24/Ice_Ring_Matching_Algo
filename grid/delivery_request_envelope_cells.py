@@ -5,16 +5,14 @@ from optional import Optional
 
 from common.entities.delivery_option import DeliveryOption
 from common.entities.delivery_request import DeliveryRequest
-from common.entities.package import PackageType
 from common.entities.package_delivery_plan import PackageDeliveryPlan, PackageDeliveryPlanList
-from common.math.angle import Angle, AngleUnit
+from common.math.angle import Angle
 from grid.azimuth_options import AzimuthOptions
 from grid.cell import EnvelopeCell
 from grid.cell_services import CellServices
 from grid.grid_location import GridLocation, GridLocationServices
 from grid.grid_service import GridService
 from grid.slides_container import SlidesContainer
-from params import MAX_PITCH_DEGREES
 
 
 class DeliveryRequestEnvelopeCellsDict:
@@ -68,8 +66,7 @@ class DeliveryRequestEnvelopeCells:
 
     @staticmethod
     def _get_indices_to_calc_average(grid_locations: [Optional.of(GridLocation)]) -> List[int]:
-        return [index for index, grid_location in enumerate(grid_locations) if
-                grid_location != Optional.empty()]
+        return [index for index, grid_location in enumerate(grid_locations) if not grid_location.empty()]
 
     @staticmethod
     def _calc_average(indices_to_calc: List[int], grid_locations: List[GridLocation]) -> GridLocation:
