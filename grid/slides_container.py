@@ -1,6 +1,8 @@
 from collections import defaultdict
 from typing import List
 
+from flatten_dict import flatten
+from flatten_dict.reducer import underscore_reducer
 from optional import Optional
 
 from common.entities.package import PackageType
@@ -69,3 +71,6 @@ class SlidesContainer:
             int(self._drop_azimuth_delta_deg.degrees))
 
         return self._hash[package_type][round_drone_azimuth][round_drop_azimuth].envelope_location
+
+    def flatten_hash(self):
+        return flatten(self._hash, reducer=underscore_reducer)

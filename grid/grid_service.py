@@ -43,5 +43,9 @@ class GridService:
     def scale_to_grid(drop_point_grid_location: GridLocation, envelope_grid_location: Optional.of(GridLocation)) -> \
             Optional.of(GridLocation):
 
-        scale_to_grid_location = drop_point_grid_location + envelope_grid_location
-        return scale_to_grid_location if scale_to_grid_location != drop_point_grid_location else Optional.empty()
+        res = Optional.of(
+            drop_point_grid_location + envelope_grid_location.get()) if not envelope_grid_location.is_empty() else \
+                Optional.empty()
+
+        return res
+

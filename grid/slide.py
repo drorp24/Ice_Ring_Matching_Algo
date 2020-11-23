@@ -65,4 +65,13 @@ class Slide:
         if not self._envelope_service.is_valid_envelope(envelope_polygon, self._required_area):
             return Optional.empty()
 
-        return GridService.get_polygon_centroid_grid_location(envelope_polygon, self._cell_resolution)
+        return Optional.of(GridService.get_polygon_centroid_grid_location(envelope_polygon, self._cell_resolution))
+
+    def __repr__(self):
+        return "Slide ({0} {1} {2} {3})".format(self.package_type,
+                                                self.drone_azimuth.degrees,
+                                                self.drop_azimuth.degrees,
+                                                self.envelope_location if self.envelope_location.is_empty()
+                                                else
+                                                "{0}:{1}".format(self.envelope_location.get().column,
+                                                                 self.envelope_location.get().row))

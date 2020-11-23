@@ -1,6 +1,7 @@
 from typing import List
 
 import numpy as np
+from optional import Optional
 
 
 class GridLocation(object):
@@ -34,12 +35,24 @@ class GridLocation(object):
 
         return self.row == other.row and self.column == other.column
 
-    def as_list(self):
+    def flatten(self):
         return [self._row, self._column]
 
 
 class GridLocationServices:
+
     @staticmethod
-    def calc_average(grid_locations: List[GridLocation]) -> GridLocation:
+    def get_not_empty_indices(grid_locations: [Optional.of(GridLocation)]) -> List[int]:
+        return [index for index, grid_location in enumerate(grid_locations) if not grid_location.is_empty()]
+
+    @staticmethod
+    def get_not_empty_grid_locations(grid_locations: [Optional.of(GridLocation)]) -> List[GridLocation]:
+        filtered_grid_indices = list(
+            map(grid_locations.__getitem__, GridLocationServices.get_not_empty_indices(grid_locations)))
+        return [grid_location.get() for grid_location in filtered_grid_indices]
+
+    @staticmethod
+    def calc_average(grid_locations: [Optional.of(GridLocation)]) -> GridLocation:
+        filtered_grid_locations = GridLocationServices.get_not_empty_grid_locations(grid_locations)
         return GridLocation(
-            *list(map(np.mean, zip(*list(grid_location.as_list() for grid_location in grid_locations)))))
+            *list(map(np.mean, zip(*list(grid_location.flatten() for grid_location in filtered_grid_locations)))))
