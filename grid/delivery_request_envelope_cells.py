@@ -37,13 +37,13 @@ class DeliveryRequestEnvelopeCellsDict:
 
 class DeliveryRequestEnvelopeCells:
     def __init__(self, slides_container: SlidesContainer, delivery_request: DeliveryRequest):
-        self._cells = list(map(DeliveryRequestEnvelopeCellsDict, list(
+        self._delivery_options_cells = list(map(DeliveryRequestEnvelopeCellsDict, list(
             map(DeliveryRequestEnvelopeCells._get_delivery_request_envelope_cells, repeat(slides_container),
                 delivery_request.delivery_options))))
 
     @property
-    def cells(self) -> List[DeliveryRequestEnvelopeCellsDict]:
-        return self._cells
+    def delivery_options_cells(self) -> List[DeliveryRequestEnvelopeCellsDict]:
+        return self._delivery_options_cells
 
     @staticmethod
     def _get_delivery_request_envelope_cells(slides_container: SlidesContainer, delivery_option: DeliveryOption) -> \

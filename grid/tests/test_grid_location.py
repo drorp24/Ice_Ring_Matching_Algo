@@ -12,15 +12,15 @@ class BasicGridLocationTestCase(unittest.TestCase):
         cls.row = 10
         cls.column = 15
 
-        cls.grid_location_1 = GridLocation(10, 15)
-        cls.grid_location_2 = GridLocation(20, 10)
-        cls.grid_location_3 = GridLocation(60, 5)
+        cls.grid_location_1 = Optional.of(GridLocation(10, 15))
+        cls.grid_location_2 = Optional.of(GridLocation(20, 10))
+        cls.grid_location_3 = Optional.of(GridLocation(60, 5))
 
-        cls.grid_location_avg = GridLocation(30, 10)
+        cls.grid_location_avg = Optional.of(GridLocation(30, 10))
 
     def test_grid_location(self):
-        self.assertEqual(self.row, self.grid_location_1.row)
-        self.assertEqual(self.column, self.grid_location_1.column)
+        self.assertEqual(self.row, self.grid_location_1.get().row)
+        self.assertEqual(self.column, self.grid_location_1.get().column)
 
     def test_grid_location_calc_average(self):
         average_grid_location = GridLocationServices.calc_average(

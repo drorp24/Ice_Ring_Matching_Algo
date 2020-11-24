@@ -1,6 +1,5 @@
 import unittest
 from datetime import date, time
-from pprint import pprint
 from uuid import UUID
 
 from common.entities.customer_delivery import CustomerDelivery
@@ -37,7 +36,6 @@ class BasicDeliveryRequestEnvelopeCellsTestCase(unittest.TestCase):
                                                          cls.drop_azimuth_resolution,
                                                          cls.cell_resolution,
                                                          cls.cell_ratio_required)
-        pprint(cls.slides_container.flatten_hash())
 
         cls.pdp_1 = PackageDeliveryPlan(id=UUID(int=42),
                                         drop_point=create_point_2d(10, 20),
@@ -66,7 +64,7 @@ class BasicDeliveryRequestEnvelopeCellsTestCase(unittest.TestCase):
                                    priority=1)
 
         cls.delivery_requests_envelope_cells = DeliveryRequestEnvelopeCells(cls.slides_container, cls.dr_1)
-        cls.delivery_requests_envelope_cells_dict_do_1 = cls.delivery_requests_envelope_cells.cells[0]
+        cls.delivery_requests_envelope_cells_dict_do_1 = cls.delivery_requests_envelope_cells.delivery_options_cells[0]
 
     def test_drone_azimuth(self):
         self.assertEqual(self.delivery_requests_envelope_cells_dict_do_1.keys(),

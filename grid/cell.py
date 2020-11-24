@@ -1,6 +1,7 @@
 from attr import dataclass
 
 from attr import dataclass
+from optional import Optional
 
 from common.entities.package_delivery_plan import PackageDeliveryPlanList
 from common.math.angle import Angle
@@ -9,7 +10,7 @@ from grid.grid_location import GridLocation
 
 @dataclass
 class Cell:
-    location: GridLocation
+    location: Optional.of(GridLocation)
 
 
 @dataclass

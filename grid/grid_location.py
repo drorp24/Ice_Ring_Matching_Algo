@@ -52,7 +52,11 @@ class GridLocationServices:
         return [grid_location.get() for grid_location in filtered_grid_indices]
 
     @staticmethod
-    def calc_average(grid_locations: [Optional.of(GridLocation)]) -> GridLocation:
+    def calc_average(grid_locations: [Optional.of(GridLocation)]) -> Optional.of(GridLocation):
         filtered_grid_locations = GridLocationServices.get_not_empty_grid_locations(grid_locations)
-        return GridLocation(
-            *list(map(np.mean, zip(*list(grid_location.flatten() for grid_location in filtered_grid_locations)))))
+
+        if not filtered_grid_locations:
+            return Optional.empty()
+
+        return Optional.of(GridLocation(
+            *list(map(np.mean, zip(*list(grid_location.flatten() for grid_location in filtered_grid_locations))))))

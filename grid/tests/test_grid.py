@@ -1,16 +1,22 @@
 import unittest
+from datetime import date, time
 from random import Random
+from typing import List
+from uuid import UUID
 
-from optional import Optional
+import numpy as np
 
-from common.entities.delivery_request import generate_dr_distribution
+from common.entities.customer_delivery import CustomerDelivery
+from common.entities.delivery_option import DeliveryOption
+from common.entities.delivery_request import generate_dr_distribution, DeliveryRequest
 from common.entities.delivery_request_generator import DeliveryRequestDatasetGenerator, DeliveryRequestDatasetStructure
 from common.entities.package import PackageType
+from common.entities.package_delivery_plan import PackageDeliveryPlan
+from common.entities.temporal import TimeWindowExtension, DateTimeExtension
+from common.math.angle import Angle, AngleUnit
 from geometry.geo_distribution import UniformPointInBboxDistribution
-from geometry.geo_factory import create_point_2d, create_polygon_2d
+from geometry.geo_factory import create_point_2d
 from grid.grid import DeliveryRequestsGrid
-from grid.grid_location import GridLocation, GridLocationServices
-from grid.grid_service import GridService
 from grid.slides_container import SlidesContainer
 from grid.slides_factory import generate_slides_container
 from services.mock_envelope_services import MockEnvelopeServices
@@ -19,91 +25,121 @@ from services.mock_envelope_services import MockEnvelopeServices
 class BasicGridTestCase(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.dr_dataset_1 = create_local_data_in_region_1()
-        cls.dr_dataset_2 = create_local_data_in_region_2()
+        cls.slides_container = generate_slide_container()
 
-        cls.envelope_service = MockEnvelopeServices()
-        cls.cell_resolution = 1
-        cls.cell_ratio_required = 0.5
-        cls.drone_azimuth_resolution = 8
-        cls.drop_azimuth_resolution = 8
-        cls.package_types = [package_type for package_type in PackageType]
-        cls.slides_container = generate_slides_container(MockEnvelopeServices(),
-                                                         cls.package_types,
-                                                         cls.drone_azimuth_resolution,
-                                                         cls.drop_azimuth_resolution,
-                                                         cls.cell_resolution,
-                                                         cls.cell_ratio_required)
+        cls.dr_data_set_1 = create_distributed_dr_data_set()
+        cls.delivery_requests_grid_1 = DeliveryRequestsGrid(cls.slides_container, cls.dr_data_set_1)
 
-        cls.delivery_requests_grid_1 = DeliveryRequestsGrid(cls.slides_container, cls.dr_dataset_1)
-        cls.delivery_requests_grid_2 = DeliveryRequestsGrid(cls.slides_container, cls.dr_dataset_2)
+        cls.dr_data_set_2 = create_no_zero_dist_dr_data_set()
+        cls.delivery_requests_grid_2 = DeliveryRequestsGrid(cls.slides_container, cls.dr_data_set_2)
+
+        cls.dr_data_set_3 = create_inf_dist_dr_data_set()
+        cls.delivery_requests_grid_3 = DeliveryRequestsGrid(cls.slides_container, cls.dr_data_set_3)
 
     def test_delivery_requests(self):
-        delivery_requests = self.delivery_requests_grid.delivery_requests_envelope_cells.keys()
-        self.assertTrue(set(delivery_requests.issubset(self.dr_dataset)))
+        delivery_requests = self.delivery_requests_grid_1.delivery_requests_envelope_cells.keys()
+        self.assertTrue(set(self.dr_data_set_1).issubset(delivery_requests))
 
     def test_zero_distance(self):
-        self.assertEqual(self.delivery_requests_grid_2.get_distance(self.dr_dataset_2[0], self.dr_dataset_2[1], 0, 0),
-                         0)
+        expected_distance = 0
+
+        for dr in self.dr_data_set_1:
+            self.assertEqual(self.delivery_requests_grid_1.get_distance(dr, dr, 0, 0), expected_distance)
 
     def test_non_zero_distance(self):
-        self.assertGreater(self.delivery_requests_grid_1.get_distance(self.dr_dataset_1[0], self.dr_dataset_1[1], 0, 0),
-                           0)
+        expected_distance = 3.61
 
-class BasicGridServiceTestCase(unittest.TestCase):
+        self.assertEqual(
+            round(self.delivery_requests_grid_2.get_distance(self.dr_data_set_2[0], self.dr_data_set_2[1], 0, 0), 2),
+            expected_distance)
 
-    @classmethod
-    def setUpClass(cls):
-        cls.p1 = create_point_2d(21.0, 21.0)
-        cls.grid_location_1 = GridLocation(10, 10)
+    def test_inf_distance(self):
+        expected_distance = np.inf
 
-        cls.p2 = create_point_2d(0.0, 0.0)
-        cls.p3 = create_point_2d(0.0, 40.0)
-        cls.p4 = create_point_2d(40.0, 40.0)
-        cls.p5 = create_point_2d(40.0, 0.0)
-        cls.poly1 = create_polygon_2d([cls.p2, cls.p3, cls.p4, cls.p5])
-
-        cls.envelope_grid_location_1 = GridLocation(2, 2)
-        cls.scale_to_grid_location_1 = GridService.scale_to_grid(cls.grid_location_1, cls.envelope_grid_location_1)
-        cls.scale_to_grid_location_2 = GridService.scale_to_grid(cls.grid_location_1, Optional.empty())
-
-    def test_get_grid_location(self):
-        grid_location = GridService.get_grid_location(self.p1, 2)
-        self.assertEqual(self.grid_location_1, grid_location)
-
-    def test_get_polygon_centroid_grid_location(self):
-        grid_location = GridService.get_polygon_centroid_grid_location(self.poly1, 2)
-        self.assertEqual(self.grid_location_1, grid_location)
-
-    def test_scale_to_grid(self):
-        expected_scale_to_grid_location = GridLocation(12, 12)
-        self.assertEqual(expected_scale_to_grid_location, self.scale_to_grid_location_1)
-        self.assertEqual(Optional.empty(), self.scale_to_grid_location_2)
+        self.assertEqual(
+            self.delivery_requests_grid_3.get_distance(self.dr_data_set_3[0], self.dr_data_set_3[1], 0, 0),
+            expected_distance)
 
 
-def create_local_data_in_region_1():
+def generate_slide_container() -> SlidesContainer:
+    cell_resolution = 1
+    cell_ratio_required = 0.5
+    drone_azimuth_resolution = 8
+    drop_azimuth_resolution = 8
+    package_types = [package_type for package_type in PackageType]
+    return generate_slides_container(MockEnvelopeServices(),
+                                     package_types,
+                                     drone_azimuth_resolution,
+                                     drop_azimuth_resolution,
+                                     cell_resolution,
+                                     cell_ratio_required)
+
+
+def create_distributed_dr_data_set():
     dr_struct = DeliveryRequestDatasetStructure(num_of_delivery_requests=10,
                                                 num_of_delivery_options_per_delivery_request=1,
                                                 num_of_customer_deliveries_per_delivery_option=2,
                                                 num_of_package_delivery_plan_per_customer_delivery=3,
-                                                delivery_request_distribution=(_create_region_1_dr_distribution()))
+                                                delivery_request_distribution=(_create_dr_distribution()))
     return DeliveryRequestDatasetGenerator.generate(dr_struct, random=Random(42))
 
 
-def create_local_data_in_region_2():
-    dr_struct = DeliveryRequestDatasetStructure(num_of_delivery_requests=2,
-                                                num_of_delivery_options_per_delivery_request=1,
-                                                num_of_customer_deliveries_per_delivery_option=1,
-                                                num_of_package_delivery_plan_per_customer_delivery=1,
-                                                delivery_request_distribution=(_create_region_2_dr_distribution()))
-    return DeliveryRequestDatasetGenerator.generate(dr_struct, random=Random(42))
-
-
-def _create_region_1_dr_distribution():
+def _create_dr_distribution():
     return generate_dr_distribution(
         drop_point_distribution=UniformPointInBboxDistribution(min_x=10, max_x=1200, min_y=10, max_y=1150))
 
 
-def _create_region_2_dr_distribution():
-    return generate_dr_distribution(
-        drop_point_distribution=UniformPointInBboxDistribution(min_x=1100, max_x=1100, min_y=1150, max_y=1150))
+def create_no_zero_dist_dr_data_set() -> List[DeliveryRequest]:
+    pdp_1 = PackageDeliveryPlan(id=UUID(int=42),
+                                drop_point=create_point_2d(10, 20),
+                                azimuth=Angle(135, AngleUnit.DEGREE),
+                                pitch=Angle(90, AngleUnit.DEGREE),
+                                package_type=PackageType.TINY)
+
+    do_1 = DeliveryOption([CustomerDelivery([pdp_1])])
+    dr_1 = DeliveryRequest(delivery_options=[do_1],
+                           time_window=TimeWindowExtension(
+                               DateTimeExtension(dt_date=date(2021, 1, 1), dt_time=time(6, 0, 0)),
+                               DateTimeExtension(dt_date=date(2021, 1, 1), dt_time=time(6, 0, 0))),
+                           priority=1)
+
+    pdp_2 = PackageDeliveryPlan(id=UUID(int=44),
+                                drop_point=create_point_2d(30, 40),
+                                azimuth=Angle(45, AngleUnit.DEGREE),
+                                pitch=Angle(45, AngleUnit.DEGREE),
+                                package_type=PackageType.TINY)
+    do_2 = DeliveryOption([CustomerDelivery([pdp_2])])
+    dr_2 = DeliveryRequest(delivery_options=[do_2],
+                           time_window=TimeWindowExtension(
+                               DateTimeExtension(dt_date=date(2021, 1, 1), dt_time=time(6, 0, 0)),
+                               DateTimeExtension(dt_date=date(2021, 1, 1), dt_time=time(6, 0, 0))),
+                           priority=1)
+    return [dr_1, dr_2]
+
+
+def create_inf_dist_dr_data_set() -> List[DeliveryRequest]:
+    pdp_1 = PackageDeliveryPlan(id=UUID(int=42),
+                                drop_point=create_point_2d(10, 20),
+                                azimuth=Angle(270, AngleUnit.DEGREE),
+                                pitch=Angle(270, AngleUnit.DEGREE),
+                                package_type=PackageType.TINY)
+
+    do_1 = DeliveryOption([CustomerDelivery([pdp_1])])
+    dr_1 = DeliveryRequest(delivery_options=[do_1],
+                           time_window=TimeWindowExtension(
+                               DateTimeExtension(dt_date=date(2021, 1, 1), dt_time=time(6, 0, 0)),
+                               DateTimeExtension(dt_date=date(2021, 1, 1), dt_time=time(6, 0, 0))),
+                           priority=1)
+
+    pdp_2 = PackageDeliveryPlan(id=UUID(int=44),
+                                drop_point=create_point_2d(30, 40),
+                                azimuth=Angle(45, AngleUnit.DEGREE),
+                                pitch=Angle(45, AngleUnit.DEGREE),
+                                package_type=PackageType.TINY)
+    do_2 = DeliveryOption([CustomerDelivery([pdp_2])])
+    dr_2 = DeliveryRequest(delivery_options=[do_2],
+                           time_window=TimeWindowExtension(
+                               DateTimeExtension(dt_date=date(2021, 1, 1), dt_time=time(6, 0, 0)),
+                               DateTimeExtension(dt_date=date(2021, 1, 1), dt_time=time(6, 0, 0))),
+                           priority=1)
+    return [dr_1, dr_2]

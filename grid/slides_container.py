@@ -62,15 +62,15 @@ class SlidesContainer:
     def get_envelope_location(self, drone_azimuth: Angle, drop_azimuth: Angle,
                               package_type: PackageType) -> Optional.of(GridLocation):
 
-        round_drone_azimuth = PolygonUtils.convert_nearest_value_in_resolution(
+        round_drone_azimuth = Angle(PolygonUtils.convert_nearest_value_in_resolution(
             drone_azimuth.degrees,
-            int(self._drone_azimuth_delta_deg.degrees))
+            int(self._drone_azimuth_delta_deg.degrees)),AngleUnit.DEGREE)
 
-        round_drop_azimuth = PolygonUtils.convert_nearest_value_in_resolution(
+        round_drop_azimuth =  Angle(PolygonUtils.convert_nearest_value_in_resolution(
             drop_azimuth.degrees,
-            int(self._drop_azimuth_delta_deg.degrees))
+            int(self._drop_azimuth_delta_deg.degrees)), AngleUnit.DEGREE)
 
-        return self._hash[package_type][round_drone_azimuth][round_drop_azimuth].envelope_location
+        return self._hash[package_type][round_drone_azimuth.degrees][round_drop_azimuth.degrees].envelope_location
 
     def flatten_hash(self):
         return flatten(self._hash, reducer=underscore_reducer)

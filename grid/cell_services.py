@@ -1,6 +1,7 @@
 import math
 
 import numpy as np
+from optional import Optional
 
 from common.math.angle import Angle, AngleUnit
 from grid.cell import EnvelopeCell
@@ -12,8 +13,12 @@ class CellServices:
 
     @staticmethod
     def get_distance(cell1: EnvelopeCell, cell2: EnvelopeCell) -> float:
+        if cell1.location.is_empty() \
+                or cell2.location.is_empty():
+            return np.inf
+
         angle_delta = cell1.drone_azimuth.calc_abs_difference(cell2.drone_azimuth)
-        location_delta = cell1.location - cell2.location
+        location_delta = cell1.location.get() - cell2.location.get()
         dist = np.linalg.norm([location_delta.row, location_delta.column])
         angle_delta_cost = (math.cos(angle_delta.radians) - 1) / -2
         return dist + CellServices.ANGLE_DELTA_COST / (dist + 1) * angle_delta_cost
