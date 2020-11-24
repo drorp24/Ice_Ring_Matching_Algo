@@ -4,13 +4,14 @@ from random import Random
 from typing import List
 from uuid import UUID
 
-from common.entities.base_entity import JsonableBaseEntity, Localizable
 from common.entities.disribution.distribution import Distribution
+from common.entities.base_entity import JsonableBaseEntity
 from common.entities.package import PackageType, PackageDistribution
 from common.math.angle import Angle, AngleUniformDistribution, AngleUnit
-from common.utils.uuid_utils import convert_str_to_uuid
-from geometry.geo2d import Point2D
+from geometry.geo2d import Point2D, Polygon2D
 from geometry.geo_distribution import UniformPointInBboxDistribution
+from geometry.geo_factory import create_polygon_2d_from_ellipse, convert_dict_to_point_2d
+from geometry.utils import Localizable
 from geometry.geo_factory import convert_dict_to_point_2d
 
 

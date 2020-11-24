@@ -1,3 +1,4 @@
+from abc import abstractmethod, ABC
 from typing import Tuple, List, Iterator
 
 from geometry.geo2d import Point2D
@@ -17,3 +18,10 @@ class GeometryUtils:
     @staticmethod
     def convert_points_list_to_xy_array(points: List[Point2D]) -> List[Tuple[float, float]]:
         return [(p.x, p.y) for p in points]
+
+
+class Localizable(ABC):
+
+    @abstractmethod
+    def calc_location(self) -> Point2D:
+        raise NotImplementedError

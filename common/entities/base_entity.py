@@ -4,9 +4,8 @@ import json
 from uuid import UUID
 
 from common.utils.uuid_utils import convert_uuid_to_str
-from abc import abstractmethod, ABC
+from abc import abstractmethod
 
-from geometry.geo2d import Point2D
 
 DEFAULT_TEST_FILE_JSON = 'jsons/test_file.json'
 
@@ -49,11 +48,4 @@ class JsonableBaseEntity(BaseEntity):
     @classmethod
     @abstractmethod
     def dict_to_obj(cls, dict_input):
-        raise NotImplementedError
-
-
-class Localizable(ABC):
-
-    @abstractmethod
-    def calc_location(self) -> Point2D:
         raise NotImplementedError

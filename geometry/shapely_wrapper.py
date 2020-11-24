@@ -226,6 +226,9 @@ class _ShapelyPolygon2D(_ShapelyGeometry, Polygon2D):
     def __eq__(self, other):
         return _ShapelyPolygon2D.is_approximately_equal_by_symmetric_difference(self, other)
 
+    def __contains__(self, other: _ShapelyGeometry):
+        return self._shapely_obj.contains(other._shapely_obj)
+
     @staticmethod
     def is_approximately_equal_by_symmetric_difference(polygon1: Polygon2D, polygon2: Polygon2D,
                                                        epsilon_equal_area: float = EPSILON_FOR_EQUAL_AREA) -> bool:

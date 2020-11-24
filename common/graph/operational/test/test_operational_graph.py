@@ -3,9 +3,10 @@ from datetime import time, date, timedelta
 from math import sqrt
 from random import Random
 
-from common.entities.delivery_request import DeliveryRequestDistribution, generate_dr_distribution, PriorityDistribution
+from common.entities.delivery_request import DeliveryRequestDistribution, generate_dr_distribution, \
+    PriorityDistribution, DeliveryRequest
 from common.entities.delivery_request_generator import DeliveryRequestDatasetGenerator, DeliveryRequestDatasetStructure
-from common.entities.drone_loading_dock import DroneLoadingDockDistribution
+from common.entities.drone_loading_dock import DroneLoadingDockDistribution, DroneLoadingDock
 from common.entities.temporal import TimeWindowDistribution, DateTimeDistribution, DateTimeExtension, \
     TimeDeltaExtension, TimeDeltaDistribution, TimeWindowExtension
 from common.graph.operational.operational_graph import OperationalEdge, \
@@ -25,19 +26,28 @@ class BasicDeliveryRequestGraphTestCases(unittest.TestCase):
         cls.dr_dataset_afternoon = create_afternoon_dr_dataset()
         cls.dr_dataset_top_priority = create_top_priority_dr_dataset()
         cls.dr_dataset_low_priority = create_low_priority_dr_dataset()
-        cls.dr_dataset_local_region_1 = create_local_data_in_region_1()
-        cls.dr_dataset_local_region_2 = create_local_data_in_region_2()
+        cls.dr_dataset_local_region_1_morning = create_local_data_in_region_1_morning()
+        cls.dr_dataset_local_region_2_morning = create_local_data_in_region_2_morning()
+        cls.dr_dataset_local_region_2_afternoon = create_local_data_in_region_2_afternoon()
 
     def test_local_graph_generation_should_be_fully_connected(self):
-        region_dataset = self.dr_dataset_local_region_1
+        region_dataset = self.dr_dataset_local_region_1_morning
         graph = OperationalGraph()
         add_locally_connected_dr_graph(graph, region_dataset, max_cost_to_connect=100 * 2 / sqrt(2))
         num_nodes = len(graph.nodes)
         self.assertEqual(len(region_dataset), num_nodes)
         self.assertEqual((num_nodes * (num_nodes - 1)), len(graph.edges))
 
-    def test_local_graph_generation_two_separate_clique(self):
-        region_dataset = self.dr_dataset_local_region_1 + self.dr_dataset_local_region_2
+    def test_local_graph_generation_two_separate_spatial_cliques(self):
+        region_dataset = self.dr_dataset_local_region_1_morning + self.dr_dataset_local_region_2_morning
+        graph = OperationalGraph()
+        add_locally_connected_dr_graph(graph, region_dataset, max_cost_to_connect=100 * 2 / sqrt(2))
+        num_nodes = len(graph.nodes)
+        self.assertEqual(len(region_dataset), num_nodes)
+        self.assertEqual(2 * (num_nodes / 2 * (num_nodes / 2 - 1)), len(graph.edges))
+
+    def test_local_graph_generation_two_separate_temporal_cliques(self):
+        region_dataset = self.dr_dataset_local_region_2_afternoon + self.dr_dataset_local_region_2_morning
         graph = OperationalGraph()
         add_locally_connected_dr_graph(graph, region_dataset, max_cost_to_connect=100 * 2 / sqrt(2))
         num_nodes = len(graph.nodes)
@@ -45,13 +55,22 @@ class BasicDeliveryRequestGraphTestCases(unittest.TestCase):
         self.assertEqual(2 * (num_nodes / 2 * (num_nodes / 2 - 1)), len(graph.edges))
 
     def test_add_full_connection_between_loading_docks_and_delivery_requests(self):
-        regional_dr_dataset = self.dr_dataset_local_region_1
+        regional_dr_dataset = self.dr_dataset_local_region_2_afternoon
         graph = OperationalGraph()
         graph.add_delivery_requests(regional_dr_dataset)
-        dld_dataset = DroneLoadingDockDistribution().choose_rand(Random(42), 3)
+        dld_dataset = create_loading_dock_afternoon_distribution()
         add_fully_connected_loading_docks(graph, dld_dataset)
         self.assertEqual(len(regional_dr_dataset) + len(dld_dataset), len(graph.nodes))
         self.assertEqual(2 * len(regional_dr_dataset) * len(dld_dataset), len(graph.edges))
+
+    def test_no_connection_between_dlds_and_drs_due_to_temporal_constraints(self):
+        regional_dr_dataset = self.dr_dataset_local_region_1_morning
+        graph = OperationalGraph()
+        graph.add_delivery_requests(regional_dr_dataset)
+        dld_dataset = create_loading_dock_afternoon_distribution()
+        add_fully_connected_loading_docks(graph, dld_dataset)
+        self.assertEqual(len(regional_dr_dataset) + len(dld_dataset), len(graph.nodes))
+        self.assertEqual(0, len(graph.edges))
 
     def test_delivery_request_graph_creation(self):
         drg = OperationalGraph()
@@ -125,73 +144,107 @@ class BasicDeliveryRequestGraphTestCases(unittest.TestCase):
         self.assertEqual(nodes_in_low_priority_subgraph, node_in_low_priority_graph)
 
 
-def create_local_data_in_region_1():
+def create_local_data_in_region_1_morning() -> [DeliveryRequest]:
     dr_struct = DeliveryRequestDatasetStructure(num_of_delivery_requests=10,
-                                                delivery_request_distribution=(_create_region_1_dr_distribution()))
+                                                delivery_request_distribution=(
+                                                    _create_region_1_morning_dr_distribution()))
     return DeliveryRequestDatasetGenerator.generate(dr_struct, random=Random(42))
 
 
-def create_local_data_in_region_2():
+def create_local_data_in_region_2_morning() -> [DeliveryRequest]:
     dr_struct = DeliveryRequestDatasetStructure(num_of_delivery_requests=10,
-                                                delivery_request_distribution=(_create_region_2_dr_distribution()))
+                                                delivery_request_distribution=(
+                                                    _create_region_2_morning_dr_distribution()))
     return DeliveryRequestDatasetGenerator.generate(dr_struct, random=Random(42))
 
 
-def create_morning_dr_dataset():
+def create_loading_dock_afternoon_distribution() -> [DroneLoadingDock]:
+    return _create_loading_dock_afternoon_distribution().choose_rand(Random(42), 10)
+
+
+def create_local_data_in_region_2_afternoon() -> [DeliveryRequest]:
+    dr_struct = DeliveryRequestDatasetStructure(num_of_delivery_requests=10,
+                                                delivery_request_distribution=(
+                                                    _create_region_2_afternoon_dr_distribution()))
+    return DeliveryRequestDatasetGenerator.generate(dr_struct, random=Random(42))
+
+
+def create_morning_dr_dataset() -> [DeliveryRequest]:
     dr_struct = DeliveryRequestDatasetStructure(num_of_delivery_requests=10,
                                                 delivery_request_distribution=(_create_morning_dr_distribution()))
     return DeliveryRequestDatasetGenerator.generate(dr_struct, random=Random(42))
 
 
-def create_afternoon_dr_dataset():
+def create_afternoon_dr_dataset() -> [DeliveryRequest]:
     dr_struct = DeliveryRequestDatasetStructure(num_of_delivery_requests=5,
                                                 delivery_request_distribution=(_create_afternoon_dr_distribution()))
     return DeliveryRequestDatasetGenerator.generate(dr_struct, random=Random(42))
 
 
-def create_top_priority_dr_dataset():
+def create_top_priority_dr_dataset() -> [DeliveryRequest]:
     dr_struct = DeliveryRequestDatasetStructure(num_of_delivery_requests=4,
                                                 delivery_request_distribution=(_create_high_priority_dr_distribution()))
     return DeliveryRequestDatasetGenerator.generate(dr_struct, random=Random(42))
 
 
-def create_low_priority_dr_dataset():
+def create_low_priority_dr_dataset() -> [DeliveryRequest]:
     dr_struct = DeliveryRequestDatasetStructure(num_of_delivery_requests=6,
                                                 delivery_request_distribution=(_create_low_priority_dr_distribution()))
     return DeliveryRequestDatasetGenerator.generate(dr_struct, random=Random(42))
 
 
-def _create_morning_dr_distribution():
+def _create_morning_dr_distribution() -> DeliveryRequestDistribution:
     return generate_dr_distribution(
         time_window_distribution=TimeWindowDistribution(
             start_time_distribution=DateTimeDistribution([DateTimeExtension(date(2021, 1, 1), time(6, 0, 0))]),
             time_delta_distribution=TimeDeltaDistribution([TimeDeltaExtension(timedelta(hours=3, minutes=30))])))
 
 
-def _create_afternoon_dr_distribution():
+def _create_afternoon_dr_distribution() -> DeliveryRequestDistribution:
     return generate_dr_distribution(
         time_window_distribution=TimeWindowDistribution(
             start_time_distribution=DateTimeDistribution([DateTimeExtension(date(2021, 1, 1), time(16, 30, 0))]),
             time_delta_distribution=TimeDeltaDistribution([TimeDeltaExtension(timedelta(hours=1, minutes=30))])))
 
 
-def _create_high_priority_dr_distribution():
+def _create_high_priority_dr_distribution() -> DeliveryRequestDistribution:
     return generate_dr_distribution(priority_distribution=PriorityDistribution([101, 102, 103, 104, 105]))
 
 
-def _create_low_priority_dr_distribution():
+def _create_low_priority_dr_distribution() -> DeliveryRequestDistribution:
     return generate_dr_distribution(priority_distribution=PriorityDistribution([1, 2, 3, 4, 5]))
 
 
-def _get_dr_from_dr_graph(drg1):
+def _get_dr_from_dr_graph(drg1) -> [DeliveryRequest]:
     return [n.internal_node for n in drg1.nodes]
 
 
-def _create_region_1_dr_distribution():
+def _create_region_1_morning_dr_distribution() -> DeliveryRequestDistribution:
     return generate_dr_distribution(
-        drop_point_distribution=UniformPointInBboxDistribution(min_x=100, max_x=200, min_y=50, max_y=150))
+        drop_point_distribution=UniformPointInBboxDistribution(min_x=100, max_x=200, min_y=50, max_y=150),
+        time_window_distribution=TimeWindowDistribution(
+            start_time_distribution=DateTimeDistribution([DateTimeExtension(date(2021, 1, 1), time(6, 0, 0))]),
+            time_delta_distribution=TimeDeltaDistribution([TimeDeltaExtension(timedelta(hours=3, minutes=30))])))
 
 
-def _create_region_2_dr_distribution():
+def _create_region_2_morning_dr_distribution() -> DeliveryRequestDistribution:
     return generate_dr_distribution(
-        drop_point_distribution=UniformPointInBboxDistribution(min_x=1100, max_x=1200, min_y=150, max_y=1150))
+        drop_point_distribution=UniformPointInBboxDistribution(min_x=1100, max_x=1200, min_y=150, max_y=1150),
+        time_window_distribution=TimeWindowDistribution(
+            start_time_distribution=DateTimeDistribution([DateTimeExtension(date(2021, 1, 1), time(6, 0, 0))]),
+            time_delta_distribution=TimeDeltaDistribution([TimeDeltaExtension(timedelta(hours=3, minutes=30))])))
+
+
+def _create_region_2_afternoon_dr_distribution() -> DeliveryRequestDistribution:
+    return generate_dr_distribution(
+        drop_point_distribution=UniformPointInBboxDistribution(min_x=1100, max_x=1200, min_y=150, max_y=1150),
+        time_window_distribution=TimeWindowDistribution(
+            start_time_distribution=DateTimeDistribution([DateTimeExtension(date(2021, 1, 1), time(16, 30, 0))]),
+            time_delta_distribution=TimeDeltaDistribution([TimeDeltaExtension(timedelta(hours=1, minutes=30))])))
+
+
+def _create_loading_dock_afternoon_distribution() -> DroneLoadingDockDistribution:
+    return DroneLoadingDockDistribution(
+        time_window_distributions=TimeWindowDistribution(
+            start_time_distribution=DateTimeDistribution([DateTimeExtension(date(2021, 1, 1), time(16, 30, 0))]),
+            time_delta_distribution=TimeDeltaDistribution([TimeDeltaExtension(timedelta(hours=1, minutes=30))])))

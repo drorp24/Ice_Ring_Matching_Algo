@@ -2,13 +2,14 @@ from pprint import pprint
 from random import Random
 from typing import List
 
-from common.entities.base_entity import JsonableBaseEntity, Localizable
+from common.entities.base_entity import JsonableBaseEntity
 from common.entities.disribution.distribution import UniformChoiceDistribution, Distribution
 from common.entities.package import PackageType
 from common.entities.package_delivery_plan import PackageDeliveryPlan, PackageDeliveryPlanDistribution, \
     DEFAULT_DROP_POINT_DISTRIB, DEFAULT_AZI_DISTRIB, DEFAULT_PITCH_DISTRIB, DEFAULT_PACKAGE_DISTRIB
 from geometry.geo2d import Point2D
 from geometry.geo_factory import calc_centroid
+from geometry.utils import Localizable
 
 
 class CustomerDelivery(JsonableBaseEntity, Localizable):
