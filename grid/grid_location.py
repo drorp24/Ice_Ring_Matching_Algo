@@ -18,21 +18,12 @@ class GridLocation(object):
         return self._column
 
     def __add__(self, other):
-        if not isinstance(other, GridLocation):
-            return self
-
         return GridLocation(self.row + other.row, self.column + other.column)
 
     def __sub__(self, other):
-        if not isinstance(other, GridLocation):
-            return self
-
         return GridLocation(self.row - other.row, self.column - other.column)
 
     def __eq__(self, other):
-        if not isinstance(other, GridLocation):
-            return False
-
         return self.row == other.row and self.column == other.column
 
     def flatten(self):
