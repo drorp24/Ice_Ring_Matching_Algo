@@ -47,7 +47,7 @@ class BasicGridTestCase(unittest.TestCase):
             self.assertEqual(self.delivery_requests_grid_1.get_distance(dr, dr, 0, 0), expected_distance)
 
     def test_non_zero_distance(self):
-        expected_distance = 3.61
+        expected_distance = 22.36
 
         self.assertEqual(
             round(self.delivery_requests_grid_2.get_distance(self.dr_data_set_2[0], self.dr_data_set_2[1], 0, 0), 2),
@@ -62,7 +62,8 @@ class BasicGridTestCase(unittest.TestCase):
 
 
 def generate_slide_container() -> SlidesContainer:
-    cell_resolution = 1
+    cell_width_resolution = 1
+    cell_height_resolution = 2
     cell_ratio_required = 0.5
     drone_azimuth_resolution = 8
     drop_azimuth_resolution = 8
@@ -71,7 +72,8 @@ def generate_slide_container() -> SlidesContainer:
                                      package_types,
                                      drone_azimuth_resolution,
                                      drop_azimuth_resolution,
-                                     cell_resolution,
+                                     cell_width_resolution,
+                                     cell_height_resolution,
                                      cell_ratio_required)
 
 

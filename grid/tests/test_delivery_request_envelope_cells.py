@@ -25,7 +25,8 @@ class BasicDeliveryRequestEnvelopeCellsTestCase(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.envelope_service = MockEnvelopeServices()
-        cls.cell_resolution = 1
+        cls.cell_width_resolution = 1
+        cls.cell_height_resolution = 2
         cls.cell_ratio_required = 0.5
         cls.drone_azimuth_resolution = 8
         cls.drop_azimuth_resolution = 8
@@ -34,7 +35,8 @@ class BasicDeliveryRequestEnvelopeCellsTestCase(unittest.TestCase):
                                                          cls.package_types,
                                                          cls.drone_azimuth_resolution,
                                                          cls.drop_azimuth_resolution,
-                                                         cls.cell_resolution,
+                                                         cls.cell_width_resolution,
+                                                         cls.cell_height_resolution,
                                                          cls.cell_ratio_required)
 
         cls.pdp_1 = PackageDeliveryPlan(id=UUID(int=42),
@@ -76,7 +78,8 @@ class BasicDeliveryRequestEnvelopeCellsTestCase(unittest.TestCase):
             scale_to_grid_list = []
             for pdp in pdp_list:
                 drop_point_grid_location = \
-                    GridService.get_grid_location(pdp.drop_point, self.slides_container.get_drone_azimuth_resolution)
+                    GridService.get_grid_location(pdp.drop_point, self.slides_container.cell_width_resolution,
+                                                  self.slides_container.cell_height_resolution)
                 drop_azimuth = CellServices.get_drop_azimuth(drone_azimuth, pdp.azimuth, pdp.pitch)
                 envelope_location = self.slides_container.get_envelope_location(drone_azimuth,
                                                                                 drop_azimuth,

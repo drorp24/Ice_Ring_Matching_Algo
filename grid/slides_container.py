@@ -20,7 +20,7 @@ def make_hash() -> defaultdict:
 class SlidesContainer:
 
     def __init__(self, drone_azimuth_resolution: int, drop_azimuth_resolution: int,
-                 slides: List[Slide]):
+                 cell_width_resolution: float, cell_height_resolution: float, slides: List[Slide]):
 
         if drone_azimuth_resolution <= 0:
             raise ValueError("Drone azimuth resolution should be more than 0")
@@ -42,6 +42,9 @@ class SlidesContainer:
         if not self._drop_azimuth_delta_deg.degrees.is_integer():
             raise ValueError(MAX_AZIMUTH_DEGREES, "should be divided by drop azimuth resolution with no remainder")
 
+        self._cell_width_resolution = cell_width_resolution
+        self._cell_height_resolution = cell_height_resolution
+
         self._hash = make_hash()
         for slide in slides:
             self._hash[slide.package_type][slide.drone_azimuth.degrees][
@@ -59,14 +62,22 @@ class SlidesContainer:
     def get_drop_azimuth_resolution(self) -> int:
         return self._drop_azimuth_resolution
 
+    @property
+    def cell_width_resolution(self) -> float:
+        return self._cell_width_resolution
+
+    @property
+    def cell_height_resolution(self) -> float:
+        return self._cell_height_resolution
+
     def get_envelope_location(self, drone_azimuth: Angle, drop_azimuth: Angle,
                               package_type: PackageType) -> Optional.of(GridLocation):
 
         round_drone_azimuth = Angle(PolygonUtils.convert_nearest_value_in_resolution(
             drone_azimuth.degrees,
-            int(self._drone_azimuth_delta_deg.degrees)),AngleUnit.DEGREE)
+            int(self._drone_azimuth_delta_deg.degrees)), AngleUnit.DEGREE)
 
-        round_drop_azimuth =  Angle(PolygonUtils.convert_nearest_value_in_resolution(
+        round_drop_azimuth = Angle(PolygonUtils.convert_nearest_value_in_resolution(
             drop_azimuth.degrees,
             int(self._drop_azimuth_delta_deg.degrees)), AngleUnit.DEGREE)
 

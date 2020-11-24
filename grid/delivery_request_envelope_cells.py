@@ -73,7 +73,8 @@ class DeliveryRequestEnvelopeCells:
     def _get_scaled_grid_locations(slides_container: SlidesContainer,
                                    package_delivery_plan: PackageDeliveryPlan) -> [Optional.of(GridLocation)]:
         drop_point_grid_location = GridService.get_grid_location(package_delivery_plan.drop_point,
-                                                                 slides_container.get_drone_azimuth_resolution)
+                                                                 slides_container.cell_width_resolution,
+                                                                 slides_container.cell_height_resolution)
 
         scale_to_grid = list(map(GridService.scale_to_grid, repeat(drop_point_grid_location),
                                  list(map(slides_container.get_envelope_location,

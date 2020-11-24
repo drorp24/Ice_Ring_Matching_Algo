@@ -14,29 +14,31 @@ class BasicSlideTestCase(unittest.TestCase):
         cls.envelope_service = MockEnvelopeServices()
         cls.drone_azimuth = Angle(90, AngleUnit.DEGREE)
         cls.drop_azimuth = Angle(45, AngleUnit.DEGREE)
-        cls.cell_resolution = 1
+        cls.cell_width_resolution = 1
+        cls.cell_height_resolution = 2
         cls.cell_ratio_required = 0.5
         cls.drone_azimuth_resolution = 8
         cls.drop_azimuth_resolution = 8
 
         cls.slide1 = create_slide(cls.envelope_service, PackageType.TINY, cls.drone_azimuth, cls.drop_azimuth,
-                                  cls.cell_resolution, cls.cell_ratio_required)
+                                  cls.cell_width_resolution, cls.cell_height_resolution, cls.cell_ratio_required)
 
         cls.slide2 = create_slide(cls.envelope_service, PackageType.MEDIUM, cls.drone_azimuth, cls.drop_azimuth,
-                                  cls.cell_resolution, cls.cell_ratio_required)
+                                  cls.cell_width_resolution, cls.cell_height_resolution, cls.cell_ratio_required)
 
         cls.package_types = [package_type for package_type in PackageType]
         cls.slides_container = generate_slides_container(cls.envelope_service,
                                                          cls.package_types,
                                                          cls.drone_azimuth_resolution,
                                                          cls.drop_azimuth_resolution,
-                                                         cls.cell_resolution,
+                                                         cls.cell_width_resolution,
+                                                         cls.cell_height_resolution,
                                                          cls.cell_ratio_required)
 
     def test_slide(self):
         self.assertEqual(self.slide1,
                          Slide(self.envelope_service, PackageType.TINY, self.drone_azimuth, self.drop_azimuth,
-                               self.cell_resolution, self.cell_ratio_required))
+                               self.cell_width_resolution, self.cell_height_resolution, self.cell_ratio_required))
 
     def test_slide_container(self):
         slide_1_locations = self.slides_container.get_envelope_location(self.drone_azimuth, self.drop_azimuth,

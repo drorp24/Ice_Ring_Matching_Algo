@@ -11,12 +11,13 @@ from services.envelope_services_interface import EnvelopeServicesInterface
 class Slide:
     def __init__(self, envelope_service: EnvelopeServicesInterface,
                  package_type: PackageType, drone_azimuth: Angle, drop_azimuth: Angle,
-                 cell_resolution: int, required_area: float):
+                 cell_width_resolution: float, cell_height_resolution: float, required_area: float):
         self._envelope_service = envelope_service
         self._package_type = package_type
         self._drone_azimuth = drone_azimuth
         self._drop_azimuth = drop_azimuth
-        self._cell_resolution = cell_resolution
+        self._cell_width_resolution = cell_width_resolution
+        self._cell_height_resolution = cell_height_resolution
         self._required_area = required_area
 
         self._envelope_location = self.calc_envelope_location()
@@ -25,7 +26,8 @@ class Slide:
         return (self.package_type == other.package_type) and \
                (self.drone_azimuth == other.drone_azimuth) and \
                (self.drop_azimuth == other.drop_azimuth) and \
-               (self.cell_resolution == other.cell_resolution) and \
+               (self._cell_width_resolution == other._cell_width_resolution) and \
+               (self.cell_height_resolution == other.cell_height_resolution) and \
                (self.required_area == other.required_area)
 
     @property
@@ -45,8 +47,12 @@ class Slide:
         return self._drop_azimuth
 
     @property
-    def cell_resolution(self) -> int:
-        return self._cell_resolution
+    def cell_width_resolution(self) -> float:
+        return self._cell_width_resolution
+
+    @property
+    def cell_height_resolution(self) -> float:
+        return self._cell_height_resolution
 
     @property
     def required_area(self) -> float:
@@ -65,7 +71,8 @@ class Slide:
         if not self._envelope_service.is_valid_envelope(envelope_polygon, self._required_area):
             return Optional.empty()
 
-        return Optional.of(GridService.get_polygon_centroid_grid_location(envelope_polygon, self._cell_resolution))
+        return Optional.of(GridService.get_polygon_centroid_grid_location(envelope_polygon, self._cell_width_resolution,
+                                                                          self._cell_height_resolution))
 
     def __repr__(self):
         return "Slide ({0} {1} {2} {3})".format(self.package_type,

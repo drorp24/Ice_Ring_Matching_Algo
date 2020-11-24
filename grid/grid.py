@@ -24,7 +24,7 @@ class DeliveryRequestsGrid(DeliveryRequestDistanceServiceInterface):
                 for delivery_request in delivery_requests}
 
     def get_distance(self, delivery_request1: DeliveryRequest, delivery_request2: DeliveryRequest,
-                     delivery_request1_selected_option: int, delivery_request2_selected_option: int) -> float:
+                     delivery_request1_selected_option: int = 0, delivery_request2_selected_option: int = 0) -> float:
         delivery_request1_envelope_cells = \
             self.delivery_requests_envelope_cells[
                 delivery_request1].delivery_options_cells[delivery_request1_selected_option]
