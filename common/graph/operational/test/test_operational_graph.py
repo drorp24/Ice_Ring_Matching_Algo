@@ -52,7 +52,6 @@ class BasicDeliveryRequestGraphTestCases(unittest.TestCase):
     def test_local_graph_generation_two_separate_spatial_cliques(self):
         region_dataset = self.dr_dataset_local_region_1_morning + self.dr_dataset_local_region_2_morning
         graph = OperationalGraph()
-        radius_surrounding_region_1 = 100 * 2 / sqrt(2)
         add_locally_connected_dr_graph(graph, region_dataset, max_cost_to_connect=self.radius_surrounding_region_1)
         num_nodes_in_graph = len(graph.nodes)
         self.assertEqual(len(region_dataset), num_nodes_in_graph)
