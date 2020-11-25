@@ -26,7 +26,7 @@ class Slide:
         return (self.package_type == other.package_type) and \
                (self.drone_azimuth == other.drone_azimuth) and \
                (self.drop_azimuth == other.drop_azimuth) and \
-               (self._cell_width_resolution == other._cell_width_resolution) and \
+               (self.cell_width_resolution == other.cell_width_resolution) and \
                (self.cell_height_resolution == other.cell_height_resolution) and \
                (self.required_area == other.required_area)
 
