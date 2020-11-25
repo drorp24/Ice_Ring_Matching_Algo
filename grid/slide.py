@@ -1,3 +1,5 @@
+from dataclasses import dataclass
+
 from optional import Optional
 
 from common.entities.package import PackageType
@@ -8,17 +10,26 @@ from grid.grid_service import GridService
 from services.envelope_services_interface import EnvelopeServicesInterface
 
 
+@dataclass
+class SlideProperties:
+    envelope_service: EnvelopeServicesInterface
+    package_type: PackageType
+    drone_azimuth: Angle
+    drop_azimuth: Angle
+    cell_width_resolution: float
+    cell_height_resolution: float
+    cell_required_area: float
+
+
 class Slide:
-    def __init__(self, envelope_service: EnvelopeServicesInterface,
-                 package_type: PackageType, drone_azimuth: Angle, drop_azimuth: Angle,
-                 cell_width_resolution: float, cell_height_resolution: float, required_area: float):
-        self._envelope_service = envelope_service
-        self._package_type = package_type
-        self._drone_azimuth = drone_azimuth
-        self._drop_azimuth = drop_azimuth
-        self._cell_width_resolution = cell_width_resolution
-        self._cell_height_resolution = cell_height_resolution
-        self._required_area = required_area
+    def __init__(self, slide_properties: SlideProperties):
+        self._envelope_service = slide_properties.envelope_service
+        self._package_type = slide_properties.package_type
+        self._drone_azimuth = slide_properties.drone_azimuth
+        self._drop_azimuth = slide_properties.drop_azimuth
+        self._cell_width_resolution = slide_properties.cell_width_resolution
+        self._cell_height_resolution = slide_properties.cell_height_resolution
+        self._cell_required_area = slide_properties.cell_required_area
 
         self._envelope_location = self.calc_envelope_location()
 
@@ -28,7 +39,7 @@ class Slide:
                (self.drop_azimuth == other.drop_azimuth) and \
                (self.cell_width_resolution == other.cell_width_resolution) and \
                (self.cell_height_resolution == other.cell_height_resolution) and \
-               (self.required_area == other.required_area)
+               (self.cell_required_area == other.cell_required_area)
 
     @property
     def envelope_service(self) -> EnvelopeServicesInterface:
@@ -55,8 +66,8 @@ class Slide:
         return self._cell_height_resolution
 
     @property
-    def required_area(self) -> float:
-        return self._required_area
+    def cell_required_area(self) -> float:
+        return self._cell_required_area
 
     @property
     def envelope_location(self) -> Optional.of(GridLocation):
@@ -68,7 +79,7 @@ class Slide:
                                                                      drop_point,
                                                                      self._drop_azimuth)
 
-        if not self._envelope_service.is_valid_envelope(envelope_polygon, self._required_area):
+        if not self._envelope_service.is_valid_envelope(envelope_polygon, self._cell_required_area):
             return Optional.empty()
 
         return Optional.of(GridService.get_polygon_centroid_grid_location(envelope_polygon, self._cell_width_resolution,

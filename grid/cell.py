@@ -1,6 +1,5 @@
-from attr import dataclass
+from dataclasses import dataclass
 
-from attr import dataclass
 from optional import Optional
 
 from common.entities.package_delivery_plan import PackageDeliveryPlanList
