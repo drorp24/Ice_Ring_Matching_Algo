@@ -7,9 +7,10 @@ from common.entities.customer_delivery import CustomerDelivery, CustomerDelivery
 from geometry.geo2d import Point2D
 from geometry.geo_factory import calc_centroid
 from common.entities.package import PackageType
+from geometry.utils import Localizable
 
 
-class DeliveryOption(JsonableBaseEntity):
+class DeliveryOption(JsonableBaseEntity, Localizable):
 
     def __init__(self, customer_deliveries: [CustomerDelivery]):
         self._customer_deliveries = customer_deliveries if customer_deliveries is not None else []

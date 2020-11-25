@@ -5,22 +5,18 @@ from typing import List, Union
 
 from networkx import DiGraph, Graph, subgraph
 
-from common.entities.base_entity import Localizable
 from common.entities.delivery_request import DeliveryRequest
 from common.entities.drone_loading_dock import DroneLoadingDock
-from common.entities.temporal import TimeWindowExtension
+from common.entities.temporal import TimeWindowExtension, Temporal
 from geometry.geo2d import Polygon2D
+from geometry.utils import Localizable
 
 
 class OperationalNode:
 
     def __init__(self, internal_node: Union[DeliveryRequest, DroneLoadingDock]):
-        if not issubclass(internal_node, Localizable):
-            raise NonLocalizableNodeException()
-
-        if not issubclass(internal_node, Temporal):
-            raise NonLocalizableNodeException()
-
+        assert_node_is_localizable(internal_node)
+        assert_node_is_temporal(internal_node)
         self._internal = internal_node
 
     @property
@@ -100,30 +96,44 @@ class OperationalGraph:
     def add_operational_edges(self, operational_edges: [OperationalEdge]):
         self._internal_graph.add_edges_from([dr.to_tuple() for dr in operational_edges])
 
-    def calc_subgraph_in_time_window(self, time_window_scope: TimeWindowExtension):
+    def calc_subgraph_in_time_window(self, time_window_scope: TimeWindowExtension) -> OperationalGraph:
         nodes_at_time = [node for node in self.nodes if node.time_window in time_window_scope]
-        extracted_subgraph = self.extract_subgraph_of_nodes(nodes_at_time)
+        extracted_subgraph = self._extract_internal_subgraph_of_nodes(nodes_at_time)
         return OperationalGraph._create_from_extracted_subgraph(extracted_subgraph)
 
     def calc_subgraph_below_priority(self, max_priority: int) -> OperationalGraph:
         nodes_below_priority = [node for node in self.nodes if node.priority < max_priority]
-        extracted_subgraph = self.extract_subgraph_of_nodes(nodes_below_priority)
+        extracted_subgraph = self._extract_internal_subgraph_of_nodes(nodes_below_priority)
         return OperationalGraph._create_from_extracted_subgraph(extracted_subgraph)
 
-    def calc_subgraph_within_polygon(self, boudary: Polygon2D):
-        nodes_within_polygon = [node for node in self.nodes if node.centroid in boudary]
-        extracted_subgraph = self.extract_subgraph_of_nodes(nodes_within_polygon)
+    def calc_subgraph_within_polygon(self, boundary: Polygon2D) -> OperationalGraph:
+        nodes_within_polygon = [node for node in self.nodes if node.internal_node.calc_location() in boundary]
+        extracted_subgraph = self._extract_internal_subgraph_of_nodes(nodes_within_polygon)
         return OperationalGraph._create_from_extracted_subgraph(extracted_subgraph)
 
-    def extract_subgraph_of_nodes(self, nodes_in_subgraph):
-        return Graph(self._internal_graph.subgraph(nodes_in_subgraph).copy())
+    def _extract_internal_subgraph_of_nodes(self, nodes_in_subgraph: [OperationalNode]) -> DiGraph:
+        return DiGraph(self._internal_graph.subgraph(nodes_in_subgraph))
 
     @staticmethod
     def _create_from_extracted_subgraph(extracted_subgraph: subgraph):
-        delivery_request_subgraph = OperationalGraph()
-        delivery_request_subgraph.set_internal_graph(extracted_subgraph)
-        return delivery_request_subgraph
+        internal_subgraph = OperationalGraph()
+        internal_subgraph.set_internal_graph(extracted_subgraph)
+        return internal_subgraph
+
+
+def assert_node_is_temporal(internal_node) -> None:
+    if not issubclass(type(internal_node), Temporal):
+        raise NonTemporalNodeException()
+
+
+def assert_node_is_localizable(internal_node) -> None:
+    if not issubclass(type(internal_node), Localizable):
+        raise NonLocalizableNodeException()
 
 
 class NonLocalizableNodeException(Exception):
+    pass
+
+
+class NonTemporalNodeException(Exception):
     pass
