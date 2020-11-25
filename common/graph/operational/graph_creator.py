@@ -11,13 +11,15 @@ from geometry.utils import Localizable
 
 def add_locally_connected_dr_graph(graph, dr_connection_options: [DeliveryRequest], max_cost_to_connect):
     edges = []
-    graph.add_operational_nodes(dr_connection_options)
+    graph.add_delivery_requests(dr_connection_options)
     for start_dr in dr_connection_options:
         end_dr_options = calc_under_cost(dr_connection_options, start_dr, max_cost_to_connect)
         for end_dr in end_dr_options:
             if has_overlapping_time_window(start_dr, end_dr):
                 cost = calc_cost(start_dr, end_dr)
-                edges.append(OperationalEdge(start_dr, end_dr, OperationalEdgeAttribs(cost)))
+                edges.append(OperationalEdge(OperationalNode(start_dr),
+                                             OperationalNode(end_dr),
+                                             OperationalEdgeAttribs(cost)))
     graph.add_operational_edges(edges)
 
 
