@@ -31,6 +31,7 @@ class BasicDeliveryRequestGraphTestCases(unittest.TestCase):
         cls.dr_dataset_local_region_1_morning = create_local_data_in_region_1_morning()
         cls.dr_dataset_local_region_2_morning = create_local_data_in_region_2_morning()
         cls.dr_dataset_local_region_2_afternoon = create_local_data_in_region_2_afternoon()
+        cls.radius_surrounding_region_1 = 100 * 2 / sqrt(2)
 
     def test_node(self):
         with self.assertRaises(NonLocalizableNodeException) as context:
@@ -43,7 +44,7 @@ class BasicDeliveryRequestGraphTestCases(unittest.TestCase):
     def test_local_graph_generation_should_be_fully_connected(self):
         region_dataset = self.dr_dataset_local_region_1_morning
         graph = OperationalGraph()
-        add_locally_connected_dr_graph(graph, region_dataset, max_cost_to_connect=100 * 2 / sqrt(2))
+        add_locally_connected_dr_graph(graph, region_dataset, max_cost_to_connect=self.radius_surrounding_region_1)
         num_nodes = len(graph.nodes)
         self.assertEqual(len(region_dataset), num_nodes)
         self.assertEqual((num_nodes * (num_nodes - 1)), len(graph.edges))
@@ -51,7 +52,8 @@ class BasicDeliveryRequestGraphTestCases(unittest.TestCase):
     def test_local_graph_generation_two_separate_spatial_cliques(self):
         region_dataset = self.dr_dataset_local_region_1_morning + self.dr_dataset_local_region_2_morning
         graph = OperationalGraph()
-        add_locally_connected_dr_graph(graph, region_dataset, max_cost_to_connect=100 * 2 / sqrt(2))
+        radius_surrounding_region_1 = 100 * 2 / sqrt(2)
+        add_locally_connected_dr_graph(graph, region_dataset, max_cost_to_connect=self.radius_surrounding_region_1)
         num_nodes_in_graph = len(graph.nodes)
         self.assertEqual(len(region_dataset), num_nodes_in_graph)
         self.assertEqual(2 * (num_nodes_in_graph / 2 * (num_nodes_in_graph / 2 - 1)), len(graph.edges))
@@ -59,7 +61,7 @@ class BasicDeliveryRequestGraphTestCases(unittest.TestCase):
     def test_local_graph_generation_two_separate_temporal_cliques(self):
         region_dataset = self.dr_dataset_local_region_2_afternoon + self.dr_dataset_local_region_2_morning
         graph = OperationalGraph()
-        add_locally_connected_dr_graph(graph, region_dataset, max_cost_to_connect=100 * 2 / sqrt(2))
+        add_locally_connected_dr_graph(graph, region_dataset, max_cost_to_connect=self.radius_surrounding_region_1)
         num_nodes = len(graph.nodes)
         self.assertEqual(len(region_dataset), num_nodes)
         self.assertEqual(2 * (num_nodes / 2 * (num_nodes / 2 - 1)), len(graph.edges))
@@ -156,16 +158,15 @@ class BasicDeliveryRequestGraphTestCases(unittest.TestCase):
     def test_sub_graph_within_polygon(self):
         region_dataset = self.dr_dataset_local_region_1_morning + self.dr_dataset_local_region_2_morning
         graph = OperationalGraph()
-        add_locally_connected_dr_graph(graph, region_dataset, max_cost_to_connect=100 * 2 / sqrt(2))
-        graph = graph.calc_subgraph_within_polygon(create_polygon_2d([create_point_2d(100, 50),
-                                                                      create_point_2d(100, 150),
-                                                                      create_point_2d(200, 150),
-                                                                      create_point_2d(200, 50)]))
-        num_nodes_in_graph = len(graph.nodes)
-        num_potential_nodes_in_input = len(region_dataset)
-        expected_nodes_after_filter = num_potential_nodes_in_input / 2
-        self.assertEqual(expected_nodes_after_filter, num_nodes_in_graph)
-        self.assertEqual(expected_nodes_after_filter * (expected_nodes_after_filter - 1), len(graph.edges))
+        add_locally_connected_dr_graph(graph, region_dataset, max_cost_to_connect=self.radius_surrounding_region_1)
+        region_1_polygon = create_polygon_2d([create_point_2d(100, 50), create_point_2d(100, 150),
+                                              create_point_2d(200, 150), create_point_2d(200, 50)])
+        subgraph_in_region_1 = graph.calc_subgraph_within_polygon(region_1_polygon)
+        num_nodes_in_region_1_subgraph = len(subgraph_in_region_1.nodes)
+        num_nodes_in_all_regions = len(region_dataset)
+        expected_nodes_in_region_1 = num_nodes_in_all_regions / 2
+        self.assertEqual(expected_nodes_in_region_1, num_nodes_in_region_1_subgraph)
+        self.assertEqual(expected_nodes_in_region_1 * (expected_nodes_in_region_1 - 1), len(subgraph_in_region_1.edges))
 
 
 def create_local_data_in_region_1_morning() -> [DeliveryRequest]:
