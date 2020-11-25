@@ -1,10 +1,11 @@
 import statistics
 from math import cos, sin
+from uuid import UUID
+
 from matplotlib.patches import Circle
 
 from common.entities.package import PackageType, PotentialDropEnvelope
 from common.entities.package_delivery_plan import PackageDeliveryPlan
-from common.entities.package_factory import package_delivery_plan_factory
 from common.math.angle import Angle, AngleUnit
 from geometry.geo2d import Point2D
 from geometry.geo_factory import create_point_2d, create_polygon_2d
@@ -17,8 +18,7 @@ from visualization.drawer2d_factory import create_drawer2d
 
 
 def draw_potential_drop_envelope(drawer: Drawer2D, potential_drop_envelope: PotentialDropEnvelope, location: Point2D):
-    minimal_potential_drop_envelope_circle = Circle((location.xy()),
-                                                    potential_drop_envelope.minimal_radius_meters)
+    minimal_potential_drop_envelope_circle = Circle((location.xy()), potential_drop_envelope.minimal_radius_meters)
     drawer.add_polygon2d(create_polygon_2d(GeometryUtils.convert_xy_array_to_points_list(
         minimal_potential_drop_envelope_circle.get_verts())), edgecolor=Color.Red, facecolor=Color.Red)
     maximal_potential_drop_envelope_circle = Circle(location.xy(),
@@ -28,15 +28,15 @@ def draw_potential_drop_envelope(drawer: Drawer2D, potential_drop_envelope: Pote
 
 
 def draw_location_azimuth(drawer: Drawer2D, location: Point2D, azimuth: Angle, color):
-    drawer.add_arrow2d(create_point_2d(location.x - cos(azimuth.radians()),
-                                       location.y - sin(azimuth.radians())),
+    drawer.add_arrow2d(create_point_2d(location.x - cos(azimuth.radians),
+                                       location.y - sin(azimuth.radians)),
                        location, edgecolor=color, facecolor=color)
 
 
 def draw_delivery_plan(drawer: Drawer2D, delivery_plan: PackageDeliveryPlan):
     drawer.add_point2d(delivery_plan.drop_point)
     draw_potential_drop_envelope(drawer,
-                                 delivery_plan.package_type.value.potential_drop_envelope,
+                                 delivery_plan.package_type.value.calc_potential_drop_envelope(),
                                  delivery_plan.drop_point)
     draw_location_azimuth(drawer, delivery_plan.drop_point, delivery_plan.azimuth, Color.Red)
 
@@ -44,11 +44,11 @@ def draw_delivery_plan(drawer: Drawer2D, delivery_plan: PackageDeliveryPlan):
 def draw_drone_arrival(drawer: Drawer2D, delivery_plan: PackageDeliveryPlan, drone_azimuth: Angle):
     drone_arrival_angle = Angle(180 + drone_azimuth.degrees, AngleUnit.DEGREE)
     arrival_point = create_point_2d(delivery_plan.drop_point.x +
-                                    delivery_plan.package_type.value.potential_drop_envelope.maximal_radius_meters *
-                                    cos(drone_arrival_angle.radians()),
+                                    delivery_plan.package_type.value.calc_potential_drop_envelope().maximal_radius_meters *
+                                    cos(drone_arrival_angle.radians),
                                     delivery_plan.drop_point.y +
-                                    delivery_plan.package_type.value.potential_drop_envelope.maximal_radius_meters *
-                                    sin(drone_arrival_angle.radians()))
+                                    delivery_plan.package_type.value.calc_potential_drop_envelope().maximal_radius_meters *
+                                    sin(drone_arrival_angle.radians))
     draw_location_azimuth(drawer, arrival_point, drone_azimuth, Color.Blue)
 
 
@@ -62,19 +62,19 @@ def draw_delivery_envelope(drawer: Drawer2D, delivery_plan: PackageDeliveryPlan,
                            drone_location: Point2D, drone_azimuth: Angle, drop_envelope_service:EnvelopeServicesInterface):
     delivery_envelope = drop_envelope_service.calc_delivery_envelope(delivery_plan.package_type, drone_location, drone_azimuth,delivery_plan.azimuth)
     drawer.add_polygon2d(delivery_envelope, edgecolor=Color.Blue, facecolor=Color.Blue)
-    average_radius = statistics.mean([delivery_plan.package_type.value.potential_drop_envelope.maximal_radius_meters,
-                                      delivery_plan.package_type.value.potential_drop_envelope.minimal_radius_meters])
+    average_radius = statistics.mean([delivery_plan.package_type.value.calc_potential_drop_envelope().maximal_radius_meters,
+                                      delivery_plan.package_type.value.calc_potential_drop_envelope().minimal_radius_meters])
     envelope_center = create_point_2d(drone_location.x +
-                                      (average_radius * cos(drone_azimuth.radians())),
+                                      (average_radius * cos(drone_azimuth.radians)),
                                       drone_location.y +
-                                      (average_radius * sin(drone_azimuth.radians())))
+                                      (average_radius * sin(drone_azimuth.radians)))
     draw_location_azimuth(drawer, envelope_center, delivery_plan.azimuth, Color.Red)
 
 
 def main():
     # Experiment 1
     drop_point = create_point_2d(1, 2)
-    delivery_plan = package_delivery_plan_factory(drop_point,
+    delivery_plan = PackageDeliveryPlan(UUID(int=42),drop_point,
                                                   azimuth=Angle(30, AngleUnit.DEGREE),
                                                   pitch=Angle(80, AngleUnit.DEGREE),
                                                   package_type=PackageType.TINY)
@@ -89,7 +89,7 @@ def main():
     # # Experiment 2
     drawer2 = create_drawer2d()
     drone_location2 = create_point_2d(0, -1000)
-    draw_potential_drop_envelope(drawer2, delivery_plan.package_type.value.calc_potential_drop_envelope, drone_location2)
+    draw_potential_drop_envelope(drawer2, delivery_plan.package_type.value.calc_potential_drop_envelope(), drone_location2)
     drone_azimuth2 = Angle(90, AngleUnit.DEGREE)
     draw_drone_arrival(drawer2, delivery_plan, drone_azimuth2)
     draw_delivery_envelope(drawer2, delivery_plan, drone_location2, drone_azimuth2, drop_envelope_service)
