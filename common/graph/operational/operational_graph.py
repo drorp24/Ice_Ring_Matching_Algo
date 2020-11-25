@@ -5,14 +5,22 @@ from typing import List, Union
 
 from networkx import DiGraph, Graph, subgraph
 
+from common.entities.base_entity import Localizable
 from common.entities.delivery_request import DeliveryRequest
 from common.entities.drone_loading_dock import DroneLoadingDock
 from common.entities.temporal import TimeWindowExtension
+from geometry.geo2d import Polygon2D
 
 
 class OperationalNode:
 
     def __init__(self, internal_node: Union[DeliveryRequest, DroneLoadingDock]):
+        if not issubclass(internal_node, Localizable):
+            raise NonLocalizableNodeException()
+
+        if not issubclass(internal_node, Temporal):
+            raise NonLocalizableNodeException()
+
         self._internal = internal_node
 
     @property
@@ -102,6 +110,11 @@ class OperationalGraph:
         extracted_subgraph = self.extract_subgraph_of_nodes(nodes_below_priority)
         return OperationalGraph._create_from_extracted_subgraph(extracted_subgraph)
 
+    def calc_subgraph_within_polygon(self, boudary: Polygon2D):
+        nodes_within_polygon = [node for node in self.nodes if node.centroid in boudary]
+        extracted_subgraph = self.extract_subgraph_of_nodes(nodes_within_polygon)
+        return OperationalGraph._create_from_extracted_subgraph(extracted_subgraph)
+
     def extract_subgraph_of_nodes(self, nodes_in_subgraph):
         return Graph(self._internal_graph.subgraph(nodes_in_subgraph).copy())
 
@@ -110,3 +123,7 @@ class OperationalGraph:
         delivery_request_subgraph = OperationalGraph()
         delivery_request_subgraph.set_internal_graph(extracted_subgraph)
         return delivery_request_subgraph
+
+
+class NonLocalizableNodeException(Exception):
+    pass
