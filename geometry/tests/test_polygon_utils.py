@@ -1,15 +1,11 @@
-import time
 import unittest
 
 from geometry.geo_factory import create_polygon_2d
-from geometry.geometry_utils import GeometryUtils
 from geometry.polygon_utils import PolygonUtils
+from geometry.utils import GeometryUtils
 
 
 class PolygonUtilsTestCase(unittest.TestCase):
-
-    # @classmethod
-    # def setUpClass(cls):
 
     def test_split_polygon_simple_box_ra1_bs10(self):
         polygon_side_length = 10

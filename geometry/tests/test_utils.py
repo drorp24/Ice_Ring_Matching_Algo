@@ -1,7 +1,7 @@
 import unittest
 
 from geometry.geo_factory import create_point_2d
-from geometry.geometry_utils import GeometryUtils
+from geometry.utils import GeometryUtils
 
 
 class GeometryUtilsTestCase(unittest.TestCase):

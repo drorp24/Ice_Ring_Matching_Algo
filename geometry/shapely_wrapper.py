@@ -8,7 +8,7 @@ from shapely.geometry.base import BaseGeometry, EmptyGeometry
 from common.entities.base_entity import JsonableBaseEntity
 from geometry.geo2d import Point2D, Vector2D, Polygon2D, MultiPolygon2D, LineString2D, LinearRing2D, EmptyGeometry2D, \
     Bbox2D
-from geometry.geometry_utils import GeometryUtils
+from geometry.utils import GeometryUtils
 
 EPSILON_FOR_EQUAL_AREA: float = 0.00001
 

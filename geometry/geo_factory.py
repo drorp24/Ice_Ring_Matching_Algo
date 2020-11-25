@@ -11,7 +11,7 @@ from geometry.math_wrapper import _MathVector2D
 from geometry.shapely_wrapper import _ShapelyMultiPolygon2D, _ShapelyEmptyGeometry, _ShapelyBbox2D
 from geometry.shapely_wrapper import _ShapelyPoint2D
 from geometry.shapely_wrapper import _ShapelyPolygon2D, _ShapelyLineString2D, _ShapelyLinearRing2D
-from geometry.geometry_utils import GeometryUtils
+from geometry.utils import GeometryUtils
 
 
 def create_empty_geometry_2d() -> EmptyGeometry2D:
