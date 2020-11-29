@@ -4,11 +4,12 @@ from functools import reduce
 from typing import List, Union
 
 from matplotlib.patches import Ellipse
+from shapely.geometry import MultiPoint
 
 from geometry.geo2d import Point2D, Vector2D, MultiPolygon2D, EmptyGeometry2D
 from geometry.geo2d import Polygon2D, LineString2D, LinearRing2D
 from geometry.math_wrapper import _MathVector2D
-from geometry.shapely_wrapper import _ShapelyMultiPolygon2D, _ShapelyEmptyGeometry
+from geometry.shapely_wrapper import _ShapelyMultiPolygon2D, _ShapelyEmptyGeometry, _ShapelyUtils
 from geometry.shapely_wrapper import _ShapelyPoint2D
 from geometry.shapely_wrapper import _ShapelyPolygon2D, _ShapelyLineString2D, _ShapelyLinearRing2D
 from geometry.utils import GeometryUtils
@@ -67,3 +68,15 @@ def create_linear_ring_2d(points: List[Point2D]) -> LinearRing2D:
 
 def calc_centroid(points: [Point2D]) -> Point2D:
     return (reduce(lambda p, j: p + j, points).to_vector() * (1.0 / points.__len__())).to_point()
+
+
+def calc_convex_hull_polygon(points: [Point2D]) -> Polygon2D:
+    output_polygon = _ShapelyUtils.convert_shapely_to_polygon_2d(
+        MultiPoint([p._shapely_obj for p in points]).convex_hull)
+    if isinstance(output_polygon, Polygon2D):
+        return output_polygon
+    raise NonPolygonConvexHullException()
+
+
+class NonPolygonConvexHullException(Exception):
+    pass

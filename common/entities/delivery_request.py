@@ -4,10 +4,10 @@ from datetime import timedelta, time, date
 from random import Random
 from typing import List
 
-from common.entities.disribution.distribution import UniformChoiceDistribution, Distribution
 from common.entities.base_entity import JsonableBaseEntity
 from common.entities.customer_delivery import CustomerDeliveryDistribution
 from common.entities.delivery_option import DeliveryOption, DeliveryOptionDistribution, DEFAULT_CD_DISTRIB
+from common.entities.disribution.distribution import UniformChoiceDistribution, Distribution
 from common.entities.package import PackageDistribution
 from common.entities.package_delivery_plan import PackageDeliveryPlanDistribution, DEFAULT_DROP_POINT_DISTRIB, \
     DEFAULT_PITCH_DISTRIB, DEFAULT_PACKAGE_DISTRIB, DEFAULT_AZI_DISTRIB
@@ -15,7 +15,7 @@ from common.entities.temporal import TimeWindowDistribution, TimeWindowExtension
     TimeDeltaExtension, TimeDeltaDistribution, DateTimeExtension, Temporal
 from common.math.angle import AngleUniformDistribution
 from geometry.geo2d import Point2D
-from geometry.geo_distribution import UniformPointInBboxDistribution
+from geometry.geo_distribution import PointLocationDistribution
 from geometry.geo_factory import calc_centroid
 from geometry.utils import Localizable
 
@@ -101,7 +101,7 @@ class DeliveryRequestDistribution(Distribution):
             time_window_distributions[i], priority_distribution[i]) for i in list(range(amount))]
 
 
-def generate_dr_distribution(drop_point_distribution: UniformPointInBboxDistribution = DEFAULT_DROP_POINT_DISTRIB,
+def generate_dr_distribution(drop_point_distribution: PointLocationDistribution = DEFAULT_DROP_POINT_DISTRIB,
                              azimuth_distribution: AngleUniformDistribution = DEFAULT_AZI_DISTRIB,
                              pitch_distribution: UniformChoiceDistribution = DEFAULT_PITCH_DISTRIB,
                              package_type_distribution: PackageDistribution = DEFAULT_PACKAGE_DISTRIB,

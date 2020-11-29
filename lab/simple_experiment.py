@@ -4,14 +4,13 @@ from matplotlib.patches import Circle
 
 from common.entities.package import PackageType, PotentialDropEnvelope
 from common.entities.package_delivery_plan import PackageDeliveryPlan
-from common.entities.package_factory import package_delivery_plan_factory
 from common.math.angle import Angle, AngleUnit
 from geometry.geo2d import Point2D
 from geometry.geo_factory import create_point_2d, create_polygon_2d
 from geometry.utils import GeometryUtils
-from visualization.color import Color
-from visualization.drawer2d import Drawer2D
-from visualization.drawer2d_factory import create_drawer2d
+from visualization.basic.color import Color
+from visualization.basic.drawer2d import Drawer2D
+from visualization.basic.pltdrawer2d import create_drawer_2d
 
 
 def draw_potential_drop_envelope(drawer: Drawer2D, potential_drop_envelope: PotentialDropEnvelope, location: Point2D):
@@ -72,21 +71,22 @@ def draw_delivery_envelope(drawer: Drawer2D, delivery_plan: PackageDeliveryPlan,
 def main():
     # Experiment 1
     drop_point = create_point_2d(1, 2)
-    delivery_plan = package_delivery_plan_factory(drop_point,
-                                                  azimuth=Angle(30, AngleUnit.DEGREE),
-                                                  pitch=Angle(80, AngleUnit.DEGREE),
-                                                  package_type=PackageType.TINY)
+    delivery_plan = PackageDeliveryPlan(drop_point=drop_point,
+                                        azimuth=Angle(30, AngleUnit.DEGREE),
+                                        pitch=Angle(80, AngleUnit.DEGREE),
+                                        package_type=PackageType.TINY)
     drone_azimuth1 = Angle(delivery_plan.azimuth.degrees + 45, AngleUnit.DEGREE)
-    drawer1 = create_drawer2d()
+    drawer1 = create_drawer_2d()
     draw_delivery_plan(drawer1, delivery_plan)
     draw_drone_arrival(drawer1, delivery_plan, drone_azimuth1)
     draw_drop_envelope(drawer1, delivery_plan, drone_azimuth1)
     drawer1.draw(block=False)
 
     # # Experiment 2
-    drawer2 = create_drawer2d()
+    drawer2 = create_drawer_2d()
     drone_location2 = create_point_2d(0, -1000)
-    draw_potential_drop_envelope(drawer2, delivery_plan.package_type.value.calc_potential_drop_envelope, drone_location2)
+    draw_potential_drop_envelope(drawer2, delivery_plan.package_type.value.calc_potential_drop_envelope,
+                                 drone_location2)
     drone_azimuth2 = Angle(90, AngleUnit.DEGREE)
     draw_drone_arrival(drawer2, delivery_plan, drone_azimuth2)
     draw_delivery_envelope(drawer2, delivery_plan, drone_location2, drone_azimuth2)
@@ -94,7 +94,7 @@ def main():
 
     # Experiment 3
     drone_azimuth3 = Angle(delivery_plan.azimuth.degrees, AngleUnit.DEGREE)
-    drawer3 = create_drawer2d()
+    drawer3 = create_drawer_2d()
     draw_delivery_plan(drawer3, delivery_plan)
     draw_drone_arrival(drawer3, delivery_plan, drone_azimuth3)
     draw_drop_envelope(drawer3, delivery_plan, drone_azimuth3)
@@ -102,7 +102,7 @@ def main():
 
     # Experiment 4
     drone_azimuth4 = Angle(delivery_plan.azimuth.degrees + 100, AngleUnit.DEGREE)
-    drawer4 = create_drawer2d()
+    drawer4 = create_drawer_2d()
     draw_delivery_plan(drawer4, delivery_plan)
     draw_drone_arrival(drawer4, delivery_plan, drone_azimuth4)
     draw_drop_envelope(drawer4, delivery_plan, drone_azimuth4)

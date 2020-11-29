@@ -6,8 +6,8 @@ from common.entities.disribution.distribution import UniformChoiceDistribution, 
 from common.entities.package import PackageType
 from common.entities.package_delivery_plan import PackageDeliveryPlan, PackageDeliveryPlanDistribution, \
     DEFAULT_DROP_POINT_DISTRIB, DEFAULT_AZI_DISTRIB, DEFAULT_PITCH_DISTRIB, DEFAULT_PACKAGE_DISTRIB
-from geometry.geo2d import Point2D
-from geometry.geo_factory import calc_centroid
+from geometry.geo2d import Point2D, Polygon2D
+from geometry.geo_factory import calc_centroid, calc_convex_hull_polygon
 from geometry.utils import Localizable
 
 
@@ -22,6 +22,9 @@ class CustomerDelivery(JsonableBaseEntity, Localizable):
 
     def calc_location(self) -> Point2D:
         return calc_centroid([pdp.drop_point for pdp in self._package_delivery_plans])
+
+    def calc_bounds(self) -> Polygon2D:
+        return calc_convex_hull_polygon([pdp.drop_point for pdp in self._package_delivery_plans])
 
     def get_amount_of_package_type(self, package_type: PackageType) -> int:
         package_delivery_plans = self.package_delivery_plans
