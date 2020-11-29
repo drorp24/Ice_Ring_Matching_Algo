@@ -5,21 +5,22 @@ from random import Random
 from typing import List
 
 from common.entities.disribution.distribution import UniformChoiceDistribution, Distribution
-from common.entities.base_entity import JsonableBaseEntity, Localizable
+from common.entities.base_entity import JsonableBaseEntity
 from common.entities.customer_delivery import CustomerDeliveryDistribution
 from common.entities.delivery_option import DeliveryOption, DeliveryOptionDistribution, DEFAULT_CD_DISTRIB
 from common.entities.package import PackageDistribution
 from common.entities.package_delivery_plan import PackageDeliveryPlanDistribution, DEFAULT_DROP_POINT_DISTRIB, \
     DEFAULT_PITCH_DISTRIB, DEFAULT_PACKAGE_DISTRIB, DEFAULT_AZI_DISTRIB
 from common.entities.temporal import TimeWindowDistribution, TimeWindowExtension, DateTimeDistribution, \
-    TimeDeltaExtension, TimeDeltaDistribution, DateTimeExtension
+    TimeDeltaExtension, TimeDeltaDistribution, DateTimeExtension, Temporal
 from common.math.angle import AngleUniformDistribution
 from geometry.geo2d import Point2D
 from geometry.geo_distribution import UniformPointInBboxDistribution
 from geometry.geo_factory import calc_centroid
+from geometry.utils import Localizable
 
 
-class DeliveryRequest(JsonableBaseEntity, Localizable):
+class DeliveryRequest(JsonableBaseEntity, Localizable, Temporal):
 
     def __init__(self, delivery_options: [DeliveryOption], time_window: TimeWindowExtension, priority: int):
         self._delivery_options = delivery_options if delivery_options is not None else []
