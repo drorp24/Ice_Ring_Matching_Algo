@@ -1,6 +1,7 @@
 from random import Random
 from typing import List
 
+from common.entities.disribution.distribution import Distribution
 from geometry.geo2d import Point2D
 from common.entities.disribution.distribution import Distribution
 from geometry.geo_distribution import UniformPointInBboxDistribution
@@ -27,8 +28,7 @@ class DroneLoadingStation:
 class DroneLoadingStationDistribution(Distribution):
 
     def __init__(self,
-                 drone_station_locations_distributions: UniformPointInBboxDistribution =
-                 DEFAULT_DRONE_LOCATIONS_DISTRIB):
+                 drone_station_locations_distributions: UniformPointInBboxDistribution = DEFAULT_DRONE_LOCATIONS_DISTRIB):
         self._drone_station_locations_distributions = drone_station_locations_distributions
 
     def choose_rand(self, random: Random, amount: int = 1) -> List[DroneLoadingStation]:

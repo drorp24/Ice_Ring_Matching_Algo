@@ -12,12 +12,15 @@ from common.entities.package import PackageDistribution
 from common.entities.package_delivery_plan import PackageDeliveryPlanDistribution, DEFAULT_DROP_POINT_DISTRIB, \
     DEFAULT_PITCH_DISTRIB, DEFAULT_PACKAGE_DISTRIB, DEFAULT_AZI_DISTRIB
 from common.entities.temporal import TimeWindowDistribution, TimeWindowExtension, DateTimeDistribution, \
-    TimeDeltaExtension, TimeDeltaDistribution, DateTimeExtension
+    TimeDeltaExtension, TimeDeltaDistribution, DateTimeExtension, Temporal
 from common.math.angle import AngleUniformDistribution
+from geometry.geo2d import Point2D
 from geometry.geo_distribution import UniformPointInBboxDistribution
+from geometry.geo_factory import calc_centroid
+from geometry.utils import Localizable
 
 
-class DeliveryRequest(JsonableBaseEntity):
+class DeliveryRequest(JsonableBaseEntity, Localizable, Temporal):
 
     def __init__(self, delivery_options: [DeliveryOption], time_window: TimeWindowExtension, priority: int):
         self._delivery_options = delivery_options if delivery_options is not None else []
@@ -36,6 +39,9 @@ class DeliveryRequest(JsonableBaseEntity):
     def priority(self) -> int:
         return self._priority
 
+    def calc_location(self) -> Point2D:
+        return calc_centroid([do.calc_location() for do in self.delivery_options])
+
     @classmethod
     def dict_to_obj(cls, dict_input):
         assert (dict_input['__class__'] == cls.__name__)
@@ -46,12 +52,13 @@ class DeliveryRequest(JsonableBaseEntity):
         )
 
     def __eq__(self, other):
-        return (self.__class__ == other.__class__ and self.delivery_options == other.delivery_options) and \
+        return (self.__class__ == other.__class__) and \
+               (self.delivery_options == other.delivery_options) and \
                (self.time_window == other.time_window) and \
                (self.priority == other.priority)
 
     def __hash__(self):
-        return hash((tuple(self._delivery_options), self._time_window, self._priority))
+        return hash((tuple(self.delivery_options), self.time_window, self.priority))
 
 
 class PriorityDistribution(UniformChoiceDistribution):

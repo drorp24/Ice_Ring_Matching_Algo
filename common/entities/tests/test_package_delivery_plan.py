@@ -1,4 +1,3 @@
-import json
 import unittest
 from pprint import pprint
 from random import Random
