@@ -316,3 +316,4 @@ class Bbox2D(Polygon2D):
     @abstractmethod
     def max_y(self) -> float:
         raise NotImplementedError()
+

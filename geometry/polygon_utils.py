@@ -36,8 +36,7 @@ class PolygonUtils:
         max_x = math.ceil(bounds.max_x / box_resolution) * box_resolution
         max_y = math.ceil(bounds.max_y / box_resolution) * box_resolution
 
-        # if count == PolygonUtils.MAX_ITERATION: todo add max split check
-        #     raise ValueError("split polygon has been reached to the maximum number of recursions")
+        #   TODO :  add max split check
 
         if max(max_x - min_x, max_y - min_y) <= box_resolution:
             return [polygon]

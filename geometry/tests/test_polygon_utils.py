@@ -1,3 +1,4 @@
+import time
 import unittest
 
 from geometry.geo_factory import create_polygon_2d
@@ -60,66 +61,47 @@ class PolygonUtilsTestCase(unittest.TestCase):
         box_resolution = 1
         splited_polygon = PolygonUtils.split_polygon(polygon, box_resolution, required_area)
         self.assertEqual(len(splited_polygon), 4)
-    #
-    # def test_split_polygon_large_box_ra1_br1_iterative_split_polygon(self):
-    #     start_time = time.time()
-    #     polygon_side_length = 100
-    #     shift = 0
-    #     polygon = create_polygon_2d(GeometryUtils.convert_xy_array_to_points_list(
-    #         [(0 + shift, 0 + shift), (polygon_side_length + shift, 0 + shift),
-    #          (polygon_side_length + shift, polygon_side_length + shift), (0 + shift, polygon_side_length + shift)]))
-    #     required_area = 1
-    #     box_resolution = 1
-    #     splited_polygon = PolygonUtils.split_polygon(polygon, box_resolution, required_area)
-    #     print(f'large_box_test took {time.time() - start_time} seconds  with iterative_split_polygon')
-    #     self.assertEqual(len(splited_polygon), polygon_side_length ** 2)
-    #
-    # def test_split_polygon_large_triangle_ra1_br1_iterative_split_polygon(self):
-    #     start_time = time.time()
-    #     polygon_side_length = 100
-    #     shift = 0
-    #     polygon = create_polygon_2d(GeometryUtils.convert_xy_array_to_points_list(
-    #         [(0 + shift, 0 + shift), (polygon_side_length / 2 + shift, polygon_side_length + shift),
-    #          (polygon_side_length + shift, 0 + shift)]))
-    #     required_area = 1
-    #     box_resolution = 1
-    #     splited_polygon = PolygonUtils.split_polygon(polygon, box_resolution, required_area)
-    #     print(f'large_box_test took {time.time() - start_time} seconds  with split_polygon1')
-    #
-    # def test_split_polygon_large_box_ra1_br1_iterative_split_polygon_negative_values(self):
-    #     start_time = time.time()
-    #     polygon_side_length = -100
-    #     shift = 0
-    #     polygon = create_polygon_2d(GeometryUtils.convert_xy_array_to_points_list(
-    #         [(0 + shift, 0 + shift), (polygon_side_length + shift, 0 + shift),
-    #          (polygon_side_length + shift, polygon_side_length + shift), (0 + shift, polygon_side_length + shift)]))
-    #     required_area = 1
-    #     box_resolution = 1
-    #     splited_polygon = PolygonUtils.split_polygon(polygon, box_resolution, required_area)
-    #     print(f'large_box_test took {time.time() - start_time} seconds  with recursive_split_polygon')
-    #     self.assertEqual(len(splited_polygon), polygon_side_length ** 2)
-    # def test_split_polygon_large_triangle1_ra1_br1_recursive_split_polygon(self):
-    #     start_time = time.time()
-    #     polygon_side_length = 1000
-    #     shift = 0
-    #     polygon = create_polygon_2d(GeometryUtils.convert_xy_array_to_points_list(
-    #         [(0 + shift, 0 + shift), (polygon_side_length + shift, polygon_side_length + shift),
-    #          (polygon_side_length + shift, 0 + shift)]))
-    #     required_area = 1
-    #     box_resolution = 1
-    #     splited_polygon = PolygonUtils.split_polygon_recursive(polygon, box_resolution, required_area)
-    #     print(f'large_box_test took {time.time() - start_time} seconds  with split_polygon2')
-    #     # self.assertEqual(len(splited_polygon), polygon_side_length**2)
-    #
-    # def test_split_polygon_large_triangle1_ra1_br1_iterative_split_polygon(self):
-    #     start_time = time.time()
-    #     polygon_side_length = 1000
-    #     shift = 0
-    #     polygon = create_polygon_2d(GeometryUtils.convert_xy_array_to_points_list(
-    #         [(0 + shift, 0 + shift), (polygon_side_length + shift, polygon_side_length + shift),
-    #          (polygon_side_length + shift, 0 + shift)]))
-    #     required_area = 1
-    #     box_resolution = 1
-    #     splited_polygon = PolygonUtils.split_polygon_iterative(polygon, box_resolution, required_area)
-    #     print(f'large_box_test took {time.time() - start_time} seconds  with split_polygon1')
-    #     # self.assertEqual(len(splited_polygon), polygon_side_length ** 2)
+
+    def test_split_polygon_large_box_ra1_br1_split_polygon(self):
+        start_time = time.time()
+        polygon_side_length = 10
+        shift = 0
+        polygon = create_polygon_2d(GeometryUtils.convert_xy_array_to_points_list(
+            [(0 + shift, 0 + shift), (polygon_side_length + shift, 0 + shift),
+             (polygon_side_length + shift, polygon_side_length + shift), (0 + shift, polygon_side_length + shift)]))
+        required_area = 1
+        box_resolution = 1
+        splited_polygon = PolygonUtils.split_polygon(polygon, box_resolution, required_area)
+        total_time = time.time() - start_time
+        print(f'large_box_test took {total_time} seconds')
+        self.assertEqual(len(splited_polygon), polygon_side_length ** 2)
+        self.assertLess(total_time, 0.2)
+
+    def test_split_polygon_large_box_ra1_br1_negative_values(self):
+        start_time = time.time()
+        polygon_side_length = -10
+        shift = 0
+        polygon = create_polygon_2d(GeometryUtils.convert_xy_array_to_points_list(
+            [(0 + shift, 0 + shift), (polygon_side_length + shift, 0 + shift),
+             (polygon_side_length + shift, polygon_side_length + shift), (0 + shift, polygon_side_length + shift)]))
+        required_area = 1
+        box_resolution = 1
+        splited_polygon = PolygonUtils.split_polygon(polygon, box_resolution, required_area)
+        total_time = time.time() - start_time
+        print(f'large_box_test took {total_time} seconds')
+        self.assertEqual(len(splited_polygon), polygon_side_length ** 2)
+        self.assertLess(total_time, 0.2)
+
+    def test_split_polygon_large_triangle1_ra1_br1(self):
+        start_time = time.time()
+        polygon_side_length = 10
+        shift = 0
+        polygon = create_polygon_2d(GeometryUtils.convert_xy_array_to_points_list(
+            [(0 + shift, 0 + shift), (polygon_side_length + shift, polygon_side_length + shift),
+             (polygon_side_length + shift, 0 + shift)]))
+        required_area = 1
+        box_resolution = 1
+        splited_polygon = PolygonUtils.split_polygon(polygon, box_resolution, required_area)
+        total_time = time.time() - start_time
+        print(f'large_box_test took {total_time} seconds')
+        self.assertLess(total_time, 0.2)

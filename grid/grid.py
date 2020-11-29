@@ -1,7 +1,6 @@
+import math
+from statistics import mean
 from typing import List
-
-import numpy as np
-
 from common.entities.delivery_request import DeliveryRequest
 from grid.cell_services import CellServices
 from grid.delivery_request_envelope_cells import DeliveryRequestEnvelopeCells
@@ -23,8 +22,10 @@ class DeliveryRequestsGrid(DeliveryRequestDistanceServiceInterface):
         return {delivery_request: DeliveryRequestEnvelopeCells(slides_container, delivery_request)
                 for delivery_request in delivery_requests}
 
-    def get_distance(self, delivery_request1: DeliveryRequest, delivery_request2: DeliveryRequest,
-                     delivery_request1_selected_option: int = 0, delivery_request2_selected_option: int = 0) -> float:
+    def get_distance_between_delivery_options(self, delivery_request1: DeliveryRequest,
+                                              delivery_request2: DeliveryRequest,
+                                              delivery_request1_selected_option: int = 0,
+                                              delivery_request2_selected_option: int = 0) -> float:
         delivery_request1_envelope_cells = \
             self.delivery_requests_envelope_cells[
                 delivery_request1].delivery_options_cells[delivery_request1_selected_option]
@@ -35,9 +36,9 @@ class DeliveryRequestsGrid(DeliveryRequestDistanceServiceInterface):
 
         delivery_request_1_cells = delivery_request1_envelope_cells.values()
         delivery_request_2_cells = delivery_request2_envelope_cells.values()
-        distances_list_filter = list(filter(lambda dist: dist != np.inf,
+        distances_list_filter = list(filter(lambda dist: dist != math.inf,
                                             [CellServices.get_distance(cell_1, cell_2) for cell_1, cell_2 in
                                              zip(delivery_request_1_cells,
                                                  delivery_request_2_cells)]))
 
-        return np.average(distances_list_filter) if distances_list_filter else np.inf
+        return mean(distances_list_filter) if distances_list_filter else math.inf

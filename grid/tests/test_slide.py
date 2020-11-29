@@ -16,7 +16,7 @@ class BasicSlideTestCase(unittest.TestCase):
         cls.drop_azimuth = Angle(45, AngleUnit.DEGREE)
         cls.cell_width_resolution = 1
         cls.cell_height_resolution = 2
-        cls.cell_required_area = 0.5
+        cls.minimal_area = 0.5
         cls.drone_azimuth_resolution = 8
         cls.drop_azimuth_resolution = 8
 
@@ -26,7 +26,7 @@ class BasicSlideTestCase(unittest.TestCase):
                                                     drop_azimuth=cls.drop_azimuth,
                                                     cell_width_resolution=cls.cell_width_resolution,
                                                     cell_height_resolution=cls.cell_height_resolution,
-                                                    cell_required_area=cls.cell_required_area)
+                                                    minimal_area=cls.minimal_area)
 
         cls.slide_properties_medium = SlideProperties(envelope_service=MockEnvelopeServices(),
                                                       package_type=PackageType.MEDIUM,
@@ -34,7 +34,7 @@ class BasicSlideTestCase(unittest.TestCase):
                                                       drop_azimuth=cls.drop_azimuth,
                                                       cell_width_resolution=cls.cell_width_resolution,
                                                       cell_height_resolution=cls.cell_height_resolution,
-                                                      cell_required_area=cls.cell_required_area)
+                                                      minimal_area=cls.minimal_area)
 
         cls.slide1 = create_slide(cls.slide_properties_tiny)
 
@@ -47,7 +47,7 @@ class BasicSlideTestCase(unittest.TestCase):
                                                          cls.drop_azimuth_resolution,
                                                          cls.cell_width_resolution,
                                                          cls.cell_height_resolution,
-                                                         cls.cell_required_area)
+                                                         cls.minimal_area)
 
     def test_slide(self):
         self.assertEqual(self.slide1,

@@ -36,9 +36,6 @@ class MockEnvelopeServices(EnvelopeServicesInterface):
         return cls._calc_envelope(package_type, envelope_center, drone_azimuth, drop_azimuth)
 
     @staticmethod
-    def is_valid_envelope(polygon: Polygon2D, required_area: float) -> bool:
-        if polygon.calc_area() < required_area:
-            return False
-
-        return True
+    def is_valid_envelope(polygon: Polygon2D, minimum_valid_area: float) -> bool:
+        return polygon.calc_area() >= minimum_valid_area
 

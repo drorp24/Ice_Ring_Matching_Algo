@@ -28,13 +28,6 @@ class BasicCellServiceTestCase(unittest.TestCase):
                                         pitch=Angle(90, AngleUnit.DEGREE),
                                         package_type=PackageType.TINY)
 
-    def test_cell_service_commutative(self):
-        cell1 = EnvelopeCell(Optional.of(GridLocation(0, 0)), Angle(0, AngleUnit.DEGREE))
-        cell2 = EnvelopeCell(Optional.of(GridLocation(2, 3)), Angle(15, AngleUnit.DEGREE))
-        dist12 = CellServices.get_distance(cell1, cell2)
-        dist21 = CellServices.get_distance(cell2, cell1)
-        self.assertEqual(dist12, dist21)
-
     def test_cell_service_angle(self):
         cell1 = EnvelopeCell(Optional.of(GridLocation(0, 0)), Angle(0, AngleUnit.DEGREE))
         cell2 = EnvelopeCell(Optional.of(GridLocation(0, 0)), Angle(15, AngleUnit.DEGREE))

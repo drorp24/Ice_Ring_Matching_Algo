@@ -44,20 +44,22 @@ class BasicGridTestCase(unittest.TestCase):
         expected_distance = 0
 
         for dr in self.dr_data_set_1:
-            self.assertEqual(self.delivery_requests_grid_1.get_distance(dr, dr, 0, 0), expected_distance)
+            self.assertEqual(self.delivery_requests_grid_1.get_distance_between_delivery_options(dr, dr, 0, 0), expected_distance)
 
     def test_non_zero_distance(self):
         expected_distance = 22.36
 
         self.assertEqual(
-            round(self.delivery_requests_grid_2.get_distance(self.dr_data_set_2[0], self.dr_data_set_2[1], 0, 0), 2),
+            round(self.delivery_requests_grid_2.get_distance_between_delivery_options(self.dr_data_set_2[0],
+                                                                                      self.dr_data_set_2[1], 0, 0), 2),
             expected_distance)
 
     def test_inf_distance(self):
         expected_distance = np.inf
 
         self.assertEqual(
-            self.delivery_requests_grid_3.get_distance(self.dr_data_set_3[0], self.dr_data_set_3[1], 0, 0),
+            self.delivery_requests_grid_3.get_distance_between_delivery_options(self.dr_data_set_3[0],
+                                                                                self.dr_data_set_3[1], 0, 0),
             expected_distance)
 
 

@@ -30,15 +30,14 @@ class BasicGridLocationTestCase(unittest.TestCase):
 
     def test_get_not_empty_indices(self):
         not_empty_indices = GridLocationServices.get_not_empty_indices(
-            [Optional.of(self.grid_location_1), Optional.of(self.grid_location_2), Optional.empty(),
-             Optional.of(self.grid_location_3)])
+            [self.grid_location_1, self.grid_location_2, Optional.empty(), self.grid_location_3])
 
         self.assertEqual(len(not_empty_indices), 3)
 
     def test_get_not_empty_grid_locations(self):
         not_empty_grid_locations = GridLocationServices.get_not_empty_grid_locations(
-            [Optional.of(self.grid_location_1), Optional.of(self.grid_location_2), Optional.empty(),
-             Optional.of(self.grid_location_3)])
+            [self.grid_location_1, self.grid_location_2, Optional.empty(), self.grid_location_3])
 
-        expected_not_empty_grid_locations = [self.grid_location_1,self.grid_location_2,self.grid_location_3]
+        expected_not_empty_grid_locations = [self.grid_location_1.get(), self.grid_location_2.get(),
+                                             self.grid_location_3.get()]
         self.assertEqual(not_empty_grid_locations,expected_not_empty_grid_locations)

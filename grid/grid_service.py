@@ -20,8 +20,6 @@ class GridService:
     @staticmethod
     def scale_to_grid(drop_point_grid_location: GridLocation, envelope_grid_location: Optional.of(GridLocation)) -> \
             Optional.of(GridLocation):
-        res = Optional.of(
+        return Optional.of(
             drop_point_grid_location + envelope_grid_location.get()) if not envelope_grid_location.is_empty() else \
             Optional.empty()
-
-        return res

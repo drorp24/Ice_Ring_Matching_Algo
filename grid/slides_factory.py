@@ -11,7 +11,7 @@ from services.envelope_services_interface import EnvelopeServicesInterface
 
 
 def create_slide(slide_properties: SlideProperties):
-    assert 0 <= slide_properties.cell_required_area <= 1
+    assert 0 <= slide_properties.minimal_area <= 1
     return Slide(slide_properties)
 
 
@@ -19,7 +19,7 @@ def generate_slides_container(service: EnvelopeServicesInterface,
                               package_types: List[PackageType], drone_azimuth_resolution: int,
                               drop_azimuth_resolution: int,
                               cell_width_resolution: float, cell_height_resolution: float,
-                              cell_required_area: float) -> SlidesContainer:
+                              minimal_area: float) -> SlidesContainer:
     slides = []
 
     drone_azimuth_options = np.arange(MIN_AZIMUTH_DEGREES, MAX_AZIMUTH_DEGREES,
@@ -37,7 +37,7 @@ def generate_slides_container(service: EnvelopeServicesInterface,
                                                    drop_azimuth=Angle(drop_azimuth_option, AngleUnit.DEGREE),
                                                    cell_width_resolution=cell_width_resolution,
                                                    cell_height_resolution=cell_height_resolution,
-                                                   cell_required_area=cell_required_area)
+                                                   minimal_area=minimal_area)
                 slide = create_slide(slide_properties)
 
                 slides.append(slide)

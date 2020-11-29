@@ -1,6 +1,5 @@
+from statistics import mean
 from typing import List
-
-import numpy as np
 from optional import Optional
 
 
@@ -50,4 +49,4 @@ class GridLocationServices:
             return Optional.empty()
 
         return Optional.of(GridLocation(
-            *list(map(np.mean, zip(*list(grid_location.flatten() for grid_location in filtered_grid_locations))))))
+            *list(map(mean, zip(*list(grid_location.flatten() for grid_location in filtered_grid_locations))))))

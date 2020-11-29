@@ -50,13 +50,12 @@ def create_multipolygon_2d(polygons: List[Polygon2D]) -> MultiPolygon2D:
 def create_bbox(min_x: float, min_y: float, max_x: float, max_y: float) -> Bbox2D:
     min_point = create_point_2d(min_x, min_y)
     max_point = create_point_2d(max_x, max_y)
-
     return _ShapelyBbox2D(min_point, max_point)
 
 
 def create_polygon_2d_from_ellipse(ellipse_center: Point2D, ellipse_width: float, ellipse_height: float,
-                                   ellipse_rotation_deg: float, epsilon_dist=0.0001) -> Union[
-    Polygon2D, EmptyGeometry2D]:
+                                   ellipse_rotation_deg: float,
+                                   epsilon_dist=0.0001) -> Union[Polygon2D, EmptyGeometry2D]:
     plt_ellipse = Ellipse(ellipse_center.xy(), ellipse_width, ellipse_height, ellipse_rotation_deg)
     vertices = plt_ellipse.get_verts()
     if ellipse_width < epsilon_dist or ellipse_height < epsilon_dist:

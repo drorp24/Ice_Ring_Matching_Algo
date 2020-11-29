@@ -9,7 +9,7 @@ from geometry.geo2d import Polygon2D, Point2D, EmptyGeometry2D
 class EnvelopeServicesInterface(ABC):
 
     @staticmethod
-    def is_valid_envelope(polygon: Polygon2D,required_area: float) -> bool:
+    def is_valid_envelope(polygon: Polygon2D,minimum_valid_area: float) -> bool:
         raise NotImplementedError()
 
     @classmethod

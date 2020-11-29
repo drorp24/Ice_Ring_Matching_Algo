@@ -17,22 +17,20 @@ from grid.slides_container import SlidesContainer
 
 class DeliveryRequestEnvelopeCellsDict:
     def __init__(self, envelope_cells: List[EnvelopeCell]):
-        self._dict = {}
-        for envelope_cell in envelope_cells:
-            self._dict[envelope_cell.drone_azimuth] = envelope_cell
+        self._envelope_cells = {envelope_cell.drone_azimuth:envelope_cell for envelope_cell in envelope_cells}
 
     @property
-    def dict(self) -> dict:
-        return self._dict
+    def envelope_cells(self) -> dict:
+        return self._envelope_cells
 
     def keys(self) -> [Angle]:
-        return list(self._dict.keys())
+        return list(self._envelope_cells.keys())
 
     def __getitem__(self, drone_azimuth: Angle) -> EnvelopeCell:
-        return self._dict[drone_azimuth]
+        return self._envelope_cells[drone_azimuth]
 
     def values(self) -> [EnvelopeCell]:
-        return list(self._dict.values())
+        return list(self._envelope_cells.values())
 
 
 class DeliveryRequestEnvelopeCells:

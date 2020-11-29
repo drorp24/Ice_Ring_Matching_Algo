@@ -1,4 +1,3 @@
-from pprint import pprint
 from random import Random
 from typing import List
 
@@ -57,4 +56,3 @@ class CustomerDeliveryDistribution(Distribution):
     def choose_rand(self, random: Random, amount: int = 1, num_pdp: int = 1) -> List[CustomerDelivery]:
         pdp_distributions = UniformChoiceDistribution(self._pdp_distributions).choose_rand(random, amount=amount)
         return [CustomerDelivery(pdp_distributions[i].choose_rand(random, amount=num_pdp)) for i in list(range(amount))]
-
