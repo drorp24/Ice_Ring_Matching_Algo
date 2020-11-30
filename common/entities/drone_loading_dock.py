@@ -1,6 +1,7 @@
 from datetime import date, timedelta, time
 from random import Random
 
+from common.entities.base_entity import JsonableBaseEntity
 from common.entities.disribution.distribution import Distribution
 from common.entities.drone import PlatformType, PlatformTypeDistribution
 from common.entities.drone_loading_station import DroneLoadingStation, DroneLoadingStationDistribution
@@ -10,7 +11,7 @@ from geometry.geo2d import Point2D
 from geometry.utils import Localizable
 
 
-class DroneLoadingDock(Localizable, Temporal):
+class DroneLoadingDock(JsonableBaseEntity, Localizable, Temporal):
 
     def __init__(self, drone_loading_station: DroneLoadingStation,
                  platform_type: PlatformType,
@@ -46,6 +47,12 @@ class DroneLoadingDock(Localizable, Temporal):
 
     def __hash__(self):
         return hash((self._drone_loading_station, self._platform_type, self._time_window))
+
+    @classmethod
+    def dict_to_obj(cls, dict_input):
+        return DroneLoadingDock(drone_loading_station=DroneLoadingStation.dict_to_obj(dict_input['loading_station']),
+                                platform_type=PlatformType.dict_to_obj(dict_input['platform_type']),
+                                time_window=TimeWindowExtension.dict_to_obj(dict_input['time_window']))
 
 
 def create_default_time_window_for_drone_loading_dock():

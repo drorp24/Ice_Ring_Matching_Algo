@@ -1,13 +1,20 @@
 from enum import Enum
 from random import Random
 
+from common.entities.base_entity import JsonableBaseEntity
 from common.entities.disribution.distribution import Distribution, ChoiceDistribution
 from common.entities.package import PackageType
 
 
-class PlatformType(Enum):
+class PlatformType(JsonableBaseEntity, Enum):
+
     platform_1 = 4
     platform_2 = 6
+
+    @classmethod
+    def dict_to_obj(cls, dict_input):
+        return PlatformType[dict_input['platform_type']]
+
 
 
 class _PackageTypesVolumeMap:

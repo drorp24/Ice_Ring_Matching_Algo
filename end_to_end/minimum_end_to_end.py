@@ -1,0 +1,67 @@
+from dataclasses import dataclass
+from pathlib import Path
+
+from common.entities.base_entity import JsonableBaseEntity
+from common.entities.drone_delivery_board import EmptyDroneDeliveryBoard, DroneDeliveryBoard
+from common.graph.operational.graph_creator import *
+from end_to_end.scenario import Scenario
+from common.tools.empty_drone_delivery_board_generation import generate_empty_delivery_board, FleetReader
+from matching.matcher import MatchInput, MatchConfig
+from matching.ortools.ortools_matcher import ORToolsMatcher
+from common.entities.temporal import DateTimeExtension
+
+
+@dataclass
+class MinimumEnd2EndConfig(JsonableBaseEntity):
+    scenario_json: Path
+    fleet_partition_json: Path
+    matcher_config_json: Path
+
+    @classmethod
+    def dict_to_obj(cls, dict_input):
+        return MinimumEnd2EndConfig(dict_input['scenario_path'],
+                                    dict_input['fleet_partition_json'],
+                                    dict_input['matcher_config_json'])
+
+
+class DataLoader:
+    def __init__(self, config: MinimumEnd2EndConfig):
+        self.scenario_dict = Scenario.json_to_dict(config.scenario_json)
+        self.fleet_json = config.fleet_partition_json
+        self.matcher_config_json = config.matcher_config_json
+
+    def get_delivery_requests(self) -> List[DeliveryRequest]:
+        scenario = Scenario.dict_to_obj(self.scenario_dict)
+        return scenario.delivery_requests
+
+    def get_docks(self) -> List[DroneLoadingDock]:
+        scenario = Scenario.dict_to_obj(self.scenario_dict)
+        return scenario.drone_loading_docks
+
+    def get_empty_drone_delivery_board(self) -> EmptyDroneDeliveryBoard:
+        fleet_reader = FleetReader(self.fleet_json)
+        return generate_empty_delivery_board(fleet_reader)
+
+    def get_zero_time(self) -> DateTimeExtension:
+        scenario = Scenario.dict_to_obj(self.scenario_dict)
+        return scenario.zero_time
+
+
+class MinimumEnd2End:
+    def __init__(self, delivery_requests: List[DeliveryRequest], loading_dock: DroneLoadingDock,
+                 empty_drone_delivery_board: EmptyDroneDeliveryBoard, zero_time: DateTimeExtension):
+        self.delivery_requests = delivery_requests
+        self.loading_dock = loading_dock
+        self.empty_drone_delivery_board = empty_drone_delivery_board
+        self.zero_time = zero_time
+
+    def create_graph_model(self, max_cost_to_connect: float) -> OperationalGraph:
+        operational_graph = OperationalGraph(self.zero_time.get_internal())
+        add_locally_connected_dr_graph(operational_graph, self.delivery_requests, max_cost_to_connect)
+        add_fully_connected_loading_docks(operational_graph, [self.loading_dock])
+
+    def calc_assignment(self, graph: OperationalGraph, match_config_file: Path) -> DroneDeliveryBoard:
+        match_input = MatchInput(graph, self.empty_drone_delivery_board, MatchConfig.from_file(match_config_file))
+        matcher = ORToolsMatcher(match_input)
+        solution = matcher.match()
+        return solution.delivery_board()

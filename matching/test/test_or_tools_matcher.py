@@ -8,7 +8,7 @@ from common.entities.drone import PlatformType
 from common.entities.drone_delivery import DroneDelivery, EmptyDroneDelivery, MatchedDeliveryRequest
 from common.entities.drone_delivery_board import DroneDeliveryBoard, EmptyDroneDeliveryBoard
 from common.entities.drone_formation import FormationSize, FormationOptions, DroneFormations
-from common.graph.operational.delivery_request_graph import OperationalGraph
+from common.graph.operational.operational_graph  import OperationalGraph
 from matching.matcher import MatchInput, MatchConfig
 from matching.ortools.ortools_matcher import ORToolsMatcher
 
