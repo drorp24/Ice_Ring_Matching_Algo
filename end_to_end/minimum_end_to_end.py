@@ -19,7 +19,7 @@ class MinimumEnd2EndConfig(JsonableBaseEntity):
 
     @classmethod
     def dict_to_obj(cls, dict_input):
-        return MinimumEnd2EndConfig(dict_input['scenario_path'],
+        return MinimumEnd2EndConfig(dict_input['scenario_json'],
                                     dict_input['fleet_partition_json'],
                                     dict_input['matcher_config_json'])
 
