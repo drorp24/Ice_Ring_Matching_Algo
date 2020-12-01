@@ -168,7 +168,7 @@ class TimeDeltaExtension(BaseEntity):
         return hash(self.get_internal())
 
     def in_minutes(self) -> float:
-        return self._internal_delta.total_seconds() / 60
+        return self.get_internal().total_seconds() / 60
 
 
 class DateTimeDistribution(UniformChoiceDistribution):

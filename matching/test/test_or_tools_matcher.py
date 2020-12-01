@@ -15,8 +15,8 @@ from common.entities.drone_loading_station import DroneLoadingStation
 from common.entities.package import PackageDistribution, PackageType
 from common.entities.package_delivery_plan import PackageDeliveryPlanDistribution
 from common.entities.temporal import TimeWindowExtension, DateTimeExtension
-from common.graph.operational.delivery_request_graph import OperationalGraph, OperationalEdge, OperationalNode, \
-    OperationalEdgeAttributes
+from common.graph.operational.operational_graph import OperationalGraph, OperationalEdge, OperationalNode, \
+    OperationalEdgeAttribs
 from geometry.geo_factory import create_point_2d
 from matching.matcher import MatchInput, MatchConfig
 from matching.ortools.ortools_matcher import ORToolsMatcher
@@ -66,13 +66,13 @@ class TestORToolsMatcher(TestCase):
         graph.add_delivery_requests(delivery_requests)
         graph.add_operational_edges([OperationalEdge(start_node=OperationalNode(loading_dock),
                                                      end_node=OperationalNode(delivery_requests[0]),
-                                                     attributes=OperationalEdgeAttributes(3)),
+                                                     attributes=OperationalEdgeAttribs(3)),
                                      OperationalEdge(start_node=OperationalNode(delivery_requests[0]),
                                                      end_node=OperationalNode(delivery_requests[1]),
-                                                     attributes=OperationalEdgeAttributes(5)),
+                                                     attributes=OperationalEdgeAttribs(5)),
                                      OperationalEdge(start_node=OperationalNode(loading_dock),
                                                      end_node=OperationalNode(delivery_requests[1]),
-                                                     attributes=OperationalEdgeAttributes(6))
+                                                     attributes=OperationalEdgeAttribs(6))
                                      ])
         return graph
 
