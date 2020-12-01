@@ -5,13 +5,14 @@ from common.entities.base_entity import JsonableBaseEntity
 from common.entities.customer_delivery import CustomerDelivery, CustomerDeliveryDistribution, DEFAULT_PDP_DISTRIB
 from common.entities.disribution.distribution import UniformChoiceDistribution, Distribution
 from common.entities.package import PackageType
+from geometry.utils import Localizable
 from geometry.geo2d import Point2D
 from geometry.geo_distribution import PointLocationDistribution, UniformPointInBboxDistribution, \
     DEFAULT_ZERO_LOCATION_DISTRIBUTION
 from geometry.geo_factory import calc_centroid, create_point_2d
 
 
-class DeliveryOption(JsonableBaseEntity):
+class DeliveryOption(JsonableBaseEntity, Localizable):
 
     def __init__(self, customer_deliveries: [CustomerDelivery]):
         self._customer_deliveries = customer_deliveries if customer_deliveries is not None else []

@@ -1,6 +1,6 @@
 import unittest
 
-from geometry.geo_factory import create_point_2d, create_vector_2d
+from geometry.geo_factory import create_point_2d, create_vector_2d, calc_centroid
 
 
 class BasicPointTestCase(unittest.TestCase):
@@ -39,3 +39,11 @@ class BasicPointMathTestCase(unittest.TestCase):
         result = self.p1.calc_distance_to_point(self.p2)
         self.assertTrue(isinstance(result, float))
         self.assertEqual(result, 10)
+
+    def test_calc_centroid(self):
+        result = calc_centroid(points=[self.p1, self.p1, self.p1, self.p2])
+        self.assertEqual(create_point_2d(2.5, 0), result)
+
+    def test_calc_centroid_on_single_point(self):
+        result = calc_centroid(points=[self.p1])
+        self.assertEqual(self.p1, result)
