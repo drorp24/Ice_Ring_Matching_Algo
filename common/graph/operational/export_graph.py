@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from common.graph.operational.delivery_request_graph import *
+from common.graph.operational.operational_graph import *
 
 
 class GraphExporter(ABC):

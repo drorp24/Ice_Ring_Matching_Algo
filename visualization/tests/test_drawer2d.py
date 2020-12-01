@@ -1,6 +1,8 @@
 import unittest
-from matplotlib.testing.compare import compare_images
 from pathlib import Path
+
+from matplotlib.testing.compare import compare_images
+
 from geometry.geo_factory import create_polygon_2d, \
     create_point_2d, create_vector_2d, create_line_string_2d, \
     create_linear_ring_2d

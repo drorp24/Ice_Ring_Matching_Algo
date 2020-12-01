@@ -3,11 +3,11 @@ from datetime import date, time
 from random import Random
 
 from common.entities.delivery_request import DeliveryRequestDistribution
-from common.entities.drone_loading_dock import DroneLoadingDockDistribution
 from common.entities.package import PackageType
 from common.entities.temporal import DateTimeExtension
-from common.graph.operational.delivery_request_graph import OperationalGraph, OperationalEdge, OperationalNode, \
-    OperationalEdgeAttributes
+from common.graph.operational.operational_graph import OperationalGraph, OperationalEdge, OperationalNode, \
+    OperationalEdgeAttribs
+from common.entities.drone_loading_dock import DroneLoadingDockDistribution
 from common.graph.operational.export_ortools_graph import OrtoolsGraphExporter
 
 
@@ -30,7 +30,7 @@ class BasicOrtoolsExporterTestCases(unittest.TestCase):
         for dk in cls.dld_dataset_random:
             for dl in cls.dr_dataset_random:
                 edges.append(OperationalEdge(OperationalNode(dk), OperationalNode(dl),
-                                             OperationalEdgeAttributes(Random().choice(range(10)))))
+                                             OperationalEdgeAttribs(Random().choice(range(10)))))
         return edges
 
     def test_export_time_window(self):

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from typing import List, Tuple, Union
+
 from shapely.geometry import Point, Polygon, LineString, LinearRing, MultiPolygon
 from shapely.geometry.base import BaseGeometry, EmptyGeometry
 
@@ -95,6 +96,9 @@ class _ShapelyPoint2D(_ShapelyGeometry, Point2D):
 
     def __hash__(self):
         return hash(self.to_tuple())
+
+    def __add__(self, other: Point2D) -> Point2D:
+        return self.add_vector(other.to_vector())
 
 
 class _ShapelyLineString2D(_ShapelyGeometry, LineString2D):
@@ -211,6 +215,9 @@ class _ShapelyPolygon2D(_ShapelyGeometry, Polygon2D):
 
     def __eq__(self, other):
         return _ShapelyPolygon2D.is_approximately_equal_by_symmetric_difference(self, other)
+
+    def __contains__(self, other: _ShapelyGeometry):
+        return self._shapely_obj.contains(other._shapely_obj)
 
     @staticmethod
     def is_approximately_equal_by_symmetric_difference(polygon1: Polygon2D, polygon2: Polygon2D,
