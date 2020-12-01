@@ -3,16 +3,15 @@ from datetime import time, date, timedelta
 from math import sqrt
 from random import Random
 
-from common.entities.delivery_request import build_delivery_request_distribution, \
+from common.entities.delivery_request import build_delivery_request_distribution
 from common.entities.delivery_option import DeliveryOptionDistribution
-from common.entities.delivery_request import DeliveryRequestDistribution, \
-    PriorityDistribution, DeliveryRequest
+from common.entities.delivery_request import DeliveryRequestDistribution, PriorityDistribution, DeliveryRequest
 from common.entities.delivery_request_generator import DeliveryRequestDatasetGenerator, DeliveryRequestDatasetStructure
 from common.entities.drone_loading_dock import DroneLoadingDockDistribution, DroneLoadingDock
 from common.entities.temporal import TimeWindowDistribution, DateTimeDistribution, DateTimeExtension, \
     TimeDeltaExtension, TimeDeltaDistribution, TimeWindowExtension
 from common.graph.operational.operational_graph import OperationalEdge, \
-    OperationalEdgeAttribs, OperationalNode
+    OperationalEdgeAttribs, OperationalNode, NonLocalizableNodeException, NonTemporalNodeException
 from common.graph.operational.operational_graph import OperationalGraph
 from common.graph.operational.graph_creator import add_locally_connected_dr_graph, add_fully_connected_loading_docks
 from geometry.geo_distribution import UniformPointInBboxDistribution
@@ -219,7 +218,7 @@ def create_low_priority_dr_dataset() -> [DeliveryRequest]:
 
 
 def _create_morning_dr_distribution() -> DeliveryRequestDistribution:
-    return generate_dr_distribution(
+    return build_delivery_request_distribution(
         time_window_distribution=TimeWindowDistribution(
             start_time_distribution=DateTimeDistribution([DateTimeExtension(date(2021, 1, 1), time(6, 0, 0))]),
             time_delta_distribution=TimeDeltaDistribution([TimeDeltaExtension(timedelta(hours=3, minutes=30))])))
