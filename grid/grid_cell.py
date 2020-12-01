@@ -8,11 +8,11 @@ from grid.grid_location import GridLocation
 
 
 @dataclass
-class Cell:
+class GridCell:
     location: Optional.of(GridLocation)
 
 
 @dataclass
-class EnvelopeCell(Cell):
+class EnvelopeGridCell(GridCell):
     drone_azimuth: Angle
     package_delivery_plans: PackageDeliveryPlanList = PackageDeliveryPlanList([])

@@ -2,7 +2,7 @@ import math
 from statistics import mean
 from typing import List
 from common.entities.delivery_request import DeliveryRequest
-from grid.cell_services import CellServices
+from grid.grid_cell_services import GridCellServices
 from grid.delivery_request_envelope_cells import DeliveryRequestEnvelopeCells
 from grid.slides_container import SlidesContainer
 from services.delivery_request_distance_service_interface import DeliveryRequestDistanceServiceInterface
@@ -37,7 +37,7 @@ class DeliveryRequestsGrid(DeliveryRequestDistanceServiceInterface):
         delivery_request_1_cells = delivery_request1_envelope_cells.values()
         delivery_request_2_cells = delivery_request2_envelope_cells.values()
         distances_list_filter = list(filter(lambda dist: dist != math.inf,
-                                            [CellServices.get_distance(cell_1, cell_2) for cell_1, cell_2 in
+                                            [GridCellServices.get_distance(cell_1, cell_2) for cell_1, cell_2 in
                                              zip(delivery_request_1_cells,
                                                  delivery_request_2_cells)]))
 

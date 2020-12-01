@@ -8,13 +8,14 @@ from optional import Optional
 from common.entities.package import PackageType
 from common.math.angle import Angle, AngleUnit
 from geometry.polygon_utils import PolygonUtils
+from grid.grid_geometry_utils import convert_nearest_value_in_resolution
 from grid.grid_location import GridLocation
 from grid.slide import Slide
 from params import MAX_AZIMUTH_DEGREES
 
 
-def make_hash() -> defaultdict:
-    return defaultdict(make_hash)
+def make_dict() -> defaultdict:
+    return defaultdict(make_dict)
 
 
 class SlidesContainer:
@@ -38,9 +39,9 @@ class SlidesContainer:
         self._cell_width_resolution = cell_width_resolution
         self._cell_height_resolution = cell_height_resolution
 
-        self._hash = make_hash()
+        self._slides_container = make_dict()
         for slide in slides:
-            self._hash[slide.package_type][slide.drone_azimuth.degrees][
+            self._slides_container[slide.package_type][slide.drone_azimuth.degrees][
                 slide.drop_azimuth.degrees] = slide
 
     def is_drop_azimuth_delta_deg_integer(self):
@@ -61,7 +62,7 @@ class SlidesContainer:
 
     @property
     def hash(self) -> defaultdict:
-        return self._hash
+        return self._slides_container
 
     @property
     def get_drone_azimuth_resolution(self) -> int:
@@ -82,15 +83,15 @@ class SlidesContainer:
     def get_envelope_location(self, drone_azimuth: Angle, drop_azimuth: Angle,
                               package_type: PackageType) -> Optional.of(GridLocation):
 
-        round_drone_azimuth = Angle(PolygonUtils.convert_nearest_value_in_resolution(
+        round_drone_azimuth = Angle(convert_nearest_value_in_resolution(
             drone_azimuth.degrees,
             int(self._drone_azimuth_delta_deg.degrees)), AngleUnit.DEGREE)
 
-        round_drop_azimuth = Angle(PolygonUtils.convert_nearest_value_in_resolution(
+        round_drop_azimuth = Angle(convert_nearest_value_in_resolution(
             drop_azimuth.degrees,
             int(self._drop_azimuth_delta_deg.degrees)), AngleUnit.DEGREE)
 
-        return self._hash[package_type][round_drone_azimuth.degrees][round_drop_azimuth.degrees].envelope_location
+        return self._slides_container[package_type][round_drone_azimuth.degrees][round_drop_azimuth.degrees].envelope_location
 
     def flatten_hash(self):
-        return flatten(self._hash, reducer=underscore_reducer)
+        return flatten(self._slides_container, reducer=underscore_reducer)

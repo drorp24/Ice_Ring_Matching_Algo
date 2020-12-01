@@ -5,7 +5,7 @@ from common.entities.package import PackageType
 from common.entities.package_delivery_plan import PackageDeliveryPlanList, PackageDeliveryPlan
 from common.math.angle import Angle, AngleUnit
 from geometry.geo_factory import create_point_2d
-from grid.cell import Cell, EnvelopeCell
+from grid.grid_cell import GridCell, EnvelopeGridCell
 from grid.grid_location import GridLocation
 
 
@@ -13,7 +13,7 @@ class BasicCellTestCase(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.cell_1 = Cell(location=GridLocation(10, 15))
+        cls.cell_1 = GridCell(location=GridLocation(10, 15))
 
         cls.pdp_1 = PackageDeliveryPlan(id=UUID(int=42),
                                         drop_point=create_point_2d(1, 2),
@@ -27,9 +27,9 @@ class BasicCellTestCase(unittest.TestCase):
                                         pitch=Angle(90, AngleUnit.DEGREE),
                                         package_type=PackageType.TINY)
 
-        cls.envelope_cell_1 = EnvelopeCell(location=GridLocation(10, 15),
-                                           drone_azimuth=Angle(45, AngleUnit.DEGREE),
-                                           package_delivery_plans=PackageDeliveryPlanList([cls.pdp_1, cls.pdp_2]))
+        cls.envelope_cell_1 = EnvelopeGridCell(location=GridLocation(10, 15),
+                                               drone_azimuth=Angle(45, AngleUnit.DEGREE),
+                                               package_delivery_plans=PackageDeliveryPlanList([cls.pdp_1, cls.pdp_2]))
 
     def test_cell(self):
         expected_grid_location = GridLocation(10, 15)

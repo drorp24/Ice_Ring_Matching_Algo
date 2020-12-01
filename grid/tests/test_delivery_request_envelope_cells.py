@@ -11,8 +11,8 @@ from common.entities.temporal import TimeWindowExtension, DateTimeExtension
 from common.math.angle import Angle, AngleUnit
 from geometry.geo_factory import create_point_2d
 from grid.azimuth_options import AzimuthOptions
-from grid.cell import Cell, EnvelopeCell
-from grid.cell_services import CellServices
+from grid.grid_cell import GridCell, EnvelopeGridCell
+from grid.grid_cell_services import GridCellServices
 from grid.delivery_request_envelope_cells import DeliveryRequestEnvelopeCellsDict, DeliveryRequestEnvelopeCells
 from grid.grid_location import GridLocation, GridLocationServices
 from grid.grid_service import GridService
@@ -75,36 +75,44 @@ class BasicDeliveryRequestEnvelopeCellsTestCase(unittest.TestCase):
     def test_envelope_cells(self):
         pdp_list = [self.pdp_1, self.pdp_2, self.pdp_3]
         for drone_azimuth in AzimuthOptions(self.slides_container.get_drone_azimuth_resolution).values:
-            scale_to_grid_list = []
-            for pdp in pdp_list:
-                drop_point_grid_location = \
-                    GridService.get_grid_location(pdp.drop_point, self.slides_container.cell_width_resolution,
-                                                  self.slides_container.cell_height_resolution)
-                drop_azimuth = CellServices.get_drop_azimuth(drone_azimuth, pdp.azimuth, pdp.pitch)
-                envelope_location = self.slides_container.get_envelope_location(drone_azimuth,
-                                                                                drop_azimuth,
-                                                                                pdp.package_type)
-                scale_to_grid_list.append(GridService.scale_to_grid(drop_point_grid_location, envelope_location))
+            scale_to_grid_list = self._scale_to_grid_list(drone_azimuth, pdp_list)
 
-            expected_average_location = GridLocationServices.calc_average(scale_to_grid_list)
+            self._test_envelope_cells_average(drone_azimuth, scale_to_grid_list)
 
-            self.assertEqual(self.delivery_requests_envelope_cells_dict_do_1[drone_azimuth].location,
-                             expected_average_location)
+            self._test_envelope_cells_pdp_ids(drone_azimuth, scale_to_grid_list)
 
-            empty_indices = GridLocationServices.get_not_empty_indices(scale_to_grid_list)
-            package_delivery_plan_list = PackageDeliveryPlanList(
-                list(map([self.pdp_1, self.pdp_2, self.pdp_3].__getitem__, empty_indices)))
+    def _test_envelope_cells_pdp_ids(self, drone_azimuth, scale_to_grid_list):
+        empty_indices = GridLocationServices.get_not_empty_indices(scale_to_grid_list)
+        package_delivery_plan_list = PackageDeliveryPlanList(
+            list(map([self.pdp_1, self.pdp_2, self.pdp_3].__getitem__, empty_indices)))
+        self.assertEqual(
+            self.delivery_requests_envelope_cells_dict_do_1[drone_azimuth].package_delivery_plans.ids(),
+            package_delivery_plan_list.ids())
 
-            self.assertEqual(
-                self.delivery_requests_envelope_cells_dict_do_1[drone_azimuth].package_delivery_plans.ids(),
-                package_delivery_plan_list.ids())
+    def _test_envelope_cells_average(self, drone_azimuth, scale_to_grid_list):
+        expected_average_location = GridLocationServices.calc_average(scale_to_grid_list)
+        self.assertEqual(self.delivery_requests_envelope_cells_dict_do_1[drone_azimuth].location,
+                         expected_average_location)
+
+    def _scale_to_grid_list(self, drone_azimuth, pdp_list):
+        scale_to_grid_list = []
+        for pdp in pdp_list:
+            drop_point_grid_location = \
+                GridService.get_grid_location(pdp.drop_point, self.slides_container.cell_width_resolution,
+                                              self.slides_container.cell_height_resolution)
+            drop_azimuth = GridCellServices.get_drop_azimuth(drone_azimuth, pdp.azimuth, pdp.pitch)
+            envelope_location = self.slides_container.get_envelope_location(drone_azimuth,
+                                                                            drop_azimuth,
+                                                                            pdp.package_type)
+            scale_to_grid_list.append(GridService.scale_to_grid(drop_point_grid_location, envelope_location))
+        return scale_to_grid_list
 
 
 class BasicDeliveryRequestEnvelopeCellsDictTestCase(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.cell_1 = Cell(location=GridLocation(10, 15))
+        cls.cell_1 = GridCell(location=GridLocation(10, 15))
 
         cls.pdp_1 = PackageDeliveryPlan(id=UUID(int=42),
                                         drop_point=create_point_2d(1, 2),
@@ -118,13 +126,13 @@ class BasicDeliveryRequestEnvelopeCellsDictTestCase(unittest.TestCase):
                                         pitch=Angle(90, AngleUnit.DEGREE),
                                         package_type=PackageType.TINY)
 
-        cls.envelope_cell_1 = EnvelopeCell(location=GridLocation(10, 15),
-                                           drone_azimuth=Angle(45, AngleUnit.DEGREE),
-                                           package_delivery_plans=PackageDeliveryPlanList([cls.pdp_1, cls.pdp_2]))
+        cls.envelope_cell_1 = EnvelopeGridCell(location=GridLocation(10, 15),
+                                               drone_azimuth=Angle(45, AngleUnit.DEGREE),
+                                               package_delivery_plans=PackageDeliveryPlanList([cls.pdp_1, cls.pdp_2]))
 
-        cls.envelope_cell_2 = EnvelopeCell(location=GridLocation(20, 15),
-                                           drone_azimuth=Angle(90, AngleUnit.DEGREE),
-                                           package_delivery_plans=PackageDeliveryPlanList([cls.pdp_1, cls.pdp_2]))
+        cls.envelope_cell_2 = EnvelopeGridCell(location=GridLocation(20, 15),
+                                               drone_azimuth=Angle(90, AngleUnit.DEGREE),
+                                               package_delivery_plans=PackageDeliveryPlanList([cls.pdp_1, cls.pdp_2]))
 
         cls.delivery_request_envelope_cells = DeliveryRequestEnvelopeCellsDict(
             [cls.envelope_cell_1, cls.envelope_cell_2])
