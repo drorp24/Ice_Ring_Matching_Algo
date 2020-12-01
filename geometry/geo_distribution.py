@@ -68,3 +68,6 @@ class ChoiceNormalDistribution(PointLocationDistribution):
                                         self._sigma_x_distrib.choose_rand(random, 1)[0],
                                         self._sigma_y_distrib.choose_rand(random, 1)[0]).choose_rand(random, 1)[0]
                 for _ in range(amount)]
+
+
+DEFAULT_ZERO_LOCATION_DISTRIBUTION = UniformPointInBboxDistribution(0, 0, 0, 0)

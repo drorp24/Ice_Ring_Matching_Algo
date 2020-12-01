@@ -5,9 +5,10 @@ from common.entities.base_entity import JsonableBaseEntity
 from common.entities.disribution.distribution import UniformChoiceDistribution, Distribution
 from common.entities.package import PackageType
 from common.entities.package_delivery_plan import PackageDeliveryPlan, PackageDeliveryPlanDistribution, \
-    DEFAULT_DROP_POINT_DISTRIB, DEFAULT_AZI_DISTRIB, DEFAULT_PITCH_DISTRIB, DEFAULT_PACKAGE_DISTRIB
+    DEFAULT_AZI_DISTRIB, DEFAULT_PITCH_DISTRIB, DEFAULT_PACKAGE_DISTRIB
 from geometry.geo2d import Point2D, Polygon2D
-from geometry.geo_factory import calc_centroid, calc_convex_hull_polygon
+from geometry.geo_distribution import PointLocationDistribution, DEFAULT_ZERO_LOCATION_DISTRIBUTION
+from geometry.geo_factory import calc_centroid, calc_convex_hull_polygon, create_point_2d
 from geometry.utils import Localizable
 
 
@@ -44,6 +45,7 @@ class CustomerDelivery(JsonableBaseEntity, Localizable):
                                     dict_input['package_delivery_plans']])
 
 
+DEFAULT_DROP_POINT_DISTRIB = DEFAULT_ZERO_LOCATION_DISTRIBUTION
 DEFAULT_PDP_DISTRIB = PackageDeliveryPlanDistribution(DEFAULT_DROP_POINT_DISTRIB,
                                                       DEFAULT_AZI_DISTRIB,
                                                       DEFAULT_PITCH_DISTRIB,
@@ -51,11 +53,15 @@ DEFAULT_PDP_DISTRIB = PackageDeliveryPlanDistribution(DEFAULT_DROP_POINT_DISTRIB
 
 
 class CustomerDeliveryDistribution(Distribution):
-    def __init__(self, package_delivery_plan_distributions=None):
-        if package_delivery_plan_distributions is None:
-            package_delivery_plan_distributions = [DEFAULT_PDP_DISTRIB]
+    def __init__(self, relative_location_distribution: PointLocationDistribution = DEFAULT_DROP_POINT_DISTRIB,
+                 package_delivery_plan_distributions: [PackageDeliveryPlanDistribution] = [DEFAULT_PDP_DISTRIB]):
+        self._relative_location_distribution = relative_location_distribution
         self._pdp_distributions = package_delivery_plan_distributions
 
-    def choose_rand(self, random: Random, amount: int = 1, num_pdp: int = 1) -> List[CustomerDelivery]:
-        pdp_distributions = UniformChoiceDistribution(self._pdp_distributions).choose_rand(random, amount=amount)
-        return [CustomerDelivery(pdp_distributions[i].choose_rand(random, amount=num_pdp)) for i in list(range(amount))]
+    def choose_rand(self, random: Random, base_location: Point2D = create_point_2d(0, 0),
+                    amount: int = 1, num_pdp: int = 1) -> List[CustomerDelivery]:
+        relative_locations = self._relative_location_distribution.choose_rand(random, amount)
+        pdp_distributions = UniformChoiceDistribution(self._pdp_distributions).choose_rand(random, amount=1)[0]
+        return [CustomerDelivery(
+            pdp_distributions.choose_rand(random, amount=num_pdp, base_location=base_location + relative_locations[i]))
+            for i in list(range(amount))]

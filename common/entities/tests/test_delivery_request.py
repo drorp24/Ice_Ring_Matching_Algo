@@ -1,6 +1,6 @@
 import unittest
 
-from common.entities.delivery_request import generate_dr_distribution, PriorityDistribution
+from common.entities.delivery_request import build_delivery_request_distribution, PriorityDistribution
 from common.entities.delivery_request_generator import DeliveryRequestDatasetGenerator, DeliveryRequestDatasetStructure
 
 
@@ -13,7 +13,7 @@ class BasicDeliveryRequestGeneration(unittest.TestCase):
         cls.num_of_cd_per_do = 8
         cls.num_of_pdp_per_cd = 3
 
-        dr_distribution = generate_dr_distribution(priority_distribution=PriorityDistribution([1, 2, 3, 4, 5]))
+        dr_distribution = build_delivery_request_distribution(priority_distribution=PriorityDistribution([1, 2, 3, 4, 5]))
 
         cls.ds = DeliveryRequestDatasetStructure(num_of_delivery_requests=cls.num_of_drs,
                                                  num_of_delivery_options_per_delivery_request=cls.num_of_do_per_dr,

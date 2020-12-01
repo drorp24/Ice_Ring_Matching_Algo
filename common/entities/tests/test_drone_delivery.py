@@ -7,13 +7,14 @@ from common.entities.drone_delivery import DroneDelivery, EmptyDroneDelivery
 from common.entities.drone_formation import DroneFormations, FormationSize, FormationOptions
 from common.entities.drone import PlatformType
 from common.entities.drone_delivery_board import EmptyDroneDeliveryBoard, DroneDeliveryBoard
+from geometry.geo_factory import create_point_2d
 
 
 class BasicDroneDeliveryGeneration(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.dr = DeliveryRequestDistribution().choose_rand(Random(42), 3)
+        cls.dr = DeliveryRequestDistribution().choose_rand(Random(42), base_location=create_point_2d(0,0), amount=3)
 
         cls.empty_drone_delivery_1 = EmptyDroneDelivery("edd_1", DroneFormations.get_drone_formation(
             FormationSize.MINI, FormationOptions.TINY_PACKAGES, PlatformType.platform_1))
