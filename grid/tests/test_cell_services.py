@@ -29,34 +29,34 @@ class BasicCellServiceTestCase(unittest.TestCase):
                                         package_type=PackageType.TINY)
 
     def test_cell_service_angle(self):
-        cell1 = EnvelopeGridCell(Optional.of(GridLocation(0, 0)), Angle(0, AngleUnit.DEGREE))
-        cell2 = EnvelopeGridCell(Optional.of(GridLocation(0, 0)), Angle(15, AngleUnit.DEGREE))
-        cell3 = EnvelopeGridCell(Optional.of(GridLocation(0, 0)), Angle(30, AngleUnit.DEGREE))
-        dist12 = GridCellServices.get_distance(cell1, cell2)
-        dist13 = GridCellServices.get_distance(cell1, cell3)
-        dist23 = GridCellServices.get_distance(cell2, cell3)
+        cell1 = EnvelopeGridCell(Optional.of(GridLocation(0, 0)), Angle(0, AngleUnit.DEGREE), [])
+        cell2 = EnvelopeGridCell(Optional.of(GridLocation(0, 0)), Angle(15, AngleUnit.DEGREE), [])
+        cell3 = EnvelopeGridCell(Optional.of(GridLocation(0, 0)), Angle(30, AngleUnit.DEGREE), [])
+        dist12 = GridCellServices.calc_distance(cell1, cell2)
+        dist13 = GridCellServices.calc_distance(cell1, cell3)
+        dist23 = GridCellServices.calc_distance(cell2, cell3)
 
         self.assertEqual(dist12, dist23)
         self.assertGreater(dist13, dist12)
 
     def test_cell_service_grid_location(self):
-        cell1 = EnvelopeGridCell(Optional.of(GridLocation(0, 0)), Angle(0, AngleUnit.DEGREE))
-        cell2 = EnvelopeGridCell(Optional.of(GridLocation(1, 1)), Angle(0, AngleUnit.DEGREE))
-        cell3 = EnvelopeGridCell(Optional.of(GridLocation(2, 2)), Angle(0, AngleUnit.DEGREE))
-        dist12 = GridCellServices.get_distance(cell1, cell2)
-        dist13 = GridCellServices.get_distance(cell1, cell3)
-        dist23 = GridCellServices.get_distance(cell2, cell3)
+        cell1 = EnvelopeGridCell(Optional.of(GridLocation(0, 0)), Angle(0, AngleUnit.DEGREE), [])
+        cell2 = EnvelopeGridCell(Optional.of(GridLocation(1, 1)), Angle(0, AngleUnit.DEGREE), [])
+        cell3 = EnvelopeGridCell(Optional.of(GridLocation(2, 2)), Angle(0, AngleUnit.DEGREE), [])
+        dist12 = GridCellServices.calc_distance(cell1, cell2)
+        dist13 = GridCellServices.calc_distance(cell1, cell3)
+        dist23 = GridCellServices.calc_distance(cell2, cell3)
 
         self.assertEqual(dist12, dist23)
         self.assertGreater(dist13, dist12)
 
     def test_cell_service_angle_delta_cost(self):
-        cell1 = EnvelopeGridCell(Optional.of(GridLocation(0, 0)), Angle(0, AngleUnit.DEGREE))
-        cell2 = EnvelopeGridCell(Optional.of(GridLocation(1, 1)), Angle(0, AngleUnit.DEGREE))
-        cell3 = EnvelopeGridCell(Optional.of(GridLocation(2, 2)), Angle(0, AngleUnit.DEGREE))
-        dist12 = GridCellServices.get_distance(cell1, cell2)
-        dist13 = GridCellServices.get_distance(cell1, cell3)
-        dist23 = GridCellServices.get_distance(cell2, cell3)
+        cell1 = EnvelopeGridCell(Optional.of(GridLocation(0, 0)), Angle(0, AngleUnit.DEGREE), [])
+        cell2 = EnvelopeGridCell(Optional.of(GridLocation(1, 1)), Angle(0, AngleUnit.DEGREE), [])
+        cell3 = EnvelopeGridCell(Optional.of(GridLocation(2, 2)), Angle(0, AngleUnit.DEGREE), [])
+        dist12 = GridCellServices.calc_distance(cell1, cell2)
+        dist13 = GridCellServices.calc_distance(cell1, cell3)
+        dist23 = GridCellServices.calc_distance(cell2, cell3)
 
         self.assertEqual(dist12, dist23)
         self.assertGreater(dist13, dist12)

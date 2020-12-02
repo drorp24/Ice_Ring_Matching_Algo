@@ -10,7 +10,7 @@ class AzimuthOptions:
         self._values = [Angle(value=angle, unit=AngleUnit.DEGREE)
                         for angle in (range(MIN_AZIMUTH_DEGREES, MAX_AZIMUTH_DEGREES,
                                                 math.floor(
-                                                    MAX_AZIMUTH_DEGREES
+                                                    (MAX_AZIMUTH_DEGREES - MIN_AZIMUTH_DEGREES)
                                                     / azimuth_resolution)))]
 
     @property

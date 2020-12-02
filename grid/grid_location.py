@@ -37,9 +37,11 @@ class GridLocationServices:
 
     @staticmethod
     def get_not_empty_grid_locations(grid_locations: [Optional.of(GridLocation)]) -> List[GridLocation]:
-        filtered_grid_indices = list(
-            map(grid_locations.__getitem__, GridLocationServices.get_not_empty_indices(grid_locations)))
-        return [grid_location.get() for grid_location in filtered_grid_indices]
+        # filtered_grid_indices = list(
+        #     map(grid_locations.__getitem__, GridLocationServices.get_not_empty_indices(grid_locations)))
+        # return [grid_location.get() for grid_location in filtered_grid_indices]
+        return list(map(lambda grid_location : grid_location.get(),
+                        filter(lambda grid_location : grid_location.is_present(),grid_locations)))
 
     @staticmethod
     def calc_average(grid_locations: [Optional.of(GridLocation)]) -> Optional.of(GridLocation):

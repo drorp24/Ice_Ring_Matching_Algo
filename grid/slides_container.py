@@ -11,7 +11,7 @@ from geometry.polygon_utils import PolygonUtils
 from grid.grid_geometry_utils import convert_nearest_value_in_resolution
 from grid.grid_location import GridLocation
 from grid.slide import Slide
-from params import MAX_AZIMUTH_DEGREES
+from params import MAX_AZIMUTH_DEGREES, MIN_AZIMUTH_DEGREES
 
 
 def make_dict() -> defaultdict:
@@ -27,12 +27,12 @@ class SlidesContainer:
         self.is_drop_az_resolution_positive(drop_azimuth_resolution)
 
         self._drone_azimuth_resolution = drone_azimuth_resolution
-        self._drone_azimuth_delta_deg = Angle(MAX_AZIMUTH_DEGREES / self._drone_azimuth_resolution,
+        self._drone_azimuth_delta_deg = Angle((MAX_AZIMUTH_DEGREES - MIN_AZIMUTH_DEGREES) / self._drone_azimuth_resolution,
                                               AngleUnit.DEGREE)
         self.is_drone_azimuth_delta_deg_integer()
 
         self._drop_azimuth_resolution = drop_azimuth_resolution
-        self._drop_azimuth_delta_deg = Angle(MAX_AZIMUTH_DEGREES / self._drop_azimuth_resolution,
+        self._drop_azimuth_delta_deg = Angle((MAX_AZIMUTH_DEGREES - MIN_AZIMUTH_DEGREES) / self._drop_azimuth_resolution,
                                              AngleUnit.DEGREE)
         self.is_drop_azimuth_delta_deg_integer()
 

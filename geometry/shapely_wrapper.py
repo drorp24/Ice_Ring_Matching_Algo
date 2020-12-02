@@ -187,7 +187,7 @@ class _ShapelyPolygon2D(_ShapelyGeometry, Polygon2D):
     @property
     def bbox(self) -> Bbox2D:
         min_x, min_y, max_x, max_y = self._shapely_obj.bounds
-        return _ShapelyBbox2D(_ShapelyPoint2D(min_x, min_y), _ShapelyPoint2D(max_x, max_y))
+        return _ShapelyBbox2D(min_x, min_y, max_x, max_y)
 
     @property
     def points(self) -> List[Point2D]:
@@ -238,31 +238,33 @@ class _ShapelyPolygon2D(_ShapelyGeometry, Polygon2D):
 
 class _ShapelyBbox2D(_ShapelyPolygon2D, Bbox2D):
 
-    def __init__(self, min_point: Point2D, max_point: Point2D):
-        self._min_point = min_point
-        self._max_point = max_point
+    def __init__(self, min_x: float, min_y: float, max_x: float, max_y: float):
+        self._min_x = min_x
+        self._min_y = min_y
+        self._max_x = max_x
+        self._max_y = max_y
 
-        super().__init__([_ShapelyPoint2D(max_point.x, min_point.y),
-                          max_point,
-                          _ShapelyPoint2D(min_point.x, max_point.y),
-                          min_point
+        super().__init__([_ShapelyPoint2D(max_x, min_y),
+                          _ShapelyPoint2D(max_x, max_y),
+                          _ShapelyPoint2D(min_x, max_y),
+                          _ShapelyPoint2D(min_x, min_y)
                           ])
 
     @property
     def min_x(self) -> float:
-        return self._min_point.x
+        return self._min_x
 
     @property
     def min_y(self) -> float:
-        return self._min_point.y
+        return self._min_y
 
     @property
     def max_x(self) -> float:
-        return self._max_point.x
+        return self._max_x
 
     @property
     def max_y(self) -> float:
-        return self._max_point.y
+        return self._max_y
 
     @property
     def holes(self) -> List[LinearRing2D]:

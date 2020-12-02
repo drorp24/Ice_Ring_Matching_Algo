@@ -6,7 +6,7 @@ from uuid import UUID
 
 from common.entities.disribution.test.test_distribution import assert_samples_approx_expected
 from common.entities.package import PackageType, PackageDistribution
-from common.entities.package_delivery_plan import PackageDeliveryPlan, PackageDeliveryPlanList
+from common.entities.package_delivery_plan import PackageDeliveryPlan
 from common.math.angle import Angle, AngleUnit
 from geometry.geo2d import Polygon2D
 from geometry.geo_factory import create_point_2d, create_polygon_2d_from_ellipse, create_empty_geometry_2d
@@ -38,7 +38,7 @@ class BasicPackageTestCase(unittest.TestCase):
 
         cls.drop_envelope_service = MockEnvelopeServices()
 
-        cls.package_delivery_plan_list = PackageDeliveryPlanList([cls.pdp_1, cls.pdp_2])
+        cls.package_delivery_plan_list = [cls.pdp_1, cls.pdp_2]
 
     def test_package_weights(self):
         self.assertEqual(PackageType.TINY.value.weight, 1)

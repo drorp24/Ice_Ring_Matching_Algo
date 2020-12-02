@@ -24,10 +24,10 @@ def generate_slides_container(service: EnvelopeServicesInterface,
     slides = []
 
     drone_azimuth_options = np.arange(MIN_AZIMUTH_DEGREES, MAX_AZIMUTH_DEGREES,
-                                      MAX_AZIMUTH_DEGREES / drone_azimuth_resolution)
+                                      (MAX_AZIMUTH_DEGREES - MIN_AZIMUTH_DEGREES) / drone_azimuth_resolution)
 
     drop_azimuth_options = np.arange(MIN_AZIMUTH_DEGREES, MAX_AZIMUTH_DEGREES,
-                                     MAX_AZIMUTH_DEGREES / drop_azimuth_resolution)
+                                     (MAX_AZIMUTH_DEGREES - MIN_AZIMUTH_DEGREES) / drop_azimuth_resolution)
 
 
     for package_type, drone_azimuth_option, drop_azimuth_option in itertools.product(package_types,drone_azimuth_options,drop_azimuth_options):

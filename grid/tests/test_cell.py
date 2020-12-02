@@ -2,7 +2,7 @@ import unittest
 from uuid import UUID
 
 from common.entities.package import PackageType
-from common.entities.package_delivery_plan import PackageDeliveryPlanList, PackageDeliveryPlan
+from common.entities.package_delivery_plan import PackageDeliveryPlan
 from common.math.angle import Angle, AngleUnit
 from geometry.geo_factory import create_point_2d
 from grid.grid_cell import GridCell, EnvelopeGridCell
@@ -29,7 +29,7 @@ class BasicCellTestCase(unittest.TestCase):
 
         cls.envelope_cell_1 = EnvelopeGridCell(location=GridLocation(10, 15),
                                                drone_azimuth=Angle(45, AngleUnit.DEGREE),
-                                               package_delivery_plans=PackageDeliveryPlanList([cls.pdp_1, cls.pdp_2]))
+                                               package_delivery_plans=[cls.pdp_1, cls.pdp_2])
 
     def test_cell(self):
         expected_grid_location = GridLocation(10, 15)
@@ -50,9 +50,9 @@ class BasicCellTestCase(unittest.TestCase):
                                              pitch=Angle(90, AngleUnit.DEGREE),
                                              package_type=PackageType.TINY)
 
-        expected_pdp_list = PackageDeliveryPlanList([expected_pdp_1, expected_pdp_2])
+        expected_pdp_list = [expected_pdp_1, expected_pdp_2]
 
         self.assertEqual(self.envelope_cell_1.location, expected_grid_location)
         self.assertEqual(self.envelope_cell_1.drone_azimuth, expected_angle)
         self.assertEqual(self.envelope_cell_1.package_delivery_plans, expected_pdp_list)
-        self.assertEqual(self.envelope_cell_1.package_delivery_plans.ids, expected_pdp_list.ids)
+        self.assertEqual(self.envelope_cell_1.package_delivery_plans_ids(), [pdp.id for pdp in expected_pdp_list])
