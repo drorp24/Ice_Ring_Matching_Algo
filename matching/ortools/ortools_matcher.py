@@ -1,7 +1,6 @@
 # from ice_ring.diagnoses.monitor import Monitor
 # from ice_ring.graph.graph_handler import GraphDataType
 # from ice_ring.matching.matching_solution import MatchingSolution
-from dataclasses import dataclass
 
 from ortools.constraint_solver import pywrapcp
 
@@ -37,7 +36,7 @@ class ORToolsMatcher:
         solution = self._solve()
 
         # return the solution
-        return self._create_match_solution(solution,monitor)
+        return self._create_match_solution(solution, monitor)
 
     @property
     def input(self):
@@ -56,25 +55,25 @@ class ORToolsMatcher:
         """Returns the priority of the node."""
         # Convert from routing variable Index to priorities NodeIndex.
         from_node = self._manager.IndexToNode(from_index)
-        return self._input.priorities[from_node]
+        return self._graph_exporter.export_priorities(self._input.graph)[from_node]
 
     # Create and register a transit callback.
     def _time_callback(self, from_index, to_index):
         # Convert from routing variable Index to time matrix NodeIndex.
         from_node = self._manager.IndexToNode(from_index)
         to_node = self._manager.IndexToNode(to_index)
-        return self._input.graph.travel_weights[from_node][to_node]
+        return self._graph_exporter.export_travel_times(self._input.graph)[from_node][to_node]
 
     # Add Capacity constraint.
     def _demand_callback(self, from_index):
         # Convert from routing variable Index to demands NodeIndex.
         from_node = self._manager.IndexToNode(from_index)
-        return self._input.graph.packages_per_request[from_node]
+        package_type = self._input.empty_board.empty_drone_deliveries[0].drone_formation.get_package_types()[0]
+        return self._graph_exporter.export_package_type_demands(self._input.graph, package_type)[from_node]
 
     def _solve(self):
         # Solve the problem.
         solution = self._routing.SolveWithParameters(self._search_parameters)
-        #print(function_name(self, inspect.currentframe()), "solution objective value=", solution.ObjectiveValue())
         return solution
 
     def _add_priority_objective(self):
@@ -95,9 +94,11 @@ class ORToolsMatcher:
         self._routing = pywrapcp.RoutingModel(self._manager)
 
     def _set_manager(self):
-        self._manager = pywrapcp.RoutingIndexManager(len(self._input.graph.travel_weights),
+        travel_times = self._graph_exporter.export_travel_times(self._input.graph)
+        self._manager = pywrapcp.RoutingIndexManager(len(travel_times),
                                                      self._input.empty_board.num_of_formations,
-                                                     self._input.graph.depos)
+                                                     self._graph_exporter.export_basis_nodes_indices(self._input.graph)[
+                                                         0])
 
     def _add_demand_constraints(self):
         # Register Demand Callback
@@ -106,7 +107,7 @@ class ORToolsMatcher:
             demand_callback_index,
             0,  # null capacity slack
             self._input.empty_board.formation_capacities,  # vehicle maximum capacities
-            self._input.config.count_capacity_from_zero,  # start cumul to zero
+            self._input.config.constraints.capacity.count_capacity_from_zero,  # start cumul to zero
             'Capacity')
 
     def _add_time_constraints(self):
@@ -118,13 +119,14 @@ class ORToolsMatcher:
         time = 'Time'
         self._routing.AddDimension(
             transit_callback_index,
-            self._input.config.waiting_time_allowed_min,  # allow waiting time
-            self._input.config.max_total_drone_time_min,  # maximum time per vehicle
-            self._input.config.count_time_from_zero,  # Don't force start cumul to zero.
+            self._input.config.constraints.time.waiting_time_allowed_min,  # allow waiting time
+            self._input.config.constraints.time.max_total_drone_time_min,  # maximum time per vehicle
+            self._input.config.constraints.time.count_time_from_zero,  # Don't force start cumul to zero.
             time)
         time_dimension = self._routing.GetDimensionOrDie(time)
+        time_windows = self._graph_exporter.export_time_windows(self._input.graph, self._input.config.zero_time)
         # Add time window constraints for each location except depot.
-        for location_idx, time_window in enumerate(self._input.graph.time_windows):
+        for location_idx, time_window in enumerate(time_windows):
             if location_idx == 0:
                 continue
             index = self._manager.NodeToIndex(location_idx)
@@ -132,8 +134,8 @@ class ORToolsMatcher:
         # Add time window constraints for each vehicle start node.
         for vehicle_id in range(len(self._input.empty_board.empty_drone_deliveries)):
             index = self._routing.Start(vehicle_id)
-            time_dimension.CumulVar(index).SetRange(self._input.graph.time_windows[0][0],
-                                                    self._input.graph.time_windows[0][1])
+            time_dimension.CumulVar(index).SetRange(time_windows[0][0],
+                                                    time_windows[0][1])
         # Instantiate route start and end times to produce feasible times.
         for i in range(len(self._input.empty_board.empty_drone_deliveries)):
             self._routing.AddVariableMinimizedByFinalizer(
@@ -148,10 +150,10 @@ class ORToolsMatcher:
         self._search_parameters.first_solution_strategy = ORToolsStrategyFactory.create_first_solution_strategy(
             self._input.config.first_solution_strategy)
         self._search_parameters.local_search_metaheuristic = ORToolsStrategyFactory.create_local_search_solver(
-            self._input.config.solver)
+            self._input.config.solver.name)
 
         # search_parameters.solution_limit = 5
-        self._search_parameters.time_limit.seconds = self._input.config.time_limit_sec
+        self._search_parameters.time_limit.seconds = self._input.config.solver.timeout_sec
         # self._search_parameters.log_search = self._input.config.log_search
 
     def _create_match_solution(self, solution, monitor):

@@ -1,14 +1,42 @@
 {
-  "match_config":
-    {
-      "solver_name": "or_tools:automatic",
-      "dropped_penalty": 5,
-      "waiting_time_allowed_min": 10,
-      "max_total_drone_time_min": 300,
-      "count_time_from_zero": false,
-      "count_capacity_from_zero": true,
-      "count_priority_from_zero": true,
-      "first_solution_strategy": "or_tools:path_cheapest_arc",
-      "time_limit_sec": 30
-    }
+    "__class__": "MatchConfig",
+    "zero_time": {
+      "__class__": "DateTimeExtension",
+      "date": {
+        "day": 23,
+        "month": 1,
+        "year": 2020
+      },
+      "time": {
+        "hour": 11,
+        "minute": 30,
+        "second": 0
+      }
+    },
+    "first_solution_strategy": "or_tools:path_cheapest_arc",
+    "solver" : {
+      "__class__": "MatchSolver",
+      "name": "or_tools:automatic",
+      "timeout_sec": 30
+    },
+    "constraints": {
+      "__class__": "MatchConstraints",
+      "capacity": {
+        "__class__": "CapacityConstraints",
+        "count_capacity_from_zero": true
+      },
+      "time": {
+        "__class__": "TimeConstraints",
+        "waiting_time_allowed_min": 10,
+        "max_total_drone_time_min": 300,
+        "count_time_from_zero": false
+      },
+      "priority": {
+        "__class__": "PriorityConstraints",
+        "count_priority_from_zero": true
+      }
+    },
+    "dropped_penalty": 5
  }
+
+

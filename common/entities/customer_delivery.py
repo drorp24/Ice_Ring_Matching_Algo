@@ -48,7 +48,7 @@ DEFAULT_PDP_DISTRIB = PackageDeliveryPlanDistribution(DEFAULT_DROP_POINT_DISTRIB
 
 
 class CustomerDeliveryDistribution(Distribution):
-    def __init__(self, package_delivery_plan_distributions=None):
+    def __init__(self, package_delivery_plan_distributions: [PackageDeliveryPlanDistribution] = None):
         if package_delivery_plan_distributions is None:
             package_delivery_plan_distributions = [DEFAULT_PDP_DISTRIB]
         self._pdp_distributions = package_delivery_plan_distributions
