@@ -13,7 +13,7 @@ from geometry.geo_factory import create_point_2d
 from grid.azimuth_options import AzimuthOptions
 from grid.grid_cell import GridCell, EnvelopeGridCell
 from grid.grid_cell_services import GridCellServices
-from grid.delivery_request_envelope_cells import PotentialEnvelope, DeliveryRequestPotentialEnvelope
+from grid.delivery_request_envelope_cells import PotentialEnvelope, DeliveryRequestPotentialEnvelopes
 from grid.grid_location import GridLocation, GridLocationServices
 from grid.grid_service import GridService
 from grid.slides_factory import generate_slides_container
@@ -65,7 +65,7 @@ class BasicDeliveryRequestEnvelopeCellsTestCase(unittest.TestCase):
                                        DateTimeExtension(dt_date=date(2021, 1, 1), dt_time=time(6, 0, 0))),
                                    priority=1)
 
-        cls.delivery_requests_envelope_cells = DeliveryRequestPotentialEnvelope(cls.slides_container, cls.dr_1)
+        cls.delivery_requests_envelope_cells = DeliveryRequestPotentialEnvelopes(cls.slides_container, cls.dr_1)
         cls.delivery_requests_envelope_cells_dict_do_1 = cls.delivery_requests_envelope_cells.delivery_options_cells[0]
 
     def test_drone_azimuth(self):

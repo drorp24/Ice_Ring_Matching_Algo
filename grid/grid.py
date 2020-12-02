@@ -3,7 +3,7 @@ from statistics import mean
 from typing import List
 from common.entities.delivery_request import DeliveryRequest
 from grid.grid_cell_services import GridCellServices
-from grid.delivery_request_envelope_cells import DeliveryRequestPotentialEnvelope
+from grid.delivery_request_envelope_cells import DeliveryRequestPotentialEnvelopes
 from grid.slides_container import SlidesContainer
 from services.delivery_request_distance_service_interface import DeliveryRequestDistanceServiceInterface
 
@@ -19,7 +19,7 @@ class DeliveryRequestsGrid(DeliveryRequestDistanceServiceInterface):
 
     @staticmethod
     def _create_delivery_requests_envelope_cells(slides_container, delivery_requests):
-        return {delivery_request: DeliveryRequestPotentialEnvelope(slides_container, delivery_request)
+        return {delivery_request: DeliveryRequestPotentialEnvelopes(slides_container, delivery_request)
                 for delivery_request in delivery_requests}
 
     def get_distance_between_delivery_options(self, delivery_request1: DeliveryRequest,

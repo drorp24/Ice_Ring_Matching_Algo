@@ -33,10 +33,10 @@ class PotentialEnvelope:
         return list(self._envelope_cells.values())
 
 
-class DeliveryRequestPotentialEnvelope:
+class DeliveryRequestPotentialEnvelopes:
     def __init__(self, slides_container: SlidesContainer, delivery_request: DeliveryRequest):
         self._delivery_options_cells = list(map(PotentialEnvelope, list(
-            map(DeliveryRequestPotentialEnvelope._get_delivery_request_envelope_cells, repeat(slides_container),
+            map(DeliveryRequestPotentialEnvelopes._get_delivery_request_envelope_cells, repeat(slides_container),
                 delivery_request.delivery_options))))
 
     @property
@@ -47,14 +47,14 @@ class DeliveryRequestPotentialEnvelope:
     def _get_delivery_request_envelope_cells(slides_container: SlidesContainer, delivery_option: DeliveryOption) -> \
             List[EnvelopeGridCell]:
         scale_grid_locations = list(
-            map(DeliveryRequestPotentialEnvelope._get_scaled_grid_locations, repeat(slides_container),
+            map(DeliveryRequestPotentialEnvelopes._get_scaled_grid_locations, repeat(slides_container),
                 delivery_option.package_delivery_plans))
 
         average_locations = list(
             map(GridLocationServices.calc_average, list(zip(*scale_grid_locations))))
 
         average_package_delivery_list = list(
-            map(DeliveryRequestPotentialEnvelope._get_package_delivery_list, list(
+            map(DeliveryRequestPotentialEnvelopes._get_package_delivery_list, list(
                 map(GridLocationServices.get_not_empty_indices, list(zip(*scale_grid_locations)))),
                 repeat(delivery_option.package_delivery_plans)))
 
@@ -75,8 +75,8 @@ class DeliveryRequestPotentialEnvelope:
                                                                  slides_container.cell_height_resolution)
 
         scale_to_grid = list(map(GridService.scale_to_grid, repeat(drop_point_grid_location),
-                                 DeliveryRequestPotentialEnvelope._get_envelope_location_values(slides_container,
-                                                                                                package_delivery_plan)))
+                                 DeliveryRequestPotentialEnvelopes._get_envelope_location_values(slides_container,
+                                                                                                 package_delivery_plan)))
 
         return scale_to_grid
 
@@ -85,7 +85,7 @@ class DeliveryRequestPotentialEnvelope:
                                       package_delivery_plan: PackageDeliveryPlan):
         return list(map(slides_container.get_envelope_location,
                         AzimuthOptions(slides_container.get_drone_azimuth_resolution).values,
-                        DeliveryRequestPotentialEnvelope._get_drop_azimuth_values(slides_container, package_delivery_plan),
+                        DeliveryRequestPotentialEnvelopes._get_drop_azimuth_values(slides_container, package_delivery_plan),
                         repeat(package_delivery_plan.package_type))
                     )
 
