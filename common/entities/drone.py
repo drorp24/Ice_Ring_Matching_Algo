@@ -13,8 +13,7 @@ class PlatformType(JsonableBaseEntity, Enum):
 
     @classmethod
     def dict_to_obj(cls, dict_input):
-        return PlatformType[dict_input['platform_type']]
-
+        return PlatformType[dict_input['name']]
 
 
 class _PackageTypesVolumeMap:

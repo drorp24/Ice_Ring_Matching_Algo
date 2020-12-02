@@ -64,7 +64,7 @@ class TestORToolsMatcher(TestCase):
         small_graph = OperationalGraph(datetime(2020, 1, 23, 11, 30, 00))
         # small_graph = cls.create_graph(cls.delivery_requests)  # TODO: create real graph
         empty_board = cls.create_empty_drone_delivery_board()
-        config = MatchConfig.from_file(Path('matching/test/match_config1.json'))
+        config = MatchConfig.from_file(Path('matching/test/test_matcher_config.json'))
 
         cls.small_match_input = MatchInput(small_graph, empty_board, config)
         cls.expected_matched_board = cls.create_drone_delivery_board(empty_board.empty_drone_deliveries[0],

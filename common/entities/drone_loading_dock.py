@@ -50,7 +50,7 @@ class DroneLoadingDock(JsonableBaseEntity, Localizable, Temporal):
 
     @classmethod
     def dict_to_obj(cls, dict_input):
-        return DroneLoadingDock(drone_loading_station=DroneLoadingStation.dict_to_obj(dict_input['loading_station']),
+        return DroneLoadingDock(drone_loading_station=DroneLoadingStation.dict_to_obj(dict_input['drone_loading_station']),
                                 platform_type=PlatformType.dict_to_obj(dict_input['platform_type']),
                                 time_window=TimeWindowExtension.dict_to_obj(dict_input['time_window']))
 
