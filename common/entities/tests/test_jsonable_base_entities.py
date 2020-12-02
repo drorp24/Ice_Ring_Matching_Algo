@@ -8,7 +8,7 @@ from common.entities.delivery_request import DeliveryRequestDistribution, Delive
 from common.entities.package_delivery_plan import PackageDeliveryPlan, PackageDeliveryPlanDistribution
 
 
-class BasicPackageTestCase(unittest.TestCase):
+class JsonableBaseEntitiesTestCase(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
