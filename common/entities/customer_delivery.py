@@ -45,23 +45,24 @@ class CustomerDelivery(JsonableBaseEntity, Localizable):
                                     dict_input['package_delivery_plans']])
 
 
-DEFAULT_DROP_POINT_DISTRIB = DEFAULT_ZERO_LOCATION_DISTRIBUTION
-DEFAULT_PDP_DISTRIB = PackageDeliveryPlanDistribution(DEFAULT_DROP_POINT_DISTRIB,
+DEFAULT_RELATIVE_DROP_POINT_DISTRIB = DEFAULT_ZERO_LOCATION_DISTRIBUTION
+DEFAULT_PDP_DISTRIB = PackageDeliveryPlanDistribution(DEFAULT_RELATIVE_DROP_POINT_DISTRIB,
                                                       DEFAULT_AZI_DISTRIB,
                                                       DEFAULT_PITCH_DISTRIB,
                                                       DEFAULT_PACKAGE_DISTRIB)
 
 
 class CustomerDeliveryDistribution(Distribution):
-    def __init__(self, relative_location_distribution: PointLocationDistribution = DEFAULT_DROP_POINT_DISTRIB,
+    def __init__(self, relative_location_distribution: PointLocationDistribution = DEFAULT_RELATIVE_DROP_POINT_DISTRIB,
                  package_delivery_plan_distributions: [PackageDeliveryPlanDistribution] = [DEFAULT_PDP_DISTRIB]):
         self._relative_location_distribution = relative_location_distribution
         self._pdp_distributions = package_delivery_plan_distributions
 
     def choose_rand(self, random: Random, base_location: Point2D = create_point_2d(0, 0),
                     amount: int = 1, num_pdp: int = 1) -> List[CustomerDelivery]:
-        relative_locations = self._relative_location_distribution.choose_rand(random, amount)
-        pdp_distributions = UniformChoiceDistribution(self._pdp_distributions).choose_rand(random, amount=1)[0]
+        relative_locations = self._relative_location_distribution.choose_rand(random=random, amount=amount)
+        pdp_distributions = UniformChoiceDistribution(self._pdp_distributions).choose_rand(random=random, amount=1)[0]
         return [CustomerDelivery(
-            pdp_distributions.choose_rand(random, amount=num_pdp, base_location=base_location + relative_locations[i]))
+            pdp_distributions.choose_rand(random=random, amount=num_pdp,
+                                          base_loc=base_location + relative_locations[i]))
             for i in list(range(amount))]

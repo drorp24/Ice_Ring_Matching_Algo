@@ -54,18 +54,12 @@ class Angle(JsonableBaseEntity):
         return Angle(self.degrees + AngleUnit.DEGREE.cyclic_value / 2, AngleUnit.DEGREE)
 
     def calc_abs_difference(self, other: Angle) -> Angle:
-        self.validate_equal_angle_units(other)
         angle_1 = _calc_first_cycle_equivalent(self)
         angle_2 = _calc_first_cycle_equivalent(other)
         return Angle(abs(angle_1.degrees - angle_2.degrees), AngleUnit.DEGREE)
 
     def difference(self, other: Angle) -> Angle:
-        self.validate_equal_angle_units(other)
         return Angle(self.degrees - other.degrees, AngleUnit.DEGREE)
-
-    def validate_equal_angle_units(self, other):
-        if self.__unit is not other.__unit:
-            raise ValueError("error, angle units are not equal")
 
     def __str__(self):
         return "Angle ({0}, {1})".format(self.__value, self.__unit)

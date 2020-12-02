@@ -105,7 +105,7 @@ class DeliveryRequestDistribution(Distribution):
         time_window_distributions = self._time_window_distributions.choose_rand(random, amount)
         priority_distribution = self._priority_distribution.choose_rand(random, amount)
         return [DeliveryRequest(
-            do_distribution.choose_rand(random=random, base_location=base_location + relative_locations[i],
+            do_distribution.choose_rand(random=random, base_loc=base_location + relative_locations[i],
                                         amount=num_do, num_cd=num_cd, num_pdp=num_pdp),
             time_window_distributions[i], priority_distribution[i]) for i in list(range(amount))]
 

@@ -100,10 +100,10 @@ class PackageDeliveryPlanDistribution(Distribution):
         self._package_type_distribution = package_type_distribution
 
     def choose_rand(self, random: Random,
-                    base_location: Point2D = create_point_2d(0, 0), amount: int = 1) -> List[PackageDeliveryPlan]:
-        relative_drop_points = self._relative_drop_point_distribution.choose_rand(random, amount)
-        azimuths = self._azimuth_distribution.choose_rand(random, amount)
-        pitches = self._pitch_distribution.choose_rand(random, amount)
-        packages = self._package_type_distribution.choose_rand(random, amount)
-        return [PackageDeliveryPlan(dp + base_location, az, el, pk) for (dp, az, el, pk) in
-                zip(relative_drop_points, azimuths, pitches, packages)]
+                    base_loc: Point2D = create_point_2d(0, 0), amount: int = 1) -> List[PackageDeliveryPlan]:
+        relative_drop_points = self._relative_drop_point_distribution.choose_rand(random=random, amount=amount)
+        azimuths = self._azimuth_distribution.choose_rand(random=random, amount=amount)
+        pitches = self._pitch_distribution.choose_rand(random=random, amount=amount)
+        packages = self._package_type_distribution.choose_rand(random=random, amount=amount)
+        return [PackageDeliveryPlan(drop_point=dp + base_loc, azimuth=az, pitch=ptc, package_type=p_t) for
+                (dp, az, ptc, p_t) in zip(relative_drop_points, azimuths, pitches, packages)]
