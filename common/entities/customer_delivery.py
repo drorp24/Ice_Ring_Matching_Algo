@@ -17,7 +17,7 @@ class CustomerDelivery(JsonableBaseEntity, Localizable):
         self._package_delivery_plans = package_delivery_plans
 
     @property
-    def package_delivery_plans(self) -> [PackageDeliveryPlan]:
+    def package_delivery_plans(self) -> List[PackageDeliveryPlan]:
         return self._package_delivery_plans
 
     def calc_location(self) -> Point2D:
