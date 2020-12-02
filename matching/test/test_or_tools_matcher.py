@@ -3,6 +3,7 @@ from random import Random
 from unittest import TestCase
 from datetime import datetime
 
+from common.entities.base_entity import JsonableBaseEntity
 from common.entities.customer_delivery import CustomerDeliveryDistribution
 from common.entities.delivery_option import DeliveryOptionDistribution
 from common.entities.delivery_request import DeliveryRequest
@@ -22,13 +23,14 @@ from matching.matcher import MatchInput, MatchConfig
 from matching.ortools.ortools_matcher import ORToolsMatcher
 
 
-class TestORToolsMatcher(TestCase):
+class ORToolsMatcherBasicTestCase(TestCase):
     @classmethod
     def setUpClass(cls):
         cls.delivery_requests = cls.create_delivery_requests()
         small_graph = cls.create_graph(cls.delivery_requests)
         empty_board = cls.create_empty_drone_delivery_board()
-        config = MatchConfig.from_file(Path('matching/test/match_config1.json'))
+        do_dict = JsonableBaseEntity.json_to_dict(Path('matching/test/match_config1.json'))
+        config = MatchConfig.dict_to_obj(do_dict)
         cls.small_match_input = MatchInput(small_graph, empty_board, config)
         cls.expected_matched_board = cls.create_drone_delivery_board(empty_board.empty_drone_deliveries[0],
                                                                      empty_board.empty_drone_deliveries[1],

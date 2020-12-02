@@ -1,7 +1,6 @@
 # from ice_ring.diagnoses.monitor import Monitor
 # from ice_ring.graph.graph_handler import GraphDataType
 # from ice_ring.matching.matching_solution import MatchingSolution
-from dataclasses import dataclass
 
 from ortools.constraint_solver import pywrapcp
 
@@ -37,7 +36,7 @@ class ORToolsMatcher:
         solution = self._solve()
 
         # return the solution
-        return self._create_match_solution(solution,monitor)
+        return self._create_match_solution(solution, monitor)
 
     @property
     def input(self):
@@ -98,7 +97,8 @@ class ORToolsMatcher:
         travel_times = self._graph_exporter.export_travel_times(self._input.graph)
         self._manager = pywrapcp.RoutingIndexManager(len(travel_times),
                                                      self._input.empty_board.num_of_formations,
-                                                     self._graph_exporter.export_basis_nodes_indices(self._input.graph)[0])
+                                                     self._graph_exporter.export_basis_nodes_indices(self._input.graph)[
+                                                         0])
 
     def _add_demand_constraints(self):
         # Register Demand Callback
@@ -107,7 +107,7 @@ class ORToolsMatcher:
             demand_callback_index,
             0,  # null capacity slack
             self._input.empty_board.formation_capacities,  # vehicle maximum capacities
-            self._input.config.count_capacity_from_zero,  # start cumul to zero
+            self._input.config.constraints.capacity.count_capacity_from_zero,  # start cumul to zero
             'Capacity')
 
     def _add_time_constraints(self):
@@ -119,9 +119,9 @@ class ORToolsMatcher:
         time = 'Time'
         self._routing.AddDimension(
             transit_callback_index,
-            self._input.config.waiting_time_allowed_min,  # allow waiting time
-            self._input.config.max_total_drone_time_min,  # maximum time per vehicle
-            self._input.config.count_time_from_zero,  # Don't force start cumul to zero.
+            self._input.config.constraints.time.waiting_time_allowed_min,  # allow waiting time
+            self._input.config.constraints.time.max_total_drone_time_min,  # maximum time per vehicle
+            self._input.config.constraints.time.count_time_from_zero,  # Don't force start cumul to zero.
             time)
         time_dimension = self._routing.GetDimensionOrDie(time)
         time_windows = self._graph_exporter.export_time_windows(self._input.graph, self._input.config.zero_time)
@@ -150,10 +150,10 @@ class ORToolsMatcher:
         self._search_parameters.first_solution_strategy = ORToolsStrategyFactory.create_first_solution_strategy(
             self._input.config.first_solution_strategy)
         self._search_parameters.local_search_metaheuristic = ORToolsStrategyFactory.create_local_search_solver(
-            self._input.config.solver)
+            self._input.config.solver.name)
 
         # search_parameters.solution_limit = 5
-        self._search_parameters.time_limit.seconds = self._input.config.time_limit_sec
+        self._search_parameters.time_limit.seconds = self._input.config.solver.timeout_sec
         # self._search_parameters.log_search = self._input.config.log_search
 
     def _create_match_solution(self, solution, monitor):
