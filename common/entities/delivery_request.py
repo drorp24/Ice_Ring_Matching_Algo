@@ -1,22 +1,24 @@
 from __future__ import annotations
 
+from dataclasses import dataclass
 from datetime import timedelta, time, date
 from random import Random
 from typing import List
 
-from common.entities.disribution.distribution import UniformChoiceDistribution, Distribution
 from common.entities.base_entity import JsonableBaseEntity
 from common.entities.customer_delivery import CustomerDeliveryDistribution
 from common.entities.delivery_option import DeliveryOption, DeliveryOptionDistribution, DEFAULT_CD_DISTRIB
+from common.entities.disribution.distribution import UniformChoiceDistribution, Distribution
 from common.entities.package import PackageDistribution
-from common.entities.package_delivery_plan import PackageDeliveryPlanDistribution, DEFAULT_DROP_POINT_DISTRIB, \
+from common.entities.package_delivery_plan import PackageDeliveryPlanDistribution, \
     DEFAULT_PITCH_DISTRIB, DEFAULT_PACKAGE_DISTRIB, DEFAULT_AZI_DISTRIB
 from common.entities.temporal import TimeWindowDistribution, TimeWindowExtension, DateTimeDistribution, \
     TimeDeltaExtension, TimeDeltaDistribution, DateTimeExtension, Temporal
 from common.math.angle import AngleUniformDistribution
 from geometry.geo2d import Point2D
-from geometry.geo_distribution import UniformPointInBboxDistribution
-from geometry.geo_factory import calc_centroid
+from geometry.geo_distribution import PointLocationDistribution, UniformPointInBboxDistribution, \
+    DEFAULT_ZERO_LOCATION_DISTRIBUTION
+from geometry.geo_factory import calc_centroid, create_point_2d
 from geometry.utils import Localizable
 
 
@@ -75,45 +77,62 @@ def create_default_time_window_for_delivery_request():
     return TimeWindowDistribution(DateTimeDistribution(default_dt_options), default_time_delta_distrib)
 
 
-DEFAULT_DO_DISTRIB = DeliveryOptionDistribution([DEFAULT_CD_DISTRIB])
+DEFAULT_DO_DISTRIB = DeliveryOptionDistribution(relative_location_distribution=DEFAULT_ZERO_LOCATION_DISTRIBUTION,
+                                                customer_delivery_distributions=[DEFAULT_CD_DISTRIB])
 
 DEFAULT_TW_DISRIB = create_default_time_window_for_delivery_request()
 
 DEFAULT_PRIORITY_DISTRIB = PriorityDistribution(list(range(0, 100, 3)))
 
+DEFAULT_LOC_DISTRIB = UniformPointInBboxDistribution(0, 100, 0, 100)
+
 
 class DeliveryRequestDistribution(Distribution):
-    def __init__(self, delivery_option_distributions: [DeliveryOptionDistribution] = [DEFAULT_DO_DISTRIB],
+    def __init__(self,
+                 relative_location_distribution: PointLocationDistribution = DEFAULT_LOC_DISTRIB,
+                 delivery_option_distributions: [DeliveryOptionDistribution] = [DEFAULT_DO_DISTRIB],
                  time_window_distributions: TimeWindowDistribution = DEFAULT_TW_DISRIB,
                  priority_distribution: PriorityDistribution = DEFAULT_PRIORITY_DISTRIB):
+        self._relative_location_distribution = relative_location_distribution
         self._do_distribution_options = delivery_option_distributions
         self._time_window_distributions = time_window_distributions
         self._priority_distribution = priority_distribution
 
-    def choose_rand(self, random: Random, amount: int = 1, num_do: int = 1, num_cd: int = 1, num_pdp: int = 1) -> \
-            List[DeliveryRequest]:
-        do_distributions = UniformChoiceDistribution(self._do_distribution_options).choose_rand(random, amount)
+    def choose_rand(self, random: Random, base_location: Point2D = create_point_2d(0, 0),
+                    amount: int = 1, num_do: int = 1, num_cd: int = 1, num_pdp: int = 1) -> List[DeliveryRequest]:
+        relative_locations = self._relative_location_distribution.choose_rand(random, amount)
+        do_distribution = UniformChoiceDistribution(self._do_distribution_options).choose_rand(random, 1)[0]
         time_window_distributions = self._time_window_distributions.choose_rand(random, amount)
         priority_distribution = self._priority_distribution.choose_rand(random, amount)
-
         return [DeliveryRequest(
-            do_distributions[i].choose_rand(random=random, amount=num_do, num_cd=num_cd, num_pdp=num_pdp),
+            do_distribution.choose_rand(random=random, base_loc=base_location + relative_locations[i],
+                                        amount=num_do, num_cd=num_cd, num_pdp=num_pdp),
             time_window_distributions[i], priority_distribution[i]) for i in list(range(amount))]
 
 
-def generate_dr_distribution(drop_point_distribution: UniformPointInBboxDistribution = DEFAULT_DROP_POINT_DISTRIB,
-                             azimuth_distribution: AngleUniformDistribution = DEFAULT_AZI_DISTRIB,
-                             pitch_distribution: UniformChoiceDistribution = DEFAULT_PITCH_DISTRIB,
-                             package_type_distribution: PackageDistribution = DEFAULT_PACKAGE_DISTRIB,
-                             priority_distribution: PriorityDistribution = DEFAULT_PRIORITY_DISTRIB,
-                             time_window_distribution: TimeWindowDistribution = DEFAULT_TW_DISRIB):
-    pdp_distribution = PackageDeliveryPlanDistribution(drop_point_distribution=drop_point_distribution,
-                                                       azimuth_distribution=azimuth_distribution,
-                                                       pitch_distribution=pitch_distribution,
-                                                       package_type_distribution=package_type_distribution)
-    pdp_distribution = [pdp_distribution]
-    cd_distribution = [CustomerDeliveryDistribution(pdp_distribution)]
-    do_distribution = [DeliveryOptionDistribution(cd_distribution)]
-    return DeliveryRequestDistribution(delivery_option_distributions=do_distribution,
-                                       priority_distribution=priority_distribution,
-                                       time_window_distributions=time_window_distribution)
+def build_delivery_request_distribution(
+        relative_dr_location_distribution: PointLocationDistribution = DEFAULT_ZERO_LOCATION_DISTRIBUTION,
+        relative_do_location_distribution: PointLocationDistribution = DEFAULT_ZERO_LOCATION_DISTRIBUTION,
+        relative_cd_location_distribution: PointLocationDistribution = DEFAULT_ZERO_LOCATION_DISTRIBUTION,
+        relative_pdp_location_distribution: PointLocationDistribution = DEFAULT_ZERO_LOCATION_DISTRIBUTION,
+        azimuth_distribution: AngleUniformDistribution = DEFAULT_AZI_DISTRIB,
+        pitch_distribution: AngleUniformDistribution = DEFAULT_PITCH_DISTRIB,
+        package_type_distribution: PackageDistribution = DEFAULT_PACKAGE_DISTRIB,
+        priority_distribution: PriorityDistribution = DEFAULT_PRIORITY_DISTRIB,
+        time_window_distribution: TimeWindowDistribution = DEFAULT_TW_DISRIB) -> DeliveryRequestDistribution:
+    pdp_distributions = [PackageDeliveryPlanDistribution(
+        relative_location_distribution=relative_pdp_location_distribution,
+        azimuth_distribution=azimuth_distribution,
+        pitch_distribution=pitch_distribution,
+        package_type_distribution=package_type_distribution)]
+    cd_distributions = [CustomerDeliveryDistribution(
+        package_delivery_plan_distributions=pdp_distributions,
+        relative_location_distribution=relative_cd_location_distribution)]
+    do_distributions = [DeliveryOptionDistribution(
+        customer_delivery_distributions=cd_distributions,
+        relative_location_distribution=relative_do_location_distribution)]
+    return DeliveryRequestDistribution(
+        delivery_option_distributions=do_distributions,
+        priority_distribution=priority_distribution,
+        time_window_distributions=time_window_distribution,
+        relative_location_distribution=relative_dr_location_distribution)

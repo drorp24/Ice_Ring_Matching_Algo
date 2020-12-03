@@ -6,7 +6,7 @@ from matplotlib.testing.compare import compare_images
 from geometry.geo_factory import create_polygon_2d, \
     create_point_2d, create_vector_2d, create_line_string_2d, \
     create_linear_ring_2d
-from visualization.drawer2d_factory import create_drawer2d
+from visualization.basic.pltdrawer2d import create_drawer_2d
 
 
 class DrawGeometriesTestCase(unittest.TestCase):
@@ -25,15 +25,15 @@ class DrawGeometriesTestCase(unittest.TestCase):
         cls.line_string1 = create_line_string_2d([cls.p3, cls.p6, cls.p7, cls.p8])
         cls.poly1 = create_polygon_2d([cls.p1, cls.p2, cls.p3, cls.p4])
         cls.linear_ring1 = create_linear_ring_2d([cls.p1, cls.p2, cls.p5, cls.p6])
-        cls.expected_image_path = Path('visualization/tests/test_drawer2d_expected.png')
-        cls.result_image_path = Path('visualization/tests/test_drawer2d_expected.png')
+        cls.expected_image_path = Path('visualization/basic/tests/images/test_drawer2d_expected.png')
+        cls.result_image_path = Path('visualization/basic/tests/images/test_drawer2d_expected.png')
 
     @classmethod
     def tearDownClass(cls) -> None:
         cls.result_image_path.unlink()
 
     def test_draw(self):
-        drawer = create_drawer2d()
+        drawer = create_drawer_2d()
         drawer.add_point2d(self.p1)
         drawer.add_line_string2d(self.line_string1)
         drawer.add_polygon2d(self.poly1)

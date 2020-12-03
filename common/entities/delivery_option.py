@@ -6,13 +6,15 @@ from typing import List
 from common.entities.customer_delivery import CustomerDelivery
 from common.entities.package_delivery_plan import PackageDeliveryPlan
 
-from common.entities.disribution.distribution import UniformChoiceDistribution, Distribution
 from common.entities.base_entity import JsonableBaseEntity
 from common.entities.customer_delivery import CustomerDelivery, CustomerDeliveryDistribution, DEFAULT_PDP_DISTRIB
-from geometry.geo2d import Point2D
-from geometry.geo_factory import calc_centroid
+from common.entities.disribution.distribution import UniformChoiceDistribution, Distribution
 from common.entities.package import PackageType
 from geometry.utils import Localizable
+from geometry.geo2d import Point2D
+from geometry.geo_distribution import PointLocationDistribution, UniformPointInBboxDistribution, \
+    DEFAULT_ZERO_LOCATION_DISTRIBUTION
+from geometry.geo_factory import calc_centroid, create_point_2d
 
 
 class DeliveryOption(JsonableBaseEntity, Localizable):
@@ -51,14 +53,22 @@ class DeliveryOption(JsonableBaseEntity, Localizable):
         return hash(tuple(self.customer_deliveries))
 
 
-DEFAULT_CD_DISTRIB = CustomerDeliveryDistribution([DEFAULT_PDP_DISTRIB])
+loc_distrib = UniformPointInBboxDistribution(0, 0, 100, 100)
+DEFAULT_CD_DISTRIB = CustomerDeliveryDistribution(relative_location_distribution=loc_distrib,
+                                                  package_delivery_plan_distributions=[DEFAULT_PDP_DISTRIB])
 
 
 class DeliveryOptionDistribution(Distribution):
-    def __init__(self, customer_delivery_distributions: List[CustomerDeliveryDistribution] = DEFAULT_CD_DISTRIB):
+    def __init__(self,
+                 relative_location_distribution: PointLocationDistribution = DEFAULT_ZERO_LOCATION_DISTRIBUTION,
+                 customer_delivery_distributions: List[CustomerDeliveryDistribution] = DEFAULT_CD_DISTRIB):
+        self._relative_location_distribution = relative_location_distribution
         self._customer_delivery_distributions = customer_delivery_distributions
 
-    def choose_rand(self, random: Random, amount: int = 1, num_cd: int = 1, num_pdp: int = 1) -> List[DeliveryOption]:
-        cd_distributions = UniformChoiceDistribution(self._customer_delivery_distributions).choose_rand(random, amount)
-        return [DeliveryOption(cd_distributions[i].choose_rand(random, amount=num_cd, num_pdp=num_pdp)) for i in
-                list(range(amount))]
+    def choose_rand(self, random: Random, base_loc: Point2D = create_point_2d(0, 0),
+                    amount: int = 1, num_cd: int = 1, num_pdp: int = 1) -> List[DeliveryOption]:
+        relative_locations = self._relative_location_distribution.choose_rand(random, amount)
+        cd_distributions = UniformChoiceDistribution(self._customer_delivery_distributions).choose_rand(random, 1)[0]
+        return [DeliveryOption(
+            cd_distributions.choose_rand(random, base_loc=base_loc + relative_locations[i], amount=num_cd,
+                                         num_pdp=num_pdp)) for i in list(range(amount))]

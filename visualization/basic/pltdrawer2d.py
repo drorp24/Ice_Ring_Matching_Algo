@@ -3,9 +3,13 @@ import matplotlib.pyplot as plt
 from matplotlib.patches import Polygon, Circle, PathPatch, Path
 from typing import List
 
-from visualization.drawer2d import Drawer2D
-from visualization.color import Color
+from visualization.basic.drawer2d import Drawer2D
+from visualization.basic.color import Color
 from geometry.geo2d import Point2D, Polygon2D, LineString2D, LinearRing2D
+
+
+def create_drawer_2d() -> Drawer2D:
+    return PltDrawer2D()
 
 
 class PltDrawer2D(Drawer2D):
