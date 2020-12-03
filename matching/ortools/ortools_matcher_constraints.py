@@ -16,7 +16,7 @@ class ORToolsMatcherConstraints:
         self._routing.AddDimensionWithVehicleCapacity(
             demand_callback_index,
             0,
-            self._match_input.empty_board.formation_capacities,
+            self._match_input.empty_board.formation_capacities(),
             self._match_input.config.constraints.capacity.count_capacity_from_zero,
             'Capacity')
 
@@ -48,13 +48,13 @@ class ORToolsMatcherConstraints:
             time_dimension.CumulVar(index).SetRange(time_window[0], time_window[1])
 
         # Add time window constraints for each vehicle start node.
-        for vehicle_id in range(len(self._match_input.empty_board.empty_drone_deliveries)):
+        for vehicle_id in range(len(self._match_input.empty_board.empty_drone_deliveries())):
             index = self._routing.Start(vehicle_id)
             time_dimension.CumulVar(index).SetRange(time_windows[0][0],
                                                     time_windows[0][1])
 
         # Instantiate route start and end times to produce feasible times.
-        for i in range(len(self._match_input.empty_board.empty_drone_deliveries)):
+        for i in range(len(self._match_input.empty_board.empty_drone_deliveries())):
             self._routing.AddVariableMinimizedByFinalizer(
                 time_dimension.CumulVar(self._routing.Start(i)))
             self._routing.AddVariableMinimizedByFinalizer(
