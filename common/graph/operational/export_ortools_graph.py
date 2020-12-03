@@ -1,3 +1,4 @@
+from pprint import pprint
 from typing import Tuple, List
 import numpy as np
 
@@ -30,6 +31,7 @@ class OrtoolsGraphExporter(GraphExporter):
             destination_idx = nodes.index(edge.end_node)
             travel_times[origin_idx, destination_idx] = edge.attributes.cost
             travel_times[destination_idx, origin_idx] = edge.attributes.cost
+        #pprint(travel_times)
         return travel_times.tolist()
 
     def export_basis_nodes_indices(self, graph: OperationalGraph) -> List[int]:
@@ -54,5 +56,6 @@ class OrtoolsGraphExporter(GraphExporter):
         delivery_requests_nodes = list(delivery_requests_nodes[delivery_request_indices])
         delivery_requests = [node.internal_node for node in delivery_requests_nodes]
         base_empty_demands = [0 for base_node in self.export_basis_nodes_indices(graph)]
-        return base_empty_demands + [delivery_request.delivery_options[0].get_amount_of_package_type(package_type)
+        demands = base_empty_demands + [delivery_request.delivery_options[0].get_amount_of_package_type(package_type)
                                      for i, delivery_request in enumerate(delivery_requests)]
+        return demands

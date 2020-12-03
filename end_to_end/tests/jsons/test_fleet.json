@@ -6,23 +6,10 @@
           "MEDIUM": 0.0
         },
         "configuration_policy": {
-          "LARGE_X2": 0.4,
-          "MEDIUM_X4": 0.4,
+          "LARGE_X2": 0.6,
+          "MEDIUM_X4": 0.2,
           "SMALL_X8": 0.2,
           "TINY_X16": 0.0
-        }
-      },
-      "platform_2": {
-        "size": 30,
-        "formation_policy": {
-          "MINI": 1.0,
-          "MEDIUM": 0.0
-        },
-        "configuration_policy": {
-          "LARGE_X4": 0.4,
-          "MEDIUM_X8": 0.4,
-          "SMALL_X16": 0.2,
-          "TINY_X32": 0.0
         }
       }
 }

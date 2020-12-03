@@ -68,7 +68,7 @@ class ORToolsMatcher:
     def _demand_callback(self, from_index):
         # Convert from routing variable Index to demands NodeIndex.
         from_node = self._manager.IndexToNode(from_index)
-        package_type = self._input.empty_board.empty_drone_deliveries[0].drone_formation.get_package_types()[0]
+        package_type = self._input.empty_board.empty_drone_deliveries[0].drone_formation.get_package_types()[3]
         return self._graph_exporter.export_package_type_demands(self._input.graph, package_type)[from_node]
 
     def _solve(self):
@@ -82,7 +82,7 @@ class ORToolsMatcher:
 
     def _add_dropped_penalty(self):
         # add penalty
-        for node in range(1, self._input.empty_board.num_of_formations):
+        for node in range(1, len(self._input.graph.nodes)):
             self._routing.AddDisjunction([self._manager.NodeToIndex(node)], self._input.config.dropped_penalty)
 
     def _set_routing(self):

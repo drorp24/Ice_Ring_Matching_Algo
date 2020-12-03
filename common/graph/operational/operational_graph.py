@@ -67,30 +67,25 @@ class OperationalEdge(object):
 
 class OperationalGraph:
 
-<<<<<<< Temporary merge branch 1:common/graph/operational/delivery_request_graph.py
     def __init__(self, zero_time: datetime):
         self.internal_graph = DiGraph()
         self._zero_time = zero_time
-=======
-    def __init__(self):
-        self._internal_graph = DiGraph()
->>>>>>> Temporary merge branch 2:common/graph/operational/operational_graph.py
 
     @property
     def nodes(self) -> List[OperationalNode]:
-        return self._internal_graph.nodes(data=False)
+        return self.internal_graph.nodes(data=False)
 
     @property
     def edges(self) -> List[OperationalEdge]:
-        internal_edges = self._internal_graph.edges.data(data=True)
+        internal_edges = self.internal_graph.edges.data(data=True)
         return [OperationalEdge(edge[0], edge[1], OperationalEdgeAttribs(edge[2]["cost"])) for edge in
                 internal_edges]
 
     def is_empty(self):
-        return self._internal_graph.nodes.__len__() == 0
+        return self.internal_graph.nodes.__len__() == 0
 
     def set_internal_graph(self, networkx_graph: DiGraph):
-        self._internal_graph = networkx_graph
+        self.internal_graph = networkx_graph
 
     def add_drone_loading_docks(self, drone_loading_docks: [DroneLoadingDock]):
         self.add_operational_nodes([OperationalNode(dl) for dl in drone_loading_docks])
@@ -99,10 +94,10 @@ class OperationalGraph:
         self.add_operational_nodes([OperationalNode(dr) for dr in delivery_requests])
 
     def add_operational_nodes(self, operational_nodes: [OperationalNode]):
-        self._internal_graph.add_nodes_from(operational_nodes)
+        self.internal_graph.add_nodes_from(operational_nodes)
 
     def add_operational_edges(self, operational_edges: [OperationalEdge]):
-        self._internal_graph.add_edges_from([dr.to_tuple() for dr in operational_edges])
+        self.internal_graph.add_edges_from([dr.to_tuple() for dr in operational_edges])
 
     def calc_subgraph_in_time_window(self, time_window_scope: TimeWindowExtension) -> OperationalGraph:
         nodes_at_time = [node for node in self.nodes if node.time_window in time_window_scope]
@@ -120,22 +115,17 @@ class OperationalGraph:
         return OperationalGraph._create_from_extracted_subgraph(extracted_subgraph)
 
     def _extract_internal_subgraph_of_nodes(self, nodes_in_subgraph: [OperationalNode]) -> DiGraph:
-        return DiGraph(self._internal_graph.subgraph(nodes_in_subgraph))
+        return DiGraph(self.internal_graph.subgraph(nodes_in_subgraph))
 
     @staticmethod
     def _create_from_extracted_subgraph(extracted_subgraph: subgraph):
-<<<<<<< Temporary merge branch 1:common/graph/operational/delivery_request_graph.py
-        delivery_request_subgraph = OperationalGraph(datetime(2021, 1, 1))
-        delivery_request_subgraph.set_internal_graph(extracted_subgraph)
-        return delivery_request_subgraph
+        internal_subgraph = OperationalGraph()
+        internal_subgraph.set_internal_graph(extracted_subgraph)
+        return internal_subgraph
 
     @property
     def zero_time(self) -> datetime:
         return self._zero_time
-=======
-        internal_subgraph = OperationalGraph()
-        internal_subgraph.set_internal_graph(extracted_subgraph)
-        return internal_subgraph
 
 
 def assert_node_is_temporal(internal_node) -> None:
@@ -154,4 +144,4 @@ class NonLocalizableNodeException(Exception):
 
 class NonTemporalNodeException(Exception):
     pass
->>>>>>> Temporary merge branch 2:common/graph/operational/operational_graph.py
+

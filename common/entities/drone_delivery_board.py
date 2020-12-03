@@ -32,3 +32,10 @@ class DroneDeliveryBoard:
     @property
     def drone_deliveries(self) -> [DroneDelivery]:
         return self._drone_deliveries
+
+    def __str__(self):
+        s = ""
+        for dd in self._drone_deliveries:
+            for mr in dd.matched_requests:
+                s += "["+ str(mr.delivery_request.priority) + "] "
+        return s

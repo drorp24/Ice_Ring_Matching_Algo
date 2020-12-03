@@ -23,6 +23,25 @@ def add_locally_connected_dr_graph(graph, dr_connection_options: [DeliveryReques
     graph.add_operational_edges(edges)
 
 
+def build_fully_connected_graph(graph: OperationalGraph):
+    nodes = graph.nodes
+    edges = []
+    for origin_node in nodes:
+        for destination_node in nodes:
+            if origin_node != destination_node:
+                if has_overlapping_time_window(origin_node.internal_node, destination_node.internal_node):
+                    edges += [OperationalEdge(origin_node, destination_node,
+                                              OperationalEdgeAttribs(calc_cost(origin_node.internal_node,
+                                                                               destination_node.internal_node)))]
+                else:
+                    edges += [OperationalEdge(origin_node, destination_node,
+                                             OperationalEdgeAttribs(100 + calc_cost(origin_node.internal_node,
+                                                                                    destination_node.internal_node)))]
+        graph.add_operational_edges(edges)
+
+
+
+
 def add_fully_connected_loading_docks(graph: OperationalGraph, drone_loading_docks: [DroneLoadingDock]):
     graph.add_operational_nodes([OperationalNode(dld) for dld in drone_loading_docks])
     dr_in_graph = get_delivery_requests_from_graph(graph)

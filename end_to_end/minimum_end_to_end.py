@@ -80,12 +80,17 @@ class MinimumEnd2End:
 
     def create_graph_model(self, max_cost_to_connect: float) -> OperationalGraph:
         operational_graph = OperationalGraph(self.zero_time.get_internal())
-        add_locally_connected_dr_graph(operational_graph, self.delivery_requests, max_cost_to_connect)
-        add_fully_connected_loading_docks(operational_graph, self.loading_dock)
+        operational_graph.add_drone_loading_docks(self.loading_dock)
+        operational_graph.add_delivery_requests(self.delivery_requests)
+        build_fully_connected_graph(operational_graph)
+        #add_locally_connected_dr_graph(operational_graph, self.delivery_requests, max_cost_to_connect)
+        #add_fully_connected_loading_docks(operational_graph, self.loading_dock)
         return operational_graph
 
     def calc_assignment(self, graph: OperationalGraph, match_config_file: Path) -> DroneDeliveryBoard:
-        match_input = MatchInput(graph, self.empty_drone_delivery_board, MatchConfig.from_file(match_config_file))
+        match_config_dict = MatchConfig.json_to_dict(match_config_file)
+        match_input = MatchInput(graph, self.empty_drone_delivery_board, MatchConfig.dict_to_obj(match_config_dict))
         matcher = ORToolsMatcher(match_input)
         solution = matcher.match()
+        solution.print_solution()
         return solution.delivery_board()

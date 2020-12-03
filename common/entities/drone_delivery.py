@@ -29,6 +29,9 @@ class MatchedDeliveryRequest:
     def __eq__(self, other):
         return self.delivery_request == other.delivery_request and self.delivery_time == other.delivery_time
 
+    def __str__(self):
+        return self.delivery_request.priority
+
 
 class DroneDelivery(EmptyDroneDelivery):
     def __init__(self, id_: str, drone_formation: DroneFormation, matched_requests: [MatchedDeliveryRequest]):
