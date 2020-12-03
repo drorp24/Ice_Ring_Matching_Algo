@@ -5,15 +5,12 @@ class EmptyDroneDeliveryBoard:
     def __init__(self, empty_drone_deliveries: [EmptyDroneDelivery]):
         self._empty_drone_deliveries = empty_drone_deliveries
 
-    @property
     def empty_drone_deliveries(self) -> [EmptyDroneDelivery]:
         return self._empty_drone_deliveries
 
-    @property
-    def num_of_formations(self) -> [int]:
+    def num_of_formations(self) -> int:
         return len(self._empty_drone_deliveries)
 
-    @property
     def formation_capacities(self) -> [int]:
         capacities = []
         for delivery in self._empty_drone_deliveries:

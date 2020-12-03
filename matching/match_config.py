@@ -33,7 +33,7 @@ class MatchSolver(JsonableBaseEntity):
 
 
 class CapacityConstraints(JsonableBaseEntity):
-    def __init__(self, count_capacity_from_zero: bool):
+    def __init__(self, count_capacity_from_zero):
         self._count_capacity_from_zero = count_capacity_from_zero
 
     @classmethod
@@ -44,11 +44,11 @@ class CapacityConstraints(JsonableBaseEntity):
             count_capacity_from_zero=dict_input["count_capacity_from_zero"])
 
     @property
-    def count_capacity_from_zero(self):
+    def count_capacity_from_zero(self) -> bool:
         return self._count_capacity_from_zero
 
     def __eq__(self, other):
-        return (self.count_capacity_from_zero == other.count_capacity_from_zero)
+        return self.count_capacity_from_zero == other.count_capacity_from_zero
 
 
 class TimeConstraints(JsonableBaseEntity):

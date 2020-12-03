@@ -26,7 +26,7 @@ class ORToolsMatchingSolution(MatchingSolution):
                 self._data_matched[MatchingSolutionData.dropped_nodes].append(node)
         # Save solution details into matching_solution for plot and print usage
         time_dimension = routing.GetDimensionOrDie('Time')
-        for vehicle_id in range(match_input.empty_board.num_of_formations):
+        for vehicle_id in range(match_input.empty_board.num_of_formations()):
             nodes_in_route = []
             node_service_time = {}
             node_route_load = {}
@@ -39,7 +39,7 @@ class ORToolsMatchingSolution(MatchingSolution):
                 node_index = manager.IndexToNode(index)
 
                 nodes_in_route.append(node_index)
-                package_type = match_input.empty_board.empty_drone_deliveries[0].drone_formation.get_package_types()[0]
+                package_type = match_input.empty_board.empty_drone_deliveries()[0].drone_formation.get_package_types()[0]
                 package_type_demands = self._matching_handler._graph_exporter.export_package_type_demands(match_input.graph, package_type)
                 route_load += package_type_demands[node_index]
 
@@ -162,7 +162,7 @@ class ORToolsMatchingSolution(MatchingSolution):
 
     def delivery_board(self) -> DroneDeliveryBoard:
         match_input = self._matching_handler.input
-        empty_drone_deliveries = match_input.empty_board.empty_drone_deliveries
+        empty_drone_deliveries = match_input.empty_board.empty_drone_deliveries()
         drone_deliveries = []
         for vehicle_id, vehicle_route in enumerate(self.vehicle_route):
             matched_requests = []

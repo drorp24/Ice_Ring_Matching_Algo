@@ -95,19 +95,21 @@ class ORToolsMatcher:
 
     def _set_manager(self):
         travel_times = self._graph_exporter.export_travel_times(self._input.graph)
+        num_of_formations = self._input.empty_board.num_of_formations()
+        docks_indices = self._graph_exporter.export_basis_nodes_indices(self._input.graph)
         self._manager = pywrapcp.RoutingIndexManager(len(travel_times),
-                                                     self._input.empty_board.num_of_formations,
-                                                     self._graph_exporter.export_basis_nodes_indices(self._input.graph)[
-                                                         0])
+                                                     num_of_formations,
+                                                     docks_indices[0])
 
     def _add_demand_constraints(self):
         # Register Demand Callback
+        #count_capacity_from_zero = self._input.config.constraints.capacity.count_capacity_from_zero()
         demand_callback_index = self._routing.RegisterPositiveUnaryTransitCallback(self._demand_callback)
         self._routing.AddDimensionWithVehicleCapacity(
             demand_callback_index,
             0,  # null capacity slack
-            self._input.empty_board.formation_capacities,  # vehicle maximum capacities
-            self._input.config.constraints.capacity.count_capacity_from_zero,  # start cumul to zero
+            self._input.empty_board.formation_capacities(),  # vehicle maximum capacities
+            True,  # start cumul to zero
             'Capacity')
 
     def _add_time_constraints(self):
@@ -132,12 +134,12 @@ class ORToolsMatcher:
             index = self._manager.NodeToIndex(location_idx)
             time_dimension.CumulVar(index).SetRange(time_window[0], time_window[1])
         # Add time window constraints for each vehicle start node.
-        for vehicle_id in range(len(self._input.empty_board.empty_drone_deliveries)):
+        for vehicle_id in range(len(self._input.empty_board.empty_drone_deliveries())):
             index = self._routing.Start(vehicle_id)
             time_dimension.CumulVar(index).SetRange(time_windows[0][0],
                                                     time_windows[0][1])
         # Instantiate route start and end times to produce feasible times.
-        for i in range(len(self._input.empty_board.empty_drone_deliveries)):
+        for i in range(len(self._input.empty_board.empty_drone_deliveries())):
             self._routing.AddVariableMinimizedByFinalizer(
                 time_dimension.CumulVar(self._routing.Start(i)))
             self._routing.AddVariableMinimizedByFinalizer(
