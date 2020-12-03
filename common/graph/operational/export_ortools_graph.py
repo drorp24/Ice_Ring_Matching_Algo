@@ -25,13 +25,14 @@ class OrtoolsGraphExporter(GraphExporter):
     def export_travel_times(self, graph: OperationalGraph) -> List[List[int]]:
         nodes = list(graph.nodes)
         edges = list(graph.edges)
-        travel_times = np.zeros((len(nodes), len(nodes)))
+        travel_times = np.inf *np.ones((len(nodes), len(nodes)))
+        for i in range(len(nodes)):
+            travel_times[i,i] = 0
         for edge in edges:
             origin_idx = nodes.index(edge.start_node)
             destination_idx = nodes.index(edge.end_node)
             travel_times[origin_idx, destination_idx] = edge.attributes.cost
             travel_times[destination_idx, origin_idx] = edge.attributes.cost
-        #pprint(travel_times)
         return travel_times.tolist()
 
     def export_basis_nodes_indices(self, graph: OperationalGraph) -> List[int]:
