@@ -14,7 +14,7 @@ class ORToolsMatchingSolution(MatchingSolution):
 
     def _save_routing(self):
 
-        match_input = self._matching_handler.input
+        match_input = self._matching_handler.match_input
         routing = self._matching_handler.routing
         manager = self._matching_handler.manager
 
@@ -161,7 +161,7 @@ class ORToolsMatchingSolution(MatchingSolution):
         print("********* print_solution_debug end *************")
 
     def delivery_board(self) -> DroneDeliveryBoard:
-        match_input = self._matching_handler.input
+        match_input = self._matching_handler.match_input
         empty_drone_deliveries = match_input.empty_board.empty_drone_deliveries()
         drone_deliveries = []
         for vehicle_id, vehicle_route in enumerate(self.vehicle_route):
