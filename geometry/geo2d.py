@@ -236,6 +236,14 @@ class Polygon2D(Geometry2D, Surface2D):
     def boundary(self) -> LinearRing2D:
         raise NotImplementedError()
 
+    @property
+    def centroid(self) -> Point2D:
+        raise NotImplementedError()
+
+    @property
+    def bbox(self) -> Bbox2D:
+        raise NotImplementedError()
+
     @abstractmethod
     def calc_area(self) -> float:
         raise NotImplementedError()
@@ -275,3 +283,37 @@ class MultiPolygon2D(Geometry2D, Surface2D):
     @abstractmethod
     def to_polygons(self) -> List[Polygon2D]:
         raise NotImplementedError()
+
+
+class Bbox2D(Polygon2D):
+
+    """
+        Bbox2D represents a (minx, miny, maxx, maxy) tuple (float values)
+        that bounds an object.
+    """
+
+    @property
+    @abstractmethod
+    def _geo_type(self) -> str:
+        raise NotImplementedError()
+
+    @property
+    @abstractmethod
+    def min_x(self) -> float:
+        raise NotImplementedError()
+
+    @property
+    @abstractmethod
+    def min_y(self) -> float:
+        raise NotImplementedError()
+
+    @property
+    @abstractmethod
+    def max_x(self) -> float:
+        raise NotImplementedError()
+
+    @property
+    @abstractmethod
+    def max_y(self) -> float:
+        raise NotImplementedError()
+

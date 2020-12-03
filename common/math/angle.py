@@ -1,11 +1,12 @@
 from __future__ import annotations
+
 import math
 from enum import Enum
 from random import Random
 from typing import List
 
-from common.entities.disribution.distribution import UniformDistribution, Range
 from common.entities.base_entity import JsonableBaseEntity
+from common.entities.disribution.distribution import UniformDistribution, Range
 from geometry.geo2d import Vector2D
 from geometry.geo_factory import create_vector_2d
 
@@ -28,6 +29,8 @@ class AngleUnit(Enum):
 class Angle(JsonableBaseEntity):
 
     def __init__(self, value: float, unit: AngleUnit):
+        super().__init__()
+
         self.__value = _calc_cyclic_value(value, unit.cyclic_value)
         self.__unit = unit
 
