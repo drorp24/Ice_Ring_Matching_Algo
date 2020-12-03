@@ -33,11 +33,11 @@ class BasicDeliveryRequestGraphTestCases(unittest.TestCase):
         cls.dr_dataset_local_region_2_afternoon = create_local_data_in_region_2_afternoon()
         cls.radius_surrounding_region_1 = 100 * 2 / sqrt(2)
 
-    def test_node(self):
+    def test_localizable_node_exception(self):
         with self.assertRaises(NonLocalizableNodeException) as context:
             OperationalNode(3)
 
-    def test_node(self):
+    def test_temporal_node_exception(self):
         with self.assertRaises(NonTemporalNodeException) as context:
             OperationalNode(DeliveryOptionDistribution().choose_rand(Random(42))[0])
 

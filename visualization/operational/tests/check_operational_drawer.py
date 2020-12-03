@@ -7,7 +7,7 @@ from common.entities.disribution.distribution import Range
 from geometry.geo_distribution import ChoiceNormalDistribution
 from geometry.geo_factory import create_point_2d
 from visualization.basic.pltdrawer2d import create_drawer_2d
-from visualization.operational.operational_drawer2d import add_dr
+from visualization.operational.operational_drawer2d import add_delivery_request
 
 
 def _create_dr_locations():
@@ -75,7 +75,7 @@ def create_example_dr_distribution():
 def draw_all_delivery_requests(sampled_drs: List[DeliveryRequest]):
     d = create_drawer_2d()
     for dr in sampled_drs:
-        add_dr(d, dr)
+        add_delivery_request(d, dr)
     d.draw()
 
 
