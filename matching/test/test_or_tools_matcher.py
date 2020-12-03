@@ -58,7 +58,7 @@ class ORToolsMatcherBasicTestCase(TestCase):
 
     @staticmethod
     def create_graph(delivery_requests):
-        graph = OperationalGraph()
+        graph = OperationalGraph(zero_time=datetime(2020, 1, 23, 12, 30, 00))
         loading_dock = DroneLoadingDock(DroneLoadingStation(create_point_2d(0, 0)),
                                         PlatformType.platform_1,
                                         TimeWindowExtension(since=DateTimeExtension.from_dt(
