@@ -1,6 +1,7 @@
 from random import Random
+from typing import List
 
-from common.entities.delivery_request import build_delivery_request_distribution
+from common.entities.delivery_request import build_delivery_request_distribution, DeliveryRequest
 from common.entities.delivery_request_generator import DeliveryRequestDatasetStructure, DeliveryRequestDatasetGenerator
 from common.entities.disribution.distribution import Range
 from geometry.geo_distribution import ChoiceNormalDistribution
@@ -53,8 +54,7 @@ def _create_pdp_locations():
     return pdp_deltas, pdp_sig_x, pdp_sig_y
 
 
-if __name__ == '__main__':
-    d = create_drawer_2d()
+def create_example_dr_distribution():
     dr_centers, dr_sig_x, dr_sig_y = _create_dr_locations()
     do_deltas, do_sig_x, do_sig_y = _create_do_locations()
     cd_deltas, cd_sig_x, cd_sig_y = _create_cd_locations()
@@ -69,7 +69,16 @@ if __name__ == '__main__':
                                                 num_of_customer_deliveries_per_delivery_option=5,
                                                 num_of_package_delivery_plan_per_customer_delivery=12,
                                                 delivery_request_distribution=dr_distrib)
-    drs = DeliveryRequestDatasetGenerator().generate(dr_struct, Random(42))
-    for dr in drs:
+    return DeliveryRequestDatasetGenerator().generate(dr_struct, Random(42))
+
+
+def draw_all_delivery_requests(sampled_drs: List[DeliveryRequest]):
+    d = create_drawer_2d()
+    for dr in sampled_drs:
         add_dr(d, dr)
     d.draw()
+
+
+if __name__ == '__main__':
+    sampled_drs = create_example_dr_distribution()
+    draw_all_delivery_requests(sampled_drs)
