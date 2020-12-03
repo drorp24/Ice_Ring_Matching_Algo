@@ -8,7 +8,7 @@ import numpy as np
 
 from common.entities.customer_delivery import CustomerDelivery
 from common.entities.delivery_option import DeliveryOption
-from common.entities.delivery_request import generate_dr_distribution, DeliveryRequest
+from common.entities.delivery_request import DeliveryRequest, build_delivery_request_distribution
 from common.entities.delivery_request_generator import DeliveryRequestDatasetGenerator, DeliveryRequestDatasetStructure
 from common.entities.package import PackageType
 from common.entities.package_delivery_plan import PackageDeliveryPlan
@@ -89,8 +89,8 @@ def create_distributed_dr_data_set():
 
 
 def _create_dr_distribution():
-    return generate_dr_distribution(
-        drop_point_distribution=UniformPointInBboxDistribution(min_x=10, max_x=1200, min_y=10, max_y=1150))
+    return build_delivery_request_distribution(
+        relative_pdp_location_distribution=UniformPointInBboxDistribution(min_x=10, max_x=1200, min_y=10, max_y=1150))
 
 
 def create_no_zero_dist_dr_data_set() -> List[DeliveryRequest]:

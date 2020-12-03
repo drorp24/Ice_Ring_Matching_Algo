@@ -97,5 +97,6 @@ class PackageDeliveryPlanDistribution(Distribution):
         azimuths = self._azimuth_distribution.choose_rand(random=random, amount=amount)
         pitches = self._pitch_distribution.choose_rand(random=random, amount=amount)
         packages = self._package_type_distribution.choose_rand(random=random, amount=amount)
-        return [PackageDeliveryPlan(drop_point=dp + base_loc, azimuth=az, pitch=ptc, package_type=p_t) for
+        uuid_seed = random.getrandbits(128)
+        return [PackageDeliveryPlan(UUID(int=uuid_seed), drop_point=dp + base_loc, azimuth=az, pitch=ptc, package_type=p_t) for
                 (dp, az, ptc, p_t) in zip(relative_drop_points, azimuths, pitches, packages)]
