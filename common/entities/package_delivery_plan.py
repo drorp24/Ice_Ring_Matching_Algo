@@ -8,14 +8,12 @@ from common.entities.base_entity import JsonableBaseEntity
 from common.entities.disribution.distribution import Distribution
 from common.entities.package import PackageType, PackageDistribution
 from common.math.angle import Angle, AngleUniformDistribution, AngleUnit
-from geometry.geo2d import Point2D, Polygon2D
-from geometry.geo_distribution import UniformPointInBboxDistribution, PointLocationDistribution, \
-    DEFAULT_ZERO_LOCATION_DISTRIBUTION
-from geometry.geo_factory import create_polygon_2d_from_ellipse, convert_dict_to_point_2d, create_point_2d
 from common.utils.uuid_utils import convert_str_to_uuid
 from geometry.geo2d import Point2D
-from geometry.geo_distribution import UniformPointInBboxDistribution
+from geometry.geo_distribution import PointLocationDistribution, \
+    DEFAULT_ZERO_LOCATION_DISTRIBUTION
 from geometry.geo_factory import convert_dict_to_point_2d
+from geometry.geo_factory import create_point_2d
 from geometry.utils import Localizable
 
 
@@ -98,5 +96,5 @@ class PackageDeliveryPlanDistribution(Distribution):
         pitches = self._pitch_distribution.choose_rand(random=random, amount=amount)
         packages = self._package_type_distribution.choose_rand(random=random, amount=amount)
         uuid_seed = random.getrandbits(128)
-        return [PackageDeliveryPlan(UUID(int=uuid_seed), drop_point=dp + base_loc, azimuth=az, pitch=ptc, package_type=p_t) for
-                (dp, az, ptc, p_t) in zip(relative_drop_points, azimuths, pitches, packages)]
+        return [PackageDeliveryPlan(UUID(int=uuid_seed), drop_point=d_p + base_loc, azimuth=az, pitch=ptc, package_type=p_t) for
+                (d_p, az, ptc, p_t) in zip(relative_drop_points, azimuths, pitches, packages)]
