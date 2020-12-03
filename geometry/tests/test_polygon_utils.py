@@ -73,7 +73,6 @@ class PolygonUtilsTestCase(unittest.TestCase):
         box_resolution = 1
         splited_polygon = PolygonUtils.split_polygon(polygon, box_resolution, required_area)
         total_time = time.time() - start_time
-        print(f'large_box_test took {total_time} seconds')
         self.assertEqual(len(splited_polygon), polygon_side_length ** 2)
         self.assertLess(total_time, 0.2)
 
@@ -88,7 +87,6 @@ class PolygonUtilsTestCase(unittest.TestCase):
         box_resolution = 1
         splited_polygon = PolygonUtils.split_polygon(polygon, box_resolution, required_area)
         total_time = time.time() - start_time
-        print(f'large_box_test took {total_time} seconds')
         self.assertEqual(len(splited_polygon), polygon_side_length ** 2)
         self.assertLess(total_time, 0.2)
 
@@ -103,5 +101,4 @@ class PolygonUtilsTestCase(unittest.TestCase):
         box_resolution = 1
         splited_polygon = PolygonUtils.split_polygon(polygon, box_resolution, required_area)
         total_time = time.time() - start_time
-        print(f'large_box_test took {total_time} seconds')
         self.assertLess(total_time, 0.2)
