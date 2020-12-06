@@ -21,7 +21,7 @@ class BasicMinimumConfig(unittest.TestCase):
     def test_config_file_read(self):
         config_dict = MinimumEnd2EndConfig.json_to_dict(self.config_file_path)
         loaded_config = MinimumEnd2EndConfig.dict_to_obj(config_dict)
-        self.assertEqual(loaded_config.matcher_config_json, self.matcher_file_path)
-        self.assertEqual(loaded_config.fleet_partition_json, self.fleet_file_path)
-        self.assertEqual(loaded_config.scenario_json, self.scenario_file_path)
+        self.assertEqual(loaded_config.matcher_config_json, str(self.matcher_file_path))
+        self.assertEqual(loaded_config.fleet_partition_json, str(self.fleet_file_path))
+        self.assertEqual(loaded_config.scenario_json, str(self.scenario_file_path))
 

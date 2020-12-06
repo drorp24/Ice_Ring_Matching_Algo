@@ -61,11 +61,11 @@ class BasicDroneDeliveryGeneration(unittest.TestCase):
         self.assertEqual(len(self.drone_delivery_2.matched_requests), 1)
 
     def test_empty_drone_delivery_board(self):
-        self.assertEqual(len(self.empty_drone_delivery_board.empty_drone_deliveries), 2)
-        self.assertEqual(self.empty_drone_delivery_board.empty_drone_deliveries[0].drone_formation,
+        self.assertEqual(len(self.empty_drone_delivery_board.empty_drone_deliveries()), 2)
+        self.assertEqual(self.empty_drone_delivery_board.empty_drone_deliveries()[0].drone_formation,
                          DroneFormations.get_drone_formation(
                              FormationSize.MINI, FormationOptions.TINY_PACKAGES, PlatformType.platform_1))
-        self.assertEqual(self.empty_drone_delivery_board.empty_drone_deliveries[1].drone_formation,
+        self.assertEqual(self.empty_drone_delivery_board.empty_drone_deliveries()[1].drone_formation,
                          DroneFormations.get_drone_formation(
                              FormationSize.MEDIUM, FormationOptions.TINY_PACKAGES,
                              PlatformType.platform_1))

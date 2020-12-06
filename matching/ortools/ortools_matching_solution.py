@@ -9,8 +9,8 @@ from matching.matching_solution import MatchingSolution, MatchingSolutionData
 
 class ORToolsMatchingSolution(MatchingSolution):
 
-    def __init__(self, matcher: Matcher, solution: dict, monitor):
-        super().__init__(matcher, solution, monitor)
+    def __init__(self, matcher: Matcher, solution: dict):
+        super().__init__(matcher, solution)
 
     def _save_routing(self):
 

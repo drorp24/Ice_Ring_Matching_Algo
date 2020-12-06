@@ -35,6 +35,18 @@ class MinimumEnd2EndConfig(JsonableBaseEntity):
     def matcher_config_json(self) -> Path:
         return self._matcher_config_json
 
+    @scenario_json.getter
+    def scenario_json(self) -> str:
+        return str(self._scenario_json)
+
+    @fleet_partition_json.getter
+    def fleet_partition_json(self) -> str:
+        return str(self._fleet_partition_json)
+
+    @matcher_config_json.getter
+    def matcher_config_json(self) -> str:
+        return str(self._matcher_config_json)
+
     @scenario_json.setter
     def scenario_json(self, scenario_json: str):
         self._scenario_json = Path(scenario_json)

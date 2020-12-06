@@ -119,7 +119,7 @@ class OperationalGraph:
 
     @staticmethod
     def _create_from_extracted_subgraph(extracted_subgraph: subgraph):
-        internal_subgraph = OperationalGraph()
+        internal_subgraph = OperationalGraph(zero_time=datetime(2020, 1, 23, 12, 30, 00))
         internal_subgraph.set_internal_graph(extracted_subgraph)
         return internal_subgraph
 

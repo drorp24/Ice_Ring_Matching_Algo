@@ -16,10 +16,9 @@ class MatchingSolutionData(enum.Enum):
 
 
 class MatchingSolution:
-    def __init__(self,matching_handler,solution,monitor):
+    def __init__(self,matching_handler,solution):
         self._solution = solution
         self._matching_handler = matching_handler
-        self.__monitor = monitor
 
         # __data_matched - dict of MatchingSolutionData
         self._data_matched = {
@@ -47,10 +46,6 @@ class MatchingSolution:
     @property
     def matching_handler(self):
         return self._matching_handler
-
-    @property
-    def monitor(self):
-        return self.__monitor
 
     @property
     def dropped(self):

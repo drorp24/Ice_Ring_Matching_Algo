@@ -33,8 +33,8 @@ class ORToolsMatcherBasicTestCase(TestCase):
         do_dict = JsonableBaseEntity.json_to_dict(Path('matching/test/match_config1.json'))
         config = MatchConfig.dict_to_obj(do_dict)
         cls.small_match_input = MatchInput(small_graph, empty_board, config)
-        cls.expected_matched_board = cls.create_drone_delivery_board(empty_board.empty_drone_deliveries[0],
-                                                                     empty_board.empty_drone_deliveries[1],
+        cls.expected_matched_board = cls.create_drone_delivery_board(empty_board.empty_drone_deliveries()[0],
+                                                                     empty_board.empty_drone_deliveries()[1],
                                                                      cls.delivery_requests)
 
     @staticmethod
