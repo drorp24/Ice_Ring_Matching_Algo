@@ -79,7 +79,7 @@ class DroneLoadingDockDistribution(Distribution):
         drone_loading_stations = self._drone_loading_station_distributions.choose_rand(random=random,
                                                                                        base_location=base_location,
                                                                                        amount=amount)
-        time_windows = self._time_window_distributions.choose_rand(random, amount)
-        platform_types = self._platform_type_distributions.choose_rand(random, amount)
+        time_windows = self._time_window_distributions.choose_rand(random=random, amount=amount)
+        platform_types = self._platform_type_distributions.choose_rand(random=random, amount=amount)
         return [DroneLoadingDock(dl, pt, tw)
                 for (dl, pt, tw) in zip(drone_loading_stations, platform_types, time_windows)]

@@ -13,13 +13,13 @@ class BasicDroneLoadingStationGeneration(unittest.TestCase):
 
     def test_drone_loading_station_generation(self):
         drone_loading_station_distribution = DroneLoadingStationDistribution()
-        stations = drone_loading_station_distribution.choose_rand(Random(100), self.num_of_drone_stations)
+        stations = drone_loading_station_distribution.choose_rand(random=Random(100), amount=self.num_of_drone_stations)
         self.assertEqual(len(stations), 10)
         self.assertIsInstance(stations[0], DroneLoadingStation)
 
     def test_drone_loading_station_location(self):
         drone_loading_station_distribution = DroneLoadingStationDistribution(UniformPointInBboxDistribution(5, 10, 5, 10))
-        stations = drone_loading_station_distribution.choose_rand(Random(100), self.num_of_drone_stations)
+        stations = drone_loading_station_distribution.choose_rand(random=Random(100), amount=self.num_of_drone_stations)
         for station in stations:
             self.assertGreaterEqual(station.location.x, 5)
             self.assertLessEqual(station.location.x, 10)

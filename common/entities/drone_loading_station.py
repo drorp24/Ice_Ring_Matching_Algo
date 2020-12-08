@@ -32,6 +32,6 @@ class DroneLoadingStationDistribution(Distribution):
 
     def choose_rand(self, random: Random, base_location: Point2D = create_point_2d(0,0), amount: int = 1) -> \
             List[DroneLoadingStation]:
-        delta_location = self._drone_station_locations_distributions.choose_rand(random, amount)
-        location = [delta + base_location for delta in delta_location]
-        return list(map(DroneLoadingStation, location))
+        delta_locations = self._drone_station_locations_distributions.choose_rand(random=random, amount=amount)
+        locations = [base_location.add_vector(delta.to_vector()) for delta in delta_locations]
+        return list(map(DroneLoadingStation, locations))

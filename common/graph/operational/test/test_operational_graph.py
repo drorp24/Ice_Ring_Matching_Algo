@@ -183,7 +183,7 @@ def create_local_data_in_region_2_morning() -> [DeliveryRequest]:
 
 
 def create_loading_dock_afternoon_distribution() -> [DroneLoadingDock]:
-    return _create_loading_dock_afternoon_distribution().choose_rand(Random(42), 10)
+    return _create_loading_dock_afternoon_distribution().choose_rand(random=Random(42), amount=10)
 
 
 def create_local_data_in_region_2_afternoon() -> [DeliveryRequest]:
