@@ -61,9 +61,8 @@ class CustomerDeliveryDistribution(Distribution):
     def choose_rand(self, random: Random, base_loc: Point2D = create_point_2d(0, 0),
                     amount: int = 1, num_pdp: int = 1) -> List[CustomerDelivery]:
         relative_locations = self._relative_location_distribution.choose_rand(random=random, amount=amount)
-        pdp_distributions = UniformChoiceDistribution(self._pdp_distributions).choose_rand(random=random, amount=1)[0]
-        #TODO: calculate single package delivery type for each pdp distribution in customer delivery
+        pdp_distribution = UniformChoiceDistribution(self._pdp_distributions).choose_rand(random=random, amount=1)[0]
+        # TODO: calculate single package delivery type for each pdp distribution in customer delivery
         return [CustomerDelivery(
-            pdp_distributions.choose_rand(random=random, amount=num_pdp,
-                                          base_loc=base_loc + relative_locations[i]))
+            pdp_distribution.choose_rand(random=random, amount=num_pdp, base_loc=base_loc + relative_locations[i]))
             for i in list(range(amount))]
