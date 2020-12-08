@@ -7,6 +7,8 @@ from common.entities.drone_loading_station import DroneLoadingStation, DroneLoad
 from common.entities.temporal import TimeWindowExtension, TimeWindowDistribution, DateTimeExtension, \
     TimeDeltaDistribution, TimeDeltaExtension, DateTimeDistribution, Temporal
 from geometry.geo2d import Point2D
+from geometry.geo_distribution import DEFAULT_ZERO_LOCATION_DISTRIBUTION
+from geometry.geo_factory import create_point_2d
 from geometry.utils import Localizable
 
 
@@ -64,18 +66,20 @@ DEFAULT_DRONE_LOADING_STATION_DISTRIBUTIONS = DroneLoadingStationDistribution()
 
 class DroneLoadingDockDistribution(Distribution):
 
-    def __init__(self, platform_type_distribution: PlatformTypeDistribution = DEFAULT_PLATFORM_TYPE_DISTRIBUTIONS,
-                 drone_loading_station_distributions: DroneLoadingStationDistribution =
-                 DEFAULT_DRONE_LOADING_STATION_DISTRIBUTIONS,
-                 time_window_distributions: TimeWindowDistribution =
-                 DEFAULT_TIME_WINDOW_DISTRIBUTIONS):
+    def __init__(self,
+                 platform_type_distribution: PlatformTypeDistribution = DEFAULT_PLATFORM_TYPE_DISTRIBUTIONS,
+                 drone_loading_station_distributions: DroneLoadingStationDistribution = DEFAULT_DRONE_LOADING_STATION_DISTRIBUTIONS,
+                 time_window_distributions: TimeWindowDistribution = DEFAULT_TIME_WINDOW_DISTRIBUTIONS):
         self._platform_type_distributions = platform_type_distribution
         self._drone_loading_station_distributions = drone_loading_station_distributions
         self._time_window_distributions = time_window_distributions
 
-    def choose_rand(self, random: Random, amount: int = 1) -> [DroneLoadingDock]:
-        drone_loading_stations = self._drone_loading_station_distributions.choose_rand(random, amount)
-        time_windows = self._time_window_distributions.choose_rand(random, amount)
-        platform_types = self._platform_type_distributions.choose_rand(random, amount)
+    def choose_rand(self, random: Random, base_location: Point2D = create_point_2d(0, 0), amount: int = 1) -> \
+            [DroneLoadingDock]:
+        drone_loading_stations = self._drone_loading_station_distributions.choose_rand(random=random,
+                                                                                       base_location=base_location,
+                                                                                       amount=amount)
+        time_windows = self._time_window_distributions.choose_rand(random=random, amount=amount)
+        platform_types = self._platform_type_distributions.choose_rand(random=random, amount=amount)
         return [DroneLoadingDock(dl, pt, tw)
                 for (dl, pt, tw) in zip(drone_loading_stations, platform_types, time_windows)]

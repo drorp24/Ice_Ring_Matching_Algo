@@ -1,6 +1,6 @@
+import math
 from math import ceil
 from typing import List
-
 from common.entities.delivery_request import DeliveryRequest
 from common.entities.drone_loading_dock import DroneLoadingDock
 from common.entities.temporal import Temporal
@@ -9,7 +9,7 @@ from common.graph.operational.operational_graph import OperationalGraph, Operati
 from geometry.utils import Localizable
 
 
-def add_locally_connected_dr_graph(graph, dr_connection_options: [DeliveryRequest], max_cost_to_connect):
+def add_locally_connected_dr_graph(graph, dr_connection_options: [DeliveryRequest], max_cost_to_connect=math.inf):
     edges = []
     graph.add_delivery_requests(dr_connection_options)
     for start_dr in dr_connection_options:

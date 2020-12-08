@@ -4,10 +4,13 @@ from typing import List
 from common.entities.delivery_request import build_delivery_request_distribution, DeliveryRequest
 from common.entities.delivery_request_generator import DeliveryRequestDatasetStructure, DeliveryRequestDatasetGenerator
 from common.entities.disribution.distribution import Range
+from common.entities.drone_loading_dock import DroneLoadingDock, DroneLoadingDockDistribution
+from common.graph.operational import graph_creator
+from common.graph.operational.operational_graph import OperationalGraph
 from geometry.geo_distribution import ChoiceNormalDistribution
 from geometry.geo_factory import create_point_2d
 from visualization.basic.pltdrawer2d import create_drawer_2d
-from visualization.operational.operational_drawer2d import add_delivery_request
+from visualization.operational.operational_drawer2d import add_delivery_request, add_operational_graph
 
 
 def _create_dr_locations():
@@ -54,7 +57,7 @@ def _create_pdp_locations():
     return pdp_deltas, pdp_sig_x, pdp_sig_y
 
 
-def create_example_dr_distribution():
+def _create_example_dr_distribution():
     dr_centers, dr_sig_x, dr_sig_y = _create_dr_locations()
     do_deltas, do_sig_x, do_sig_y = _create_do_locations()
     cd_deltas, cd_sig_x, cd_sig_y = _create_cd_locations()
@@ -72,6 +75,11 @@ def create_example_dr_distribution():
     return DeliveryRequestDatasetGenerator().generate(dr_struct, Random(42))
 
 
+def _create_drone_delivery_dock_distribution(amount=3):
+    return DroneLoadingDockDistribution() \
+        .choose_rand(random=Random(100), base_location=create_point_2d(-5400, 2000), amount=amount)
+
+
 def draw_all_delivery_requests(sampled_drs: List[DeliveryRequest]):
     d = create_drawer_2d()
     for dr in sampled_drs:
@@ -79,6 +87,31 @@ def draw_all_delivery_requests(sampled_drs: List[DeliveryRequest]):
     d.draw()
 
 
-if __name__ == '__main__':
-    sampled_drs = create_example_dr_distribution()
+def _create_operational_graph_from_assets(sampled_drs: [DeliveryRequest],
+                                          sampled_drone_loading_dock: [DroneLoadingDock]):
+    og = OperationalGraph()
+    og.add_delivery_requests(sampled_drs)
+    graph_creator.add_locally_connected_dr_graph(og, sampled_drs)
+    graph_creator.add_fully_connected_loading_docks(og, sampled_drone_loading_dock)
+    return og
+
+
+def _draw_operational_graph(og):
+    d = create_drawer_2d()
+    add_operational_graph(d, og)
+    d.draw()
+
+
+def _visualize_delivery_request_sample():
+    sampled_drs = _create_example_dr_distribution()
     draw_all_delivery_requests(sampled_drs)
+
+
+def _visualize_operational_graph_sample():
+    sampled_drs = _create_example_dr_distribution()
+    og = _create_operational_graph_from_assets(sampled_drs, _create_drone_delivery_dock_distribution(5))
+    _draw_operational_graph(og)
+
+
+if __name__ == '__main__':
+    _visualize_delivery_request_sample()
