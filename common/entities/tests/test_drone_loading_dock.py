@@ -12,6 +12,6 @@ class BasicDroneLoadingDockGeneration(unittest.TestCase):
 
     def test_drone_loading_dock_generation(self):
         drone_loading_dock_distribution = DroneLoadingDockDistribution()
-        docks = drone_loading_dock_distribution.choose_rand(Random(100), self.num_of_drone_docks)
+        docks = drone_loading_dock_distribution.choose_rand(random=Random(100), amount=self.num_of_drone_docks)
         self.assertEqual(len(docks), self.num_of_drone_docks)
         self.assertIsInstance(docks[0], DroneLoadingDock)

@@ -4,6 +4,9 @@ from random import Random
 
 from common.entities.delivery_request import DeliveryRequestDistribution
 from common.entities.drone import PlatformType
+from common.entities.drone_delivery import DroneDelivery, EmptyDroneDelivery
+from common.entities.drone_delivery_board import EmptyDroneDeliveryBoard, DroneDeliveryBoard
+from common.entities.drone_formation import DroneFormations, FormationSize, FormationOptions
 from common.entities.drone_delivery import DroneDelivery, EmptyDroneDelivery, MatchedDroneLoadingDock, \
     MatchedDeliveryRequest
 from common.entities.drone_delivery_board import EmptyDroneDeliveryBoard, DroneDeliveryBoard, DroppedDeliveryRequest
@@ -16,7 +19,7 @@ class BasicDroneDeliveryGeneration(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.delivery_requests = DeliveryRequestDistribution().choose_rand(Random(42), 4)
+        cls.delivery_requests = DeliveryRequestDistribution().choose_rand(random=Random(42), amount=4)
 
         cls.empty_drone_delivery_1 = EmptyDroneDelivery("edd_1", DroneFormations.get_drone_formation(
             FormationSize.MINI, FormationOptions.TINY_PACKAGES, PlatformType.platform_1))

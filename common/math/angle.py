@@ -1,11 +1,12 @@
 from __future__ import annotations
+
 import math
 from enum import Enum
 from random import Random
 from typing import List
 
-from common.entities.disribution.distribution import UniformDistribution, Range
 from common.entities.base_entity import JsonableBaseEntity
+from common.entities.disribution.distribution import UniformDistribution, Range
 from geometry.geo2d import Vector2D
 from geometry.geo_factory import create_vector_2d
 
@@ -28,6 +29,8 @@ class AngleUnit(Enum):
 class Angle(JsonableBaseEntity):
 
     def __init__(self, value: float, unit: AngleUnit):
+        super().__init__()
+
         self.__value = _calc_cyclic_value(value, unit.cyclic_value)
         self.__unit = unit
 
@@ -54,11 +57,12 @@ class Angle(JsonableBaseEntity):
         return Angle(self.degrees + AngleUnit.DEGREE.cyclic_value / 2, AngleUnit.DEGREE)
 
     def calc_abs_difference(self, other: Angle) -> Angle:
-        if self.__unit is not other.__unit:
-            raise ValueError("error, angle units are not equal")
         angle_1 = _calc_first_cycle_equivalent(self)
         angle_2 = _calc_first_cycle_equivalent(other)
         return Angle(abs(angle_1.degrees - angle_2.degrees), AngleUnit.DEGREE)
+
+    def difference(self, other: Angle) -> Angle:
+        return Angle(self.degrees - other.degrees, AngleUnit.DEGREE)
 
     def __str__(self):
         return "Angle ({0}, {1})".format(self.__value, self.__unit)
