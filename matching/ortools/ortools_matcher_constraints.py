@@ -3,6 +3,7 @@ from ortools.constraint_solver.pywrapcp import RoutingIndexManager, RoutingModel
 from common.graph.operational.export_ortools_graph import OrtoolsGraphExporter
 from matching.matcher import MatchInput
 
+
 class ORToolsMatcherConstraints:
     def __init__(self, graph_exporter: OrtoolsGraphExporter, manager: RoutingIndexManager, routing: RoutingModel,
                  match_input: MatchInput):
@@ -23,7 +24,7 @@ class ORToolsMatcherConstraints:
     def _demand_callback(self, from_index):
         from_node = self._manager.IndexToNode(from_index)
         package_type = \
-            self._match_input.empty_board.empty_drone_deliveries[0].drone_formation.get_package_types()[3]
+            self._match_input.empty_board.empty_drone_deliveries()[0].drone_formation.get_package_types()[3]
         return self._graph_exporter.export_package_type_demands(self._match_input.graph, package_type)[
             from_node]
 

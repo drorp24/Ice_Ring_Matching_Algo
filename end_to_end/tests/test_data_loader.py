@@ -22,7 +22,7 @@ class BasicDataLoaderTest(unittest.TestCase):
 
     def test_get_fleet_partition(self):
         empty_drone_delivery_board = self.data_loader.get_empty_drone_delivery_board()
-        self.assertEqual(len(empty_drone_delivery_board.empty_drone_deliveries),30)
+        self.assertEqual(len(empty_drone_delivery_board.empty_drone_deliveries()),15)
 
     def test_get_zero_time(self):
         zero_time_extension = DateTimeExtension(dt_date=date(2021, 1, 1), dt_time=time(6, 0, 0))

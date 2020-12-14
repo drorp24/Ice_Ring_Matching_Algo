@@ -64,5 +64,4 @@ class ORToolsMatcher(Matcher):
 
     def match(self) -> MatchingSolution:
         solution = self._routing.SolveWithParameters(self._search_parameters)
-        # TODO "delete monitor none"
-        return ORToolsMatchingSolution(self, solution, None)
+        return ORToolsMatchingSolution(self, solution)
