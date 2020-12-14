@@ -4,9 +4,6 @@ from random import Random
 
 from common.entities.delivery_request import DeliveryRequestDistribution
 from common.entities.drone import PlatformType
-from common.entities.drone_delivery import DroneDelivery, EmptyDroneDelivery
-from common.entities.drone_delivery_board import EmptyDroneDeliveryBoard, DroneDeliveryBoard
-from common.entities.drone_formation import DroneFormations, FormationSize, FormationOptions
 from common.entities.drone_delivery import DroneDelivery, EmptyDroneDelivery, MatchedDroneLoadingDock, \
     MatchedDeliveryRequest
 from common.entities.drone_delivery_board import EmptyDroneDeliveryBoard, DroneDeliveryBoard, DroppedDeliveryRequest
@@ -59,7 +56,7 @@ class BasicDroneDeliveryGeneration(unittest.TestCase):
         cls.dropped_delivery_request = DroppedDeliveryRequest(graph_index=4, delivery_request=cls.delivery_requests[3])
 
         drone_loading_dock_distribution = DroneLoadingDockDistribution()
-        docks = drone_loading_dock_distribution.choose_rand(Random(100), 1)
+        docks = drone_loading_dock_distribution.choose_rand(Random(100), amount=1)
         cls.matched_drone_loading_dock = MatchedDroneLoadingDock(graph_index=0, drone_loading_dock=docks[0],
                                                                  delivery_min_time=DateTimeExtension(
                                                                      dt_date=date(2020, 1, 23),

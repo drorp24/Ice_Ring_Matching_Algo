@@ -40,10 +40,9 @@ class ORToolsMatcherBasicTestCase(TestCase):
     @staticmethod
     def create_delivery_requests():
         pdp_dist = PackageDeliveryPlanDistribution(
-            package_type_distribution=PackageDistribution({PackageType.TINY.name: 1}))
-        delivery_options = DeliveryOptionDistribution([CustomerDeliveryDistribution(pdp_dist)]).choose_rand(Random(42),
-                                                                                                            amount=1,
-                                                                                                            num_pdp=1)
+            package_type_distribution=PackageDistribution({PackageType.TINY: 1}))
+        delivery_options = DeliveryOptionDistribution(customer_delivery_distributions=[
+            CustomerDeliveryDistribution(package_delivery_plan_distributions=pdp_dist)]).choose_rand(Random(42))
         delivery_request_1 = DeliveryRequest(delivery_options=delivery_options,
                                              time_window=TimeWindowExtension(
                                                  since=DateTimeExtension.from_dt(datetime(2020, 1, 23, 11, 40, 00)),
