@@ -3,6 +3,7 @@ from random import Random
 from typing import List
 
 from common.entities.delivery_request import DeliveryRequestDistribution, DeliveryRequest
+from geometry.geo_factory import create_point_2d
 
 
 @dataclass
@@ -21,6 +22,7 @@ class DeliveryRequestDatasetGenerator:
                  random: Random = Random()) -> List[DeliveryRequest]:
         dr_distrib = dr_struct.delivery_request_distribution
         return dr_distrib.choose_rand(random=random,
+                                      base_location=create_point_2d(0, 0),
                                       amount=dr_struct.num_of_delivery_requests,
                                       num_do=dr_struct.num_of_delivery_options_per_delivery_request,
                                       num_cd=dr_struct.num_of_customer_deliveries_per_delivery_option,

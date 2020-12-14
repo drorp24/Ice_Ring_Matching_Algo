@@ -15,8 +15,8 @@ class BasicOrtoolsExporterTestCases(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.dr_dataset_random = DeliveryRequestDistribution().choose_rand(Random(100), 10)
-        cls.dld_dataset_random = DroneLoadingDockDistribution().choose_rand(Random(100), 3)
+        cls.dr_dataset_random = DeliveryRequestDistribution().choose_rand(random=Random(100), amount=10)
+        cls.dld_dataset_random = DroneLoadingDockDistribution().choose_rand(random=Random(100), amount=3)
         cls.edges = cls.generate_edges()
         cls.graph_exporter = OrtoolsGraphExporter()
         cls.operational_graph = OperationalGraph()

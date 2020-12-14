@@ -3,9 +3,9 @@ from datetime import time, date, timedelta
 from math import sqrt
 from random import Random
 
+from common.entities.delivery_request import build_delivery_request_distribution
 from common.entities.delivery_option import DeliveryOptionDistribution
-from common.entities.delivery_request import DeliveryRequestDistribution, generate_dr_distribution, \
-    PriorityDistribution, DeliveryRequest
+from common.entities.delivery_request import DeliveryRequestDistribution, PriorityDistribution, DeliveryRequest
 from common.entities.delivery_request_generator import DeliveryRequestDatasetGenerator, DeliveryRequestDatasetStructure
 from common.entities.drone_loading_dock import DroneLoadingDockDistribution, DroneLoadingDock
 from common.entities.temporal import TimeWindowDistribution, DateTimeDistribution, DateTimeExtension, \
@@ -22,8 +22,8 @@ class BasicDeliveryRequestGraphTestCases(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.dr_dataset_random = DeliveryRequestDistribution().choose_rand(Random(100), 10)
-        cls.dld_dataset_random = DroneLoadingDockDistribution().choose_rand(Random(100), 3)
+        cls.dr_dataset_random = DeliveryRequestDistribution().choose_rand(random=Random(100), amount=10)
+        cls.dld_dataset_random = DroneLoadingDockDistribution().choose_rand(random=Random(100), amount=3)
         cls.dr_dataset_morning = create_morning_dr_dataset()
         cls.dr_dataset_afternoon = create_afternoon_dr_dataset()
         cls.dr_dataset_top_priority = create_top_priority_dr_dataset()
@@ -33,11 +33,11 @@ class BasicDeliveryRequestGraphTestCases(unittest.TestCase):
         cls.dr_dataset_local_region_2_afternoon = create_local_data_in_region_2_afternoon()
         cls.radius_surrounding_region_1 = 100 * 2 / sqrt(2)
 
-    def test_node(self):
+    def test_localizable_node_exception(self):
         with self.assertRaises(NonLocalizableNodeException) as context:
             OperationalNode(3)
 
-    def test_node(self):
+    def test_temporal_node_exception(self):
         with self.assertRaises(NonTemporalNodeException) as context:
             OperationalNode(DeliveryOptionDistribution().choose_rand(Random(42))[0])
 
@@ -183,7 +183,7 @@ def create_local_data_in_region_2_morning() -> [DeliveryRequest]:
 
 
 def create_loading_dock_afternoon_distribution() -> [DroneLoadingDock]:
-    return _create_loading_dock_afternoon_distribution().choose_rand(Random(42), 10)
+    return _create_loading_dock_afternoon_distribution().choose_rand(random=Random(42), amount=10)
 
 
 def create_local_data_in_region_2_afternoon() -> [DeliveryRequest]:
@@ -218,25 +218,25 @@ def create_low_priority_dr_dataset() -> [DeliveryRequest]:
 
 
 def _create_morning_dr_distribution() -> DeliveryRequestDistribution:
-    return generate_dr_distribution(
+    return build_delivery_request_distribution(
         time_window_distribution=TimeWindowDistribution(
             start_time_distribution=DateTimeDistribution([DateTimeExtension(date(2021, 1, 1), time(6, 0, 0))]),
             time_delta_distribution=TimeDeltaDistribution([TimeDeltaExtension(timedelta(hours=3, minutes=30))])))
 
 
 def _create_afternoon_dr_distribution() -> DeliveryRequestDistribution:
-    return generate_dr_distribution(
+    return build_delivery_request_distribution(
         time_window_distribution=TimeWindowDistribution(
             start_time_distribution=DateTimeDistribution([DateTimeExtension(date(2021, 1, 1), time(16, 30, 0))]),
             time_delta_distribution=TimeDeltaDistribution([TimeDeltaExtension(timedelta(hours=1, minutes=30))])))
 
 
 def _create_high_priority_dr_distribution() -> DeliveryRequestDistribution:
-    return generate_dr_distribution(priority_distribution=PriorityDistribution([101, 102, 103, 104, 105]))
+    return build_delivery_request_distribution(priority_distribution=PriorityDistribution([101, 102, 103, 104, 105]))
 
 
 def _create_low_priority_dr_distribution() -> DeliveryRequestDistribution:
-    return generate_dr_distribution(priority_distribution=PriorityDistribution([1, 2, 3, 4, 5]))
+    return build_delivery_request_distribution(priority_distribution=PriorityDistribution([1, 2, 3, 4, 5]))
 
 
 def _get_dr_from_dr_graph(drg1) -> [DeliveryRequest]:
@@ -244,24 +244,24 @@ def _get_dr_from_dr_graph(drg1) -> [DeliveryRequest]:
 
 
 def _create_region_1_morning_dr_distribution() -> DeliveryRequestDistribution:
-    return generate_dr_distribution(
-        drop_point_distribution=UniformPointInBboxDistribution(min_x=100, max_x=200, min_y=50, max_y=150),
+    return build_delivery_request_distribution(
+        relative_pdp_location_distribution=UniformPointInBboxDistribution(min_x=100, max_x=200, min_y=50, max_y=150),
         time_window_distribution=TimeWindowDistribution(
             start_time_distribution=DateTimeDistribution([DateTimeExtension(date(2021, 1, 1), time(6, 0, 0))]),
             time_delta_distribution=TimeDeltaDistribution([TimeDeltaExtension(timedelta(hours=3, minutes=30))])))
 
 
 def _create_region_2_morning_dr_distribution() -> DeliveryRequestDistribution:
-    return generate_dr_distribution(
-        drop_point_distribution=UniformPointInBboxDistribution(min_x=1100, max_x=1200, min_y=150, max_y=1150),
+    return build_delivery_request_distribution(
+        relative_pdp_location_distribution=UniformPointInBboxDistribution(min_x=1100, max_x=1200, min_y=150, max_y=1150),
         time_window_distribution=TimeWindowDistribution(
             start_time_distribution=DateTimeDistribution([DateTimeExtension(date(2021, 1, 1), time(6, 0, 0))]),
             time_delta_distribution=TimeDeltaDistribution([TimeDeltaExtension(timedelta(hours=3, minutes=30))])))
 
 
 def _create_region_2_afternoon_dr_distribution() -> DeliveryRequestDistribution:
-    return generate_dr_distribution(
-        drop_point_distribution=UniformPointInBboxDistribution(min_x=1100, max_x=1200, min_y=150, max_y=1150),
+    return build_delivery_request_distribution(
+        relative_pdp_location_distribution=UniformPointInBboxDistribution(min_x=1100, max_x=1200, min_y=150, max_y=1150),
         time_window_distribution=TimeWindowDistribution(
             start_time_distribution=DateTimeDistribution([DateTimeExtension(date(2021, 1, 1), time(16, 30, 0))]),
             time_delta_distribution=TimeDeltaDistribution([TimeDeltaExtension(timedelta(hours=1, minutes=30))])))
