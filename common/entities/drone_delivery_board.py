@@ -1,3 +1,6 @@
+from dataclasses import dataclass
+
+from common.entities.delivery_request import DeliveryRequest
 from common.entities.drone_delivery import DroneDelivery, EmptyDroneDelivery
 
 
@@ -19,20 +22,65 @@ class EmptyDroneDeliveryBoard:
         return capacities
 
 
+@dataclass
+class DroppedDeliveryRequest:
+    graph_index: int
+    # TODO: handle package type and not delivered
+    # package_type: PackageType
+    delivery_request: DeliveryRequest
+
+    def __eq__(self, other):
+        return self.graph_index == other.graph_index and self.delivery_request == other.delivery_request
+
+    def __str__(self):
+        return 'DroppedDeliveryRequest(graph_index=' + str(self.graph_index) + ', priority=' + str(
+            self.delivery_request.priority) + ', not delivered=TODO'
+
+
 class DroneDeliveryBoard:
-    def __init__(self, drone_deliveries: [DroneDelivery]):
+    def __init__(self, drone_deliveries: [DroneDelivery], dropped_delivery_request: [DroppedDeliveryRequest]):
         self._drone_deliveries = drone_deliveries
+        self._dropped_delivery_request = dropped_delivery_request
+
+        self._total_delivery = 0
+        self._total_priority = 0
+        self._total_time_in_minutes = 0
+
+        self._set_totals()
 
     def __eq__(self, other):
         return self._drone_deliveries == other.drone_deliveries
+
+    # TODO : add totals to str
+    def __str__(self):
+        drone_deliveries_str = '\n'.join(map(str, self._drone_deliveries)) if len(
+            self._drone_deliveries) > 0 else "\n[No match found]"
+        dropped_delivery_request_str = '\n'.join(map(str, self.dropped_delivery_request)) if len(
+            self._dropped_delivery_request) > 0 else "\n[No dropped delivery requests]"
+        return "\n[DroneDeliveryBoard]\n" + drone_deliveries_str + dropped_delivery_request_str
 
     @property
     def drone_deliveries(self) -> [DroneDelivery]:
         return self._drone_deliveries
 
-    def __str__(self):
-        s = ""
-        for dd in self._drone_deliveries:
-            for mr in dd.matched_requests:
-                s += "["+ str(mr.delivery_request.priority) + "] "
-        return s
+    @property
+    def dropped_delivery_request(self) -> [DeliveryRequest]:
+        return self._dropped_delivery_request
+
+    @property
+    def total_time_in_minutes(self) -> float:
+        return self._total_time_in_minutes
+
+    @property
+    def total_delivery(self) -> int:
+        return self._total_delivery
+
+    @property
+    def total_priority(self) -> int:
+        return self._total_priority
+
+    def _set_totals(self):
+        for drone_delivery in self._drone_deliveries:
+            self._total_delivery += drone_delivery.total_delivery
+            self._total_priority += drone_delivery.total_priority
+            self._total_time_in_minutes += drone_delivery.total_time_in_minutes

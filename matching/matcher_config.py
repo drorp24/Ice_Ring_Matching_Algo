@@ -4,7 +4,7 @@ from common.entities.base_entity import JsonableBaseEntity
 from common.entities.temporal import DateTimeExtension
 
 
-class MatchSolver(JsonableBaseEntity):
+class MatcherSolver(JsonableBaseEntity):
     def __init__(self, full_name: str, timeout_sec: int):
         # When using metaheuristics, need to set a time limit for the solver—otherwise the solver will not terminate.
         self._name = str.upper(full_name.partition(':')[2]) if str.upper(
@@ -15,7 +15,7 @@ class MatchSolver(JsonableBaseEntity):
     def dict_to_obj(cls, dict_input):
         assert (dict_input['__class__'] == cls.__name__)
 
-        return MatchSolver(
+        return MatcherSolver(
             full_name=dict_input["name"],
             timeout_sec=dict_input["timeout_sec"])
 
@@ -52,9 +52,9 @@ class CapacityConstraints(JsonableBaseEntity):
 
 
 class TimeConstraints(JsonableBaseEntity):
-    def __init__(self, waiting_time_allowed_min: int, max_total_drone_time_min: int, count_time_from_zero: bool):
-        self._waiting_time_allowed_min = waiting_time_allowed_min
-        self._max_total_drone_time_min = max_total_drone_time_min
+    def __init__(self, max_waiting_time: int, max_route_time: int, count_time_from_zero: bool):
+        self._max_waiting_time = max_waiting_time
+        self._max_route_time = max_route_time
         self._count_time_from_zero = count_time_from_zero
 
     @classmethod
@@ -62,25 +62,25 @@ class TimeConstraints(JsonableBaseEntity):
         assert (dict_input['__class__'] == cls.__name__)
 
         return TimeConstraints(
-            waiting_time_allowed_min=dict_input["waiting_time_allowed_min"],
-            max_total_drone_time_min=dict_input["max_total_drone_time_min"],
+            max_waiting_time=dict_input["max_waiting_time"],
+            max_route_time=dict_input["max_route_time"],
             count_time_from_zero=dict_input["count_time_from_zero"])
 
     @property
-    def waiting_time_allowed_min(self):
-        return self._waiting_time_allowed_min
+    def max_waiting_time(self):
+        return self._max_waiting_time
 
     @property
-    def max_total_drone_time_min(self):
-        return self._max_total_drone_time_min
+    def max_route_time(self):
+        return self._max_route_time
 
     @property
     def count_time_from_zero(self):
         return self._count_time_from_zero
 
     def __eq__(self, other):
-        return (self.waiting_time_allowed_min == other.waiting_time_allowed_min) and \
-               (self.max_total_drone_time_min == other.max_total_drone_time_min) and \
+        return (self.max_waiting_time == other.max_waiting_time) and \
+               (self.max_route_time == other.max_route_time) and \
                (self.count_time_from_zero == other.count_time_from_zero)
 
 
@@ -103,7 +103,7 @@ class PriorityConstraints(JsonableBaseEntity):
         return self.count_priority_from_zero == other.count_priority_from_zero
 
 
-class MatchConstraints(JsonableBaseEntity):
+class MatcherConstraints(JsonableBaseEntity):
     def __init__(self, capacity_constraints: CapacityConstraints, time_constraints: TimeConstraints,
                  priority_constraints: PriorityConstraints):
         self._capacity_constraints = capacity_constraints
@@ -114,7 +114,7 @@ class MatchConstraints(JsonableBaseEntity):
     def dict_to_obj(cls, dict_input):
         assert (dict_input['__class__'] == cls.__name__)
 
-        return MatchConstraints(
+        return MatcherConstraints(
             capacity_constraints=CapacityConstraints.dict_to_obj(dict_input["capacity"]),
             time_constraints=TimeConstraints.dict_to_obj(dict_input["time"]),
             priority_constraints=PriorityConstraints.dict_to_obj(dict_input["priority"]))
@@ -138,30 +138,30 @@ class MatchConstraints(JsonableBaseEntity):
 
 
 @dataclass
-class MatchConfigProperties:
+class MatcherConfigProperties:
     zero_time: DateTimeExtension
     first_solution_strategy: str
-    solver: MatchSolver
-    match_constraints: MatchConstraints
+    solver: MatcherSolver
+    match_constraints: MatcherConstraints
     dropped_penalty: int
 
 
-class MatchConfig(JsonableBaseEntity):
-    def __init__(self, match_config_properties: MatchConfigProperties):
+class MatcherConfig(JsonableBaseEntity):
+    def __init__(self, match_config_properties: MatcherConfigProperties):
         self._match_config_properties = match_config_properties
 
     @classmethod
     def dict_to_obj(cls, dict_input):
         assert (dict_input['__class__'] == cls.__name__)
 
-        match_config_properties = MatchConfigProperties(
+        match_config_properties = MatcherConfigProperties(
             zero_time=DateTimeExtension.from_dict(dict_input["zero_time"]),
             first_solution_strategy=dict_input["first_solution_strategy"],
-            solver=MatchSolver.dict_to_obj(dict_input["solver"]),
-            match_constraints=MatchConstraints.dict_to_obj(dict_input["constraints"]),
+            solver=MatcherSolver.dict_to_obj(dict_input["solver"]),
+            match_constraints=MatcherConstraints.dict_to_obj(dict_input["constraints"]),
             dropped_penalty=dict_input["dropped_penalty"])
 
-        return MatchConfig(match_config_properties)
+        return MatcherConfig(match_config_properties)
 
     @property
     def zero_time(self) -> DateTimeExtension:
@@ -172,7 +172,7 @@ class MatchConfig(JsonableBaseEntity):
         return self._match_config_properties.first_solution_strategy
 
     @property
-    def solver(self) -> MatchSolver:
+    def solver(self) -> MatcherSolver:
         return self._match_config_properties.solver
 
     @property
@@ -180,7 +180,7 @@ class MatchConfig(JsonableBaseEntity):
         return self._match_config_properties.dropped_penalty
 
     @property
-    def constraints(self) -> MatchConstraints:
+    def constraints(self) -> MatcherConstraints:
         return self._match_config_properties.match_constraints
 
     def __eq__(self, other):

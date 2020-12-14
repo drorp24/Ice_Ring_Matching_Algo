@@ -1,39 +1,30 @@
-from dataclasses import dataclass
+from abc import ABC, abstractmethod
 
-from common.entities.drone_delivery_board import EmptyDroneDeliveryBoard
-from common.graph.operational.export_graph import OperationalGraph
-from matching.match_config import MatchConfig
-from matching.matching_solution import MatchingSolution
-
-
-@dataclass
-class MatchInput:
-    graph: OperationalGraph
-    empty_board: EmptyDroneDeliveryBoard
-    config: MatchConfig
+from common.entities.drone_delivery_board import DroneDeliveryBoard
+from matching.matcher_input import MatcherInput
 
 
 class InvalidMatchInputException(Exception):
     pass
 
 
+class Matcher(ABC):
 
-class Matcher:
+    def __init__(self, matcher_input: MatcherInput):
+        self._matcher_input = matcher_input
 
-    def __init__(self, match_input: MatchInput):
-        self._match_input = match_input
-
-        self._valid_input()
-
-    def match(self) -> MatchingSolution:
-        pass
+        self._validate_input()
 
     @property
-    def match_input(self):
-        return self._match_input
+    def matcher_input(self) -> MatcherInput:
+        return self._matcher_input
 
-    def _valid_input(self):
-        if self._match_input.empty_board.num_of_formations == 0:
+    @abstractmethod
+    def match(self) -> DroneDeliveryBoard:
+        raise NotImplementedError()
+
+    def _validate_input(self) -> bool:
+        if self._matcher_input.empty_board.num_of_formations == 0:
             raise InvalidMatchInputException(f"Empty Board must has at least one formation")
 
         return True

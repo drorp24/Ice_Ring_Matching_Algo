@@ -1,11 +1,13 @@
 from abc import ABC, abstractmethod
+
+from common.entities.temporal import DateTimeExtension
 from common.graph.operational.operational_graph import *
 
 
 class GraphExporter(ABC):
 
     @abstractmethod
-    def export_time_windows(self, graph: OperationalGraph):
+    def export_time_windows(self, graph: OperationalGraph, zero_time: DateTimeExtension):
         raise NotImplementedError()
 
     @abstractmethod
