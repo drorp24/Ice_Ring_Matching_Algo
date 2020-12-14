@@ -1,5 +1,5 @@
 {
-    "__class__": "MatchConfig",
+    "__class__": "MatcherConfig",
     "zero_time": {
       "__class__": "DateTimeExtension",
       "date": {
@@ -15,20 +15,20 @@
     },
     "first_solution_strategy": "or_tools:path_cheapest_arc",
     "solver" : {
-      "__class__": "MatchSolver",
+      "__class__": "MatcherSolver",
       "name": "or_tools:automatic",
       "timeout_sec": 30
     },
     "constraints": {
-      "__class__": "MatchConstraints",
+      "__class__": "MatcherConstraints",
       "capacity": {
         "__class__": "CapacityConstraints",
         "count_capacity_from_zero": true
       },
       "time": {
         "__class__": "TimeConstraints",
-        "waiting_time_allowed_min": 10,
-        "max_total_drone_time_min": 300,
+        "max_waiting_time": 10,
+        "max_route_time": 300,
         "count_time_from_zero": false
       },
       "priority": {

@@ -1,14 +1,14 @@
-from dataclasses import dataclass
 from pathlib import Path
 
 from common.entities.base_entity import JsonableBaseEntity
 from common.entities.drone_delivery_board import EmptyDroneDeliveryBoard, DroneDeliveryBoard
-from common.graph.operational.graph_creator import *
-from end_to_end.scenario import Scenario
-from common.tools.empty_drone_delivery_board_generation import generate_empty_delivery_board, FleetReader
-from matching.matcher import MatchInput, MatchConfig
-from matching.ortools.ortools_matcher import ORToolsMatcher
 from common.entities.temporal import DateTimeExtension
+from common.graph.operational.graph_creator import *
+from common.tools.empty_drone_delivery_board_generation import generate_empty_delivery_board, FleetReader
+from end_to_end.scenario import Scenario
+from matching.matcher_config import MatcherConfig
+from matching.matcher_input import MatcherInput
+from matching.ortools.ortools_matcher import ORToolsMatcher
 
 
 class MinimumEnd2EndConfig(JsonableBaseEntity):
@@ -95,14 +95,12 @@ class MinimumEnd2End:
         operational_graph.add_drone_loading_docks(self.loading_dock)
         operational_graph.add_delivery_requests(self.delivery_requests)
         build_fully_connected_graph(operational_graph)
-        #add_locally_connected_dr_graph(operational_graph, self.delivery_requests, max_cost_to_connect)
-        #add_fully_connected_loading_docks(operational_graph, self.loading_dock)
+        # add_locally_connected_dr_graph(operational_graph, self.delivery_requests, max_cost_to_connect)
+        # add_fully_connected_loading_docks(operational_graph, self.loading_dock)
         return operational_graph
 
     def calc_assignment(self, graph: OperationalGraph, match_config_file: Path) -> DroneDeliveryBoard:
-        match_config_dict = MatchConfig.json_to_dict(match_config_file)
-        match_input = MatchInput(graph, self.empty_drone_delivery_board, MatchConfig.dict_to_obj(match_config_dict))
+        match_config_dict = MatcherConfig.json_to_dict(str(match_config_file))
+        match_input = MatcherInput(graph, self.empty_drone_delivery_board, MatcherConfig.dict_to_obj(match_config_dict))
         matcher = ORToolsMatcher(match_input)
-        solution = matcher.match()
-        solution.print_solution()
-        return solution.delivery_board()
+        return matcher.match()

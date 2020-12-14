@@ -1,8 +1,9 @@
+from enum import Enum, auto
+from enum import IntEnum
+
 from common.entities.drone import DroneConfiguration, PlatformType, Configurations, \
     DroneConfigurations
 from common.entities.package import PackageType
-from enum import IntEnum
-from enum import Enum, auto
 
 
 class FormationSize(IntEnum):
@@ -35,6 +36,13 @@ class DroneFormation:
 
     def get_package_type_volumes(self) -> [int]:
         return self._drone_configuration.package_type_map.get_package_types_volumes()
+
+    def get_package_type_formation(self) -> PackageType:
+        package_type_volumes = self._drone_configuration.package_type_map.get_package_types_volumes()
+        package_type_index = [pt_index for pt_index, pt_exist in enumerate(package_type_volumes) if pt_exist > 0]
+        if len(package_type_index) != 1:
+            raise TypeError(f"The selected formation has an invalid package type")
+        return self.get_package_types()[package_type_index[0]]
 
 
 class AutoName(Enum):
@@ -106,8 +114,8 @@ class DroneFormations:
                 platform_type
                 in
                 PlatformType}
-            for formation_size
-            in FormationSize}
+        for formation_size
+        in FormationSize}
         for formation_option in
         FormationOptions}
 
