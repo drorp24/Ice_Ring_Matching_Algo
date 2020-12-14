@@ -6,7 +6,8 @@ from shapely.geometry import Point, Polygon, LineString, LinearRing, MultiPolygo
 from shapely.geometry.base import BaseGeometry, EmptyGeometry
 
 from common.entities.base_entity import JsonableBaseEntity
-from geometry.geo2d import Point2D, Vector2D, Polygon2D, MultiPolygon2D, LineString2D, LinearRing2D, EmptyGeometry2D
+from geometry.geo2d import Point2D, Vector2D, Polygon2D, MultiPolygon2D, LineString2D, LinearRing2D, EmptyGeometry2D, \
+    Bbox2D
 from geometry.utils import GeometryUtils
 
 EPSILON_FOR_EQUAL_AREA: float = 0.00001
@@ -180,6 +181,15 @@ class _ShapelyPolygon2D(_ShapelyGeometry, Polygon2D):
         return _ShapelyLinearRing2D(self.points)
 
     @property
+    def centroid(self) -> Point2D:
+        return _ShapelyUtils.convert_shapely_to_point_2d(self._shapely_obj.centroid)
+
+    @property
+    def bbox(self) -> Bbox2D:
+        min_x, min_y, max_x, max_y = self._shapely_obj.bounds
+        return _ShapelyBbox2D(min_x, min_y, max_x, max_y)
+
+    @property
     def points(self) -> List[Point2D]:
         if self._shapely_obj.is_empty:
             return []
@@ -224,6 +234,41 @@ class _ShapelyPolygon2D(_ShapelyGeometry, Polygon2D):
                                                        epsilon_equal_area: float = EPSILON_FOR_EQUAL_AREA) -> bool:
         return polygon1.calc_difference(polygon2).calc_area() < epsilon_equal_area and \
                polygon2.calc_difference(polygon1).calc_area() < epsilon_equal_area
+
+
+class _ShapelyBbox2D(_ShapelyPolygon2D, Bbox2D):
+
+    def __init__(self, min_x: float, min_y: float, max_x: float, max_y: float):
+        self._min_x = min_x
+        self._min_y = min_y
+        self._max_x = max_x
+        self._max_y = max_y
+
+        super().__init__([_ShapelyPoint2D(max_x, min_y),
+                          _ShapelyPoint2D(max_x, max_y),
+                          _ShapelyPoint2D(min_x, max_y),
+                          _ShapelyPoint2D(min_x, min_y)
+                          ])
+
+    @property
+    def min_x(self) -> float:
+        return self._min_x
+
+    @property
+    def min_y(self) -> float:
+        return self._min_y
+
+    @property
+    def max_x(self) -> float:
+        return self._max_x
+
+    @property
+    def max_y(self) -> float:
+        return self._max_y
+
+    @property
+    def holes(self) -> List[LinearRing2D]:
+        return []
 
 
 class _ShapelyMultiPolygon2D(_ShapelyGeometry, MultiPolygon2D):

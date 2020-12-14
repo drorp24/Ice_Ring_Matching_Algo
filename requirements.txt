@@ -22,3 +22,5 @@ vispy==0.6.4
 time-window==0.1.0
 ortools~=8.0.8283
 networkx~=2.5
+optional.py~=1.1.0
+flatten-dict~=0.3.0

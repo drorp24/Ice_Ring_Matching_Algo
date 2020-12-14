@@ -1,7 +1,11 @@
 from __future__ import annotations
 
 import json
+from uuid import UUID
+
+from common.utils.uuid_utils import convert_uuid_to_str
 from abc import abstractmethod
+
 
 DEFAULT_TEST_FILE_JSON = 'jsons/test_file.json'
 
@@ -19,6 +23,8 @@ class BaseEntity(object):
 
     def internal_dict(self, member):
         attribs = self.__getattribute__(member)
+        if isinstance(attribs, UUID):
+            return convert_uuid_to_str(attribs)
         if isinstance(attribs, list) or isinstance(attribs, set):
             return [attribute.__dict__() for i, attribute in enumerate(attribs)]
         try:
