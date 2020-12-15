@@ -1,5 +1,6 @@
 from ortools.constraint_solver.pywrapcp import RoutingIndexManager, RoutingModel
 
+from common.entities.package import PackageType
 from common.graph.operational.export_ortools_graph import OrtoolsGraphExporter
 from matching.matcher import MatcherInput
 
@@ -13,19 +14,34 @@ class ORToolsMatcherConstraints:
         self._matcher_input = matcher_input
 
     def add_demand(self):
-        demand_callback_index = self._routing.RegisterPositiveUnaryTransitCallback(self._demand_callback)
-        self._routing.AddDimensionWithVehicleCapacity(
-            demand_callback_index,
-            self._matcher_input.config.constraints.time.max_waiting_time,
-            self._matcher_input.empty_board.formation_capacities(),  # TODO: check ronen fix
-            self._matcher_input.config.constraints.capacity.count_capacity_from_zero,
-            'Capacity')
+        for package_type in self._matcher_input.empty_board.package_types():
+            callback = getattr(self, "_demand_callback_" + str.lower(package_type.name))
+            demand_callback_index = self._routing.RegisterPositiveUnaryTransitCallback(callback)
+            self._routing.AddDimensionWithVehicleCapacity(
+                demand_callback_index,
+                self._matcher_input.config.constraints.time.max_waiting_time,
+                self._matcher_input.empty_board.formation_capacities(package_type),
+                self._matcher_input.config.constraints.capacity.count_capacity_from_zero,
+                'Capacity')
 
-    def _demand_callback(self, from_index):
+    def _demand_callback_tiny(self, from_index):
         from_node = self._manager.IndexToNode(from_index)
-        package_type = \
-            self._matcher_input.empty_board.empty_drone_deliveries()[0].drone_formation.get_package_type_formation()
-        return self._graph_exporter.export_package_type_demands(self._matcher_input.graph, package_type)[
+        return self._graph_exporter.export_package_type_demands(self._matcher_input.graph, PackageType.TINY)[
+            from_node]
+
+    def _demand_callback_small(self, from_index):
+        from_node = self._manager.IndexToNode(from_index)
+        return self._graph_exporter.export_package_type_demands(self._matcher_input.graph, PackageType.SMALL)[
+            from_node]
+
+    def _demand_callback_medium(self, from_index):
+        from_node = self._manager.IndexToNode(from_index)
+        return self._graph_exporter.export_package_type_demands(self._matcher_input.graph, PackageType.MEDIUM)[
+            from_node]
+
+    def _demand_callback_large(self, from_index):
+        from_node = self._manager.IndexToNode(from_index)
+        return self._graph_exporter.export_package_type_demands(self._matcher_input.graph, PackageType.LARGE)[
             from_node]
 
     def add_time(self):
@@ -45,7 +61,7 @@ class ORToolsMatcherConstraints:
         self._instantiate_route_start_and_end_times_to_produce_feasible_times(time_dimension)
 
     def _instantiate_route_start_and_end_times_to_produce_feasible_times(self, time_dimension):
-        for i in range(len(self._matcher_input.empty_board.empty_drone_deliveries())):
+        for i in range(len(self._matcher_input.empty_board.empty_drone_deliveries)):
             self._routing.AddVariableMinimizedByFinalizer(
                 time_dimension.CumulVar(self._routing.Start(i)))
             self._routing.AddVariableMinimizedByFinalizer(
@@ -53,7 +69,7 @@ class ORToolsMatcherConstraints:
 
     def _add_time_window_constraints_for_each_vehicle_start_node(self, time_dimension, time_windows):
         # TODO: Need to allow the start node to be different for each vehicle
-        for vehicle_id in range(len(self._matcher_input.empty_board.empty_drone_deliveries())):
+        for vehicle_id in range(len(self._matcher_input.empty_board.empty_drone_deliveries)):
             index = self._routing.Start(vehicle_id)
             time_dimension.CumulVar(index).SetRange(time_windows[0][0],
                                                     time_windows[0][1])

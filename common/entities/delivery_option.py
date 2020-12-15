@@ -1,20 +1,18 @@
+import itertools
 from random import Random
 from typing import List
-import itertools
-from typing import List
-
-from common.entities.customer_delivery import CustomerDelivery
-from common.entities.package_delivery_plan import PackageDeliveryPlan
 
 from common.entities.base_entity import JsonableBaseEntity
 from common.entities.customer_delivery import CustomerDelivery, CustomerDeliveryDistribution, DEFAULT_PDP_DISTRIB
 from common.entities.disribution.distribution import UniformChoiceDistribution, Distribution
+from common.entities.drone import PackageTypesVolumeMap
 from common.entities.package import PackageType
-from geometry.utils import Localizable
+from common.entities.package_delivery_plan import PackageDeliveryPlan
 from geometry.geo2d import Point2D
 from geometry.geo_distribution import PointLocationDistribution, UniformPointInBboxDistribution, \
     DEFAULT_ZERO_LOCATION_DISTRIBUTION
 from geometry.geo_factory import calc_centroid, create_point_2d
+from geometry.utils import Localizable
 
 
 class DeliveryOption(JsonableBaseEntity, Localizable):
@@ -33,6 +31,9 @@ class DeliveryOption(JsonableBaseEntity, Localizable):
         customer_deliveries = self.customer_deliveries
         demands = list(map(lambda x: x.get_amount_of_package_type(package_type), customer_deliveries))
         return sum(demands)
+
+    def get_amount_per_package_type(self) -> PackageTypesVolumeMap:
+        return PackageTypesVolumeMap([self.get_amount_of_package_type(package_type) for package_type in PackageType])
 
     @property
     def package_delivery_plans(self) -> List[PackageDeliveryPlan]:
