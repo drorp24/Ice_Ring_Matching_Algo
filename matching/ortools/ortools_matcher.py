@@ -73,8 +73,8 @@ class ORToolsMatcher(Matcher):
             if solution.Value(self._routing.NextVar(index)) == index:
                 graph_index = self._manager.IndexToNode(index)
                 dropped_delivery_request.append(DroppedDeliveryRequest(graph_index=graph_index,
-                                                                       delivery_request=self._graph_exporter.get_delivery_request(
-                                                                           self.matcher_input.graph, graph_index)))
+                                                       delivery_request=self._graph_exporter.get_delivery_request(
+                                                           self.matcher_input.graph, graph_index)))
 
         return dropped_delivery_request
 
@@ -82,7 +82,7 @@ class ORToolsMatcher(Matcher):
     def _create_drone_deliveries(self, solution: Assignment):
         drone_deliveries = []
 
-        for edd_index, empty_drone_delivery in enumerate(self.matcher_input.empty_board.empty_drone_deliveries()):
+        for edd_index, empty_drone_delivery in enumerate(self.matcher_input.empty_board.empty_drone_deliveries):
             matched_requests = []
 
             index = self._routing.Start(edd_index)
@@ -104,8 +104,6 @@ class ORToolsMatcher(Matcher):
                     matched_requests.append(
                         MatchedDeliveryRequest(
                             graph_index=graph_index,
-                            package_type=self.matcher_input.empty_board.empty_drone_deliveries()[
-                                edd_index].drone_formation.get_package_type_formation(),
                             delivery_request=self._graph_exporter.get_delivery_request(
                                 self.matcher_input.graph,
                                 graph_index),
@@ -126,8 +124,8 @@ class ORToolsMatcher(Matcher):
                     self._get_max_time(solution, index)))
 
             drone_deliveries.append(
-                DroneDelivery(self.matcher_input.empty_board.empty_drone_deliveries()[edd_index].id,
-                              self.matcher_input.empty_board.empty_drone_deliveries()[
+                DroneDelivery(self.matcher_input.empty_board.empty_drone_deliveries[edd_index].id,
+                              self.matcher_input.empty_board.empty_drone_deliveries[
                                   edd_index].drone_formation,
                               matched_requests, start_drone_loading_docks, end_drone_loading_docks))
 

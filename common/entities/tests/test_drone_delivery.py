@@ -25,7 +25,6 @@ class BasicDroneDeliveryGeneration(unittest.TestCase):
 
         cls.matched_delivery_request_1 = MatchedDeliveryRequest(
             graph_index=1,
-            package_type=cls.empty_drone_delivery_1.drone_formation.get_package_type_formation(),
             delivery_request=cls.delivery_requests[0],
             matched_delivery_option_index=0,
             delivery_min_time=DateTimeExtension(
@@ -35,7 +34,6 @@ class BasicDroneDeliveryGeneration(unittest.TestCase):
 
         cls.matched_delivery_request_2 = MatchedDeliveryRequest(
             graph_index=2,
-            package_type=cls.empty_drone_delivery_1.drone_formation.get_package_type_formation(),
             delivery_request=cls.delivery_requests[1],
             matched_delivery_option_index=0,
             delivery_min_time=DateTimeExtension(
@@ -45,7 +43,6 @@ class BasicDroneDeliveryGeneration(unittest.TestCase):
 
         cls.matched_delivery_request_3 = MatchedDeliveryRequest(
             graph_index=3,
-            package_type=cls.empty_drone_delivery_2.drone_formation.get_package_type_formation(),
             delivery_request=cls.delivery_requests[2],
             matched_delivery_option_index=0,
             delivery_min_time=DateTimeExtension(
@@ -92,21 +89,29 @@ class BasicDroneDeliveryGeneration(unittest.TestCase):
     def test_drone_delivery(self):
         self.assertEqual(self.drone_delivery_1.drone_formation, DroneFormations.get_drone_formation(
             FormationSize.MINI, FormationOptions.TINY_PACKAGES, PlatformType.platform_1))
-        self.assertEqual(self.drone_delivery_1.matched_requests[0].delivery_time, datetime(2020, 1, 23, 11, 30, 00))
-        self.assertEqual(self.drone_delivery_1.matched_requests[1].delivery_time, datetime(2020, 1, 23, 11, 30, 00))
+
+        expected_datetime_1 = DateTimeExtension(dt_date=date(2020, 1, 23), dt_time=time(11, 30, 0))
+
+        self.assertEqual(self.drone_delivery_1.matched_requests[0].delivery_min_time, expected_datetime_1)
+        self.assertEqual(self.drone_delivery_1.matched_requests[0].delivery_max_time, expected_datetime_1)
+        self.assertEqual(self.drone_delivery_1.matched_requests[1].delivery_min_time, expected_datetime_1)
+        self.assertEqual(self.drone_delivery_1.matched_requests[1].delivery_max_time, expected_datetime_1)
         self.assertEqual(len(self.drone_delivery_1.matched_requests), 2)
 
         self.assertEqual(self.drone_delivery_2.drone_formation, DroneFormations.get_drone_formation(
             FormationSize.MEDIUM, FormationOptions.TINY_PACKAGES, PlatformType.platform_1))
-        self.assertEqual(self.drone_delivery_2.matched_requests[0].delivery_time, datetime(2020, 1, 23, 12, 30, 00))
+
+        expected_datetime_2 = DateTimeExtension(dt_date=date(2020, 1, 23), dt_time=time(12, 30, 0))
+        self.assertEqual(self.drone_delivery_2.matched_requests[0].delivery_min_time, expected_datetime_2)
+        self.assertEqual(self.drone_delivery_2.matched_requests[0].delivery_max_time, expected_datetime_2)
         self.assertEqual(len(self.drone_delivery_2.matched_requests), 1)
 
     def test_empty_drone_delivery_board(self):
-        self.assertEqual(len(self.empty_drone_delivery_board.empty_drone_deliveries()), 2)
-        self.assertEqual(self.empty_drone_delivery_board.empty_drone_deliveries()[0].drone_formation,
+        self.assertEqual(len(self.empty_drone_delivery_board.empty_drone_deliveries), 2)
+        self.assertEqual(self.empty_drone_delivery_board.empty_drone_deliveries[0].drone_formation,
                          DroneFormations.get_drone_formation(
                              FormationSize.MINI, FormationOptions.TINY_PACKAGES, PlatformType.platform_1))
-        self.assertEqual(self.empty_drone_delivery_board.empty_drone_deliveries()[1].drone_formation,
+        self.assertEqual(self.empty_drone_delivery_board.empty_drone_deliveries[1].drone_formation,
                          DroneFormations.get_drone_formation(
                              FormationSize.MEDIUM, FormationOptions.TINY_PACKAGES,
                              PlatformType.platform_1))
@@ -121,8 +126,17 @@ class BasicDroneDeliveryGeneration(unittest.TestCase):
                              FormationSize.MEDIUM, FormationOptions.TINY_PACKAGES, PlatformType.platform_1))
 
     def test_2_matched_drone_deliveries_are_equal(self):
-        actual_matched_delivery_request = MatchedDeliveryRequest(self.delivery_requests[0],
-                                                                 datetime(2020, 1, 23, 11, 30, 00))
+        actual_matched_delivery_request = MatchedDeliveryRequest(
+            graph_index=1,
+            delivery_request=self.delivery_requests[0],
+            matched_delivery_option_index=0,
+            delivery_min_time=DateTimeExtension(
+                dt_date=date(2020, 1, 23),
+                dt_time=time(11, 30, 0)),
+            delivery_max_time=DateTimeExtension(
+                dt_date=date(2020, 1, 23),
+                dt_time=time(11, 30, 0)))
+
         self.assertEqual(self.matched_delivery_request_1, actual_matched_delivery_request)
 
     def test_2_empty_drone_deliveries_are_equal(self):
@@ -133,9 +147,13 @@ class BasicDroneDeliveryGeneration(unittest.TestCase):
     def test_2_drone_deliveries_are_equal(self):
         actual_drone_delivery = DroneDelivery(self.empty_drone_delivery_1.id,
                                               self.empty_drone_delivery_1.drone_formation,
-                                              [self.matched_delivery_request_1, self.matched_delivery_request_2])
+                                              [self.matched_delivery_request_1, self.matched_delivery_request_2],
+                                              self.matched_drone_loading_dock,
+                                              self.matched_drone_loading_dock)
         self.assertEqual(self.drone_delivery_1, actual_drone_delivery)
 
     def test_2_drone_delivery_boards_are_equal(self):
-        actual_drone_delivery_board = DroneDeliveryBoard([self.drone_delivery_1, self.drone_delivery_2])
+        actual_drone_delivery_board = DroneDeliveryBoard(
+            drone_deliveries=[self.drone_delivery_1, self.drone_delivery_2],
+            dropped_delivery_request=[self.dropped_delivery_request])
         self.assertEqual(self.drone_delivery_board, actual_drone_delivery_board)

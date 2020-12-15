@@ -7,7 +7,6 @@ from common.entities.package import PackageType
 
 
 class PlatformType(JsonableBaseEntity, Enum):
-
     platform_1 = 4
     platform_2 = 6
 
@@ -16,7 +15,7 @@ class PlatformType(JsonableBaseEntity, Enum):
         return PlatformType[dict_input['name']]
 
 
-class _PackageTypesVolumeMap:
+class PackageTypesVolumeMap:
 
     def __init__(self, packages_types_volume: [int]):
         self._dict = {}
@@ -37,10 +36,14 @@ class _PackageTypesVolumeMap:
     def get_package_types_volumes(self) -> [int]:
         return list(self._dict.values())
 
+    def __str__(self):
+        return '[' + ' '.join(
+            map(lambda item: str(item[0].name) + ':' + str(item[1]), self.dict.items())) + ']'
+
 
 class DroneConfiguration:
 
-    def __init__(self, platform_type: PlatformType, package_types_map: _PackageTypesVolumeMap):
+    def __init__(self, platform_type: PlatformType, package_types_map: PackageTypesVolumeMap):
         self._platform_type = platform_type
         self._package_types_map = package_types_map
 
@@ -49,7 +52,7 @@ class DroneConfiguration:
         return self._platform_type
 
     @property
-    def package_type_map(self) -> _PackageTypesVolumeMap:
+    def package_type_map(self) -> PackageTypesVolumeMap:
         return self._package_types_map
 
     def get_package_type_volume(self, package_type: PackageType) -> int:
@@ -60,14 +63,14 @@ class DroneConfiguration:
 
 
 class Configurations(Enum):
-    LARGE_X2 = _PackageTypesVolumeMap([0, 0, 0, 2])
-    MEDIUM_X4 = _PackageTypesVolumeMap([0, 0, 4, 0])
-    SMALL_X8 = _PackageTypesVolumeMap([0, 8, 0, 0])
-    TINY_X16 = _PackageTypesVolumeMap([16, 0, 0, 0])
-    LARGE_X4 = _PackageTypesVolumeMap([0, 0, 0, 4])
-    MEDIUM_X8 = _PackageTypesVolumeMap([0, 0, 8, 0])
-    SMALL_X16 = _PackageTypesVolumeMap([0, 16, 0, 0])
-    TINY_X32 = _PackageTypesVolumeMap([32, 0, 0, 0])
+    LARGE_X2 = PackageTypesVolumeMap([0, 0, 0, 2])
+    MEDIUM_X4 = PackageTypesVolumeMap([0, 0, 4, 0])
+    SMALL_X8 = PackageTypesVolumeMap([0, 8, 0, 0])
+    TINY_X16 = PackageTypesVolumeMap([16, 0, 0, 0])
+    LARGE_X4 = PackageTypesVolumeMap([0, 0, 0, 4])
+    MEDIUM_X8 = PackageTypesVolumeMap([0, 0, 8, 0])
+    SMALL_X16 = PackageTypesVolumeMap([0, 16, 0, 0])
+    TINY_X32 = PackageTypesVolumeMap([32, 0, 0, 0])
 
 
 class DroneConfigurationOptions:
@@ -101,7 +104,7 @@ class DroneConfigurations:
 
 class PlatformTypeDistribution(Distribution):
 
-    def __init__(self, platform_type_options: {PlatformType, int}=None):
+    def __init__(self, platform_type_options: {PlatformType, int} = None):
         if platform_type_options is None:
             platform_type_options = {platform_type: 1 for platform_type in PlatformType}
         self._platform_type_options = platform_type_options

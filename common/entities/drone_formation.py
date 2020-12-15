@@ -39,10 +39,10 @@ class DroneFormation:
 
     def get_package_type_formation(self) -> PackageType:
         package_type_volumes = self._drone_configuration.package_type_map.get_package_types_volumes()
-        package_type_index = [pt_index for pt_index, pt_exist in enumerate(package_type_volumes) if pt_exist > 0]
-        if len(package_type_index) != 1:
-            raise TypeError(f"The selected formation has an invalid package type")
-        return self.get_package_types()[package_type_index[0]]
+        package_type_indexes = [pt_index for pt_index, pt_exist in enumerate(package_type_volumes) if pt_exist > 0]
+        if len(package_type_indexes) != 1:
+            raise TypeError(f"The drone formation should has only one package type")
+        return self.get_package_types()[package_type_indexes[0]]
 
 
 class AutoName(Enum):

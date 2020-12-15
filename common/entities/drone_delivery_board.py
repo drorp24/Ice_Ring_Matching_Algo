@@ -1,32 +1,33 @@
 from dataclasses import dataclass
 
 from common.entities.delivery_request import DeliveryRequest
+from common.entities.drone import PackageTypesVolumeMap
 from common.entities.drone_delivery import DroneDelivery, EmptyDroneDelivery
+from common.entities.package import PackageType
 
 
 class EmptyDroneDeliveryBoard:
     def __init__(self, empty_drone_deliveries: [EmptyDroneDelivery]):
         self._empty_drone_deliveries = empty_drone_deliveries
 
+    @property
     def empty_drone_deliveries(self) -> [EmptyDroneDelivery]:
         return self._empty_drone_deliveries
 
     def num_of_formations(self) -> int:
         return len(self._empty_drone_deliveries)
 
-    def formation_capacities(self) -> [int]:
-        capacities = []
-        for delivery in self._empty_drone_deliveries:
-            formation_volumes = delivery.drone_formation.get_package_type_volumes()
-            capacities.append(formation_volumes[0])
-        return capacities
+    def formation_capacities(self, package_type: PackageType) -> [int]:
+        return [delivery.drone_formation.get_package_type_volume(package_type) for delivery in
+                self._empty_drone_deliveries]
+
+    def package_types(self) -> [PackageType]:
+        return set([edd.drone_formation.get_package_type_formation() for edd in self._empty_drone_deliveries])
 
 
 @dataclass
 class DroppedDeliveryRequest:
     graph_index: int
-    # TODO: handle package type and not delivered
-    # package_type: PackageType
     delivery_request: DeliveryRequest
 
     def __eq__(self, other):
@@ -34,7 +35,7 @@ class DroppedDeliveryRequest:
 
     def __str__(self):
         return 'DroppedDeliveryRequest(graph_index=' + str(self.graph_index) + ', priority=' + str(
-            self.delivery_request.priority) + ', not delivered=TODO'
+            self.delivery_request.priority)
 
 
 class DroneDeliveryBoard:
@@ -42,7 +43,7 @@ class DroneDeliveryBoard:
         self._drone_deliveries = drone_deliveries
         self._dropped_delivery_request = dropped_delivery_request
 
-        self._total_delivery = 0
+        self._total_amount_per_package_type = None
         self._total_priority = 0
         self._total_time_in_minutes = 0
 
@@ -72,15 +73,23 @@ class DroneDeliveryBoard:
         return self._total_time_in_minutes
 
     @property
-    def total_delivery(self) -> int:
-        return self._total_delivery
+    def total_amount_per_package_type(self) -> PackageTypesVolumeMap:
+        return self._total_amount_per_package_type
 
     @property
     def total_priority(self) -> int:
         return self._total_priority
 
     def _set_totals(self):
+        total_amount_per_package_type = [0] * len(PackageType)
+
         for drone_delivery in self._drone_deliveries:
-            self._total_delivery += drone_delivery.total_delivery
+
+            total_amount_per_package_type = [x + y for x, y in zip(total_amount_per_package_type,
+                                                                   drone_delivery.total_amount_per_package_type.
+                                                                   get_package_types_volumes())]
+
             self._total_priority += drone_delivery.total_priority
             self._total_time_in_minutes += drone_delivery.total_time_in_minutes
+
+        self._total_amount_per_package_type = PackageTypesVolumeMap(total_amount_per_package_type)
