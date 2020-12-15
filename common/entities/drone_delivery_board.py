@@ -35,7 +35,7 @@ class DroppedDeliveryRequest:
 
     def __str__(self):
         return 'DroppedDeliveryRequest(graph_index=' + str(self.graph_index) + ', priority=' + str(
-            self.delivery_request.priority)
+            self.delivery_request.priority) + ")"
 
 
 class DroneDeliveryBoard:
@@ -52,7 +52,7 @@ class DroneDeliveryBoard:
     def __eq__(self, other):
         return self._drone_deliveries == other.drone_deliveries
 
-    # TODO : add totals to str
+    # TODO : ********* add totals to str
     def __str__(self):
         drone_deliveries_str = '\n'.join(map(str, self._drone_deliveries)) if len(
             self._drone_deliveries) > 0 else "\n[No match found]"
