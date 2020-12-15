@@ -59,10 +59,8 @@ class DroneLoadingDock(JsonableBaseEntity, Localizable, Temporal):
 
 def create_default_time_window_for_drone_loading_dock():
     default_date_time_morning = DateTimeExtension(dt_date=date(2021, 1, 1), dt_time=time(6, 0, 0))
-    default_date_time_night = DateTimeExtension(dt_date=date(2021, 1, 1), dt_time=time(23, 59, 0))
-    default_time_delta_distrib = TimeDeltaDistribution([TimeDeltaExtension(timedelta(hours=3)),
-                                                        TimeDeltaExtension(timedelta(minutes=30))])
-    default_dt_options = [default_date_time_morning, default_date_time_night]
+    default_time_delta_distrib = TimeDeltaDistribution([TimeDeltaExtension(timedelta(hours=18, minutes=59))])
+    default_dt_options = [default_date_time_morning]
     return TimeWindowDistribution(DateTimeDistribution(default_dt_options), default_time_delta_distrib)
 
 

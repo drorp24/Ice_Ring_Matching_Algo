@@ -17,7 +17,10 @@ def add_package_delivery_plan(drawer: Drawer2D, pdp: PackageDeliveryPlan, draw_i
 
 
 def add_customer_delivery(drawer: Drawer2D, cd: CustomerDelivery, draw_internal=True):
-    drawer.add_polygon2d(cd.calc_bounds(), edgecolor=Color.DarkBlue, facecolor=Color.Blue)
+    try:
+        drawer.add_polygon2d(cd.calc_bounds(), edgecolor=Color.DarkBlue, facecolor=Color.Blue)
+    except:
+        print('no draw')
     if draw_internal:
         for pdp in cd.package_delivery_plans:
             add_package_delivery_plan(drawer, pdp, draw_internal=True)

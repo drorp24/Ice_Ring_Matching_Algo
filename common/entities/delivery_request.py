@@ -82,7 +82,7 @@ DEFAULT_DO_DISTRIB = DeliveryOptionDistribution(relative_location_distribution=D
 
 DEFAULT_TW_DISRIB = create_default_time_window_for_delivery_request()
 
-DEFAULT_PRIORITY_DISTRIB = PriorityDistribution(list(range(0, 100, 3)))
+DEFAULT_PRIORITY_DISTRIB = PriorityDistribution(list(range(1, 100, 3)))
 
 DEFAULT_LOC_DISTRIB = UniformPointInBboxDistribution(0, 100, 0, 100)
 
