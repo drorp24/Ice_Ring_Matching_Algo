@@ -39,10 +39,10 @@ class MatchedDroneLoadingDock:
                and self.delivery_max_time == other.delivery_max_time
 
     def __str__(self):
-        return 'MatchedDroneLoadingDock(graph_index=' + str(
+        return '[MatchedDroneLoadingDock(graph_index=' + str(
             self.graph_index) + ', min_time=' + self.delivery_min_time.get_internal().strftime(
             "%m %d %Y %H:%M:%S") + ', max_time=' + self.delivery_max_time.get_internal().strftime(
-            "%m %d %Y %H:%M:%S") + ') \n'
+            "%m %d %Y %H:%M:%S") + ')]'
 
 
 @dataclass
@@ -61,12 +61,12 @@ class MatchedDeliveryRequest:
 
     # TODO: handle time format
     def __str__(self):
-        return 'MatchedDeliveryRequest(graph_index=' + str(self.graph_index) + ', priority=' + str(
+        return '[MatchedDeliveryRequest(graph_index=' + str(self.graph_index) + ', priority=' + str(
             self.delivery_request.priority) + ', min_time=' + self.delivery_min_time.get_internal().strftime(
             "%m %d %Y %H:%M:%S") + ', max_time=' + self.delivery_max_time.get_internal().strftime(
             "%m %d %Y %H:%M:%S") + ', delivered=' + str(
             self.delivery_request.delivery_options[
-                self.matched_delivery_option_index].get_amount_per_package_type()) + ')'
+                self.matched_delivery_option_index].get_amount_per_package_type()) + ')]'
 
 
 # TODO change to MatchedDroneDelivery
@@ -96,7 +96,7 @@ class DroneDelivery(EmptyDroneDelivery):
             return "[No match found for drone]"
 
         return "\n[DroneDelivery id={id} {total_amount_per_package_type} total priority={priority} total time in " \
-               "minutes={total_time} \n {start_drone_loading_docks} {matched_requests} \n {end_drone_loading_docks}" \
+               "minutes={total_time}]\n{start_drone_loading_docks}\n{matched_requests}\n{end_drone_loading_docks}" \
             .format(id=self.id, total_amount_per_package_type=str(self.total_amount_per_package_type),
                     priority=str(self.total_priority), total_time=str(self.total_time_in_minutes),
                     start_drone_loading_docks=str(self.start_drone_loading_docks),
