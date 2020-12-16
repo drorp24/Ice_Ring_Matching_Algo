@@ -1,26 +1,31 @@
-from datetime import datetime
+from datetime import datetime, date, time
 from pathlib import Path
 from random import Random
 from unittest import TestCase
+from uuid import UUID
 
 from common.entities.base_entity import JsonableBaseEntity
-from common.entities.customer_delivery import CustomerDeliveryDistribution
-from common.entities.delivery_option import DeliveryOptionDistribution
+from common.entities.customer_delivery import CustomerDeliveryDistribution, CustomerDelivery
+from common.entities.delivery_option import DeliveryOptionDistribution, DeliveryOption
 from common.entities.delivery_request import DeliveryRequest
 from common.entities.drone import PlatformType
-from common.entities.drone_delivery import EmptyDroneDelivery
-from common.entities.drone_delivery_board import EmptyDroneDeliveryBoard
+from common.entities.drone_delivery import EmptyDroneDelivery, DroneDelivery, MatchedDeliveryRequest, \
+    MatchedDroneLoadingDock
+from common.entities.drone_delivery_board import EmptyDroneDeliveryBoard, DroneDeliveryBoard
 from common.entities.drone_formation import FormationSize, FormationOptions, DroneFormations
 from common.entities.drone_loading_dock import DroneLoadingDock
 from common.entities.drone_loading_station import DroneLoadingStation
 from common.entities.package import PackageDistribution, PackageType
-from common.entities.package_delivery_plan import PackageDeliveryPlanDistribution
+from common.entities.package_delivery_plan import PackageDeliveryPlanDistribution, PackageDeliveryPlan
 from common.entities.temporal import TimeWindowExtension, DateTimeExtension
+from common.graph.operational.graph_creator import build_fully_connected_graph
 from common.graph.operational.operational_graph import OperationalGraph, OperationalEdge, OperationalNode, \
     OperationalEdgeAttribs
+from common.math.angle import Angle, AngleUnit
 from geometry.geo_factory import create_point_2d
-from matching.matcher import MatcherInput
-from matching.matcher_config import MatcherConfig
+from matching.matcher_input import MatcherInput
+from matching.matcher_config import MatcherConfig, MatcherConfigProperties, MatcherSolver, MatcherConstraints, \
+    CapacityConstraints, TimeConstraints, PriorityConstraints
 from matching.ortools.ortools_matcher import ORToolsMatcher
 
 
@@ -30,6 +35,18 @@ class ORToolsMatcherBasicTestCase(TestCase):
         cls.delivery_requests = cls.create_delivery_requests()
         small_graph = cls.create_graph(cls.delivery_requests)
         empty_board = cls.create_empty_drone_delivery_board()
+        cls.match_config_properties = MatcherConfigProperties(
+            zero_time=DateTimeExtension(dt_date=date(2020, 1, 23), dt_time=time(11, 30, 0)),
+            first_solution_strategy="or_tools:path_cheapest_arc",
+            solver=MatcherSolver(full_name="or_tools:GREEDY_DESCENT", timeout_sec=30),
+            match_constraints=MatcherConstraints(
+                capacity_constraints=CapacityConstraints(count_capacity_from_zero=False),
+                time_constraints=TimeConstraints(max_waiting_time=10,
+                                                 max_route_time=300,
+                                                 count_time_from_zero=False),
+                priority_constraints=PriorityConstraints(True)),
+            dropped_penalty=5)
+
         do_dict = JsonableBaseEntity.json_to_dict(Path('matching/test/jsons/test_matcher_config_1.json'))
         config = MatcherConfig.dict_to_obj(do_dict)
         cls.small_match_input = MatcherInput(small_graph, empty_board, config)
@@ -157,7 +174,8 @@ class ORToolsMatcherBasicTestCase(TestCase):
         matcher = ORToolsMatcher(self.small_match_input)
         actual_delivery_board = matcher.match()
         print(actual_delivery_board)
-        # TODO edit expected_matched_board and fix test
+        # TODO ******************** edit expected_matched_board and fix test
         # self.assertEqual(self.expected_matched_board, actual_delivery_board)
 
-    # TODO add tests from ronen
+    # TODO ***************** add tests from ronen
+    # TODO ************** think about more tests :MatchedDock
