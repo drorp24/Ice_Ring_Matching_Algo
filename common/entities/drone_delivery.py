@@ -93,7 +93,7 @@ class DroneDelivery(EmptyDroneDelivery):
 
     def __str__(self):
         if len(self._matched_requests) == 0:
-            return "[No match found for drone]"
+            return "\n[DroneDelivery id={id} - No match found]".format(id=self.id)
 
         return "\n[DroneDelivery id={id} {total_amount_per_package_type} total priority={priority} total time in " \
                "minutes={total_time}]\n{start_drone_loading_docks}\n{matched_requests}\n{end_drone_loading_docks}" \

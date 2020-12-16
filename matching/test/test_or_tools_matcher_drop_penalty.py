@@ -7,9 +7,10 @@ from common.entities.customer_delivery import CustomerDelivery
 from common.entities.delivery_option import DeliveryOption
 from common.entities.delivery_request import DeliveryRequest
 from common.entities.drone import PlatformType
-from common.entities.drone_delivery import EmptyDroneDelivery, DroneDelivery, MatchedDeliveryRequest, \
+from common.entities.drone_delivery import EmptyDroneDelivery, DroneDelivery, \
     MatchedDroneLoadingDock
-from common.entities.drone_delivery_board import EmptyDroneDeliveryBoard, DroneDeliveryBoard, DroppedDeliveryRequest
+from common.entities.drone_delivery_board import EmptyDroneDeliveryBoard, DroneDeliveryBoard, \
+    DroppedDeliveryRequest
 from common.entities.drone_formation import FormationSize, FormationOptions, DroneFormations
 from common.entities.drone_loading_dock import DroneLoadingDock
 from common.entities.drone_loading_station import DroneLoadingStation
@@ -20,15 +21,16 @@ from common.graph.operational.graph_creator import build_fully_connected_graph
 from common.graph.operational.operational_graph import OperationalGraph
 from common.math.angle import Angle, AngleUnit
 from geometry.geo_factory import create_point_2d
-from matching.matcher_config import MatcherConfig, MatcherConfigProperties, MatcherSolver, MatcherConstraints, \
+from matching.matcher_config import MatcherConfig, MatcherConfigProperties, MatcherSolver, \
+    MatcherConstraints, \
     CapacityConstraints, TimeConstraints, PriorityConstraints
 from matching.matcher_input import MatcherInput
 from matching.ortools.ortools_matcher import ORToolsMatcher
 
 ZERO_TIME = datetime(2020, 1, 23, 11, 30, 00)
 
-
 class ORToolsMatcherDropPenaltyTestCase(TestCase):
+
     @classmethod
     def setUpClass(cls):
         cls.delivery_requests = cls._create_delivery_requests()
@@ -41,14 +43,30 @@ class ORToolsMatcherDropPenaltyTestCase(TestCase):
     def test_matcher_drop_penalty_zero(self):
         matcher = ORToolsMatcher(self.match_input)
         actual_delivery_board = matcher.match()
-        print(actual_delivery_board)
+
+        drone_delivery = DroneDelivery(id_=self.empty_board.empty_drone_deliveries[0].id,
+                                       drone_formation=self.empty_board.empty_drone_deliveries[
+                                           0].drone_formation,
+                                       matched_requests=[],
+                                       start_drone_loading_docks=MatchedDroneLoadingDock(
+                                           graph_index=0,
+                                           drone_loading_dock=self.loading_dock,
+                                           delivery_min_time=DateTimeExtension.from_dt(
+                                               ZERO_TIME),
+                                           delivery_max_time=DateTimeExtension.from_dt(
+                                               ZERO_TIME)),
+                                       end_drone_loading_docks=MatchedDroneLoadingDock(
+                                           graph_index=0,
+                                           drone_loading_dock=self.loading_dock,
+                                           delivery_min_time=DateTimeExtension.from_dt(
+                                               ZERO_TIME),
+                                           delivery_max_time=DateTimeExtension.from_dt(
+                                               ZERO_TIME)))
 
         dropped_delivery_request = self._create_dropped(self.delivery_requests)
 
-        expected_matched_board = DroneDeliveryBoard(
-            drone_deliveries=[[]],
-            dropped_delivery_request=[dropped_delivery_request])
-        print(expected_matched_board)
+        expected_matched_board = DroneDeliveryBoard(drone_deliveries=[drone_delivery],
+                                                    dropped_delivery_request=dropped_delivery_request)
         self.assertEqual(expected_matched_board, actual_delivery_board)
 
     @staticmethod
@@ -101,7 +119,8 @@ class ORToolsMatcherDropPenaltyTestCase(TestCase):
                                         TimeDeltaExtension(timedelta(hours=5)))))
 
     @staticmethod
-    def _create_graph(delivery_requests: List[DeliveryRequest], loading_dock: DroneLoadingDock) -> OperationalGraph:
+    def _create_graph(delivery_requests: List[DeliveryRequest],
+                      loading_dock: DroneLoadingDock) -> OperationalGraph:
         graph = OperationalGraph(zero_time=ZERO_TIME)
         graph.add_drone_loading_docks([loading_dock])
         graph.add_delivery_requests(delivery_requests)
@@ -135,8 +154,6 @@ class ORToolsMatcherDropPenaltyTestCase(TestCase):
     def _create_match_input(graph: OperationalGraph, empty_board: EmptyDroneDeliveryBoard,
                             match_config_properties: MatcherConfig) -> MatcherInput:
         return MatcherInput(graph, empty_board, match_config_properties)
-
-
 
     @staticmethod
     def _create_dropped(delivery_requests: List[DeliveryRequest]):

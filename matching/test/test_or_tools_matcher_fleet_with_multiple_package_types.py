@@ -11,7 +11,7 @@ from common.entities.delivery_request import DeliveryRequest
 from common.entities.drone import PlatformType
 from common.entities.drone_delivery import EmptyDroneDelivery, DroneDelivery, MatchedDeliveryRequest, \
     MatchedDroneLoadingDock
-from common.entities.drone_delivery_board import EmptyDroneDeliveryBoard, DroneDeliveryBoard, DroppedDeliveryRequest
+from common.entities.drone_delivery_board import EmptyDroneDeliveryBoard, DroneDeliveryBoard
 from common.entities.drone_formation import FormationSize, FormationOptions, DroneFormations
 from common.entities.drone_loading_dock import DroneLoadingDock
 from common.entities.drone_loading_station import DroneLoadingStation
@@ -29,7 +29,8 @@ from matching.ortools.ortools_matcher import ORToolsMatcher
 ZERO_TIME = datetime(2020, 1, 23, 11, 30, 00)
 
 
-class ORToolsMatcherDifferentPriorityTestCase(TestCase):
+class ORToolsMatcherFleetWithMultiplePackageTYpe(TestCase):
+
     @classmethod
     def setUpClass(cls):
         cls.delivery_requests = cls._create_delivery_requests()
@@ -41,15 +42,16 @@ class ORToolsMatcherDifferentPriorityTestCase(TestCase):
     def test_matcher(self):
         matcher = ORToolsMatcher(self.match_input)
         actual_delivery_board = matcher.match()
+        print(actual_delivery_board)
+
         expected_drone_deliveries = self._create_drone_deliveries(delivery_requests=self.delivery_requests,
                                                                   empty_board=self.empty_board,
                                                                   loading_dock=self.loading_dock)
-
-        dropped_delivery_request = DroppedDeliveryRequest(graph_index=2, delivery_request=self.delivery_requests[1])
-
         expected_matched_board = DroneDeliveryBoard(
-            drone_deliveries=[expected_drone_deliveries[0]],
-            dropped_delivery_request=[dropped_delivery_request])
+            drone_deliveries=[expected_drone_deliveries[0], expected_drone_deliveries[1]],
+            dropped_delivery_request=[])
+
+        print(expected_matched_board)
 
         self.assertEqual(expected_matched_board, actual_delivery_board)
 
@@ -61,7 +63,7 @@ class ORToolsMatcherDifferentPriorityTestCase(TestCase):
                                     create_point_2d(0, 5),
                                     Angle(45, AngleUnit.DEGREE),
                                     Angle(45, AngleUnit.DEGREE),
-                                    PackageType.LARGE)])])],
+                                    PackageType.SMALL)])])],
             time_window=TimeWindowExtension(
                 since=DateTimeExtension.from_dt(datetime(2020, 1, 23, 11, 30, 00)),
                 until=DateTimeExtension.from_dt(datetime(2020, 1, 23, 12, 00, 00))),
@@ -73,25 +75,13 @@ class ORToolsMatcherDifferentPriorityTestCase(TestCase):
                                     create_point_2d(0, 10),
                                     Angle(45, AngleUnit.DEGREE),
                                     Angle(45, AngleUnit.DEGREE),
-                                    PackageType.LARGE)])])],
+                                    PackageType.MEDIUM)])])],
             time_window=TimeWindowExtension(
-                since=DateTimeExtension.from_dt(datetime(2020, 1, 23, 11, 30, 00)),
-                until=DateTimeExtension.from_dt(datetime(2020, 1, 23, 12, 00, 00))),
-            priority=10)
-
-        delivery_request_3 = DeliveryRequest(
-            delivery_options=[DeliveryOption([CustomerDelivery([
-                PackageDeliveryPlan(UUID(int=3),
-                                    create_point_2d(0, 15),
-                                    Angle(45, AngleUnit.DEGREE),
-                                    Angle(45, AngleUnit.DEGREE),
-                                    PackageType.LARGE)])])],
-            time_window=TimeWindowExtension(
-                since=DateTimeExtension.from_dt(datetime(2020, 1, 23, 11, 30, 00)),
-                until=DateTimeExtension.from_dt(datetime(2020, 1, 23, 12, 00, 00))),
+                since=DateTimeExtension.from_dt(datetime(2020, 1, 23, 12, 30, 00)),
+                until=DateTimeExtension.from_dt(datetime(2020, 1, 23, 13, 00, 00))),
             priority=1)
 
-        return [delivery_request_1, delivery_request_2, delivery_request_3]
+        return [delivery_request_1, delivery_request_2]
 
     @staticmethod
     def _create_loading_dock() -> DroneLoadingDock:
@@ -100,7 +90,7 @@ class ORToolsMatcherDifferentPriorityTestCase(TestCase):
                                 TimeWindowExtension(
                                     since=DateTimeExtension.from_dt(ZERO_TIME),
                                     until=DateTimeExtension.from_dt(ZERO_TIME).add_time_delta(
-                                        TimeDeltaExtension(timedelta(hours=1)))))
+                                        TimeDeltaExtension(timedelta(hours=5)))))
 
     @staticmethod
     def _create_graph(delivery_requests: List[DeliveryRequest], loading_dock: DroneLoadingDock) -> OperationalGraph:
@@ -113,9 +103,12 @@ class ORToolsMatcherDifferentPriorityTestCase(TestCase):
     @staticmethod
     def _create_empty_board() -> EmptyDroneDeliveryBoard:
         empty_drone_delivery_1 = EmptyDroneDelivery("edd_1", DroneFormations.get_drone_formation(
-            FormationSize.MINI, FormationOptions.LARGE_PACKAGES, PlatformType.platform_1))
+            FormationSize.MINI, FormationOptions.MEDIUM_PACKAGES, PlatformType.platform_1))
 
-        return EmptyDroneDeliveryBoard([empty_drone_delivery_1])
+        empty_drone_delivery_2 = EmptyDroneDelivery("edd_2", DroneFormations.get_drone_formation(
+            FormationSize.MINI, FormationOptions.SMALL_PACKAGES, PlatformType.platform_1))
+
+        return EmptyDroneDeliveryBoard([empty_drone_delivery_1, empty_drone_delivery_2])
 
     @staticmethod
     def _create_match_input(graph: OperationalGraph, empty_board: EmptyDroneDeliveryBoard) -> MatcherInput:
@@ -126,24 +119,43 @@ class ORToolsMatcherDifferentPriorityTestCase(TestCase):
     @staticmethod
     def _create_drone_deliveries(delivery_requests: List[DeliveryRequest], empty_board: EmptyDroneDeliveryBoard,
                                  loading_dock: DroneLoadingDock) -> List[DroneDelivery]:
+
         drone_delivery_1 = DroneDelivery(id_=empty_board.empty_drone_deliveries[0].id,
                                          drone_formation=empty_board.empty_drone_deliveries[0].drone_formation,
                                          matched_requests=[MatchedDeliveryRequest(
-                                             graph_index=3,
-                                             delivery_request=delivery_requests[2],
+                                             graph_index=2,
+                                             delivery_request=delivery_requests[1],
                                              matched_delivery_option_index=0,
                                              delivery_min_time=DateTimeExtension.from_dt(
-                                                 datetime(2020, 1, 23, 11, 45, 00)),
+                                                 datetime(2020, 1, 23, 12, 30, 00)),
                                              delivery_max_time=DateTimeExtension.from_dt(
-                                                 datetime(2020, 1, 23, 11, 45, 00))),
-                                             MatchedDeliveryRequest(
-                                                 graph_index=1,
-                                                 delivery_request=delivery_requests[0],
-                                                 matched_delivery_option_index=0,
-                                                 delivery_min_time=DateTimeExtension.from_dt(
-                                                     datetime(2020, 1, 23, 11, 55, 00)),
-                                                 delivery_max_time=DateTimeExtension.from_dt(
-                                                     datetime(2020, 1, 23, 11, 55, 00)))
+                                                 datetime(2020, 1, 23, 12, 30, 00)))
+                                         ],
+                                         start_drone_loading_docks=MatchedDroneLoadingDock(
+                                             graph_index=0,
+                                             drone_loading_dock=loading_dock,
+                                             delivery_min_time=loading_dock.time_window.since.add_time_delta(
+                                                 TimeDeltaExtension(timedelta(minutes=40))),
+                                             delivery_max_time=loading_dock.time_window.since.add_time_delta(
+                                                 TimeDeltaExtension(timedelta(minutes=40)))),
+                                         end_drone_loading_docks=MatchedDroneLoadingDock(
+                                             graph_index=0,
+                                             drone_loading_dock=loading_dock,
+                                             delivery_min_time=loading_dock.time_window.since.add_time_delta(
+                                                 TimeDeltaExtension(timedelta(minutes=70))),
+                                             delivery_max_time=loading_dock.time_window.since.add_time_delta(
+                                                 TimeDeltaExtension(timedelta(minutes=70)))))
+
+        drone_delivery_2 = DroneDelivery(id_=empty_board.empty_drone_deliveries[1].id,
+                                         drone_formation=empty_board.empty_drone_deliveries[1].drone_formation,
+                                         matched_requests=[MatchedDeliveryRequest(
+                                             graph_index=1,
+                                             delivery_request=delivery_requests[0],
+                                             matched_delivery_option_index=0,
+                                             delivery_min_time=DateTimeExtension.from_dt(
+                                                 datetime(2020, 1, 23, 11, 35, 00)),
+                                             delivery_max_time=DateTimeExtension.from_dt(
+                                                 datetime(2020, 1, 23, 11, 35, 00)))
                                          ],
                                          start_drone_loading_docks=MatchedDroneLoadingDock(
                                              graph_index=0,
@@ -154,9 +166,9 @@ class ORToolsMatcherDifferentPriorityTestCase(TestCase):
                                              graph_index=0,
                                              drone_loading_dock=loading_dock,
                                              delivery_min_time=loading_dock.time_window.since.add_time_delta(
-                                                 TimeDeltaExtension(timedelta(minutes=30))),
+                                                 TimeDeltaExtension(timedelta(minutes=10))),
                                              delivery_max_time=loading_dock.time_window.since.add_time_delta(
-                                                 TimeDeltaExtension(timedelta(minutes=30))))
+                                                 TimeDeltaExtension(timedelta(minutes=10))))
                                          )
 
-        return [drone_delivery_1]
+        return [drone_delivery_1, drone_delivery_2]
