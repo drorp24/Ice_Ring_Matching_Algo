@@ -12,6 +12,9 @@ class ORToolsMatcherConstraints:
         self._manager = manager
         self._routing = routing
         self._matcher_input = matcher_input
+        self._travel_times_matrix = self._graph_exporter.export_travel_times(self._matcher_input.graph)
+        self._time_windows = self._graph_exporter.export_time_windows(self._matcher_input.graph,
+                                                 self._matcher_input.config.zero_time)
 
     def add_demand(self):
         for package_type in self._matcher_input.empty_board.package_types():
@@ -54,10 +57,8 @@ class ORToolsMatcherConstraints:
             self._matcher_input.config.constraints.time.count_time_from_zero,
             time)
         time_dimension = self._routing.GetDimensionOrDie(time)
-        time_windows = self._graph_exporter.export_time_windows(self._matcher_input.graph,
-                                                                self._matcher_input.config.zero_time)
-        self._add_time_window_constraints_for_each_delivery(time_dimension, time_windows)
-        self._add_time_window_constraints_for_each_vehicle_start_node(time_dimension, time_windows)
+        self._add_time_window_constraints_for_each_delivery(time_dimension, self._time_windows)
+        self._add_time_window_constraints_for_each_vehicle_start_node(time_dimension, self._time_windows)
         self._instantiate_route_start_and_end_times_to_produce_feasible_times(time_dimension)
 
     def _instantiate_route_start_and_end_times_to_produce_feasible_times(self, time_dimension):
@@ -85,7 +86,7 @@ class ORToolsMatcherConstraints:
     def _time_callback(self, from_index, to_index):
         from_node = self._manager.IndexToNode(from_index)
         to_node = self._manager.IndexToNode(to_index)
-        return self._graph_exporter.export_travel_times(self._matcher_input.graph)[from_node][to_node]
+        return self._travel_times_matrix[from_node][to_node]
 
     def add_dropped_penalty(self):
         for node in range(1, len(self._matcher_input.graph.nodes)):

@@ -32,7 +32,7 @@ class DroneFormation:
         return self._drone_configuration.package_type_map.get_package_types()
 
     def get_package_type_volume(self, package_type: PackageType) -> int:
-        return self._drone_configuration.package_type_map.get_package_type_volume(package_type)
+        return self.size * self._drone_configuration.package_type_map.get_package_type_volume(package_type)
 
     def get_package_type_volumes(self) -> [int]:
         return self._drone_configuration.package_type_map.get_package_types_volumes()

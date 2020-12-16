@@ -1,3 +1,4 @@
+from datetime import date, time
 from random import Random
 from typing import List
 
@@ -5,6 +6,7 @@ from common.entities.delivery_request import build_delivery_request_distribution
 from common.entities.delivery_request_generator import DeliveryRequestDatasetStructure, DeliveryRequestDatasetGenerator
 from common.entities.disribution.distribution import Range
 from common.entities.drone_loading_dock import DroneLoadingDock, DroneLoadingDockDistribution
+from common.entities.temporal import DateTimeExtension
 from common.graph.operational import graph_creator
 from common.graph.operational.operational_graph import OperationalGraph
 from geometry.geo_distribution import ChoiceNormalDistribution
@@ -89,7 +91,7 @@ def draw_all_delivery_requests(sampled_drs: List[DeliveryRequest]):
 
 def _create_operational_graph_from_assets(sampled_drs: [DeliveryRequest],
                                           sampled_drone_loading_dock: [DroneLoadingDock]):
-    og = OperationalGraph()
+    og = OperationalGraph(DateTimeExtension(dt_date=date(2021, 1, 1), dt_time=time(6, 0, 0)).get_internal())
     og.add_delivery_requests(sampled_drs)
     graph_creator.add_locally_connected_dr_graph(og, sampled_drs)
     graph_creator.add_fully_connected_loading_docks(og, sampled_drone_loading_dock)

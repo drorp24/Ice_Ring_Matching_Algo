@@ -1,3 +1,4 @@
+from ctypes import Union
 from pathlib import Path
 
 from common.entities.base_entity import JsonableBaseEntity
@@ -59,12 +60,27 @@ class MinimumEnd2EndConfig(JsonableBaseEntity):
     def matcher_config_json(self, matcher_config_json: str):
         self._matcher_config_json = Path(matcher_config_json)
 
+    @matcher_config_json.getter
+    def matcher_config_json(self) -> str:
+        return str(self._matcher_config_json)
+
+    @scenario_json.getter
+    def scenario_json(self) -> str:
+        return str(self._scenario_json)
+
+    @fleet_partition_json.getter
+    def fleet_partition_json(self) -> str:
+        return str(self._fleet_partition_json)
+
 
 class DataLoader:
     def __init__(self, config: MinimumEnd2EndConfig):
         self.scenario_dict = Scenario.json_to_dict(config.scenario_json)
         self.fleet_json = config.fleet_partition_json
         self.matcher_config_json = config.matcher_config_json
+
+    def get_scenario(self) -> Scenario:
+        return Scenario.dict_to_obj(self.scenario_dict)
 
     def get_delivery_requests(self) -> List[DeliveryRequest]:
         scenario = Scenario.dict_to_obj(self.scenario_dict)
@@ -84,13 +100,17 @@ class DataLoader:
 
 
 class MinimumEnd2End:
-    def __init__(self, data_loader: DataLoader):
-        self.delivery_requests = data_loader.get_delivery_requests()
-        self.loading_dock = data_loader.get_docks()
-        self.empty_drone_delivery_board = data_loader.get_empty_drone_delivery_board()
-        self.zero_time = data_loader.get_zero_time()
+    def __init__(self, scenario: Scenario, empty_drone_delivery_board: EmptyDroneDeliveryBoard):
+        self.delivery_requests = scenario.delivery_requests
+        self.loading_dock = scenario.drone_loading_docks
+        self.empty_drone_delivery_board = empty_drone_delivery_board
+        self.zero_time = scenario.zero_time
 
-    def create_graph_model(self, max_cost_to_connect: float) -> OperationalGraph:
+    @classmethod
+    def build_from_json(cls, data_loader: DataLoader):
+        return MinimumEnd2End(data_loader.get_scenario(), data_loader.get_empty_drone_delivery_board())
+
+    def create_fully_connected_graph_model(self) -> OperationalGraph:
         operational_graph = OperationalGraph(self.zero_time.get_internal())
         operational_graph.add_drone_loading_docks(self.loading_dock)
         operational_graph.add_delivery_requests(self.delivery_requests)

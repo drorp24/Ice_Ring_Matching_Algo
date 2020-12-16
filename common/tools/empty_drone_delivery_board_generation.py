@@ -34,3 +34,7 @@ def generate_empty_delivery_board(fleet_reader: FleetReader) -> EmptyDroneDelive
     for platform_property in platforms_properties:
         total_drone_deliveries += calc_drone_deliveries(platform_property)
     return EmptyDroneDeliveryBoard(total_drone_deliveries)
+
+
+def build_empty_drone_delivery_board(platform_properties: PlatformPropertySet):
+    return EmptyDroneDeliveryBoard(calc_drone_deliveries(platform_properties))

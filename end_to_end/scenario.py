@@ -27,7 +27,7 @@ class Scenario(JsonableBaseEntity):
 
     @property
     def zero_time(self) -> DateTimeExtension:
-       return self._zero_time
+        return self._zero_time
 
     @classmethod
     def dict_to_obj(cls, dict_input):
@@ -52,6 +52,6 @@ class ScenarioDistribution(Distribution):
 
     def choose_rand(self, random: Random, amount: int, dock_amount: int = 1) -> Scenario:
         zero_time = self.zero_time_distribution.choose_rand(random=random, amount=1)
-        return Scenario(self.delivery_requests_distribution.choose_rand(random, amount),
-                        self.drone_loading_docks_distribution.choose_rand(random, dock_amount),
+        return Scenario(self.delivery_requests_distribution.choose_rand(random=random, amount=amount),
+                        self.drone_loading_docks_distribution.choose_rand(random=random, amount=dock_amount),
                         zero_time[0])

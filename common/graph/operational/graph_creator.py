@@ -24,22 +24,29 @@ def add_locally_connected_dr_graph(graph, dr_connection_options: [DeliveryReques
 
 
 def build_fully_connected_graph(graph: OperationalGraph):
-    nodes = graph.nodes
-    edges = []
-    for origin_node in nodes:
-        for destination_node in nodes:
-            if origin_node != destination_node:
-                if has_overlapping_time_window(origin_node.internal_node, destination_node.internal_node):
-                    edges += [OperationalEdge(origin_node, destination_node,
-                                              OperationalEdgeAttribs(calc_cost(origin_node.internal_node,
-                                                                               destination_node.internal_node)))]
-                else:
-                    edges += [OperationalEdge(origin_node, destination_node,
-                                             OperationalEdgeAttribs(100 + calc_cost(origin_node.internal_node,
-                                                                                    destination_node.internal_node)))]
+    nodes = list(graph.nodes)
+    for i,origin_node in enumerate(nodes):
+        destinations = list(filter(lambda x: x != origin_node and
+                                   has_overlapping_time_window(origin_node.internal_node, x.internal_node), nodes[i:]))
+        edges = list(map(lambda y: OperationalEdge(origin_node, y,
+                OperationalEdgeAttribs(calc_cost(origin_node.internal_node, y.internal_node))), destinations)) + \
+                list(map(lambda y: OperationalEdge(y, origin_node,
+                                           OperationalEdgeAttribs(
+                                               calc_cost(origin_node.internal_node, y.internal_node))), destinations))
+
+        #    edges = []
+        #    for origin_node in nodes:
+        #        for destination_node in nodes:
+        #            if origin_node != destination_node:
+        #                if has_overlapping_time_window(origin_node.internal_node, destination_node.internal_node):
+        #                    edges += [OperationalEdge(origin_node, destination_node,
+        #                                              OperationalEdgeAttribs(calc_cost(origin_node.internal_node,
+        #                                                                               destination_node.internal_node)))]
+        # else:
+        # edges += [OperationalEdge(origin_node, destination_node,
+        #                         OperationalEdgeAttribs(100 + calc_cost(origin_node.internal_node,
+        #                                                                    destination_node.internal_node)))]
         graph.add_operational_edges(edges)
-
-
 
 
 def add_fully_connected_loading_docks(graph: OperationalGraph, drone_loading_docks: [DroneLoadingDock]):
