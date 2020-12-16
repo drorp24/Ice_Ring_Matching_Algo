@@ -1,29 +1,45 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
+from enum import Enum, auto
 
 from geometry.geo2d import Point2D, Polygon2D, LineString2D, LinearRing2D
+from visualization.basic.color import Color
+
+
+class Drawer2DCoordinateSys(Enum):
+    CARTESIAN = auto()
+    GEOGRAPHIC = auto()
 
 
 class Drawer2D(ABC):
     @abstractmethod
-    def add_point2d(self, point2d: Point2D, edgecolor='black', facecolor='black', linewidth=2):
+    def add_point2d(self, point2d: Point2D, radius=0.05, edgecolor: Color = Color.Blue, facecolor: Color = Color.Blue,
+                    facecolor_alpha=1, linewidth=2) -> None:
         raise NotImplementedError
 
     @abstractmethod
-    def add_line_string2d(self, line_string2d: LineString2D, edgecolor='black', facecolor='black', linewidth=2):
+    def add_line_string2d(self, line_string2d: LineString2D, edgecolor: Color = Color.Green,
+                          facecolor: Color = Color.White, linewidth=2) -> None:
         raise NotImplementedError
 
     @abstractmethod
-    def add_linear_ring2d(self, linear_ring2d: LinearRing2D, edgecolor='black', facecolor='black', linewidth=2):
+    def add_linear_ring2d(self, linear_ring2d: LinearRing2D, edgecolor: Color = Color.Yellow,
+                          facecolor: Color = Color.Yellow, facecolor_alpha=0.2, linewidth=2) -> None:
         raise NotImplementedError
 
     @abstractmethod
-    def add_polygon2d(self, polygon2d: Polygon2D, edgecolor='black', facecolor='black', linewidth=2):
+    def add_polygon2d(self, polygon2d: Polygon2D, edgecolor: Color = Color.Red, facecolor: Color = Color.Red,
+                      facecolor_alpha=0.2, linewidth=2) -> None:
         raise NotImplementedError
 
     @abstractmethod
-    def add_arrow2d(self, tail: Point2D, head: Point2D, edgecolor='black', facecolor='black', linewidth=2):
+    def add_arrow2d(self, tail: Point2D, head: Point2D, edgecolor: Color = Color.Black, facecolor: Color = Color.Black,
+                    linewidth=2) -> None:
+        raise NotImplementedError
+
+    @abstractmethod
+    def add_text(self, text: str, point2d: Point2D, color: Color = Color.Black, fontsize: int = 10) -> None:
         raise NotImplementedError
 
     @abstractmethod
@@ -44,4 +60,3 @@ class Drawer2D(ABC):
         """
 
         raise NotImplementedError
-

@@ -1,6 +1,7 @@
 from common.entities.customer_delivery import CustomerDelivery
 from common.entities.delivery_option import DeliveryOption
 from common.entities.delivery_request import DeliveryRequest
+from common.entities.drone_delivery_board import DroneDeliveryBoard
 from common.entities.drone_loading_dock import DroneLoadingDock
 from common.entities.package_delivery_plan import PackageDeliveryPlan
 from common.graph.operational.operational_graph import OperationalGraph, OperationalEdge
@@ -47,7 +48,7 @@ def add_delivery_request(drawer: Drawer2D, dr: DeliveryRequest, draw_internal=Tr
 
 
 def add_drone_loading_dock(drawer: Drawer2D, ds: DroneLoadingDock):
-    drawer.add_point2d(ds.calc_location(), edgecolor=Color.Black, facecolor=Color.DodgerBlue, linewidth=16)
+    drawer.add_point2d(ds.calc_location(), edgecolor=Color.Black, facecolor=Color.DodgerBlue, linewidth=5)
 
 
 def add_operational_graph(drawer: Drawer2D, op_gr: OperationalGraph, draw_internal=True):
@@ -71,3 +72,22 @@ def _get_color_of_graph_edge(edge: OperationalEdge):
     for cond in cond_color_map:
         if cond(edge):
             return cond_color_map[cond]
+
+
+def add_delivery_board(drawer: Drawer2D, board: DroneDeliveryBoard, draw_internal=True):
+    for delivery in board.drone_deliveries:
+        if len(delivery.matched_requests) is 0:
+            continue
+        locations = []
+        add_drone_loading_dock(drawer, delivery.start_drone_loading_docks.drone_loading_dock)
+        locations.append(delivery.start_drone_loading_docks.drone_loading_dock.calc_location())
+        for request in delivery.matched_requests:
+            matched_delivery_option = request.delivery_request.delivery_options[request.matched_delivery_option_index]
+            add_delivery_option(drawer, matched_delivery_option, draw_internal=False)
+            current_location = matched_delivery_option.calc_location()
+            drawer.add_text(str(request.graph_index), current_location, fontsize=17)
+            locations.append(current_location)
+        add_drone_loading_dock(drawer, delivery.end_drone_loading_docks.drone_loading_dock)
+        locations.append(delivery.end_drone_loading_docks.drone_loading_dock.calc_location())
+        for i, location in enumerate(locations[:-1]):
+            drawer.add_arrow2d(head=locations[i+1], tail=locations[i], edgecolor=Color.Blue, linewidth=2)
