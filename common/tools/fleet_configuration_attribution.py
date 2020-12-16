@@ -1,3 +1,4 @@
+import itertools
 from dataclasses import dataclass
 from typing import Any
 
@@ -88,7 +89,7 @@ class FleetConfigurationAttribution:
         for i in range(configuration_options_size):
             for j in range(len(formation_amounts) - 1):
                 constraints_coefficients[i, i: int(formation_amounts[j] *
-                                                   configuration_options_size):configuration_options_size] =\
+                                                   configuration_options_size):configuration_options_size] = \
                     formation_sizes[j]
                 constraints_coefficients[i, i + int(formation_amounts[j] *
                                                     configuration_options_size)::configuration_options_size] = \
@@ -107,11 +108,13 @@ class FleetConfigurationAttribution:
         num_vars = cls._calc_number_variables()
         configuration_options_size = cls.configuration_attribution_parameters.configuration_options_size
         formation_amounts = cls.configuration_attribution_parameters.formation_amounts
+        decision_variable_batches = list(itertools.accumulate([0] +
+                                                              [int(amount * configuration_options_size)
+                                                               for amount in formation_amounts]))
         formation_sizes = cls.configuration_attribution_parameters.formation_sizes
         constraints_coefficients = np.zeros(num_vars)
-        for i in range(len(formation_amounts)):
-            constraints_coefficients[int(i * formation_amounts[i] * configuration_options_size):
-                                     int((i + 1) * formation_amounts[i] * configuration_options_size)] = \
+        for i in range(len(decision_variable_batches) - 1):
+            constraints_coefficients[decision_variable_batches[i]:decision_variable_batches[i + 1]] = \
                 formation_sizes[i]
         return constraints_coefficients.tolist()
 
