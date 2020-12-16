@@ -90,10 +90,9 @@ class ORToolsMatcherDifferentTWTestCase(TestCase):
             time_window=TimeWindowExtension(
                 since=DateTimeExtension.from_dt(datetime(2020, 1, 23, 13, 30, 00)),
                 until=DateTimeExtension.from_dt(datetime(2020, 1, 23, 14, 00, 00))),
-            priority=1)
+            priority=2)
 
-        delivery_requests = [delivery_request_1, delivery_request_2, delivery_request_3]
-        return delivery_requests
+        return [delivery_request_1, delivery_request_2, delivery_request_3]
 
     @staticmethod
     def _create_loading_dock() -> DroneLoadingDock:
