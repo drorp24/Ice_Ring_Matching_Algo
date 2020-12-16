@@ -58,7 +58,7 @@ class TimeWindowExtension(JsonableBaseEntity):
 
     def overlaps(self, other: TimeWindowExtension) -> bool:
         return self.get_internal().overlaps(other.get_internal())
-        return int(self._internal.since.timestamp()), int(self._internal.until.timestamp())
+        #return int(self._internal.since.timestamp()), int(self._internal.until.timestamp())
 
     def get_relative_time_in_min(self, zero_time: DateTimeExtension) -> (float, float):
         return self.since.get_time_delta(zero_time).in_minutes(), self.until.get_time_delta(zero_time).in_minutes()

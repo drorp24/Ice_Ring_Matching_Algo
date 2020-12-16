@@ -17,7 +17,7 @@
     "solver" : {
       "__class__": "MatcherSolver",
       "name": "or_tools:automatic",
-      "timeout_sec": 30
+      "timeout_sec": 60
     },
     "constraints": {
       "__class__": "MatcherConstraints",
@@ -27,8 +27,8 @@
       },
       "time": {
         "__class__": "TimeConstraints",
-        "max_waiting_time": 100000,
-        "max_route_time": 300000000,
+        "max_waiting_time": 0,
+        "max_route_time": 30000000000,
         "count_time_from_zero": false
       },
       "priority": {

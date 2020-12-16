@@ -35,7 +35,8 @@ class DroppedDeliveryRequest:
 
     def __str__(self):
         return 'DroppedDeliveryRequest(graph_index=' + str(self.graph_index) + ', priority=' + str(
-            self.delivery_request.priority)
+            self.delivery_request.priority) + ',' + self.delivery_request.time_window.since.get_internal().strftime("%m %d %Y %H:%M:%S") \
+               + str(self.delivery_request.delivery_options[0].get_amount_per_package_type()) +')'
 
 
 class DroneDeliveryBoard:

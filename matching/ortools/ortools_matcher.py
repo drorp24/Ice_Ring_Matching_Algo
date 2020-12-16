@@ -29,12 +29,12 @@ class ORToolsMatcher(Matcher):
         self._set_constraints()
 
     def _set_manager(self) -> RoutingIndexManager:
-        travel_times_matrix = self._graph_exporter.export_travel_times(self._matcher_input.graph)
+        #travel_times_matrix = self._graph_exporter.export_travel_times(self._matcher_input.graph)
         num_vehicles = self._matcher_input.empty_board.num_of_formations()
         depot_ids_start = self._graph_exporter.export_basis_nodes_indices(self._matcher_input.graph)
         # TODO depot_ids_end = self._graph_exporter.export_basis_nodes_indices(self._match_input.graph)
 
-        manager = pywrapcp.RoutingIndexManager(len(travel_times_matrix),
+        manager = pywrapcp.RoutingIndexManager(len(self.matcher_input.graph.nodes),
                                                num_vehicles,
                                                depot_ids_start[0])
         # TODO add depot_ids_end as forth param)
