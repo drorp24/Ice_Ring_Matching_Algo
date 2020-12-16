@@ -39,10 +39,10 @@ class MatchedDroneLoadingDock:
                and self.delivery_max_time == other.delivery_max_time
 
     def __str__(self):
-        return 'MatchedDroneLoadingDock(graph_index=' + str(
+        return '[MatchedDroneLoadingDock(graph_index=' + str(
             self.graph_index) + ', min_time=' + self.delivery_min_time.get_internal().strftime(
             "%m %d %Y %H:%M:%S") + ', max_time=' + self.delivery_max_time.get_internal().strftime(
-            "%m %d %Y %H:%M:%S") + ') \n'
+            "%m %d %Y %H:%M:%S") + ')]'
 
 
 @dataclass
@@ -61,18 +61,20 @@ class MatchedDeliveryRequest:
 
     # TODO: handle time format
     def __str__(self):
-        return 'MatchedDeliveryRequest(graph_index=' + str(self.graph_index) + ', priority=' + str(
+        return '[MatchedDeliveryRequest(graph_index=' + str(self.graph_index) + ', priority=' + str(
             self.delivery_request.priority) + ', min_time=' + self.delivery_min_time.get_internal().strftime(
             "%m %d %Y %H:%M:%S") + ', max_time=' + self.delivery_max_time.get_internal().strftime(
             "%m %d %Y %H:%M:%S") + ', delivered=' + str(
             self.delivery_request.delivery_options[
-                self.matched_delivery_option_index].get_amount_per_package_type()) + ')'
+                self.matched_delivery_option_index].get_amount_per_package_type()) + ')]'
 
 
 # TODO change to MatchedDroneDelivery
 class DroneDelivery(EmptyDroneDelivery):
-    def __init__(self, id_: str, drone_formation: DroneFormation, matched_requests: [MatchedDeliveryRequest],
-                 start_drone_loading_docks: MatchedDroneLoadingDock, end_drone_loading_docks: MatchedDroneLoadingDock):
+    def __init__(self, id_: str, drone_formation: DroneFormation,
+                 matched_requests: [MatchedDeliveryRequest],
+                 start_drone_loading_docks: MatchedDroneLoadingDock,
+                 end_drone_loading_docks: MatchedDroneLoadingDock):
         super().__init__(id_, drone_formation)
         self._matched_requests = matched_requests
         self._start_drone_loading_docks = start_drone_loading_docks
@@ -90,10 +92,16 @@ class DroneDelivery(EmptyDroneDelivery):
                other.start_drone_loading_docks and self.end_drone_loading_docks == other.end_drone_loading_docks
 
     def __str__(self):
-        return "\n[DroneDelivery id=" + self.id + ']\n' + \
-               '\n' + str(self.start_drone_loading_docks) + \
-               '\n'.join(map(str, self._matched_requests)) + \
-               '\n' + str(self.end_drone_loading_docks)
+        if len(self._matched_requests) == 0:
+            return "\n[DroneDelivery id={id} - No match found]".format(id=self.id)
+
+        return "\n[DroneDelivery id={id} {total_amount_per_package_type} total priority={priority} total time in " \
+               "minutes={total_time}]\n{start_drone_loading_docks}\n{matched_requests}\n{end_drone_loading_docks}" \
+            .format(id=self.id, total_amount_per_package_type=str(self.total_amount_per_package_type),
+                    priority=str(self.total_priority), total_time=str(self.total_time_in_minutes),
+                    start_drone_loading_docks=str(self.start_drone_loading_docks),
+                    matched_requests='\n'.join(map(str, self._matched_requests)),
+                    end_drone_loading_docks=str(self.end_drone_loading_docks))
 
     @property
     def matched_requests(self) -> [MatchedDeliveryRequest]:
