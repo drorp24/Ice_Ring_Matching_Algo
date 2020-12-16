@@ -54,8 +54,8 @@ class DroneDeliveryBoard:
 
     # TODO : ********* add totals to str
     def __str__(self):
-        drone_deliveries_str = '\n'.join(map(str, self._drone_deliveries)) if len(
-            self._drone_deliveries) > 0 else "\n[No match found]"
+        drone_deliveries_str = '\n'.join(map(str, self._drone_deliveries))
+
         dropped_delivery_request_str = '\n'.join(map(str, self.dropped_delivery_request)) if len(
             self._dropped_delivery_request) > 0 else "\n[No dropped delivery requests]"
         return "\n[DroneDeliveryBoard]\n" + drone_deliveries_str + dropped_delivery_request_str

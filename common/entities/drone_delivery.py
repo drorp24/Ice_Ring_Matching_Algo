@@ -71,8 +71,10 @@ class MatchedDeliveryRequest:
 
 # TODO change to MatchedDroneDelivery
 class DroneDelivery(EmptyDroneDelivery):
-    def __init__(self, id_: str, drone_formation: DroneFormation, matched_requests: [MatchedDeliveryRequest],
-                 start_drone_loading_docks: MatchedDroneLoadingDock, end_drone_loading_docks: MatchedDroneLoadingDock):
+    def __init__(self, id_: str, drone_formation: DroneFormation,
+                 matched_requests: [MatchedDeliveryRequest],
+                 start_drone_loading_docks: MatchedDroneLoadingDock,
+                 end_drone_loading_docks: MatchedDroneLoadingDock):
         super().__init__(id_, drone_formation)
         self._matched_requests = matched_requests
         self._start_drone_loading_docks = start_drone_loading_docks
@@ -90,10 +92,16 @@ class DroneDelivery(EmptyDroneDelivery):
                other.start_drone_loading_docks and self.end_drone_loading_docks == other.end_drone_loading_docks
 
     def __str__(self):
-        return "\n[DroneDelivery id=" + self.id + ']\n' + \
-               '\n' + str(self.start_drone_loading_docks) + \
-               '\n'.join(map(str, self._matched_requests)) + \
-               '\n' + str(self.end_drone_loading_docks)
+        if len(self._matched_requests) == 0:
+            return "[No match found for drone]"
+
+        return "\n[DroneDelivery id={id} {total_amount_per_package_type} total priority={priority} total time in " \
+               "minutes={total_time} \n {start_drone_loading_docks} {matched_requests} \n {end_drone_loading_docks}" \
+            .format(id=self.id, total_amount_per_package_type=str(self.total_amount_per_package_type),
+                    priority=str(self.total_priority), total_time=str(self.total_time_in_minutes),
+                    start_drone_loading_docks=str(self.start_drone_loading_docks),
+                    matched_requests='\n'.join(map(str, self._matched_requests)),
+                    end_drone_loading_docks=str(self.end_drone_loading_docks))
 
     @property
     def matched_requests(self) -> [MatchedDeliveryRequest]:
