@@ -74,7 +74,7 @@ class PolygonUtilsTestCase(unittest.TestCase):
         splited_polygon = PolygonUtils.split_polygon(polygon, box_resolution, required_area)
         total_time = time.time() - start_time
         self.assertEqual(len(splited_polygon), polygon_side_length ** 2)
-        self.assertLess(total_time, 0.2)
+        self.assertLess(total_time, 0.5)
 
     def test_split_polygon_large_box_ra1_br1_negative_values(self):
         start_time = time.time()
@@ -88,7 +88,7 @@ class PolygonUtilsTestCase(unittest.TestCase):
         splited_polygon = PolygonUtils.split_polygon(polygon, box_resolution, required_area)
         total_time = time.time() - start_time
         self.assertEqual(len(splited_polygon), polygon_side_length ** 2)
-        self.assertLess(total_time, 0.2)
+        self.assertLess(total_time, 0.5)
 
     def test_split_polygon_large_triangle1_ra1_br1(self):
         start_time = time.time()
@@ -101,4 +101,4 @@ class PolygonUtilsTestCase(unittest.TestCase):
         box_resolution = 1
         splited_polygon = PolygonUtils.split_polygon(polygon, box_resolution, required_area)
         total_time = time.time() - start_time
-        self.assertLess(total_time, 0.2)
+        self.assertLess(total_time, 0.5)
