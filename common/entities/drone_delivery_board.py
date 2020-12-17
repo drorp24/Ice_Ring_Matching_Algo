@@ -34,9 +34,8 @@ class DroppedDeliveryRequest:
         return self.graph_index == other.graph_index and self.delivery_request == other.delivery_request
 
     def __str__(self):
-        return 'DroppedDeliveryRequest(graph_index=' + str(self.graph_index) + ', priority=' + str(
-            self.delivery_request.priority) + ',' + self.delivery_request.time_window.since.get_internal().strftime("%m %d %Y %H:%M:%S") \
-               + str(self.delivery_request.delivery_options[0].get_amount_per_package_type()) +')'
+        return '[DroppedDeliveryRequest(graph_index=' + str(self.graph_index) + ', priority=' + str(
+            self.delivery_request.priority) + ")]"
 
 
 class DroneDeliveryBoard:
@@ -53,20 +52,22 @@ class DroneDeliveryBoard:
     def __eq__(self, other):
         return self._drone_deliveries == other.drone_deliveries
 
-    # TODO : add totals to str
+    # TODO : ********* add totals to str
     def __str__(self):
-        drone_deliveries_str = '\n'.join(map(str, self._drone_deliveries)) if len(
-            self._drone_deliveries) > 0 else "\n[No match found]"
+        drone_deliveries_str = '\n'.join(map(str, self._drone_deliveries))
+
         dropped_delivery_request_str = '\n'.join(map(str, self.dropped_delivery_request)) if len(
             self._dropped_delivery_request) > 0 else "\n[No dropped delivery requests]"
-        return "\n[DroneDeliveryBoard]\n" + drone_deliveries_str + dropped_delivery_request_str
+
+        return "\n[DroneDeliveryBoard]\n{drone_deliveries_str}\n{dropped_delivery_request_str}".format(
+            drone_deliveries_str=drone_deliveries_str, dropped_delivery_request_str=dropped_delivery_request_str)
 
     @property
     def drone_deliveries(self) -> [DroneDelivery]:
         return self._drone_deliveries
 
     @property
-    def dropped_delivery_request(self) -> [DeliveryRequest]:
+    def dropped_delivery_request(self) -> [DroppedDeliveryRequest]:
         return self._dropped_delivery_request
 
     @property
@@ -85,7 +86,6 @@ class DroneDeliveryBoard:
         total_amount_per_package_type = [0] * len(PackageType)
 
         for drone_delivery in self._drone_deliveries:
-
             total_amount_per_package_type = [x + y for x, y in zip(total_amount_per_package_type,
                                                                    drone_delivery.total_amount_per_package_type.
                                                                    get_package_types_volumes())]
