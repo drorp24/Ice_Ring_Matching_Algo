@@ -9,11 +9,12 @@ from geometry.geo2d import Point2D, Polygon2D, LineString2D, LinearRing2D
 from visualization.basic.color import Color
 from visualization.basic.drawer2d import Drawer2D, Drawer2DCoordinateSys
 
+
 GEOGRAPHIC_RADIUS_SIZE_RATIO = 0.1
 
 
-def create_drawer_2d() -> Drawer2D:
-    return PltDrawer2D()
+def create_drawer_2d(coordinate_sys: Drawer2DCoordinateSys = Drawer2DCoordinateSys.CARTESIAN) -> Drawer2D:
+    return PltDrawer2D(coordinate_sys)
 
 
 class PltDrawer2D(Drawer2D):

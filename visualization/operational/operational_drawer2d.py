@@ -1,3 +1,5 @@
+import random
+
 from common.entities.customer_delivery import CustomerDelivery
 from common.entities.delivery_option import DeliveryOption
 from common.entities.delivery_request import DeliveryRequest
@@ -27,23 +29,23 @@ def add_customer_delivery(drawer: Drawer2D, cd: CustomerDelivery, draw_internal=
             add_package_delivery_plan(drawer, pdp, draw_internal=True)
 
 
-def add_delivery_option(drawer: Drawer2D, do: DeliveryOption, draw_internal=True):
-    drawer.add_point2d(do.calc_location(), edgecolor=Color.Red, facecolor=Color.Red, linewidth=5)
+def add_delivery_option(drawer: Drawer2D, do: DeliveryOption, draw_internal=True, color: Color = Color.Red):
+    drawer.add_point2d(do.calc_location(), edgecolor=color, facecolor=color, linewidth=5)
     if draw_internal:
         for cd in do.customer_deliveries:
             add_customer_delivery(drawer, cd, draw_internal=True)
-            drawer.add_point2d(cd.calc_location(), edgecolor=Color.Red, linewidth=2)
+            drawer.add_point2d(cd.calc_location(), edgecolor=color, linewidth=2)
             segment = create_line_string_2d([do.calc_location(), cd.calc_location()])
-            drawer.add_line_string2d(segment, edgecolor=Color.Red, linewidth=2)
+            drawer.add_line_string2d(segment, edgecolor=color, linewidth=2)
 
 
-def add_delivery_request(drawer: Drawer2D, dr: DeliveryRequest, draw_internal=True):
-    drawer.add_point2d(dr.calc_location(), edgecolor=Color.Black, facecolor=Color.Purple, linewidth=16)
+def add_delivery_request(drawer: Drawer2D, dr: DeliveryRequest, draw_internal=True, color: Color = Color.Purple):
+    drawer.add_point2d(dr.calc_location(), edgecolor=color, facecolor=color, linewidth=5)
     if draw_internal:
         for do in dr.delivery_options:
-            drawer.add_point2d(do.calc_location(), edgecolor=Color.Purple, linewidth=2)
+            drawer.add_point2d(do.calc_location(), edgecolor=color, linewidth=2)
             segment = create_line_string_2d([do.calc_location(), dr.calc_location()])
-            drawer.add_line_string2d(segment, edgecolor=Color.Purple, linewidth=2)
+            drawer.add_line_string2d(segment, edgecolor=color, linewidth=2)
             add_delivery_option(drawer, do, draw_internal=True)
 
 
@@ -74,7 +76,11 @@ def _get_color_of_graph_edge(edge: OperationalEdge):
             return cond_color_map[cond]
 
 
-def add_delivery_board(drawer: Drawer2D, board: DroneDeliveryBoard, draw_internal=True):
+def add_delivery_board(drawer: Drawer2D, board: DroneDeliveryBoard, draw_dropped=True):
+    if draw_dropped:
+        for dropped in board.dropped_delivery_request:
+            add_delivery_request(drawer, dropped.delivery_request, draw_internal=False, color=Color.Red)
+            drawer.add_text(str(dropped.graph_index), dropped.delivery_request.calc_location(), fontsize=12)
     for delivery in board.drone_deliveries:
         if len(delivery.matched_requests) is 0:
             continue
@@ -83,11 +89,12 @@ def add_delivery_board(drawer: Drawer2D, board: DroneDeliveryBoard, draw_interna
         locations.append(delivery.start_drone_loading_docks.drone_loading_dock.calc_location())
         for request in delivery.matched_requests:
             matched_delivery_option = request.delivery_request.delivery_options[request.matched_delivery_option_index]
-            add_delivery_option(drawer, matched_delivery_option, draw_internal=False)
+            add_delivery_option(drawer, matched_delivery_option, draw_internal=False, color=Color.Green)
             current_location = matched_delivery_option.calc_location()
-            drawer.add_text(str(request.graph_index), current_location, fontsize=17)
+            drawer.add_text(str(request.graph_index), current_location, fontsize=12)
             locations.append(current_location)
         add_drone_loading_dock(drawer, delivery.end_drone_loading_docks.drone_loading_dock)
         locations.append(delivery.end_drone_loading_docks.drone_loading_dock.calc_location())
+        route_color = random.choice(list(Color))
         for i, location in enumerate(locations[:-1]):
-            drawer.add_arrow2d(head=locations[i+1], tail=locations[i], edgecolor=Color.Blue, linewidth=2)
+            drawer.add_arrow2d(head=locations[i + 1], tail=locations[i], edgecolor=route_color, linewidth=2)

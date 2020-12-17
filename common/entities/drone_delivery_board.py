@@ -67,7 +67,7 @@ class DroneDeliveryBoard:
         return self._drone_deliveries
 
     @property
-    def dropped_delivery_request(self) -> [DeliveryRequest]:
+    def dropped_delivery_request(self) -> [DroppedDeliveryRequest]:
         return self._dropped_delivery_request
 
     @property
