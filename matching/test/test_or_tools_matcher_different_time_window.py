@@ -53,7 +53,7 @@ class ORToolsMatcherDifferentTWTestCase(TestCase):
                                                                   loading_dock=self.loading_dock)
         expected_matched_board = DroneDeliveryBoard(
             drone_deliveries=[expected_drone_deliveries[0], expected_drone_deliveries[1]],
-            dropped_delivery_request=[])
+            dropped_delivery_requests=[])
 
         print(expected_matched_board)
 

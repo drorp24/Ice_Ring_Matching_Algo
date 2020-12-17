@@ -75,7 +75,7 @@ class BasicDroneDeliveryGeneration(unittest.TestCase):
             [cls.empty_drone_delivery_1, cls.empty_drone_delivery_2])
 
         cls.drone_delivery_board = DroneDeliveryBoard(drone_deliveries=[cls.drone_delivery_1, cls.drone_delivery_2],
-                                                      dropped_delivery_request=[cls.dropped_delivery_request])
+                                                      dropped_delivery_requests=[cls.dropped_delivery_request])
 
     def test_delivery_requests_quantity(self):
         self.assertGreaterEqual(len(self.delivery_requests), 3)
@@ -155,5 +155,5 @@ class BasicDroneDeliveryGeneration(unittest.TestCase):
     def test_2_drone_delivery_boards_are_equal(self):
         actual_drone_delivery_board = DroneDeliveryBoard(
             drone_deliveries=[self.drone_delivery_1, self.drone_delivery_2],
-            dropped_delivery_request=[self.dropped_delivery_request])
+            dropped_delivery_requests=[self.dropped_delivery_request])
         self.assertEqual(self.drone_delivery_board, actual_drone_delivery_board)

@@ -66,7 +66,7 @@ class ORToolsMatcherDropPenaltyTestCase(TestCase):
         dropped_delivery_request = self._create_dropped(self.delivery_requests)
 
         expected_matched_board = DroneDeliveryBoard(drone_deliveries=[drone_delivery],
-                                                    dropped_delivery_request=dropped_delivery_request)
+                                                    dropped_delivery_requests=dropped_delivery_request)
         self.assertEqual(expected_matched_board, actual_delivery_board)
 
     @staticmethod

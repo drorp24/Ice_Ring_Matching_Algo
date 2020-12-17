@@ -62,7 +62,7 @@ class ORToolsMatcher(Matcher):
     def _create_drone_delivery_board(self, solution: Assignment) -> DroneDeliveryBoard:
 
         return DroneDeliveryBoard(drone_deliveries=self._create_drone_deliveries(solution),
-                                  dropped_delivery_request=self._extract_dropped(solution))
+                                  dropped_delivery_requests=self._extract_dropped(solution))
 
     def _extract_dropped(self, solution: Assignment) -> List[DroppedDeliveryRequest]:
         dropped_delivery_request = []

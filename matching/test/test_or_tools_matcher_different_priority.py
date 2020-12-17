@@ -49,7 +49,7 @@ class ORToolsMatcherDifferentPriorityTestCase(TestCase):
 
         expected_matched_board = DroneDeliveryBoard(
             drone_deliveries=[expected_drone_deliveries[0]],
-            dropped_delivery_request=[dropped_delivery_request])
+            dropped_delivery_requests=[dropped_delivery_request])
 
         self.assertEqual(expected_matched_board, actual_delivery_board)
 

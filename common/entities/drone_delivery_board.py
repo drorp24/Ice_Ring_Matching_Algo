@@ -39,9 +39,9 @@ class DroppedDeliveryRequest:
 
 
 class DroneDeliveryBoard:
-    def __init__(self, drone_deliveries: [DroneDelivery], dropped_delivery_request: [DroppedDeliveryRequest]):
+    def __init__(self, drone_deliveries: [DroneDelivery], dropped_delivery_requests: [DroppedDeliveryRequest]):
         self._drone_deliveries = drone_deliveries
-        self._dropped_delivery_request = dropped_delivery_request
+        self._dropped_delivery_requests = dropped_delivery_requests
 
         self._total_amount_per_package_type = None
         self._total_priority = 0
@@ -50,25 +50,26 @@ class DroneDeliveryBoard:
         self._set_totals()
 
     def __eq__(self, other):
-        return self._drone_deliveries == other.drone_deliveries
+        return self._drone_deliveries == other.drone_deliveries \
+                    and self._dropped_delivery_requests == other._dropped_delivery_requests
 
-    # TODO : ********* add totals to str
+            # TODO : ********* add totals to str
     def __str__(self):
         drone_deliveries_str = '\n'.join(map(str, self._drone_deliveries))
 
-        dropped_delivery_request_str = '\n'.join(map(str, self.dropped_delivery_request)) if len(
-            self._dropped_delivery_request) > 0 else "\n[No dropped delivery requests]"
+        dropped_delivery_requests_str = '\n'.join(map(str, self.dropped_delivery_requests)) if len(
+            self._dropped_delivery_requests) > 0 else "\n[No dropped delivery requests]"
 
         return "\n[DroneDeliveryBoard]\n{drone_deliveries_str}\n{dropped_delivery_request_str}".format(
-            drone_deliveries_str=drone_deliveries_str, dropped_delivery_request_str=dropped_delivery_request_str)
+            drone_deliveries_str=drone_deliveries_str, dropped_delivery_request_str=dropped_delivery_requests_str)
 
     @property
     def drone_deliveries(self) -> [DroneDelivery]:
         return self._drone_deliveries
 
     @property
-    def dropped_delivery_request(self) -> [DroppedDeliveryRequest]:
-        return self._dropped_delivery_request
+    def dropped_delivery_requests(self) -> [DroppedDeliveryRequest]:
+        return self._dropped_delivery_requests
 
     @property
     def total_time_in_minutes(self) -> float:
