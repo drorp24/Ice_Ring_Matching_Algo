@@ -23,19 +23,19 @@ def _create_delivery_request_distribution():
     package_distribution = create_single_package_distribution()
     delivery_request_distribution = build_delivery_request_distribution(
         package_type_distribution=package_distribution,
-        relative_dr_location_distribution = UniformPointInBboxDistribution(-5,5,5,15))
-        #relative_dr_location_distribution = NormalPointDistribution(create_point_2d(5,7), 3, 5))
+        relative_dr_location_distribution=UniformPointInBboxDistribution(-5, 5, 5, 15))
+    # relative_dr_location_distribution = NormalPointDistribution(create_point_2d(5,7), 3, 5))
     return delivery_request_distribution
 
 
 def create_single_package_distribution():
-    package_type_distribution_dict = {PackageType.LARGE.name:1}
+    package_type_distribution_dict = {PackageType.LARGE.name: 1}
     package_distribution = PackageDistribution(package_distribution_dict=package_type_distribution_dict)
     return package_distribution
 
 
 def _create_empty_drone_delivery_board(
-        formation_size_policy: dict = {FormationSize.MINI: 1, FormationSize.MEDIUM: 0},
+        formation_size_policy: dict = {FormationSize.MINI: 0.5, FormationSize.MEDIUM: 0.5},
         configurations_policy: dict = {Configurations.LARGE_X2: 1,
                                        Configurations.MEDIUM_X4: 0,
                                        Configurations.SMALL_X8: 0,
@@ -60,17 +60,26 @@ class BasicMinimumEnd2EndPresentation(unittest.TestCase):
         cls.matcher_config = Path("end_to_end/tests/jsons/test_matcher_config.json")
 
     def test_small_scenario(self):
-        empty_drone_delivery_board = _create_empty_drone_delivery_board(size=20)
-        minimum_end_to_end = MinimumEnd2End(scenario=self.scenario_distribution.choose_rand(random = Random(10),amount=200),
-                                            empty_drone_delivery_board=empty_drone_delivery_board)
+        empty_drone_delivery_board = _create_empty_drone_delivery_board(size=13)
+        minimum_end_to_end = MinimumEnd2End(
+            scenario=self.scenario_distribution.choose_rand(random=Random(10), amount=20),
+            empty_drone_delivery_board=empty_drone_delivery_board)
         fully_connected_graph = minimum_end_to_end.create_fully_connected_graph_model()
-        #graph_exporter = OrtoolsGraphExporter()
-        #travel_times = np.array(graph_exporter.export_travel_times(graph=fully_connected_graph))
-        #time_windows = np.array(graph_exporter.export_time_windows(graph=fully_connected_graph,zero_time=minimum_end_to_end.zero_time))
+        d = create_drawer_2d()
+        [add_delivery_request(d, dr) for dr in minimum_end_to_end.delivery_requests]
+        d.draw()
+        delivery_board = minimum_end_to_end.calc_assignment(fully_connected_graph, self.matcher_config)
+        print(delivery_board)
 
-        #d = create_drawer_2d()
-        #[add_delivery_request(d, dr) for dr in minimum_end_to_end.delivery_requests]
-        #d.draw()
+    def test_medium_scenario(self):
+        empty_drone_delivery_board = _create_empty_drone_delivery_board(size=22)
+        minimum_end_to_end = MinimumEnd2End(
+            scenario=self.scenario_distribution.choose_rand(random=Random(10), amount=50),
+            empty_drone_delivery_board=empty_drone_delivery_board)
+        fully_connected_graph = minimum_end_to_end.create_fully_connected_graph_model()
+        d = create_drawer_2d()
+        [add_delivery_request(d, dr) for dr in minimum_end_to_end.delivery_requests]
+        d.draw()
 
         delivery_board = minimum_end_to_end.calc_assignment(fully_connected_graph, self.matcher_config)
         print(delivery_board)
