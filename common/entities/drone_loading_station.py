@@ -10,7 +10,7 @@ from common.entities.disribution.distribution import Distribution
 from geometry.geo_distribution import UniformPointInBboxDistribution
 from geometry.geo_factory import convert_dict_to_point_2d
 
-DEFAULT_LOADING_STATION_LOCATION_DISTRIB = UniformPointInBboxDistribution(0, 0, 0, 0)
+DEFAULT_LOADING_STATION_LOCATION_DISTRIB = UniformPointInBboxDistribution(0, 100, 0, 100)
 
 
 class DroneLoadingStation(JsonableBaseEntity):

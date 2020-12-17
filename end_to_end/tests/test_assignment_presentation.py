@@ -80,16 +80,11 @@ class BasicMinimumEnd2EndPresentation(unittest.TestCase):
     def test_small_scenario(self):
         empty_drone_delivery_board = _create_empty_drone_delivery_board(size=20)
         minimum_end_to_end = MinimumEnd2End(
-            scenario=self.scenario_distribution.choose_rand(random=Random(10), amount=200),
+            scenario=self.scenario_distribution.choose_rand(random=Random(10), amount=20),
             empty_drone_delivery_board=empty_drone_delivery_board)
         fully_connected_graph = minimum_end_to_end.create_fully_connected_graph_model()
-        #graph_exporter = OrtoolsGraphExporter()
-        #travel_times = np.array(graph_exporter.export_travel_times(graph=fully_connected_graph))
-        #time_windows = np.array(graph_exporter.export_time_windows(graph=fully_connected_graph,zero_time=minimum_end_to_end.zero_time))
-
         #d = create_drawer_2d()
         #[add_delivery_request(d, dr) for dr in minimum_end_to_end.delivery_requests]
         #d.draw()
-
         delivery_board = minimum_end_to_end.calc_assignment(fully_connected_graph, self.matcher_config)
         print(delivery_board)
