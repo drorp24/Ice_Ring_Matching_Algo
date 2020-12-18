@@ -43,7 +43,7 @@ class Drawer2D(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def draw(self, block=True):
+    def draw(self, block=True) -> None:
         """
         Parameters
         ----------
