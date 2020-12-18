@@ -1,11 +1,12 @@
 import unittest
 from random import Random
 
-from common.entities.delivery_request import DeliveryRequestDistribution
-from common.entities.package import PackageType
+from common.entities.base_entities.entity_distribution.delivery_request_distribution import DeliveryRequestDistribution
+from common.entities.base_entities.entity_distribution.drone_loading_dock_distribution import \
+    DroneLoadingDockDistribution
+from common.entities.base_entities.package import PackageType
 from common.graph.operational.operational_graph import OperationalGraph, OperationalEdge, OperationalNode, \
     OperationalEdgeAttribs
-from common.entities.drone_loading_dock import DroneLoadingDockDistribution
 from common.graph.operational.export_ortools_graph import OrtoolsGraphExporter
 
 

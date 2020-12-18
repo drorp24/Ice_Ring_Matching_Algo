@@ -1,10 +1,10 @@
-from typing import Tuple, List, Any
+from typing import Tuple, List
 import numpy as np
 
-from common.entities.package import PackageType
+from common.entities.base_entities.package import PackageType
 from common.graph.operational.export_graph import GraphExporter, OperationalGraph
-from common.entities.drone_loading_dock import DroneLoadingDock
-from common.entities.delivery_request import DeliveryRequest
+from common.entities.base_entities.drone_loading_dock import DroneLoadingDock
+from common.entities.base_entities.delivery_request import DeliveryRequest
 
 
 class OrtoolsGraphExporter(GraphExporter):

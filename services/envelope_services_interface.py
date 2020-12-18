@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Union
 
-from common.entities.package import PackageType
+from common.entities.base_entities.package import PackageType
 from common.math.angle import Angle
 from geometry.geo2d import Polygon2D, Point2D, EmptyGeometry2D
 

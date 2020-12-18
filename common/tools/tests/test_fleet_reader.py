@@ -1,8 +1,8 @@
 from common.tools.fleet_reader import FleetReader
 from common.tools.fleet_property_sets  import PlatformPropertySet, PlatformFormationsSizePolicyPropertySet, \
     PlatformConfigurationsPolicyPropertySet
-from common.entities.drone import PlatformType, Configurations
-from common.entities.drone_formation import FormationSize
+from common.entities.base_entities.drone import PlatformType, Configurations
+from common.entities.base_entities.drone_formation import FormationSize
 import unittest
 from common.tools.tests.path_utils import create_path_from_current_directory, Path
 

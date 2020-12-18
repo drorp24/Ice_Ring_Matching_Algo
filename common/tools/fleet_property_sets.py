@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 
-from common.entities.drone import PlatformType, Configurations
-from common.entities.drone_formation import FormationSize
+from common.entities.base_entities.drone import PlatformType, Configurations
+from common.entities.base_entities.drone_formation import FormationSize
 
 
 @dataclass
