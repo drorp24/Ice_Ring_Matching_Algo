@@ -2,7 +2,6 @@ from random import Random
 from typing import List
 
 from common.entities.base_entities.customer_delivery import CustomerDelivery
-from common.entities.base_entities.entity_distribution import distribution_utils
 from common.entities.base_entities.entity_distribution.distribution_utils import LocalDistribution
 from common.entities.base_entities.entity_distribution.package_delivery_plan_distribution import \
     PackageDeliveryPlanDistribution, DEFAULT_AZI_DISTRIB, DEFAULT_PITCH_DISTRIB, DEFAULT_PACKAGE_DISTRIB, \
