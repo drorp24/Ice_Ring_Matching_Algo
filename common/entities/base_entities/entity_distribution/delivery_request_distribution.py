@@ -7,6 +7,7 @@ from common.entities.base_entities.delivery_request import DeliveryRequest, \
     create_default_time_window_for_delivery_request
 from common.entities.base_entities.entity_distribution.delivery_option_distribution import DeliveryOptionDistribution, \
     DEFAULT_CD_DISTRIB
+from common.entities.base_entities.entity_distribution.distribution_utils import LocalDistribution
 from common.entities.base_entities.entity_distribution.priority_distribution import PriorityDistribution
 from common.entities.base_entities.entity_distribution.temporal_distribution import TimeWindowDistribution
 from common.entities.distribution.distribution import UniformChoiceDistribution, Distribution
@@ -36,11 +37,13 @@ class DeliveryRequestDistribution(Distribution):
 
     def choose_rand(self, random: Random, base_location: Point2D = create_point_2d(0, 0),
                     amount: int = 1, num_do: int = 1, num_cd: int = 1, num_pdp: int = 1) -> List[DeliveryRequest]:
-        relative_locations = self._relative_location_distribution.choose_rand(random, amount)
+        relative_locations = LocalDistribution.add_base_point_to_relative_points(
+            relative_points=self._relative_location_distribution.choose_rand(random, amount),
+            base_point=base_location)
         do_distribution = UniformChoiceDistribution(self._do_distribution_options).choose_rand(random, 1)[0]
         time_window_distributions = self._time_window_distributions.choose_rand(random, amount)
         priority_distribution = self._priority_distribution.choose_rand(random, amount)
         return [DeliveryRequest(
-            do_distribution.choose_rand(random=random, base_loc=base_location + relative_locations[i],
-                                        amount=num_do, num_cd=num_cd, num_pdp=num_pdp),
-            time_window_distributions[i], priority_distribution[i]) for i in list(range(amount))]
+            do_distribution.choose_rand(random=random, base_loc=loc, amount=num_do, num_cd=num_cd, num_pdp=num_pdp),
+            time_window_distributions[i],
+            priority_distribution[i]) for i, loc in enumerate(relative_locations)]
