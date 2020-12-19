@@ -41,9 +41,8 @@ class DeliveryRequestDistribution(Distribution):
             relative_points=self._relative_location_distribution.choose_rand(random, amount),
             base_point=base_location)
         do_distribution = UniformChoiceDistribution(self._do_distribution_options).choose_rand(random, 1)[0]
-        time_window_distributions = self._time_window_distributions.choose_rand(random, amount)
-        priority_distribution = self._priority_distribution.choose_rand(random, amount)
+        time_window_samples = self._time_window_distributions.choose_rand(random, amount)
+        priority_samples = self._priority_distribution.choose_rand(random, amount)
         return [DeliveryRequest(
-            do_distribution.choose_rand(random=random, base_loc=loc, amount=num_do, num_cd=num_cd, num_pdp=num_pdp),
-            time_window_distributions[i],
-            priority_distribution[i]) for i, loc in enumerate(relative_locations)]
+            do_distribution.choose_rand(random=random, base_loc=loc, amount=num_do, num_cd=num_cd, num_pdp=num_pdp), tw,
+            priority) for (loc, tw, priority) in zip(relative_locations, time_window_samples, priority_samples)]

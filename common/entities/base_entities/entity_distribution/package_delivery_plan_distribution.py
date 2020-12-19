@@ -4,6 +4,7 @@ from random import Random
 from typing import List
 from uuid import UUID
 
+from common.entities.base_entities.entity_distribution.distribution_utils import LocalDistribution
 from common.entities.base_entities.entity_distribution.package_distribution import PackageDistribution
 from common.entities.base_entities.package_delivery_plan import PackageDeliveryPlan
 from common.entities.distribution.distribution import Distribution
@@ -31,13 +32,16 @@ class PackageDeliveryPlanDistribution(Distribution):
         self._pitch_distribution = pitch_distribution
         self._package_type_distribution = package_type_distribution
 
-    def choose_rand(self, random: Random,
-                    base_loc: Point2D = create_point_2d(0, 0), amount: int = 1) -> List[PackageDeliveryPlan]:
-        relative_drop_points = self._relative_drop_point_distribution.choose_rand(random=random, amount=amount)
+    def choose_rand(self, random: Random, base_loc: Point2D = create_point_2d(0, 0), amount: int = 1) -> \
+            List[PackageDeliveryPlan]:
+        relative_drop_points = LocalDistribution.add_base_point_to_relative_points(
+            relative_points=self._relative_drop_point_distribution.choose_rand(random=random, amount=amount),
+            base_point=base_loc)
         azimuths = self._azimuth_distribution.choose_rand(random=random, amount=amount)
         pitches = self._pitch_distribution.choose_rand(random=random, amount=amount)
         packages = self._package_type_distribution.choose_rand(random=random, amount=amount)
         uuid_seed = random.getrandbits(128)
+
         return [
-            PackageDeliveryPlan(UUID(int=uuid_seed), drop_point=d_p + base_loc, azimuth=az, pitch=ptc, package_type=p_t)
+            PackageDeliveryPlan(UUID(int=uuid_seed), drop_point=d_p, azimuth=az, pitch=ptc, package_type=p_t)
             for (d_p, az, ptc, p_t) in zip(relative_drop_points, azimuths, pitches, packages)]
