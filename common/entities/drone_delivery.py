@@ -66,7 +66,7 @@ class MatchedDeliveryRequest:
                 self.matched_delivery_option_index].get_amount_per_package_type()) + ')]'
 
 
-# TODO ***********change to MatchedDroneDelivery
+# TODO change to MatchedDroneDelivery
 class DroneDelivery(EmptyDroneDelivery):
     def __init__(self, id_: str, drone_formation: DroneFormation,
                  matched_requests: [MatchedDeliveryRequest],
