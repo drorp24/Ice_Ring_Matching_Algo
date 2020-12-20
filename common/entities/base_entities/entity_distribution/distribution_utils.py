@@ -6,24 +6,10 @@ from uuid import UUID
 
 from common.entities.distribution.distribution import Distribution
 from geometry.geo2d import Point2D
-from geometry.geo_factory import create_point_2d
 
 
 class LocalDistribution:
-    #
-    # def __init__(self, MetaClass: ABCMeta,
-    #              attrib_distributions: Dict[str, Distribution]):
-    #     self._MetaClass = MetaClass
-    #     self._attrib_distributions = attrib_distributions
-    #
-    # def choose_rand(self, amounts: Dict[ABCMeta, int], random=Random()):
-    #     if issubclass(self._MetaClass, InternallySamplable):
-    #         return [[attrib[1].choose_rand(amounts=amounts, random=random) for _ in range(amounts[self._MetaClass])] for
-    #                 attrib in self._attrib_distributions.items()]
-    #     per_attribute_dicts = LocalDistribution.choose_rand_by_attrib(self._attrib_distributions, random,
-    #                                                                   amounts[self._MetaClass])
-    #     per_instance_dicts = LocalDistribution.convert_list_dict_to_individual_dicts(per_attribute_dicts)
-    #     return [LocalDistribution.initialize_internal(self._MetaClass, k) for k in per_instance_dicts]
+
 
     @staticmethod
     def initialize_internal(MetaClassToDistrib: ABCMeta,
