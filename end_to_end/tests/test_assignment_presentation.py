@@ -48,13 +48,9 @@ def _create_delivery_request_distribution():
 
     delivery_request_distribution = build_delivery_request_distribution(
         package_type_distribution=package_distribution,
-        #relative_dr_location_distribution=UniformPointInBboxDistribution(west_lon, east_lon, south_lat, north_lat))
-        relative_dr_location_distribution=NormalPointDistribution(create_point_2d(35.11,32.0), 0.03, 0.05))
+        relative_dr_location_distribution=NormalPointDistribution(create_point_2d(35.11,32.0), 0.03, 0.05),
         priority_distribution=PriorityDistribution(list(range(1, 10))),
-        time_window_distribution=time_window_distribution,
-        relative_dr_location_distribution=UniformPointInBboxDistribution(west_lon, east_lon, south_lat, north_lat))
-    # relative_dr_location_distribution = UniformPointInBboxDistribution(-5,5,5,15))
-    # relative_dr_location_distribution = NormalPointDistribution(create_point_2d(5,7), 3, 5))
+        time_window_distribution=time_window_distribution)
     return delivery_request_distribution
 
 
@@ -114,7 +110,7 @@ class BasicMinimumEnd2EndPresentation(unittest.TestCase):
         operational_drawer2d.add_delivery_board(drawer, delivery_board, draw_dropped=True)
         drawer.draw(False)
 
-        row_names = [delivery.id for delivery in delivery_board.drone_deliveries] + ["Dropped"]
+        row_names = ["Dropped"] + [delivery.id for delivery in delivery_board.drone_deliveries]
         drawer = create_gantt_drawer(zero_time=DateTimeExtension.from_dt((fully_connected_graph.zero_time)),
                         hours_period=24,
                         row_names=row_names)
