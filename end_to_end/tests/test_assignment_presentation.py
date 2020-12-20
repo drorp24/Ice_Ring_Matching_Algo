@@ -1,4 +1,5 @@
 import unittest
+from datetime import time, date, timedelta
 from pathlib import Path
 from pprint import pprint
 from random import Random
@@ -10,7 +11,8 @@ from common.entities.delivery_request import build_delivery_request_distribution
 from common.entities.drone_loading_dock import DroneLoadingDockDistribution
 from common.entities.drone_loading_station import DroneLoadingStationDistribution
 from common.entities.package import PackageDistribution, PackageType
-from common.entities.temporal import DateTimeExtension
+from common.entities.temporal import DateTimeExtension, TimeWindowDistribution, TimeDeltaDistribution, \
+    TimeDeltaExtension, DateTimeDistribution
 from common.graph.operational.export_ortools_graph import OrtoolsGraphExporter
 from common.tools.empty_drone_delivery_board_generation import build_empty_drone_delivery_board
 from common.tools.fleet_property_sets import *
@@ -29,12 +31,21 @@ east_lon = 35.9786527
 south_lat = 32.3508222
 north_lat = 33.3579972
 
+ZERO_TIME = DateTimeExtension(dt_date=date(2021, 1, 1), dt_time=time(0, 0, 0))
+
 
 def _create_delivery_request_distribution():
     package_distribution = create_single_package_distribution()
+    zero_time = ZERO_TIME
+    time_delta_distrib = TimeDeltaDistribution([TimeDeltaExtension(timedelta(hours=3, minutes=0))])
+    dt_options = [zero_time.add_time_delta(TimeDeltaExtension(timedelta(hours=x))) for x in range(24 - 3)]
+
+    time_window_distribution = TimeWindowDistribution(DateTimeDistribution(dt_options), time_delta_distrib)
+
     delivery_request_distribution = build_delivery_request_distribution(
         package_type_distribution=package_distribution,
         priority_distribution=PriorityDistribution(list(range(1, 10))),
+        time_window_distribution=time_window_distribution,
         relative_dr_location_distribution=UniformPointInBboxDistribution(west_lon, east_lon, south_lat, north_lat))
     # relative_dr_location_distribution = UniformPointInBboxDistribution(-5,5,5,15))
     # relative_dr_location_distribution = NormalPointDistribution(create_point_2d(5,7), 3, 5))
@@ -69,6 +80,7 @@ class BasicMinimumEnd2EndPresentation(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.scenario_distribution = ScenarioDistribution(
+            zero_time_distribution=DateTimeDistribution([ZERO_TIME]),
             delivery_requests_distribution=_create_delivery_request_distribution(),
             drone_loading_docks_distribution=
             DroneLoadingDockDistribution(drone_loading_station_distributions=
