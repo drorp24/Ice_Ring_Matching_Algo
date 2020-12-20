@@ -37,6 +37,13 @@ north_lat = 32.19276
 
 ZERO_TIME = DateTimeExtension(dt_date=date(2021, 1, 1), dt_time=time(0, 0, 0))
 
+def create_standad_full_day_test_time():
+    default_start = ZERO_TIME
+    default_time_delta_distrib = TimeDeltaDistribution([TimeDeltaExtension(timedelta(hours=23, minutes=59))])
+    default_dt_options = [default_start]
+    return TimeWindowDistribution(DateTimeDistribution(default_dt_options), default_time_delta_distrib)
+
+
 
 def _create_delivery_request_distribution():
     package_distribution = create_single_package_distribution()
@@ -90,7 +97,8 @@ class BasicMinimumEnd2EndPresentation(unittest.TestCase):
                                                                          UniformPointInBboxDistribution(west_lon,
                                                                                                         east_lon,
                                                                                                         south_lat,
-                                                                                                        north_lat))))
+                                                                                                        north_lat)),
+                                         time_window_distributions=create_standad_full_day_test_time()))
         cls.matcher_config = Path("end_to_end/tests/jsons/test_matcher_config.json")
 
     def test_small_scenario(self):
@@ -110,7 +118,7 @@ class BasicMinimumEnd2EndPresentation(unittest.TestCase):
         operational_drawer2d.add_delivery_board(drawer, delivery_board, draw_dropped=True)
         drawer.draw(False)
 
-        row_names = ["Dropped"] + [delivery.total_amount_per_package_type for delivery in delivery_board.drone_deliveries]
+        row_names = ["Dropped Out"] + [delivery.total_amount_per_package_type for delivery in delivery_board.drone_deliveries]
         drawer = create_gantt_drawer(zero_time=DateTimeExtension.from_dt(fully_connected_graph.zero_time),
                                      hours_period=24,
                                      row_names=row_names)
