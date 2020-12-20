@@ -93,7 +93,7 @@ class BasicMinimumEnd2EndPresentation(unittest.TestCase):
 
         drawer = create_drawer_2d(Drawer2DCoordinateSys.GEOGRAPHIC)
         operational_drawer2d.add_delivery_board(drawer, delivery_board, draw_dropped=True)
-        drawer.draw()
+        drawer.draw(False)
 
         row_names = [delivery.id for delivery in delivery_board.drone_deliveries] + ["Dropped"]
         drawer = create_gantt_drawer(zero_time=DateTimeExtension.from_dt((fully_connected_graph.zero_time)),
