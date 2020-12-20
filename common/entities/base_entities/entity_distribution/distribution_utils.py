@@ -6,6 +6,7 @@ from uuid import UUID
 
 from common.entities.distribution.distribution import Distribution
 from geometry.geo2d import Point2D
+from geometry.geo_factory import create_point_2d
 
 
 class LocalDistribution:

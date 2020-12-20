@@ -37,10 +37,10 @@ class DeliveryRequestDistribution(Distribution):
 
     def choose_rand(self, random: Random, base_location: Point2D = create_point_2d(0, 0),
                     amount: int = 1, num_do: int = 1, num_cd: int = 1, num_pdp: int = 1) -> List[DeliveryRequest]:
+        do_distribution = UniformChoiceDistribution(self._do_distribution_options).choose_rand(random, 1)[0]
         relative_locations = LocalDistribution.add_base_point_to_relative_points(
             relative_points=self._relative_location_distribution.choose_rand(random, amount),
             base_point=base_location)
-        do_distribution = UniformChoiceDistribution(self._do_distribution_options).choose_rand(random, 1)[0]
         time_window_samples = self._time_window_distributions.choose_rand(random, amount)
         priority_samples = self._priority_distribution.choose_rand(random, amount)
         return [DeliveryRequest(

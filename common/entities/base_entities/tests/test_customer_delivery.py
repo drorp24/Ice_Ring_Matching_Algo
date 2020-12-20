@@ -33,7 +33,7 @@ class BasicPackageDeliveryPlan(unittest.TestCase):
         dist1 = [self.plan_delivery_distribution1]
         cd = CustomerDeliveryDistribution(self.loc_distrib, dist1).choose_rand(Random(42),
                                                                                base_loc=create_point_2d(0, 0),
-                                                                               amount=1,
+                                                                               amount=3,
                                                                                num_pdp=10)[0]
         self.assertEqual(create_point_2d(10, 11), cd.calc_location())
 

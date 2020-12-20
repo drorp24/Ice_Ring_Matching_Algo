@@ -35,14 +35,17 @@ class PackageDeliveryPlanDistribution(Distribution):
         self._pitch_distribution = pitch_distribution
         self._package_type_distribution = package_type_distribution
 
-    def choose_rand(self, random: Random, base_loc: Point2D = create_point_2d(0, 0), amount: int = 1) -> \
-            List[PackageDeliveryPlan]:
-        ids = self._id_distribution.choose_rand(random=random, amount=amount)
-        relative_drop_points = LocalDistribution.add_base_point_to_relative_points(
-            relative_points=self._relative_drop_point_distribution.choose_rand(random=random, amount=amount),
-            base_point=base_loc)
-        azimuths = self._azimuth_distribution.choose_rand(random=random, amount=amount)
-        pitches = self._pitch_distribution.choose_rand(random=random, amount=amount)
-        packages = self._package_type_distribution.choose_rand(random=random, amount=amount)
-        return [PackageDeliveryPlan(id=id, drop_point=d_p, azimuth=az, pitch=ptc, package_type=p_t)
-                for (id, d_p, az, ptc, p_t) in zip(ids, relative_drop_points, azimuths, pitches, packages)]
+    def choose_rand(self, random: Random, base_loc: Point2D = create_point_2d(0, 0), amount: int = 1) -> List[
+        PackageDeliveryPlan]:
+        sampled_distributions = LocalDistribution.choose_rand_by_attrib(
+            internal_sample_dict=
+            {'id': self._id_distribution,
+             'drop_point': self._relative_drop_point_distribution,
+             'azimuth': self._azimuth_distribution,
+             'pitch': self._pitch_distribution,
+             'package_type': self._package_type_distribution
+             }, random=random, amount=amount)
+        sampled_distributions['drop_point'] = LocalDistribution.add_base_point_to_relative_points(
+            relative_points=sampled_distributions['drop_point'], base_point=base_loc)
+        pdp_attrib_samples = LocalDistribution.convert_list_dict_to_individual_dicts(sampled_distributions)
+        return [LocalDistribution.initialize_internal(PackageDeliveryPlan, pdp_dict) for pdp_dict in pdp_attrib_samples]

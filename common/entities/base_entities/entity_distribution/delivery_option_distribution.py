@@ -22,10 +22,10 @@ class DeliveryOptionDistribution(Distribution):
 
     def choose_rand(self, random: Random, base_loc: Point2D = create_point_2d(0, 0),
                     amount: int = 1, num_cd: int = 1, num_pdp: int = 1) -> List[DeliveryOption]:
+        cd_distributions = UniformChoiceDistribution(self._customer_delivery_distributions).choose_rand(random, 1)[0]
         relative_locations = LocalDistribution.add_base_point_to_relative_points(
             relative_points=self._relative_location_distribution.choose_rand(random, amount),
             base_point=base_loc)
-        cd_distributions = UniformChoiceDistribution(self._customer_delivery_distributions).choose_rand(random, 1)[0]
         return [DeliveryOption(
             cd_distributions.choose_rand(random=random, base_loc=loc, amount=num_cd, num_pdp=num_pdp))
             for loc in relative_locations]
