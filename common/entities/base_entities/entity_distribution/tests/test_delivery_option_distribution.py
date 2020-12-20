@@ -31,14 +31,14 @@ class BasicDeliveryOptionDistribTests(unittest.TestCase):
                                                                                 max_y=10),
                                                  customer_delivery_distributions=[cls.cd_dist])
         cls.base_point = create_point_2d(1000, 2000)
-        cls.num_of_dos_to_sample = 10
-        cls.num_of_cds_to_sample = 7
-        cls.num_of_pdps_to_sample = 3
+        cls.num_of_do_to_sample = 10
+        cls.num_of_cd_to_sample = 7
+        cls.num_of_pdp_to_sample = 3
         cls.do_samples = cls.do_dist.choose_rand(random=Random(),
                                                  base_loc=cls.base_point,
-                                                 amount=cls.num_of_dos_to_sample,
-                                                 num_cd=cls.num_of_cds_to_sample,
-                                                 num_pdp=cls.num_of_pdps_to_sample)
+                                                 amount=cls.num_of_do_to_sample,
+                                                 num_cd=cls.num_of_cd_to_sample,
+                                                 num_pdp=cls.num_of_pdp_to_sample)
 
     def test_random_local_sample_is_within_range(self):
         max_dist = 10 * 2 * 2 / sqrt(2)
@@ -47,8 +47,8 @@ class BasicDeliveryOptionDistribTests(unittest.TestCase):
         self.assertTrue(all(within_valid_range))
 
     def test_random_local_sample_amounts_are_correct(self):
-        self.assertEqual(len(self.do_samples), self.num_of_dos_to_sample)
-        self.assertTrue(all([len(do.customer_deliveries) is self.num_of_cds_to_sample
+        self.assertEqual(len(self.do_samples), self.num_of_do_to_sample)
+        self.assertTrue(all([len(do.customer_deliveries) is self.num_of_cd_to_sample
                              for do in self.do_samples]))
-        self.assertTrue(all([[len(cd.package_delivery_plans) is self.num_of_pdps_to_sample
+        self.assertTrue(all([[len(cd.package_delivery_plans) is self.num_of_pdp_to_sample
                               for cd in do.customer_deliveries] for do in self.do_samples]))
