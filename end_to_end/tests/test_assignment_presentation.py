@@ -79,9 +79,9 @@ class BasicMinimumEnd2EndPresentation(unittest.TestCase):
         cls.matcher_config = Path("end_to_end/tests/jsons/test_matcher_config.json")
 
     def test_small_scenario(self):
-        empty_drone_delivery_board = _create_empty_drone_delivery_board(size=20)
+        empty_drone_delivery_board = _create_empty_drone_delivery_board(size=15)
         minimum_end_to_end = MinimumEnd2End(
-            scenario=self.scenario_distribution.choose_rand(random=Random(10), amount=20),
+            scenario=self.scenario_distribution.choose_rand(random=Random(10), amount=35),
             empty_drone_delivery_board=empty_drone_delivery_board)
         fully_connected_graph = minimum_end_to_end.create_fully_connected_graph_model()
         # graph_exporter = OrtoolsGraphExporter()

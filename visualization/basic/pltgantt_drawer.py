@@ -40,7 +40,8 @@ class PltGanttDrawer(GanttDrawer):
         since, until = time_window.get_relative_time_in_min(self._zero_time)
         y = self._calc_y(row)
         self._ax.barh(y=y, width=until - since, height=self._bar_height, left=since,
-                      color=color.get_rgb_with_alpha(ALPHA), label=name)
+                      color=color.get_rgb_with_alpha(ALPHA), label=name,
+                      edgecolor=Color.Black.get_rgb_with_alpha(ALPHA), linewidth=1)
         if time_mark:
             relative_time_in_min = time_mark.get_time_delta(self._zero_time).in_minutes()
             width = MARK_WIDTH_RATIO * self._hours_period
