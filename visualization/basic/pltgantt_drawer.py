@@ -1,17 +1,18 @@
-from datetime import datetime
+from datetime import timedelta
 from pathlib import Path
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.ticker import FixedLocator, NullFormatter, FixedFormatter
 
-from common.entities.temporal import DateTimeExtension, TimeWindowExtension, MIN_IN_HOUR
+from common.entities.temporal import DateTimeExtension, TimeWindowExtension, MIN_IN_HOUR, TimeDeltaExtension
 from visualization.basic.color import Color
 from visualization.basic.gantt_drawer import GanttDrawer
 
 BAR_HEIGHT_RATIO = 0.1
-MARK_WIDTH_RATIO = 0.4
+MARK_WIDTH_RATIO = 0.1
 YLIMIT = 100
-ALPHA = 0.6
+BAR_ALPHA = 0.6
+BACKGROUND_ALPHA = 0.05
 
 
 def create_gantt_drawer(zero_time: DateTimeExtension, hours_period: int, row_names: [str]) -> GanttDrawer:
@@ -19,7 +20,7 @@ def create_gantt_drawer(zero_time: DateTimeExtension, hours_period: int, row_nam
 
 
 class PltGanttDrawer(GanttDrawer):
-    def __init__(self, zero_time: DateTimeExtension, hours_period: int, row_names: int):
+    def __init__(self, zero_time: DateTimeExtension, hours_period: int, row_names: [str]):
         self._zero_time = zero_time
         self._hours_period = hours_period
         self._fig, self._ax = plt.subplots()
@@ -32,23 +33,38 @@ class PltGanttDrawer(GanttDrawer):
         self._set_xtick_locations_and_labels()
         self._set_ytick_locations_and_labels()
         self._set_alternating_row_color()
-        self._ax.set_xlabel('Minutes since ' + self._zero_time.str_format_time())
+        self._ax.set_xlabel('Hours since ' + self._zero_time.get_internal().strftime("%d/%m/%Y %H:%M:%S"))
         self._ax.grid(b=True)
 
     def add_bar(self, row: int, time_window: TimeWindowExtension, name: str, time_mark: DateTimeExtension = None,
-                color: Color = Color.Blue) -> None:
+                side_text: str = None, color: Color = Color.Blue) -> None:
         since, until = time_window.get_relative_time_in_min(self._zero_time)
         y = self._calc_y(row)
         self._ax.barh(y=y, width=until - since, height=self._bar_height, left=since,
-                      color=color.get_rgb_with_alpha(ALPHA), label=name)
+                      color=color.get_rgb_with_alpha(BAR_ALPHA), label=name,
+                      edgecolor=Color.Black.get_rgb(), linewidth=1)
+        if side_text:
+            self._ax.text(x=until, y=y - self._bar_height / 2, s=side_text, color=Color.Black.get_rgb(), fontsize=8)
         if time_mark:
             relative_time_in_min = time_mark.get_time_delta(self._zero_time).in_minutes()
             width = MARK_WIDTH_RATIO * self._hours_period
             self._ax.barh(y=y, width=width, height=self._bar_height, left=relative_time_in_min,
                           color=color.Black.get_rgb())
 
+    def add_row_background_area(self, row: int, time_window: TimeWindowExtension, color: Color = Color.Orange) -> None:
+        since, until = time_window.get_relative_time_in_min(self._zero_time)
+        y = (row - 1) * self._row_y_factor + self._row_y_factor / 2
+        self._ax.barh(y=y, width=until - since, height=self._row_y_factor, left=since,
+                      color=color.get_rgb_with_alpha(BACKGROUND_ALPHA))
+
     def get_num_rows(self):
         return len(self._row_names)
+
+    def get_zero_time(self):
+        return self._zero_time
+
+    def get_end_time(self):
+        return self._zero_time.add_time_delta(TimeDeltaExtension(timedelta(hours=self._hours_period)))
 
     def draw(self, block=True) -> None:
         self._fig.show()
@@ -74,6 +90,7 @@ class PltGanttDrawer(GanttDrawer):
         self._ax.yaxis.set_minor_locator(FixedLocator((yticks * self._row_y_factor) + (self._row_y_factor / 2)))
         self._ax.yaxis.set_major_formatter(NullFormatter())
         self._ax.yaxis.set_minor_formatter(FixedFormatter(self._row_names))
+        self._ax.tick_params(axis='y', which='minor', labelsize=8)
         for tick in self._ax.yaxis.get_minor_ticks():
             tick.tick1line.set_markersize(0)
             tick.tick2line.set_markersize(0)
@@ -81,7 +98,8 @@ class PltGanttDrawer(GanttDrawer):
     def _set_alternating_row_color(self):
         for i, name in enumerate(self._row_names):
             if i % 2:
-                self._ax.axhspan(i * self._row_y_factor, (i + 1) * self._row_y_factor, facecolor='grey', alpha=0.1)
+                self._ax.axhspan(i * self._row_y_factor, (i + 1) * self._row_y_factor,
+                                 facecolor=Color.Grey.get_rgb_with_alpha(BACKGROUND_ALPHA))
 
     def _calc_y(self, row: int) -> float:
         # To prevent bars override we change their height
@@ -89,7 +107,6 @@ class PltGanttDrawer(GanttDrawer):
                     self._counters[row - 1] * self._bar_height) % self._row_y_factor + self._bar_height / 2
         self._counters[row - 1] += 1
         return y
-
 
 
 # zero_time = DateTimeExtension.from_dt(datetime(2020, 1, 23, 0, 00, 00))

@@ -29,12 +29,18 @@ class PltDrawer2D(Drawer2D):
             import cartopy.crs as ccrs
             self._fig = plt.figure()
             self._ax = plt.axes(projection=ccrs.PlateCarree())
-            map_background_path = filepath(r"visualization/basic/map_background.png")
+            # map_background_path = filepath(r"visualization/basic/map_background.png")
+            # map_background_img = plt.imread(map_background_path)
+            # west_lon = 34.8288611
+            # east_lon = 35.9786527
+            # south_lat = 32.3508222
+            # north_lat = 33.3579972
+            map_background_path = filepath(r"visualization/basic/gush_dan_background.Png")
             map_background_img = plt.imread(map_background_path)
-            west_lon = 34.8288611
-            east_lon = 35.9786527
-            south_lat = 32.3508222
-            north_lat = 33.3579972
+            west_lon = 34.83927
+            east_lon = 35.32341
+            south_lat = 31.77279
+            north_lat = 32.19276
             map_background_img_extent = (west_lon,
                                          east_lon,
                                          south_lat,

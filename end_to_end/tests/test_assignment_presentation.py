@@ -1,4 +1,5 @@
 import unittest
+from datetime import time, date, timedelta
 from pathlib import Path
 from pprint import pprint
 from random import Random
@@ -6,11 +7,12 @@ from typing import List
 from common.entities.drone_formation import FormationSize
 import numpy as np
 from common.entities.delivery_request import build_delivery_request_distribution, \
-    DeliveryRequest
+    DeliveryRequest, PriorityDistribution
 from common.entities.drone_loading_dock import DroneLoadingDockDistribution
 from common.entities.drone_loading_station import DroneLoadingStationDistribution
 from common.entities.package import PackageDistribution, PackageType
-from common.entities.temporal import DateTimeExtension
+from common.entities.temporal import DateTimeExtension, TimeWindowDistribution, TimeDeltaDistribution, \
+    TimeDeltaExtension, DateTimeDistribution
 from common.graph.operational.export_ortools_graph import OrtoolsGraphExporter
 from common.tools.empty_drone_delivery_board_generation import build_empty_drone_delivery_board
 from common.tools.fleet_property_sets import *
@@ -24,19 +26,31 @@ from visualization.basic.pltgantt_drawer import create_gantt_drawer
 from visualization.operational import operational_drawer2d
 from visualization.operational import operational_gantt_drawer
 
-west_lon = 34.8288611
-east_lon = 35.9786527
-south_lat = 32.3508222
-north_lat = 33.3579972
+# west_lon = 34.8288611
+# east_lon = 35.9786527
+# south_lat = 32.3508222
+# north_lat = 33.3579972
+west_lon = 34.83927
+east_lon = 35.32341
+south_lat = 31.77279
+north_lat = 32.19276
+
+ZERO_TIME = DateTimeExtension(dt_date=date(2021, 1, 1), dt_time=time(0, 0, 0))
 
 
 def _create_delivery_request_distribution():
     package_distribution = create_single_package_distribution()
+    zero_time = ZERO_TIME
+    time_delta_distrib = TimeDeltaDistribution([TimeDeltaExtension(timedelta(hours=3, minutes=0))])
+    dt_options = [zero_time.add_time_delta(TimeDeltaExtension(timedelta(hours=x))) for x in range(24 - 3)]
+
+    time_window_distribution = TimeWindowDistribution(DateTimeDistribution(dt_options), time_delta_distrib)
+
     delivery_request_distribution = build_delivery_request_distribution(
         package_type_distribution=package_distribution,
-        relative_dr_location_distribution=UniformPointInBboxDistribution(west_lon, east_lon, south_lat, north_lat))
-    # relative_dr_location_distribution = UniformPointInBboxDistribution(-5,5,5,15))
-    # relative_dr_location_distribution = NormalPointDistribution(create_point_2d(5,7), 3, 5))
+        relative_dr_location_distribution=NormalPointDistribution(create_point_2d(35.11,32.0), 0.03, 0.05),
+        priority_distribution=PriorityDistribution(list(range(1, 10))),
+        time_window_distribution=time_window_distribution)
     return delivery_request_distribution
 
 
@@ -68,6 +82,7 @@ class BasicMinimumEnd2EndPresentation(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.scenario_distribution = ScenarioDistribution(
+            zero_time_distribution=DateTimeDistribution([ZERO_TIME]),
             delivery_requests_distribution=_create_delivery_request_distribution(),
             drone_loading_docks_distribution=
             DroneLoadingDockDistribution(drone_loading_station_distributions=
@@ -93,12 +108,12 @@ class BasicMinimumEnd2EndPresentation(unittest.TestCase):
 
         drawer = create_drawer_2d(Drawer2DCoordinateSys.GEOGRAPHIC)
         operational_drawer2d.add_delivery_board(drawer, delivery_board, draw_dropped=True)
-        drawer.draw()
+        drawer.draw(False)
 
-        row_names = [delivery.id for delivery in delivery_board.drone_deliveries] + ["Dropped"]
-        drawer = create_gantt_drawer(zero_time=DateTimeExtension.from_dt((fully_connected_graph.zero_time)),
-                        hours_period=24,
-                        row_names=row_names)
+        row_names = ["Dropped"] + [delivery.total_amount_per_package_type for delivery in delivery_board.drone_deliveries]
+        drawer = create_gantt_drawer(zero_time=DateTimeExtension.from_dt(fully_connected_graph.zero_time),
+                                     hours_period=24,
+                                     row_names=row_names)
         operational_gantt_drawer.add_delivery_board(drawer, delivery_board, True)
         drawer.draw(True)
 

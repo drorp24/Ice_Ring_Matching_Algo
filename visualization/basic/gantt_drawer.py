@@ -7,11 +7,23 @@ from visualization.basic.color import Color
 class GanttDrawer(ABC):
     @abstractmethod
     def add_bar(self, row: int, time_window: TimeWindowExtension, name: str, time_mark: DateTimeExtension = None,
-                color: Color = Color.Blue) -> None:
+                side_text: str = None, color: Color = Color.Blue) -> None:
+        raise NotImplementedError
+
+    @abstractmethod
+    def add_row_background_area(self, row: int, time_window: TimeWindowExtension, color: Color = Color.Orange) -> None:
         raise NotImplementedError
 
     @abstractmethod
     def get_num_rows(self):
+        raise NotImplementedError
+
+    @abstractmethod
+    def get_zero_time(self):
+        raise NotImplementedError
+
+    @abstractmethod
+    def get_end_time(self):
         raise NotImplementedError
 
     @abstractmethod
