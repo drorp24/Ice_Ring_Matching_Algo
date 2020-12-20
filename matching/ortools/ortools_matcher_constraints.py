@@ -16,6 +16,8 @@ class ORToolsMatcherConstraints:
         self._time_windows = self._graph_exporter.export_time_windows(self._matcher_input.graph,
                                                  self._matcher_input.config.zero_time)
 
+        self._basis_nodes_indices = self._graph_exporter.export_basis_nodes_indices(self._matcher_input.graph)
+
     def add_demand(self):
         for package_type in self._matcher_input.empty_board.package_types():
             callback = getattr(self, "_demand_callback_" + str.lower(package_type.name))
@@ -57,7 +59,7 @@ class ORToolsMatcherConstraints:
             self._matcher_input.config.constraints.time.count_time_from_zero,
             time)
         time_dimension = self._routing.GetDimensionOrDie(time)
-        self._add_time_window_constraints_for_each_delivery(time_dimension, self._time_windows)
+        self._add_time_window_constraints_for_each_delivery_except_depot(time_dimension, self._time_windows)
         self._add_time_window_constraints_for_each_vehicle_start_node(time_dimension, self._time_windows)
         self._instantiate_route_start_and_end_times_to_produce_feasible_times(time_dimension)
 
@@ -69,18 +71,17 @@ class ORToolsMatcherConstraints:
                 time_dimension.CumulVar(self._routing.End(i)))
 
     def _add_time_window_constraints_for_each_vehicle_start_node(self, time_dimension, time_windows):
-        # TODO: Need to allow the start node to be different for each vehicle
         for vehicle_id in range(len(self._matcher_input.empty_board.empty_drone_deliveries)):
             index = self._routing.Start(vehicle_id)
-            time_dimension.CumulVar(index).SetRange(time_windows[0][0],
-                                                    time_windows[0][1])
+            graph_index = self._manager.IndexToNode(index)
+            time_dimension.CumulVar(index).SetRange(time_windows[graph_index][0],
+                                                    time_windows[graph_index][1])
 
-    def _add_time_window_constraints_for_each_delivery(self, time_dimension, time_windows):
-        for location_idx, time_window in enumerate(time_windows):
-            # TODO location_idx is not necessary the depot and there could be some depots
-            if location_idx == 0:
+    def _add_time_window_constraints_for_each_delivery_except_depot(self, time_dimension, time_windows):
+        for graph_index, time_window in enumerate(time_windows):
+            if graph_index in self._basis_nodes_indices:
                 continue
-            index = self._manager.NodeToIndex(location_idx)
+            index = self._manager.NodeToIndex(graph_index)
             time_dimension.CumulVar(index).SetRange(time_window[0], time_window[1])
 
     def _time_callback(self, from_index, to_index):
