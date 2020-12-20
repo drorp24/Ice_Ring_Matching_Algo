@@ -1,6 +1,3 @@
-# TODO : fix test - check why dr1 is dropped, and why changing depot TW has no effect
-
-
 from datetime import datetime, timedelta, date, time
 from typing import List
 from unittest import TestCase

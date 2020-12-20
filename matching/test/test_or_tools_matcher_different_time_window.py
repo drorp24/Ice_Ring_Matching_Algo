@@ -1,4 +1,3 @@
-
 from datetime import datetime, timedelta, date, time
 from typing import List
 from unittest import TestCase
@@ -44,7 +43,6 @@ class ORToolsMatcherDifferentTWTestCase(TestCase):
     def test_matcher(self):
         matcher = ORToolsMatcher(self.match_input)
         actual_delivery_board = matcher.match()
-        print(actual_delivery_board)
 
         expected_drone_deliveries = self._create_drone_deliveries(delivery_requests=self.delivery_requests,
                                                                   empty_board=self.empty_board,
@@ -52,8 +50,6 @@ class ORToolsMatcherDifferentTWTestCase(TestCase):
         expected_matched_board = DroneDeliveryBoard(
             drone_deliveries=[expected_drone_deliveries[0], expected_drone_deliveries[1]],
             dropped_delivery_requests=[])
-
-        print(expected_matched_board)
 
         self.assertEqual(expected_matched_board, actual_delivery_board)
 

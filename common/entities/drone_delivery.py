@@ -40,9 +40,8 @@ class MatchedDroneLoadingDock:
 
     def __str__(self):
         return '[MatchedDroneLoadingDock(graph_index=' + str(
-            self.graph_index) + ', min_time=' + self.delivery_min_time.get_internal().strftime(
-            "%m %d %Y %H:%M:%S") + ', max_time=' + self.delivery_max_time.get_internal().strftime(
-            "%m %d %Y %H:%M:%S") + ')]'
+            self.graph_index) + ', min_time=' + self.delivery_min_time.str_format_time() + \
+               ', max_time=' + self.delivery_max_time.str_format_time() + ')]'
 
 
 @dataclass
@@ -59,17 +58,15 @@ class MatchedDeliveryRequest:
                and self.delivery_min_time == other.delivery_min_time \
                and self.delivery_max_time == other.delivery_max_time
 
-    # TODO: handle time format
     def __str__(self):
         return '[MatchedDeliveryRequest(graph_index=' + str(self.graph_index) + ', priority=' + str(
-            self.delivery_request.priority) + ', min_time=' + self.delivery_min_time.get_internal().strftime(
-            "%m %d %Y %H:%M:%S") + ', max_time=' + self.delivery_max_time.get_internal().strftime(
-            "%m %d %Y %H:%M:%S") + ', delivered=' + str(
+            self.delivery_request.priority) + ', min_time=' + self.delivery_min_time.str_format_time() + \
+               ', max_time=' + self.delivery_max_time.str_format_time() + ', delivered=' + str(
             self.delivery_request.delivery_options[
                 self.matched_delivery_option_index].get_amount_per_package_type()) + ')]'
 
 
-# TODO change to MatchedDroneDelivery
+# TODO ***********change to MatchedDroneDelivery
 class DroneDelivery(EmptyDroneDelivery):
     def __init__(self, id_: str, drone_formation: DroneFormation,
                  matched_requests: [MatchedDeliveryRequest],

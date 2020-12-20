@@ -77,7 +77,7 @@ class ORToolsMatcher(Matcher):
 
         return dropped_delivery_request
 
-    # TODO: split function to small funct
+    # TODO: *************split function to small funct
     def _create_drone_deliveries(self, solution: Assignment):
         drone_deliveries = []
 

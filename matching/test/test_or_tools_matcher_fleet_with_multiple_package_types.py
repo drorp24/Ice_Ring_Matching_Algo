@@ -42,7 +42,6 @@ class ORToolsMatcherFleetWithMultiplePackageTYpe(TestCase):
     def test_matcher(self):
         matcher = ORToolsMatcher(self.match_input)
         actual_delivery_board = matcher.match()
-        print(actual_delivery_board)
 
         expected_drone_deliveries = self._create_drone_deliveries(delivery_requests=self.delivery_requests,
                                                                   empty_board=self.empty_board,
@@ -51,7 +50,6 @@ class ORToolsMatcherFleetWithMultiplePackageTYpe(TestCase):
             drone_deliveries=[expected_drone_deliveries[0], expected_drone_deliveries[1]],
             dropped_delivery_requests=[])
 
-        print(expected_matched_board)
 
         self.assertEqual(expected_matched_board, actual_delivery_board)
 
@@ -119,7 +117,6 @@ class ORToolsMatcherFleetWithMultiplePackageTYpe(TestCase):
     @staticmethod
     def _create_drone_deliveries(delivery_requests: List[DeliveryRequest], empty_board: EmptyDroneDeliveryBoard,
                                  loading_dock: DroneLoadingDock) -> List[DroneDelivery]:
-
         drone_delivery_1 = DroneDelivery(id_=empty_board.empty_drone_deliveries[0].id,
                                          drone_formation=empty_board.empty_drone_deliveries[0].drone_formation,
                                          matched_requests=[MatchedDeliveryRequest(
