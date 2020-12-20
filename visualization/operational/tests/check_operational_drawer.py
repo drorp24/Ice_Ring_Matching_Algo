@@ -1,13 +1,13 @@
 from random import Random
 from typing import List
 
-from common.entities.delivery_request import build_delivery_request_distribution, DeliveryRequest
-from common.entities.delivery_request_generator import DeliveryRequestDatasetStructure, DeliveryRequestDatasetGenerator
-from common.entities.disribution.distribution import Range
-from common.entities.drone_loading_dock import DroneLoadingDock, DroneLoadingDockDistribution
+from common.entities.base_entities.delivery_request import build_delivery_request_distribution, DeliveryRequest
+from common.entities.generator.delivery_request_generator import DeliveryRequestDatasetStructure, DeliveryRequestDatasetGenerator
+from common.entities.distribution.distribution import Range
+from common.entities.base_entities.drone_loading_dock import DroneLoadingDock, DroneLoadingDockDistribution
 from common.graph.operational import graph_creator
 from common.graph.operational.operational_graph import OperationalGraph
-from geometry.geo_distribution import ChoiceNormalDistribution
+from geometry.distribution.geo_distribution import ChoiceNormalDistribution
 from geometry.geo_factory import create_point_2d
 from visualization.basic.pltdrawer2d import create_drawer_2d
 from visualization.operational.operational_drawer2d import add_delivery_request, add_operational_graph

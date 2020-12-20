@@ -5,9 +5,8 @@ from flatten_dict import flatten
 from flatten_dict.reducer import underscore_reducer
 from optional import Optional
 
-from common.entities.package import PackageType
+from common.entities.base_entities.package import PackageType
 from common.math.angle import Angle, AngleUnit
-from geometry.polygon_utils import PolygonUtils
 from grid.grid_geometry_utils import convert_nearest_value_in_resolution
 from grid.grid_location import GridLocation
 from grid.slide import Slide

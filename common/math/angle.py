@@ -5,8 +5,8 @@ from enum import Enum
 from random import Random
 from typing import List
 
-from common.entities.base_entity import JsonableBaseEntity
-from common.entities.disribution.distribution import UniformDistribution, Range
+from common.entities.base_entities.base_entity import JsonableBaseEntity
+from common.entities.distribution.distribution import UniformDistribution, Range
 from geometry.geo2d import Vector2D
 from geometry.geo_factory import create_vector_2d
 
