@@ -8,7 +8,6 @@ from common.graph.operational.operational_graph import OperationalGraph, Operati
     OperationalNode
 from geometry.utils import Localizable
 
-DEFAULT_VELOCITY_KPH = 70
 
 def add_locally_connected_dr_graph(graph, dr_connection_options: [DeliveryRequest], max_cost_to_connect=math.inf):
     edges = []
@@ -95,4 +94,4 @@ def is_within_cost_range(start: Localizable, target: Localizable,
 
 
 def calc_cost(start: Localizable, end: Localizable) -> int:
-    return ceil(start.calc_location().calc_distance_to_point(end.calc_location())) * DEFAULT_VELOCITY_KPH
+    return ceil(start.calc_location().calc_distance_to_point(end.calc_location()))
