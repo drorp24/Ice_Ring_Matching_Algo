@@ -17,17 +17,14 @@ class BasicCustomerDeliveryDistribTests(unittest.TestCase):
     def setUpClass(cls):
         pitch_distrib = AngleUniformDistribution(start_angle=Angle(20, AngleUnit.DEGREE),
                                                    end_angle=Angle(60, AngleUnit.DEGREE))
-        cls.pdp_loc_distrib = UniformPointInBboxDistribution(min_x=-10, max_x=10, min_y=-10, max_y=10)
-        cls.plan_delivery_distribution1 = PackageDeliveryPlanDistribution(pitch_distribution=pitch_distrib,
-                                                                          relative_location_distribution=cls.pdp_loc_distrib)
-        cls.cd_loc_distrib = DEFAULT_ZERO_LOCATION_DISTRIBUTION
-        cls.cd_dist = CustomerDeliveryDistribution(relative_location_distribution=cls.cd_loc_distrib,
-                                                   package_delivery_plan_distributions=[
-                                                       cls.plan_delivery_distribution1])
+        cls.loc_distrib = UniformPointInBboxDistribution(min_x=-10, max_x=10, min_y=-10, max_y=10)
+        cls.pdp_dist = PackageDeliveryPlanDistribution(pitch_distribution=pitch_distrib,
+                                                       relative_location_distribution=cls.loc_distrib)
+
 
     def test_random_local_sample_is_within_range(self):
         center_point = create_point_2d(1000, 2000)
-        cds = self.cd_dist.choose_rand(random=Random(), base_loc=center_point, amount=10, num_pdp=7)
+        cds = self.pdp_dist.choose_rand(random=Random(), base_loc=center_point, amount=10, num_pdp=7)
         within_valid_range_from_center = [cd.calc_location().calc_distance_to_point(center_point) < 10 * sqrt(2) / 2 for cd in cds]
         self.assertTrue(all(within_valid_range_from_center))
 
