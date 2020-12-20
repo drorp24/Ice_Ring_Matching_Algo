@@ -51,9 +51,8 @@ class DroneDeliveryBoard:
 
     def __eq__(self, other):
         return self._drone_deliveries == other.drone_deliveries \
-                    and self._dropped_delivery_requests == other._dropped_delivery_requests
+               and self._dropped_delivery_requests == other._dropped_delivery_requests
 
-            # TODO : ********* add totals to str
     def __str__(self):
         drone_deliveries_str = '\n'.join(map(str, self._drone_deliveries))
 
