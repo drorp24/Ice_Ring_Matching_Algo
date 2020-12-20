@@ -36,12 +36,14 @@ class PltGanttDrawer(GanttDrawer):
         self._ax.grid(b=True)
 
     def add_bar(self, row: int, time_window: TimeWindowExtension, name: str, time_mark: DateTimeExtension = None,
-                color: Color = Color.Blue) -> None:
+                side_text: str = None, color: Color = Color.Blue) -> None:
         since, until = time_window.get_relative_time_in_min(self._zero_time)
         y = self._calc_y(row)
         self._ax.barh(y=y, width=until - since, height=self._bar_height, left=since,
                       color=color.get_rgb_with_alpha(ALPHA), label=name,
                       edgecolor=Color.Black.get_rgb_with_alpha(ALPHA), linewidth=1)
+        if side_text:
+            self._ax.text(x=until, y=y - self._bar_height / 2, s=side_text, color=Color.Black.get_rgb(), fontsize=8)
         if time_mark:
             relative_time_in_min = time_mark.get_time_delta(self._zero_time).in_minutes()
             width = MARK_WIDTH_RATIO * self._hours_period
@@ -90,7 +92,6 @@ class PltGanttDrawer(GanttDrawer):
                     self._counters[row - 1] * self._bar_height) % self._row_y_factor + self._bar_height / 2
         self._counters[row - 1] += 1
         return y
-
 
 
 # zero_time = DateTimeExtension.from_dt(datetime(2020, 1, 23, 0, 00, 00))

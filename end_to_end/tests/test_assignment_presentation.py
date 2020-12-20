@@ -6,7 +6,7 @@ from typing import List
 from common.entities.drone_formation import FormationSize
 import numpy as np
 from common.entities.delivery_request import build_delivery_request_distribution, \
-    DeliveryRequest
+    DeliveryRequest, PriorityDistribution
 from common.entities.drone_loading_dock import DroneLoadingDockDistribution
 from common.entities.drone_loading_station import DroneLoadingStationDistribution
 from common.entities.package import PackageDistribution, PackageType
@@ -34,6 +34,7 @@ def _create_delivery_request_distribution():
     package_distribution = create_single_package_distribution()
     delivery_request_distribution = build_delivery_request_distribution(
         package_type_distribution=package_distribution,
+        priority_distribution=PriorityDistribution(list(range(1, 10))),
         relative_dr_location_distribution=UniformPointInBboxDistribution(west_lon, east_lon, south_lat, north_lat))
     # relative_dr_location_distribution = UniformPointInBboxDistribution(-5,5,5,15))
     # relative_dr_location_distribution = NormalPointDistribution(create_point_2d(5,7), 3, 5))
