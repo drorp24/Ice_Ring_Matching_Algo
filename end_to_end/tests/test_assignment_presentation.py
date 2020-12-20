@@ -96,7 +96,7 @@ class BasicMinimumEnd2EndPresentation(unittest.TestCase):
         operational_drawer2d.add_delivery_board(drawer, delivery_board, draw_dropped=True)
         drawer.draw(False)
 
-        row_names = [delivery.id for delivery in delivery_board.drone_deliveries] + ["Dropped"]
+        row_names = ["Dropped"] + [delivery.total_amount_per_package_type for delivery in delivery_board.drone_deliveries]
         drawer = create_gantt_drawer(zero_time=DateTimeExtension.from_dt((fully_connected_graph.zero_time)),
                         hours_period=24,
                         row_names=row_names)

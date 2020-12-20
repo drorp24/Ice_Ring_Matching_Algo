@@ -1,4 +1,3 @@
-from datetime import datetime
 from pathlib import Path
 import numpy as np
 import matplotlib.pyplot as plt
@@ -19,7 +18,7 @@ def create_gantt_drawer(zero_time: DateTimeExtension, hours_period: int, row_nam
 
 
 class PltGanttDrawer(GanttDrawer):
-    def __init__(self, zero_time: DateTimeExtension, hours_period: int, row_names: int):
+    def __init__(self, zero_time: DateTimeExtension, hours_period: int, row_names: [str]):
         self._zero_time = zero_time
         self._hours_period = hours_period
         self._fig, self._ax = plt.subplots()
@@ -77,6 +76,7 @@ class PltGanttDrawer(GanttDrawer):
         self._ax.yaxis.set_minor_locator(FixedLocator((yticks * self._row_y_factor) + (self._row_y_factor / 2)))
         self._ax.yaxis.set_major_formatter(NullFormatter())
         self._ax.yaxis.set_minor_formatter(FixedFormatter(self._row_names))
+        self._ax.tick_params(axis='y', which='minor', labelsize=8)
         for tick in self._ax.yaxis.get_minor_ticks():
             tick.tick1line.set_markersize(0)
             tick.tick2line.set_markersize(0)
