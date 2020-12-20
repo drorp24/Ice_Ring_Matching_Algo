@@ -21,6 +21,8 @@ SECOND = 'second'
 SINCE = 'since'
 UNTIL = 'until'
 
+SEC_IN_MIN = 60
+MIN_IN_HOUR = 60
 
 class Temporal(ABC):
 
@@ -168,7 +170,7 @@ class TimeDeltaExtension(BaseEntity):
         return hash(self.get_internal())
 
     def in_minutes(self) -> float:
-        return self.get_internal().total_seconds() / 60
+        return self.get_internal().total_seconds() / SEC_IN_MIN
 
 
 class DateTimeDistribution(UniformChoiceDistribution):

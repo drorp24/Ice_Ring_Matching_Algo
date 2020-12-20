@@ -11,10 +11,6 @@ class GanttDrawer(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def add_row_name(self, row: int, name: str) -> None:
-        raise NotImplementedError
-
-    @abstractmethod
     def draw(self, block=True) -> None:
         """
         Parameters
