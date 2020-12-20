@@ -7,7 +7,7 @@ from visualization.basic.gantt_drawer import GanttDrawer
 
 def add_delivery_board(drawer: GanttDrawer, board: DroneDeliveryBoard, draw_dropped=True):
     if draw_dropped:
-        dropped_row_num = drawer.get_num_rows
+        dropped_row_num = drawer.get_num_rows()
         for i, dropped in enumerate(board.dropped_delivery_requests):
             drawer.add_bar(
                 row=dropped_row_num,

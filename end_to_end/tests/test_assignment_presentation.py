@@ -24,17 +24,22 @@ from visualization.basic.pltgantt_drawer import create_gantt_drawer
 from visualization.operational import operational_drawer2d
 from visualization.operational import operational_gantt_drawer
 
-west_lon = 34.8288611
-east_lon = 35.9786527
-south_lat = 32.3508222
-north_lat = 33.3579972
+# west_lon = 34.8288611
+# east_lon = 35.9786527
+# south_lat = 32.3508222
+# north_lat = 33.3579972
+west_lon = 34.83927
+east_lon = 35.32341
+south_lat = 31.77279
+north_lat = 32.19276
 
 
 def _create_delivery_request_distribution():
     package_distribution = create_single_package_distribution()
     delivery_request_distribution = build_delivery_request_distribution(
         package_type_distribution=package_distribution,
-        relative_dr_location_distribution=UniformPointInBboxDistribution(west_lon, east_lon, south_lat, north_lat))
+        #relative_dr_location_distribution=UniformPointInBboxDistribution(west_lon, east_lon, south_lat, north_lat))
+        relative_dr_location_distribution=NormalPointDistribution(create_point_2d(35.11,32.0), 0.03, 0.05))
     # relative_dr_location_distribution = UniformPointInBboxDistribution(-5,5,5,15))
     # relative_dr_location_distribution = NormalPointDistribution(create_point_2d(5,7), 3, 5))
     return delivery_request_distribution
@@ -79,7 +84,7 @@ class BasicMinimumEnd2EndPresentation(unittest.TestCase):
         cls.matcher_config = Path("end_to_end/tests/jsons/test_matcher_config.json")
 
     def test_small_scenario(self):
-        empty_drone_delivery_board = _create_empty_drone_delivery_board(size=20)
+        empty_drone_delivery_board = _create_empty_drone_delivery_board(size=8)
         minimum_end_to_end = MinimumEnd2End(
             scenario=self.scenario_distribution.choose_rand(random=Random(10), amount=20),
             empty_drone_delivery_board=empty_drone_delivery_board)

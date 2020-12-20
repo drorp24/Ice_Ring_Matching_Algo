@@ -76,12 +76,36 @@ def _get_color_of_graph_edge(edge: OperationalEdge):
             return cond_color_map[cond]
 
 
+# def add_delivery_board(drawer: Drawer2D, board: DroneDeliveryBoard, draw_dropped=True):
+#     if draw_dropped:
+#         for dropped in board.dropped_delivery_requests:
+#             add_delivery_request(drawer, dropped.delivery_request, draw_internal=False, color=Color.Red)
+#             drawer.add_text(str(dropped.graph_index), dropped.delivery_request.calc_location(), fontsize=12)
+#     for delivery in board.drone_deliveries:
+#         if len(delivery.matched_requests) is 0:
+#             continue
+#         locations = []
+#         add_drone_loading_dock(drawer, delivery.start_drone_loading_docks.drone_loading_dock)
+#         locations.append(delivery.start_drone_loading_docks.drone_loading_dock.calc_location())
+#         for request in delivery.matched_requests:
+#             matched_delivery_option = request.delivery_request.delivery_options[request.matched_delivery_option_index]
+#             add_delivery_option(drawer, matched_delivery_option, draw_internal=False, color=Color.Green)
+#             current_location = matched_delivery_option.calc_location()
+#             drawer.add_text(str(request.graph_index), current_location, fontsize=12)
+#             locations.append(current_location)
+#         add_drone_loading_dock(drawer, delivery.end_drone_loading_docks.drone_loading_dock)
+#         locations.append(delivery.end_drone_loading_docks.drone_loading_dock.calc_location())
+#         route_color = random.choice(list(Color))
+#         for i, location in enumerate(locations[:-1]):
+#             drawer.add_arrow2d(head=locations[i + 1], tail=locations[i], edgecolor=route_color, linewidth=2)
+
 def add_delivery_board(drawer: Drawer2D, board: DroneDeliveryBoard, draw_dropped=True):
     if draw_dropped:
         for dropped in board.dropped_delivery_requests:
             add_delivery_request(drawer, dropped.delivery_request, draw_internal=False, color=Color.Red)
             drawer.add_text(str(dropped.graph_index), dropped.delivery_request.calc_location(), fontsize=12)
-    for delivery in board.drone_deliveries:
+    deliveries_colors = random.sample(list(filter(lambda x: x!= Color.Red, list(Color))), k=len(board.drone_deliveries))
+    for color, delivery in zip(deliveries_colors, board.drone_deliveries):
         if len(delivery.matched_requests) is 0:
             continue
         locations = []
@@ -89,12 +113,9 @@ def add_delivery_board(drawer: Drawer2D, board: DroneDeliveryBoard, draw_dropped
         locations.append(delivery.start_drone_loading_docks.drone_loading_dock.calc_location())
         for request in delivery.matched_requests:
             matched_delivery_option = request.delivery_request.delivery_options[request.matched_delivery_option_index]
-            add_delivery_option(drawer, matched_delivery_option, draw_internal=False, color=Color.Green)
+            add_delivery_option(drawer, matched_delivery_option, draw_internal=False, color=color)
             current_location = matched_delivery_option.calc_location()
             drawer.add_text(str(request.graph_index), current_location, fontsize=12)
             locations.append(current_location)
         add_drone_loading_dock(drawer, delivery.end_drone_loading_docks.drone_loading_dock)
         locations.append(delivery.end_drone_loading_docks.drone_loading_dock.calc_location())
-        route_color = random.choice(list(Color))
-        for i, location in enumerate(locations[:-1]):
-            drawer.add_arrow2d(head=locations[i + 1], tail=locations[i], edgecolor=route_color, linewidth=2)

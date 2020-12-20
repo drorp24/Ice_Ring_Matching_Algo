@@ -32,7 +32,7 @@ class PltGanttDrawer(GanttDrawer):
         self._set_xtick_locations_and_labels()
         self._set_ytick_locations_and_labels()
         self._set_alternating_row_color()
-        self._ax.set_xlabel('Minutes since ' + self._zero_time.get_internal().strftime("%d/%m/%Y %H:%M:%S"))
+        self._ax.set_xlabel('Hours since ' + self._zero_time.get_internal().strftime("%d/%m/%Y %H:%M:%S"))
         self._ax.grid(b=True)
 
     def add_bar(self, row: int, time_window: TimeWindowExtension, name: str, time_mark: DateTimeExtension = None,
