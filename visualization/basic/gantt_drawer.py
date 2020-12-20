@@ -11,6 +11,10 @@ class GanttDrawer(ABC):
         raise NotImplementedError
 
     @abstractmethod
+    def get_num_rows(self):
+        raise NotImplementedError
+
+    @abstractmethod
     def draw(self, block=True) -> None:
         """
         Parameters

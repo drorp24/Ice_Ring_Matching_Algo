@@ -78,7 +78,7 @@ def _get_color_of_graph_edge(edge: OperationalEdge):
 
 def add_delivery_board(drawer: Drawer2D, board: DroneDeliveryBoard, draw_dropped=True):
     if draw_dropped:
-        for dropped in board.dropped_delivery_request:
+        for dropped in board.dropped_delivery_requests:
             add_delivery_request(drawer, dropped.delivery_request, draw_internal=False, color=Color.Red)
             drawer.add_text(str(dropped.graph_index), dropped.delivery_request.calc_location(), fontsize=12)
     for delivery in board.drone_deliveries:

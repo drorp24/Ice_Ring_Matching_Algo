@@ -10,6 +10,7 @@ from common.entities.delivery_request import build_delivery_request_distribution
 from common.entities.drone_loading_dock import DroneLoadingDockDistribution
 from common.entities.drone_loading_station import DroneLoadingStationDistribution
 from common.entities.package import PackageDistribution, PackageType
+from common.entities.temporal import DateTimeExtension
 from common.graph.operational.export_ortools_graph import OrtoolsGraphExporter
 from common.tools.empty_drone_delivery_board_generation import build_empty_drone_delivery_board
 from common.tools.fleet_property_sets import *
@@ -19,9 +20,9 @@ from geometry.geo_distribution import NormalPointDistribution, UniformPointInBbo
 from geometry.geo_factory import create_point_2d
 from visualization.basic.drawer2d import Drawer2DCoordinateSys
 from visualization.basic.pltdrawer2d import create_drawer_2d
-from visualization.operational.operational_drawer2d import add_operational_graph, add_delivery_request, \
-    add_delivery_board
-
+from visualization.basic.pltgantt_drawer import create_gantt_drawer
+from visualization.operational import operational_drawer2d
+from visualization.operational import operational_gantt_drawer
 
 west_lon = 34.8288611
 east_lon = 35.9786527
@@ -91,5 +92,13 @@ class BasicMinimumEnd2EndPresentation(unittest.TestCase):
         print(delivery_board)
 
         drawer = create_drawer_2d(Drawer2DCoordinateSys.GEOGRAPHIC)
-        add_delivery_board(drawer, delivery_board, draw_dropped=True)
+        operational_drawer2d.add_delivery_board(drawer, delivery_board, draw_dropped=True)
         drawer.draw()
+
+        row_names = [delivery.id for delivery in delivery_board.drone_deliveries] + ["Dropped"]
+        drawer = create_gantt_drawer(zero_time=DateTimeExtension.from_dt((fully_connected_graph.zero_time)),
+                        hours_period=24,
+                        row_names=row_names)
+        operational_gantt_drawer.add_delivery_board(drawer, delivery_board, True)
+        drawer.draw(True)
+

@@ -114,7 +114,7 @@ class MinimumEnd2End:
         operational_graph = OperationalGraph(self.zero_time.get_internal())
         operational_graph.add_drone_loading_docks(self.loading_dock)
         operational_graph.add_delivery_requests(self.delivery_requests)
-        build_fully_connected_graph(operational_graph)
+        build_time_overlapping_dependent_connected_graph(operational_graph)
         # add_locally_connected_dr_graph(operational_graph, self.delivery_requests, max_cost_to_connect)
         # add_fully_connected_loading_docks(operational_graph, self.loading_dock)
         return operational_graph
