@@ -6,7 +6,7 @@ from common.entities.base_entities.entity_distribution.drone_loading_dock_distri
     DroneLoadingDockDistribution
 
 
-class BasicDroneLoadingDockGeneration(unittest.TestCase):
+class BasicDroneLoadingDockGenerationTests(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):

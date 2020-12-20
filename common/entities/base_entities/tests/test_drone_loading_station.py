@@ -7,7 +7,7 @@ from common.entities.base_entities.entity_distribution.drone_loading_station_dis
 from geometry.distribution.geo_distribution import UniformPointInBboxDistribution
 
 
-class BasicDroneLoadingStationGeneration(unittest.TestCase):
+class BasicDroneLoadingStationGenerationTests(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):

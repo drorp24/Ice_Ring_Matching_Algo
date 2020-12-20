@@ -7,7 +7,7 @@ from common.entities.generator.delivery_request_generator import DeliveryRequest
     DeliveryRequestDatasetStructure
 
 
-class BasicDeliveryRequestGeneration(unittest.TestCase):
+class BasicDeliveryRequestGenerationTests(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):

@@ -14,7 +14,7 @@ from common.entities.base_entities.entity_distribution.package_delivery_plan_dis
 from common.entities.base_entities.package_delivery_plan import PackageDeliveryPlan
 
 
-class BasicPackageTestCase(unittest.TestCase):
+class BasicJsonableBaseEntitiesTests(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):

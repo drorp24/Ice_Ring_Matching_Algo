@@ -11,7 +11,7 @@ from geometry.distribution.geo_distribution import UniformPointInBboxDistributio
 from geometry.geo_factory import create_point_2d
 
 
-class BasicPackageDeliveryPlan(unittest.TestCase):
+class BasicCustomerDeliveryTests(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):

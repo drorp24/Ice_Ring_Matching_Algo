@@ -4,7 +4,7 @@ from datetime import date, time
 from common.entities.base_entities.temporal import DateTimeExtension, TimeWindowExtension
 
 
-class BasicDateTime(unittest.TestCase):
+class BasicTemporalTests(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):

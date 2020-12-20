@@ -5,7 +5,7 @@ from common.entities.base_entities.drone_formation import FormationSize, DroneFo
 from common.entities.base_entities.package import PackageType
 
 
-class BasicDroneFormationTypeGeneration(unittest.TestCase):
+class BasicDroneFormationTypeGenerationTests(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):

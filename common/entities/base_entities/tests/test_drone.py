@@ -4,7 +4,7 @@ from common.entities.base_entities.drone import PlatformType, Configurations, Dr
 from common.entities.base_entities.package import PackageType
 
 
-class BasicDroneConfigurationTypeGeneration(unittest.TestCase):
+class BasicDroneConfigurationTypeGenerationTests(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):

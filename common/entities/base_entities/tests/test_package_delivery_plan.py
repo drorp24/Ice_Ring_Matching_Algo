@@ -5,7 +5,7 @@ from random import Random
 from common.entities.base_entities.entity_distribution.customer_delivery_distribution import DEFAULT_PDP_DISTRIB
 
 
-class BasicPDPTestCase(unittest.TestCase):
+class BasicPackageDeliveryPlanTests(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):

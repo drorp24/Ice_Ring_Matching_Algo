@@ -9,7 +9,7 @@ from common.entities.base_entities.drone_formation import DroneFormations, Forma
 from common.entities.base_entities.entity_distribution.delivery_request_distribution import DeliveryRequestDistribution
 
 
-class BasicDroneDeliveryGeneration(unittest.TestCase):
+class BasicDroneDeliveryGenerationTests(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
