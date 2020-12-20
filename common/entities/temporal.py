@@ -24,7 +24,7 @@ UNTIL = 'until'
 SEC_IN_MIN = 60
 MIN_IN_HOUR = 60
 
-DATETIME_DEFAULT_FORMAT = "%m %d %Y %H:%M:%S"
+DATETIME_DEFAULT_FORMAT = "%d %m %Y %H:%M:%S"
 
 
 class Temporal(ABC):
