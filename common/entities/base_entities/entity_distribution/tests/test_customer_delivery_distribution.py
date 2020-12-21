@@ -2,10 +2,12 @@ import unittest
 from math import sqrt
 from random import Random
 
+from common.entities.base_entities.customer_delivery import CustomerDelivery
 from common.entities.base_entities.entity_distribution.customer_delivery_distribution import \
     CustomerDeliveryDistribution
 from common.entities.base_entities.entity_distribution.package_delivery_plan_distribution import \
     PackageDeliveryPlanDistribution
+from common.entities.base_entities.package_delivery_plan import PackageDeliveryPlan
 from common.math.angle import AngleUniformDistribution, Angle, AngleUnit
 from geometry.distribution.geo_distribution import UniformPointInBboxDistribution, DEFAULT_ZERO_LOCATION_DISTRIBUTION
 from geometry.geo_factory import create_point_2d
@@ -26,10 +28,9 @@ class BasicCustomerDeliveryDistribTests(unittest.TestCase):
                                                        cls.plan_delivery_distribution1])
 
         cls.base_point = create_point_2d(1000, 2000)
-        cls.num_of_cds_to_sample = 10
-        cls.num_of_pdp_to_sample = 7
+        cls.amount = {CustomerDelivery: 10, PackageDeliveryPlan: 7}
         cls.cd_samples = cls.cd_dist.choose_rand(random=Random(), base_loc=cls.base_point,
-                                                 amount=cls.num_of_cds_to_sample, num_pdp=cls.num_of_pdp_to_sample)
+                                                 amount=cls.amount)
 
     def test_random_local_sample_is_within_range(self):
         max_dist = 10 * 2 / sqrt(2)
@@ -38,5 +39,5 @@ class BasicCustomerDeliveryDistribTests(unittest.TestCase):
         self.assertTrue(all(within_valid_range))
 
     def test_random_local_sample_amounts_are_correct(self):
-        self.assertEqual(len(self.cd_samples), self.num_of_cds_to_sample)
-        self.assertTrue(all([len(cd.package_delivery_plans) is self.num_of_pdp_to_sample for cd in self.cd_samples]))
+        self.assertEqual(len(self.cd_samples), self.amount[CustomerDelivery])
+        self.assertTrue(all([len(cd.package_delivery_plans) is self.amount[PackageDeliveryPlan] for cd in self.cd_samples]))

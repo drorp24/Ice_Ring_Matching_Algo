@@ -2,6 +2,7 @@ import unittest
 from datetime import datetime
 from random import Random
 
+from common.entities.base_entities.delivery_request import DeliveryRequest
 from common.entities.base_entities.drone import PlatformType
 from common.entities.base_entities.drone_delivery import DroneDelivery, EmptyDroneDelivery
 from common.entities.base_entities.drone_delivery_board import EmptyDroneDeliveryBoard, DroneDeliveryBoard
@@ -13,7 +14,7 @@ class BasicDroneDeliveryGenerationTests(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.dr = DeliveryRequestDistribution().choose_rand(random=Random(42), amount=3)
+        cls.dr = DeliveryRequestDistribution().choose_rand(random=Random(42), amount={DeliveryRequest: 3})
 
         cls.empty_drone_delivery_1 = EmptyDroneDelivery("edd_1", DroneFormations.get_drone_formation(
             FormationSize.MINI, FormationOptions.TINY_PACKAGES, PlatformType.platform_1))

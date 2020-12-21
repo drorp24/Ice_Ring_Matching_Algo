@@ -29,7 +29,7 @@ class BasicDeliveryRequestGraphTestCases(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.dr_dataset_random = DeliveryRequestDistribution().choose_rand(random=Random(100), amount=10)
+        cls.dr_dataset_random = DeliveryRequestDistribution().choose_rand(random=Random(100), amount={DeliveryRequest: 10})
         cls.dld_dataset_random = DroneLoadingDockDistribution().choose_rand(random=Random(100), amount=3)
         cls.dr_dataset_morning = create_morning_dr_dataset()
         cls.dr_dataset_afternoon = create_afternoon_dr_dataset()

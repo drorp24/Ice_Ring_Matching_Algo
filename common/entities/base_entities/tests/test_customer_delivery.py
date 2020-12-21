@@ -2,10 +2,12 @@ import unittest
 from pprint import pprint
 from random import Random
 
+from common.entities.base_entities.customer_delivery import CustomerDelivery
 from common.entities.base_entities.entity_distribution.customer_delivery_distribution import \
     CustomerDeliveryDistribution
 from common.entities.base_entities.entity_distribution.package_delivery_plan_distribution import \
     PackageDeliveryPlanDistribution
+from common.entities.base_entities.package_delivery_plan import PackageDeliveryPlan
 from common.math.angle import AngleUniformDistribution, Angle, AngleUnit
 from geometry.distribution.geo_distribution import UniformPointInBboxDistribution, DEFAULT_ZERO_LOCATION_DISTRIBUTION
 from geometry.geo_factory import create_point_2d
@@ -33,15 +35,15 @@ class BasicCustomerDeliveryTests(unittest.TestCase):
         dist1 = [self.plan_delivery_distribution1]
         cd = CustomerDeliveryDistribution(self.loc_distrib, dist1).choose_rand(Random(42),
                                                                                base_loc=create_point_2d(0, 0),
-                                                                               amount=3,
-                                                                               num_pdp=10)[0]
+                                                                               amount={CustomerDelivery: 3,
+                                                                                       PackageDeliveryPlan: 10})[0]
         self.assertEqual(create_point_2d(10, 11), cd.calc_location())
 
         dist2 = [self.plan_delivery_distribution2]
         cd = CustomerDeliveryDistribution(self.loc_distrib, dist2).choose_rand(Random(42),
                                                                                base_loc=create_point_2d(0, 0),
-                                                                               amount=1,
-                                                                               num_pdp=10)[0]
+                                                                               amount={CustomerDelivery: 1,
+                                                                                       PackageDeliveryPlan: 10})[0]
         self.assertEqual(create_point_2d(210, 211), cd.calc_location())
 
     def print_example_customer_delivery(self):

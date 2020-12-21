@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from abc import abstractmethod, ABC
+from abc import abstractmethod, ABC, ABCMeta
 from dataclasses import dataclass
 from random import Random
 from typing import Dict, List
@@ -10,6 +10,13 @@ class Distribution(ABC):
 
     @abstractmethod
     def choose_rand(self, random: Random, amount: int):
+        raise NotImplementedError
+
+
+class HierarchialDistribution(Distribution):
+
+    @abstractmethod
+    def choose_rand(self, random: Random, amount: Dict[type, int]):
         raise NotImplementedError
 
 
