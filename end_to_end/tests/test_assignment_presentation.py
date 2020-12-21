@@ -94,10 +94,9 @@ class BasicMinimumEnd2EndPresentation(unittest.TestCase):
             drone_loading_docks_distribution=
             DroneLoadingDockDistribution(drone_loading_station_distributions=
                                          DroneLoadingStationDistribution(drone_station_locations_distribution=
-                                                                         UniformPointInBboxDistribution(west_lon,
-                                                                                                        east_lon,
-                                                                                                        south_lat,
-                                                                                                        north_lat)),
+                                                                         UniformPointInBboxDistribution(35.11,35.11,
+                                                                                                        31.79,31.79
+                                                                                                        )),
                                          time_window_distributions=create_standad_full_day_test_time()))
         cls.matcher_config = Path("end_to_end/tests/jsons/test_matcher_config.json")
 
