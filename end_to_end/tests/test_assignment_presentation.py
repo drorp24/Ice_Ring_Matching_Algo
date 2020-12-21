@@ -123,7 +123,7 @@ class BasicMinimumEnd2EndPresentation(unittest.TestCase):
         drawer = create_gantt_drawer(zero_time=DateTimeExtension.from_dt(fully_connected_graph.zero_time),
                                      hours_period=24,
                                      row_names=row_names,
-                                     rows_title='Load Per Package type: ' + str(PackageType.get_all_names())
+                                     rows_title='Carried Package type: ' + str(PackageType.get_all_names())
                                      )
         operational_gantt_drawer.add_delivery_board(drawer, delivery_board, True)
         drawer.draw(True)
