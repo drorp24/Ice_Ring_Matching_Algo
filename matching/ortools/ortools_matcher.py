@@ -6,7 +6,7 @@ from ortools.constraint_solver.pywrapcp import RoutingIndexManager, RoutingModel
 
 from common.entities.drone_delivery import MatchedDeliveryRequest, DroneDelivery, MatchedDroneLoadingDock
 from common.entities.drone_delivery_board import DroneDeliveryBoard, DroppedDeliveryRequest
-from common.entities.temporal import TimeDeltaExtension
+from common.entities.temporal import TimeDeltaExtension, DateTimeExtension
 from common.graph.operational.export_ortools_graph import OrtoolsGraphExporter
 from matching.matcher import Matcher
 from matching.matcher_input import MatcherInput
@@ -71,13 +71,14 @@ class ORToolsMatcher(Matcher):
                 continue
             if solution.Value(self._routing.NextVar(index)) == index:
                 graph_index = self._manager.IndexToNode(index)
-                dropped_delivery_request.append(DroppedDeliveryRequest(graph_index=graph_index,
-                                                       delivery_request=self._graph_exporter.get_delivery_request(
-                                                           self.matcher_input.graph, graph_index)))
+                dropped_delivery_request.append(DroppedDeliveryRequest(
+                    graph_index=graph_index,
+                    delivery_request=self._graph_exporter.get_delivery_request(
+                        self.matcher_input.graph, graph_index)))
 
         return dropped_delivery_request
 
-    def _create_drone_deliveries(self, solution: Assignment):
+    def _create_drone_deliveries(self, solution: Assignment) -> List[DroneDelivery]:
         drone_deliveries = []
 
         for edd_index, empty_drone_delivery in enumerate(self.matcher_input.empty_board.empty_drone_deliveries):
@@ -103,43 +104,46 @@ class ORToolsMatcher(Matcher):
             end_drone_loading_dock = self._create_drone_loading_dock(graph_index, index, solution)
 
             drone_deliveries.append(
-                self._create_drone_delivery(edd_index, end_drone_loading_dock, matched_requests,
-                                            start_drone_loading_dock))
+                self._create_drone_delivery(edd_index, start_drone_loading_dock, end_drone_loading_dock,
+                                            matched_requests))
 
         return drone_deliveries
 
-    def _create_drone_delivery(self, edd_index, end_drone_loading_dock, matched_requests, start_drone_loading_dock):
+    def _create_drone_delivery(self, edd_index: int, start_drone_loading_dock: MatchedDroneLoadingDock,
+                               end_drone_loading_dock: MatchedDroneLoadingDock,
+                               matched_requests: List[MatchedDeliveryRequest]) -> DroneDelivery:
         return DroneDelivery(self.matcher_input.empty_board.empty_drone_deliveries[edd_index].id,
                              self.matcher_input.empty_board.empty_drone_deliveries[
                                  edd_index].drone_formation,
                              matched_requests, start_drone_loading_dock, end_drone_loading_dock)
 
-    def _create_matched_delivery_request(self, graph_index, index, solution):
+    def _create_matched_delivery_request(self, graph_index: int, index: int,
+                                         solution: Assignment) -> MatchedDeliveryRequest:
         return MatchedDeliveryRequest(
             graph_index=graph_index,
             delivery_request=self._graph_exporter.get_delivery_request(
                 self.matcher_input.graph,
                 graph_index),
             matched_delivery_option_index=0,
-            delivery_min_time=(self._get_min_time(solution,
-                                                  index)), delivery_max_time=(
-                self._get_max_time(solution, index)))
+            delivery_min_time=(self._get_min_time(index, solution)), delivery_max_time=(
+                self._get_max_time(index, solution)))
 
-    def _create_drone_loading_dock(self, graph_index, index, solution):
+    def _create_drone_loading_dock(self, graph_index: int, index: int,
+                                   solution: Assignment) -> MatchedDroneLoadingDock:
         return MatchedDroneLoadingDock(
             graph_index=graph_index,
             drone_loading_dock=self._graph_exporter.get_drone_loading_dock(
                 self.matcher_input.graph, graph_index),
-            delivery_min_time=(self._get_min_time(solution, index)),
-            delivery_max_time=(self._get_max_time(solution, index)))
+            delivery_min_time=(self._get_min_time(index, solution)),
+            delivery_max_time=(self._get_max_time(index, solution)))
 
-    def _get_min_time(self, solution, index):
+    def _get_min_time(self, index: int, solution: Assignment) -> DateTimeExtension:
         time_dimension = self._routing.GetDimensionOrDie('Time')
         time_var = time_dimension.CumulVar(index)
         return self._matcher_input.config.zero_time.add_time_delta(
             TimeDeltaExtension(timedelta(minutes=solution.Min(time_var))))
 
-    def _get_max_time(self, solution, index):
+    def _get_max_time(self, index: int, solution: Assignment) -> DateTimeExtension:
         time_dimension = self._routing.GetDimensionOrDie('Time')
         time_var = time_dimension.CumulVar(index)
         return self._matcher_input.config.zero_time.add_time_delta(
