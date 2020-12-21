@@ -69,8 +69,8 @@ def create_single_package_distribution():
 
 def _create_empty_drone_delivery_board(
         formation_size_policy: dict = {FormationSize.MINI: 1, FormationSize.MEDIUM: 0},
-        configurations_policy: dict = {Configurations.LARGE_X2: 1,
-                                       Configurations.MEDIUM_X4: 0,
+        configurations_policy: dict = {Configurations.LARGE_X2: 0.9,
+                                       Configurations.MEDIUM_X4: 0.1,
                                        Configurations.SMALL_X8: 0,
                                        Configurations.TINY_X16: 0}
         , platform_type: PlatformType = PlatformType.platform_1,
@@ -104,7 +104,7 @@ class BasicMinimumEnd2EndPresentation(unittest.TestCase):
     def test_small_scenario(self):
         empty_drone_delivery_board = _create_empty_drone_delivery_board(size=20)
         minimum_end_to_end = MinimumEnd2End(
-            scenario=self.scenario_distribution.choose_rand(random=Random(10), amount=20),
+            scenario=self.scenario_distribution.choose_rand(random=Random(10), amount=37),
             empty_drone_delivery_board=empty_drone_delivery_board)
         fully_connected_graph = minimum_end_to_end.create_fully_connected_graph_model()
         # graph_exporter = OrtoolsGraphExporter()
@@ -118,7 +118,7 @@ class BasicMinimumEnd2EndPresentation(unittest.TestCase):
         operational_drawer2d.add_delivery_board(drawer, delivery_board, draw_dropped=True)
         drawer.draw(False)
 
-        row_names = ["Dropped Out"] + [delivery.drone_formation.get_package_type_volumes()
+        row_names = ["Dropped Out"] + [delivery.drone_formation.get_package_type_volumes().get_package_types_volumes()
                                        for delivery in delivery_board.drone_deliveries]
         drawer = create_gantt_drawer(zero_time=DateTimeExtension.from_dt(fully_connected_graph.zero_time),
                                      hours_period=24,

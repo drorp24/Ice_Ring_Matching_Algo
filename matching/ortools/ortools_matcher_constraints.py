@@ -27,7 +27,7 @@ class ORToolsMatcherConstraints:
                 self._matcher_input.config.constraints.time.max_waiting_time,
                 self._matcher_input.empty_board.formation_capacities(package_type),
                 self._matcher_input.config.constraints.capacity.count_capacity_from_zero,
-                'Capacity')
+                'Capacity_' + str.lower(package_type.name))
 
     def _demand_callback_tiny(self, from_index):
         from_node = self._manager.IndexToNode(from_index)
