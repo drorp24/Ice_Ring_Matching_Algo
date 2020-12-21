@@ -118,10 +118,13 @@ class BasicMinimumEnd2EndPresentation(unittest.TestCase):
         operational_drawer2d.add_delivery_board(drawer, delivery_board, draw_dropped=True)
         drawer.draw(False)
 
-        row_names = ["Dropped Out"] + [delivery.total_amount_per_package_type for delivery in delivery_board.drone_deliveries]
+        row_names = ["Dropped Out"] + [delivery.drone_formation.get_package_type_volumes()
+                                       for delivery in delivery_board.drone_deliveries]
         drawer = create_gantt_drawer(zero_time=DateTimeExtension.from_dt(fully_connected_graph.zero_time),
                                      hours_period=24,
-                                     row_names=row_names)
+                                     row_names=row_names,
+                                     rows_title='Load Per Package type: ' + str(PackageType.get_all_names())
+                                     )
         operational_gantt_drawer.add_delivery_board(drawer, delivery_board, True)
         drawer.draw(True)
 

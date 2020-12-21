@@ -15,16 +15,17 @@ BAR_ALPHA = 0.6
 BACKGROUND_ALPHA = 0.05
 
 
-def create_gantt_drawer(zero_time: DateTimeExtension, hours_period: int, row_names: [str]) -> GanttDrawer:
-    return PltGanttDrawer(zero_time, hours_period, row_names)
+def create_gantt_drawer(zero_time: DateTimeExtension, hours_period: int, row_names: [str], rows_title: str) -> GanttDrawer:
+    return PltGanttDrawer(zero_time, hours_period, row_names, rows_title)
 
 
 class PltGanttDrawer(GanttDrawer):
-    def __init__(self, zero_time: DateTimeExtension, hours_period: int, row_names: [str]):
+    def __init__(self, zero_time: DateTimeExtension, hours_period: int, row_names: [str], rows_title: str):
         self._zero_time = zero_time
         self._hours_period = hours_period
         self._fig, self._ax = plt.subplots()
         self._row_names = row_names
+        self._rows_title = rows_title
         self._counters = np.zeros(len(row_names))
         self._row_y_factor = YLIMIT / len(row_names)
         self._bar_height = self._row_y_factor * BAR_HEIGHT_RATIO
@@ -34,6 +35,7 @@ class PltGanttDrawer(GanttDrawer):
         self._set_ytick_locations_and_labels()
         self._set_alternating_row_color()
         self._ax.set_xlabel('Hours since ' + self._zero_time.str_format_time())
+        self._ax.set_ylabel(rows_title)
         self._ax.grid(b=True)
 
     def add_bar(self, row: int, time_window: TimeWindowExtension, name: str, time_mark: DateTimeExtension = None,
@@ -48,7 +50,7 @@ class PltGanttDrawer(GanttDrawer):
         if time_mark:
             relative_time_in_min = time_mark.get_time_delta(self._zero_time).in_minutes()
             width = MARK_WIDTH_RATIO * self._hours_period
-            self._ax.barh(y=y, width=width, height=self._bar_height, left=relative_time_in_min,
+            self._ax.barh(y=y, width=width, height=self._bar_height, left=relative_time_in_min - width / 2,
                           color=color.Black.get_rgb())
 
     def add_row_background_area(self, row: int, time_window: TimeWindowExtension, color: Color = Color.Orange) -> None:
