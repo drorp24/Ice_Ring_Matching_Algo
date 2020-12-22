@@ -35,6 +35,6 @@ class BasicDeliveryRequestGenerationTests(unittest.TestCase):
     def test_num_of_cd_per_do(self):
         self.assertEqual(len(self.dr_dataset[0].delivery_options[0].customer_deliveries), self.num_of_cd_per_do)
 
-    def test_num_of_cd_per_do(self):
+    def test_num_of_pdp_per_cd(self):
         self.assertEqual(len(self.dr_dataset[0].delivery_options[0].customer_deliveries[0].package_delivery_plans),
                          self.num_of_pdp_per_cd)
