@@ -72,7 +72,11 @@ class UniformDistribution(Distribution):
 
     def choose_rand(self, random: Random, amount: int = 1) -> List:
         # uniform sample from within range chosen by probability
-        return [random.uniform(self._value_range.start, self._value_range.stop) for i in range(amount)]
+        return [random.uniform(self._value_range.start, self._value_range.stop) for _ in range(amount)]
+
+    def choose_uniform_in_range(self, random: Random) -> object:
+        # uniform sample from within range chosen by probability
+        return random.uniform(self._value_range.start, self._value_range.stop)
 
 
 class MultiUniformDistribution(Distribution):

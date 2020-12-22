@@ -1,7 +1,8 @@
 from __future__ import annotations
 
+import math
 from random import Random
-from typing import List, Dict
+from typing import List, Dict, Union
 
 from common.entities.base_entities.customer_delivery import CustomerDelivery
 from common.entities.base_entities.delivery_option import DeliveryOption
@@ -13,7 +14,8 @@ from common.entities.base_entities.entity_distribution.distribution_utils import
 from common.entities.base_entities.entity_distribution.priority_distribution import PriorityDistribution
 from common.entities.base_entities.entity_distribution.temporal_distribution import TimeWindowDistribution
 from common.entities.base_entities.package_delivery_plan import PackageDeliveryPlan
-from common.entities.distribution.distribution import UniformChoiceDistribution, HierarchialDistribution
+from common.entities.distribution.distribution import UniformChoiceDistribution, HierarchialDistribution, Range, \
+    UniformDistribution
 from geometry.distribution.geo_distribution import PointLocationDistribution, DEFAULT_ZERO_LOCATION_DISTRIBUTION
 from geometry.geo2d import Point2D
 from geometry.geo_factory import create_zero_point_2d
@@ -38,10 +40,12 @@ class DeliveryRequestDistribution(HierarchialDistribution):
         self._time_window_distributions = time_window_distributions
         self._priority_distribution = priority_distribution
 
-    def choose_rand(self, random: Random, base_loc: Point2D = create_zero_point_2d(), amount: Dict[type, int] = {}) -> \
-            List[DeliveryRequest]:
+    def choose_rand(self, random: Random, base_loc: Point2D = create_zero_point_2d(),
+                    amount: Dict[type, Union[int, Range]] = {}) -> List[DeliveryRequest]:
         internal_amount = LocalDistribution.get_updated_internal_amount(DeliveryRequestDistribution, amount)
         dr_amount = internal_amount.pop(DeliveryRequest)
+        if isinstance(dr_amount, Range):
+            dr_amount = math.floor(UniformDistribution(value_range=dr_amount).choose_uniform_in_range(random))
         sampled_distributions = self._calc_samples_from_distributions(dr_amount, random)
         DeliveryRequestDistribution._update_the_location_of_sampled_points(base_loc, sampled_distributions)
         do_distribution = self.choose_internal_distribution(random)

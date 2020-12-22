@@ -1,3 +1,4 @@
+import math
 from random import Random
 from typing import List, Dict
 
@@ -7,7 +8,8 @@ from common.entities.base_entities.entity_distribution.customer_delivery_distrib
     CustomerDeliveryDistribution, DEFAULT_PDP_DISTRIB
 from common.entities.base_entities.entity_distribution.distribution_utils import LocalDistribution
 from common.entities.base_entities.package_delivery_plan import PackageDeliveryPlan
-from common.entities.distribution.distribution import UniformChoiceDistribution, HierarchialDistribution
+from common.entities.distribution.distribution import UniformChoiceDistribution, HierarchialDistribution, Range, \
+    UniformDistribution
 from geometry.distribution.geo_distribution import PointLocationDistribution, DEFAULT_ZERO_LOCATION_DISTRIBUTION
 from geometry.geo2d import Point2D
 from geometry.geo_factory import create_zero_point_2d
@@ -26,6 +28,8 @@ class DeliveryOptionDistribution(HierarchialDistribution):
                     amount: Dict[type, int] = {}) -> List[DeliveryOption]:
         internal_amount = LocalDistribution.get_updated_internal_amount(DeliveryOptionDistribution, amount)
         do_amount = internal_amount.pop(DeliveryOption)
+        if isinstance(do_amount, Range):
+            do_amount = math.floor(UniformDistribution(value_range=do_amount).choose_uniform_in_range(random))
         sampled_distributions = self._calc_samples_from_distributions(do_amount, random)
         DeliveryOptionDistribution._update_location_of_sampled_points(base_loc, sampled_distributions)
         cd_distributions = self.choose_internal_distribution(random)

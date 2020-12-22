@@ -1,14 +1,15 @@
 from __future__ import annotations
 
+import math
 from random import Random
-from typing import List, Dict
+from typing import List, Dict, Union
 
 from common.entities.base_entities.entity_distribution.distribution_utils import LocalDistribution
 from common.entities.base_entities.entity_distribution.entity_id_distribution import EntityIDDistribution, \
     DEFAULT_SINGLE_ID_DISTRIB
 from common.entities.base_entities.entity_distribution.package_distribution import PackageDistribution
 from common.entities.base_entities.package_delivery_plan import PackageDeliveryPlan
-from common.entities.distribution.distribution import Distribution
+from common.entities.distribution.distribution import Distribution, Range, UniformDistribution
 from common.math.angle import AngleUniformDistribution, Angle, AngleUnit
 from geometry.distribution.geo_distribution import PointLocationDistribution, \
     DEFAULT_ZERO_LOCATION_DISTRIBUTION
@@ -35,8 +36,10 @@ class PackageDeliveryPlanDistribution(Distribution):
         self._pitch_distribution = pitch_distribution
         self._package_type_distribution = package_type_distribution
 
-    def choose_rand(self, random: Random, base_loc: Point2D = create_zero_point_2d(), amount: int = 1) -> List[
+    def choose_rand(self, random: Random, base_loc: Point2D = create_zero_point_2d(), amount: Union[int, Range] = 1) -> List[
         PackageDeliveryPlan]:
+        if isinstance(amount, Range):
+            amount = math.floor(UniformDistribution(amount).choose_uniform_in_range(random))
         sampled_distributions = self._calc_samples_from_distributions(amount, random)
         PackageDeliveryPlanDistribution._update_the_location_of_sampled_points(base_loc, sampled_distributions)
         pdp_attrib_samples = LocalDistribution.convert_list_dict_to_individual_dicts(sampled_distributions)
