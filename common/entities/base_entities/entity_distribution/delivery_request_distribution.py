@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import math
 from random import Random
 from typing import List, Dict, Union
 
@@ -14,8 +13,7 @@ from common.entities.base_entities.entity_distribution.distribution_utils import
 from common.entities.base_entities.entity_distribution.priority_distribution import PriorityDistribution
 from common.entities.base_entities.entity_distribution.temporal_distribution import TimeWindowDistribution
 from common.entities.base_entities.package_delivery_plan import PackageDeliveryPlan
-from common.entities.distribution.distribution import UniformChoiceDistribution, HierarchialDistribution, Range, \
-    UniformDistribution
+from common.entities.distribution.distribution import UniformChoiceDistribution, HierarchialDistribution, Range
 from geometry.distribution.geo_distribution import PointLocationDistribution, DEFAULT_ZERO_LOCATION_DISTRIBUTION
 from geometry.geo2d import Point2D
 from geometry.geo_factory import create_zero_point_2d

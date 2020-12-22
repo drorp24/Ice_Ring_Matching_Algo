@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import math
 from random import Random
 from typing import List, Dict, Union
 
@@ -9,7 +8,7 @@ from common.entities.base_entities.entity_distribution.entity_id_distribution im
     DEFAULT_SINGLE_ID_DISTRIB
 from common.entities.base_entities.entity_distribution.package_distribution import PackageDistribution
 from common.entities.base_entities.package_delivery_plan import PackageDeliveryPlan
-from common.entities.distribution.distribution import Distribution, Range, UniformDistribution
+from common.entities.distribution.distribution import Distribution, Range
 from common.math.angle import AngleUniformDistribution, Angle, AngleUnit
 from geometry.distribution.geo_distribution import PointLocationDistribution, \
     DEFAULT_ZERO_LOCATION_DISTRIBUTION

@@ -1,4 +1,3 @@
-import math
 from random import Random
 from typing import List, Dict, Union
 
@@ -8,8 +7,7 @@ from common.entities.base_entities.entity_distribution.customer_delivery_distrib
     CustomerDeliveryDistribution, DEFAULT_PDP_DISTRIB
 from common.entities.base_entities.entity_distribution.distribution_utils import DistributionUtils
 from common.entities.base_entities.package_delivery_plan import PackageDeliveryPlan
-from common.entities.distribution.distribution import UniformChoiceDistribution, HierarchialDistribution, Range, \
-    UniformDistribution
+from common.entities.distribution.distribution import UniformChoiceDistribution, HierarchialDistribution, Range
 from geometry.distribution.geo_distribution import PointLocationDistribution, DEFAULT_ZERO_LOCATION_DISTRIBUTION
 from geometry.geo2d import Point2D
 from geometry.geo_factory import create_zero_point_2d
