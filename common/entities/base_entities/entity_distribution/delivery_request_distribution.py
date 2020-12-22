@@ -44,10 +44,10 @@ class DeliveryRequestDistribution(HierarchialDistribution):
         dr_amount = internal_amount.pop(DeliveryRequest)
         sampled_distributions = self._calc_samples_from_distributions(dr_amount, random)
         DeliveryRequestDistribution._update_the_location_of_sampled_points(base_loc, sampled_distributions)
-        do_distribution = self.choose_single_distribution(random)
+        do_distribution = self.choose_internal_distribution(random)
         return self._calc_result_list(do_distribution, internal_amount, random, sampled_distributions)
 
-    def choose_single_distribution(self, random):
+    def choose_internal_distribution(self, random):
         return UniformChoiceDistribution(self._do_distribution_options).choose_rand(random, 1)[0]
 
     def _calc_samples_from_distributions(self, dr_amount: int, random: Random):

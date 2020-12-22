@@ -30,12 +30,12 @@ class CustomerDeliveryDistribution(HierarchialDistribution):
         cd_amount = internal_amount.pop(CustomerDelivery)
         sampled_distributions = self._calc_samples_from_distributions(cd_amount, random)
         CustomerDeliveryDistribution._update_the_location_of_sampled_points(base_loc, sampled_distributions)
-        pdp_distribution = self.choose_single_distribution(random)
+        pdp_distribution = self.choose_internal_distribution(random)
         '''TODO: calculate single package delivery type for each pdp entity_distribution in customer delivery
         This means that the package_delivery_type might need to be an attribute of Customer Delivery'''
         return CustomerDeliveryDistribution._calc_result_list(internal_amount, pdp_distribution, random, sampled_distributions)
 
-    def choose_single_distribution(self, random):
+    def choose_internal_distribution(self, random):
         return UniformChoiceDistribution(self._pdp_distributions).choose_rand(random=random, amount=1)[0]
 
     @staticmethod

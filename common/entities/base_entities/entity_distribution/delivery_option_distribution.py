@@ -28,10 +28,10 @@ class DeliveryOptionDistribution(HierarchialDistribution):
         do_amount = internal_amount.pop(DeliveryOption)
         sampled_distributions = DeliveryOptionDistribution._calc_samples_from_distributions(do_amount, random)
         DeliveryOptionDistribution._update_location_of_sampled_points(base_loc, sampled_distributions)
-        cd_distributions = self.choose_single_distribution(random)
+        cd_distributions = self.choose_internal_distribution(random)
         return DeliveryOptionDistribution._calc_result_list(cd_distributions, internal_amount, random, sampled_distributions)
 
-    def choose_single_distribution(self, random):
+    def choose_internal_distribution(self, random):
         return UniformChoiceDistribution(self._customer_delivery_distributions).choose_rand(random, 1)[0]
 
     def _calc_samples_from_distributions(self, do_amount: int, random: Random) -> Dict[str, list]:
