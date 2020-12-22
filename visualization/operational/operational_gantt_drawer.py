@@ -47,7 +47,7 @@ def add_delivery_board(drawer: GanttDrawer, board: DroneDeliveryBoard, draw_drop
                 name=str(request.graph_index),
                 time_mark=request.delivery_min_time,
                 side_text=str(request.delivery_request.priority),
-                color=MATCHED_REQUEST_BAR_COLORS[request.graph_index])
+                color=MATCHED_REQUEST_BAR_COLORS[request.graph_index % len(MATCHED_REQUEST_BAR_COLORS)])
     if draw_dropped:
         for i, dropped in enumerate(board.dropped_delivery_requests):
             drawer.add_bar(

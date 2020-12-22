@@ -113,17 +113,23 @@ class BasicMinimumEnd2EndPresentation(unittest.TestCase):
         delivery_board = minimum_end_to_end.calc_assignment(fully_connected_graph, self.matcher_config)
         print(delivery_board)
 
-        drawer = create_drawer_2d(Drawer2DCoordinateSys.GEOGRAPHIC)
-        operational_drawer2d.add_delivery_board(drawer, delivery_board, draw_dropped=True)
-        drawer.draw(False)
+        dr_drawer = create_drawer_2d(Drawer2DCoordinateSys.GEOGRAPHIC)
+        operational_drawer2d.add_operational_graph(dr_drawer, fully_connected_graph,draw_internal=True, draw_edges=False)
+        dr_drawer.draw(False)
 
-        row_names = ["Dropped Out"] + [delivery.drone_formation.get_package_type_volumes().get_package_types_volumes()
-                                       for delivery in delivery_board.drone_deliveries]
-        drawer = create_gantt_drawer(zero_time=DateTimeExtension.from_dt(fully_connected_graph.zero_time),
+        board_map_drawer = create_drawer_2d(Drawer2DCoordinateSys.GEOGRAPHIC)
+        operational_drawer2d.add_delivery_board(board_map_drawer, delivery_board, draw_dropped=True)
+        board_map_drawer.draw(False)
+
+        row_names = ["Dropped Out"] + \
+                    ["[" + str(delivery.drone_formation.size.value) + "] * " +
+                     str(delivery.drone_formation.drone_configuration.package_type_map.get_package_types_volumes())
+                     for delivery in delivery_board.drone_deliveries]
+        board_gantt_drawer = create_gantt_drawer(zero_time=DateTimeExtension.from_dt(fully_connected_graph.zero_time),
                                      hours_period=24,
                                      row_names=row_names,
-                                     rows_title='Carried Package type: ' + str(PackageType.get_all_names())
+                                     rows_title='Carried Package types: [Formation Size] * ' + str(PackageType.get_all_names())
                                      )
-        operational_gantt_drawer.add_delivery_board(drawer, delivery_board, True)
-        drawer.draw(True)
+        operational_gantt_drawer.add_delivery_board(board_gantt_drawer, delivery_board, True)
+        board_gantt_drawer.draw(True)
 

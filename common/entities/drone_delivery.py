@@ -63,7 +63,7 @@ class MatchedDeliveryRequest:
             self.delivery_request.priority) + ', min_time=' + self.delivery_min_time.str_format_time() + \
                ', max_time=' + self.delivery_max_time.str_format_time() + ', delivered=' + str(
             self.delivery_request.delivery_options[
-                self.matched_delivery_option_index].get_amount_per_package_type()) + ')]'
+                self.matched_delivery_option_index].get_package_types_volume_map()) + ')]'
 
 
 # TODO change to MatchedDroneDelivery
@@ -136,7 +136,7 @@ class DroneDelivery(EmptyDroneDelivery):
             total_amount_per_package_type = [x + y for x, y in zip(total_amount_per_package_type,
                                                                    matched_request.delivery_request.delivery_options[
                                                                        matched_request.matched_delivery_option_index].
-                                                                   get_amount_per_package_type().
+                                                                   get_package_types_volume_map().
                                                                    get_package_types_volumes())]
 
             self._total_priority += matched_request.delivery_request.priority
