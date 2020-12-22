@@ -18,28 +18,19 @@ def generate_matched_request_bar_colors() -> [Color]:
 
 DROPPED_ROW_NUMBER = 1
 MATCHED_REQUEST_BAR_COLORS = generate_matched_request_bar_colors()
-IDLE_STATE_BACKGROUND_COLOR = Color.Orange
+OPERATING_TIME_WINDOW_COLOR = Color.Red
 
 
 def add_delivery_board(drawer: GanttDrawer, board: DroneDeliveryBoard, draw_dropped=True):
     for i, delivery in enumerate(board.drone_deliveries):
         delivery_row = i + 1 + DROPPED_ROW_NUMBER
         if len(delivery.matched_requests) is 0:
-            drawer.add_row_background_area(
-                row=delivery_row,
-                time_window=TimeWindowExtension(drawer.get_zero_time(), drawer.get_end_time()),
-                color=IDLE_STATE_BACKGROUND_COLOR)
             continue
-        drawer.add_row_background_area(
+        drawer.add_row_area(
             row=delivery_row,
-            time_window=TimeWindowExtension(drawer.get_zero_time(),
-                                            delivery.start_drone_loading_docks.delivery_min_time),
-            color=IDLE_STATE_BACKGROUND_COLOR)
-        drawer.add_row_background_area(
-            row=delivery_row,
-            time_window=TimeWindowExtension(delivery.end_drone_loading_docks.delivery_min_time,
-                                            drawer.get_end_time()),
-            color=IDLE_STATE_BACKGROUND_COLOR)
+            time_window=TimeWindowExtension(delivery.start_drone_loading_docks.delivery_min_time,
+                                            delivery.end_drone_loading_docks.delivery_min_time),
+            edgecolor=OPERATING_TIME_WINDOW_COLOR)
         for request in delivery.matched_requests:
             drawer.add_bar(
                 row=delivery_row,

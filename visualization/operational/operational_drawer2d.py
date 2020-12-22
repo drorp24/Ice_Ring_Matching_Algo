@@ -82,18 +82,29 @@ def add_delivery_board(drawer: Drawer2D, board: DroneDeliveryBoard, draw_dropped
     if draw_dropped:
         for dropped in board.dropped_delivery_requests:
             add_delivery_request(drawer, dropped.delivery_request, draw_internal=False, color=Color.Red)
-    deliveries_colors = random.sample(list(filter(lambda x: x != Color.Red, list(Color))),
-                                      k=len(board.drone_deliveries))
-    for color, delivery in zip(deliveries_colors, board.drone_deliveries):
+    optional_delivery_colors = list(Color)
+    optional_delivery_colors.remove(Color.Red)
+    random.shuffle(optional_delivery_colors)
+    selected_delivery_colors = []
+    matched_delivery_labels = []
+    for i, delivery in enumerate(board.drone_deliveries):
         if len(delivery.matched_requests) is 0:
             continue
         locations = []
+        matched_delivery_labels.append("[" + str(delivery.drone_formation.size.value) + "] * " +
+                                       str(
+                                           delivery.drone_formation.drone_configuration.package_type_map.get_package_types_volumes()))
+        delivery_color = optional_delivery_colors[i % len(optional_delivery_colors)]
+        selected_delivery_colors.append(delivery_color)
         add_drone_loading_dock(drawer, delivery.start_drone_loading_docks.drone_loading_dock)
         locations.append(delivery.start_drone_loading_docks.drone_loading_dock.calc_location())
         for request in delivery.matched_requests:
             matched_delivery_option = request.delivery_request.delivery_options[request.matched_delivery_option_index]
-            add_delivery_option(drawer, matched_delivery_option, draw_internal=False, color=color)
+            add_delivery_option(drawer, matched_delivery_option,
+                                draw_internal=False,
+                                color=delivery_color)
             current_location = matched_delivery_option.calc_location()
             locations.append(current_location)
         add_drone_loading_dock(drawer, delivery.end_drone_loading_docks.drone_loading_dock)
         locations.append(delivery.end_drone_loading_docks.drone_loading_dock.calc_location())
+    drawer.add_legend(matched_delivery_labels, selected_delivery_colors)

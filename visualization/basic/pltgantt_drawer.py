@@ -8,7 +8,8 @@ from common.entities.temporal import DateTimeExtension, TimeWindowExtension, MIN
 from visualization.basic.color import Color
 from visualization.basic.gantt_drawer import GanttDrawer
 
-BAR_HEIGHT_RATIO = 0.2
+BARS_IN_ROW = 5
+BAR_HEIGHT_RATIO = 1 / BARS_IN_ROW
 MARK_WIDTH_RATIO = 0.1
 YLIMIT = 100
 BAR_ALPHA = 0.6
@@ -55,11 +56,15 @@ class PltGanttDrawer(GanttDrawer):
             self._ax.barh(y=y, width=width, height=self._bar_height, left=relative_time_in_min - width / 2,
                           color=color.Black.get_rgb())
 
-    def add_row_background_area(self, row: int, time_window: TimeWindowExtension, color: Color = Color.Orange) -> None:
+    def add_row_area(self, row: int, time_window: TimeWindowExtension,
+                     facecolor: Color = Color.Red, face_alpha: float = 0,
+                     edgecolor: Color = Color.Red) -> None:
         since, until = time_window.get_relative_time_in_min(self._zero_time)
         y = (row - 1) * self._row_y_factor + self._row_y_factor / 2
         self._ax.barh(y=y, width=until - since, height=self._row_y_factor, left=since,
-                      color=color.get_rgb_with_alpha(BACKGROUND_ALPHA))
+                      facecolor=facecolor.get_rgb_with_alpha(face_alpha),
+                      edgecolor=edgecolor.get_rgb(),
+                      linewidth=1)
 
     def get_num_rows(self):
         return len(self._row_names)
@@ -107,9 +112,11 @@ class PltGanttDrawer(GanttDrawer):
 
     def _calc_y(self, row: int) -> float:
         # To prevent bars override we change their height
-        y = (row - 1) * self._row_y_factor + (
-                self._counters[row - 1] * self._bar_height) % self._row_y_factor + self._bar_height / 2
-        self._counters[row - 1] += 1
+        bar_center = self._bar_height / 2
+        row_height = (row - 1) * self._row_y_factor
+        bar_height_in_row = self._counters[row - 1] * self._bar_height
+        y = row_height + bar_height_in_row + bar_center
+        self._counters[row - 1] = (self._counters[row - 1] + 1) % BARS_IN_ROW
         return y
 
 # zero_time = DateTimeExtension.from_dt(datetime(2020, 1, 23, 0, 00, 00))
