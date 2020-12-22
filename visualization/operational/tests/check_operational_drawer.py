@@ -77,7 +77,7 @@ def _create_example_dr_distribution():
 
 def _create_drone_delivery_dock_distribution(amount=3):
     return DroneLoadingDockDistribution() \
-        .choose_rand(random=Random(100), base_location=create_point_2d(-5400, 2000), amount=amount)
+        .choose_rand(random=Random(100), base_loc=create_point_2d(-5400, 2000), amount=amount)
 
 
 def draw_all_delivery_requests(sampled_drs: List[DeliveryRequest]):

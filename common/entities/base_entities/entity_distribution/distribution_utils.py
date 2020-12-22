@@ -10,7 +10,6 @@ from geometry.geo2d import Point2D
 
 class LocalDistribution:
 
-
     @staticmethod
     def initialize_internal(MetaClassToDistrib: ABCMeta,
                             map_from_attrib_to_internal_distrib: Dict[str, object]) -> object:
@@ -32,18 +31,17 @@ class LocalDistribution:
         return [{k: attrib_to_lists[k][i] for k in keys} for i in range(amount_of_vals_per_key)]
 
     @staticmethod
-    def add_base_point_to_locations(per_location_attribute_dicts: Dict[str, List[Point2D]], base_point: Point2D):
-        return {item[0]: [base_point.add_vector(p.to_vector()) for p in item[1]] for item in
-                per_location_attribute_dicts.items()}
-
-    @staticmethod
     def add_base_point_to_relative_points(relative_points: List[Point2D], base_point: Point2D):
         return [base_point.add_vector(p.to_vector()) for p in relative_points]
 
     @staticmethod
-    def get_module_fingerprint_from_class(klass: ABCMeta):
-        word_separation_list = re.findall('[A-Z][^A-Z]*', klass.__name__)
-        class_name = sum([word + '_' for word in word_separation_list])[:-1]
-        entity_location = 'common.entities.base_entities.' + class_name
-        entity_name = klass.__name__
-        return entity_location, entity_name
+    def get_updated_internal_amount(distribution: type, amount: Dict[type, int]) -> Dict[type, int]:
+        try:
+            internal_amount = distribution.get_base_amount()
+            internal_amount.update(amount)
+            return internal_amount
+        except:
+            raise LocalDistribution.UndefinedBaseAmountException()
+
+    class UndefinedBaseAmountException(Exception):
+        pass

@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from abc import ABCMeta
 from random import Random
 from typing import List, Dict
 
@@ -17,7 +16,7 @@ from common.entities.base_entities.package_delivery_plan import PackageDeliveryP
 from common.entities.distribution.distribution import UniformChoiceDistribution, HierarchialDistribution
 from geometry.distribution.geo_distribution import PointLocationDistribution, DEFAULT_ZERO_LOCATION_DISTRIBUTION
 from geometry.geo2d import Point2D
-from geometry.geo_factory import create_point_2d
+from geometry.geo_factory import create_zero_point_2d
 
 DEFAULT_TW_DR_DISRIB = create_default_time_window_for_delivery_request()
 
@@ -39,24 +38,39 @@ class DeliveryRequestDistribution(HierarchialDistribution):
         self._time_window_distributions = time_window_distributions
         self._priority_distribution = priority_distribution
 
-    def choose_rand(self, random: Random, base_location: Point2D = create_point_2d(0, 0),
-                    amount: Dict[type, int] = {}) -> List[DeliveryRequest]:
-        internal_amount = DeliveryRequestDistribution.get_base_amount()
-        internal_amount.update(amount)
-        dr_amount = internal_amount[DeliveryRequest]
+    def choose_rand(self, random: Random, base_loc: Point2D = create_zero_point_2d, amount: Dict[type, int] = {}) -> \
+            List[DeliveryRequest]:
+        internal_amount = LocalDistribution.get_updated_internal_amount(DeliveryRequestDistribution, amount)
+        dr_amount = internal_amount.pop(DeliveryRequest)
+        sampled_distributions = self._calc_samples_from_distributions(dr_amount, random)
+        DeliveryRequestDistribution._update_the_location_of_sampled_points(base_loc, sampled_distributions)
+        do_distribution = self.choose_single_distribution(random)
+        return self._calc_result_list(do_distribution, internal_amount, random, sampled_distributions)
 
-        do_distribution = UniformChoiceDistribution(self._do_distribution_options).choose_rand(random, 1)[0]
-        relative_locations = LocalDistribution.add_base_point_to_relative_points(
-            relative_points=self._relative_location_distribution.choose_rand(random, dr_amount),
-            base_point=base_location)
-        time_window_samples = self._time_window_distributions.choose_rand(random, dr_amount)
-        priority_samples = self._priority_distribution.choose_rand(random, dr_amount)
+    def choose_single_distribution(self, random):
+        return UniformChoiceDistribution(self._do_distribution_options).choose_rand(random, 1)[0]
 
-        internal_amount.pop(DeliveryRequest)
-        return [DeliveryRequest(
-            do_distribution.choose_rand(random=random, base_loc=loc, amount=internal_amount), tw,
-            priority) for (loc, tw, priority) in zip(relative_locations, time_window_samples, priority_samples)]
+    def _calc_samples_from_distributions(self, dr_amount: int, random: Random):
+        return LocalDistribution.choose_rand_by_attrib(
+            internal_sample_dict={'location': self._relative_location_distribution,
+                                  'time_window': self._time_window_distributions,
+                                  'priority': self._priority_distribution},
+            random=random,
+            amount=dr_amount)
 
     @staticmethod
-    def get_base_amount():
+    def _update_the_location_of_sampled_points(base_loc, sampled_distributions):
+        sampled_distributions['location'] = LocalDistribution.add_base_point_to_relative_points(
+            relative_points=sampled_distributions['location'], base_point=base_loc)
+
+    @staticmethod
+    def _calc_result_list(do_distribution, internal_amount, random, sampled_distributions):
+        return [DeliveryRequest(
+            do_distribution.choose_rand(random=random, base_loc=loc, amount=internal_amount), tw,
+            priority) for (loc, tw, priority) in zip(sampled_distributions['location'],
+                                                     sampled_distributions['time_window'],
+                                                     sampled_distributions['priority'])]
+
+    @staticmethod
+    def get_base_amount() -> Dict[type, int]:
         return {DeliveryRequest: 1, DeliveryOption: 1, CustomerDelivery: 1, PackageDeliveryPlan: 1}
