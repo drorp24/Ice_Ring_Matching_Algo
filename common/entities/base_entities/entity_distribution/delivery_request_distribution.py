@@ -38,7 +38,7 @@ class DeliveryRequestDistribution(HierarchialDistribution):
         self._time_window_distributions = time_window_distributions
         self._priority_distribution = priority_distribution
 
-    def choose_rand(self, random: Random, base_loc: Point2D = create_zero_point_2d, amount: Dict[type, int] = {}) -> \
+    def choose_rand(self, random: Random, base_loc: Point2D = create_zero_point_2d(), amount: Dict[type, int] = {}) -> \
             List[DeliveryRequest]:
         internal_amount = LocalDistribution.get_updated_internal_amount(DeliveryRequestDistribution, amount)
         dr_amount = internal_amount.pop(DeliveryRequest)
@@ -66,10 +66,10 @@ class DeliveryRequestDistribution(HierarchialDistribution):
     @staticmethod
     def _calc_result_list(do_distribution, internal_amount, random, sampled_distributions):
         return [DeliveryRequest(
-            do_distribution.choose_rand(random=random, base_loc=loc, amount=internal_amount), tw,
-            priority) for (loc, tw, priority) in zip(sampled_distributions['location'],
-                                                     sampled_distributions['time_window'],
-                                                     sampled_distributions['priority'])]
+            do_distribution.choose_rand(random=random, base_loc=loc, amount=internal_amount), tw, priority)
+            for (loc, tw, priority) in zip(sampled_distributions['location'],
+                                           sampled_distributions['time_window'],
+                                           sampled_distributions['priority'])]
 
     @staticmethod
     def get_base_amount() -> Dict[type, int]:

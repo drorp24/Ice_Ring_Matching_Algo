@@ -26,7 +26,7 @@ class DeliveryOptionDistribution(HierarchialDistribution):
                     amount: Dict[type, int] = {}) -> List[DeliveryOption]:
         internal_amount = LocalDistribution.get_updated_internal_amount(DeliveryOptionDistribution, amount)
         do_amount = internal_amount.pop(DeliveryOption)
-        sampled_distributions = DeliveryOptionDistribution._calc_samples_from_distributions(do_amount, random)
+        sampled_distributions = self._calc_samples_from_distributions(do_amount, random)
         DeliveryOptionDistribution._update_location_of_sampled_points(base_loc, sampled_distributions)
         cd_distributions = self.choose_internal_distribution(random)
         return DeliveryOptionDistribution._calc_result_list(cd_distributions, internal_amount, random, sampled_distributions)
