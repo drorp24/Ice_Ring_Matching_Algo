@@ -1,14 +1,15 @@
+import math
 import re
 from abc import ABCMeta
 from random import Random
-from typing import Dict, List
+from typing import Dict, List, Union
 from uuid import UUID
 
-from common.entities.distribution.distribution import Distribution
+from common.entities.distribution.distribution import Distribution, Range, UniformDistribution
 from geometry.geo2d import Point2D
 
 
-class LocalDistribution:
+class DistributionUtils:
 
     @staticmethod
     def initialize_internal(MetaClassToDistrib: ABCMeta,
@@ -31,6 +32,12 @@ class LocalDistribution:
         return [{k: attrib_to_lists[k][i] for k in keys} for i in range(amount_of_vals_per_key)]
 
     @staticmethod
+    def extract_amount_in_range(amount_range: Union[int, Range], random: Random) -> int:
+        if isinstance(amount_range, Range):
+            amount_range = math.floor(UniformDistribution(value_range=amount_range).choose_uniform_in_range(random))
+        return amount_range
+
+    @staticmethod
     def add_base_point_to_relative_points(relative_points: List[Point2D], base_point: Point2D):
         return [base_point.add_vector(p.to_vector()) for p in relative_points]
 
@@ -41,7 +48,7 @@ class LocalDistribution:
             internal_amount.update(amount)
             return internal_amount
         except:
-            raise LocalDistribution.UndefinedBaseAmountException()
+            raise DistributionUtils.UndefinedBaseAmountException()
 
     class UndefinedBaseAmountException(Exception):
         pass

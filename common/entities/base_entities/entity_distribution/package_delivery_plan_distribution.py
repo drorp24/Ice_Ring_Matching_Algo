@@ -4,7 +4,7 @@ import math
 from random import Random
 from typing import List, Dict, Union
 
-from common.entities.base_entities.entity_distribution.distribution_utils import LocalDistribution
+from common.entities.base_entities.entity_distribution.distribution_utils import DistributionUtils
 from common.entities.base_entities.entity_distribution.entity_id_distribution import EntityIDDistribution, \
     DEFAULT_SINGLE_ID_DISTRIB
 from common.entities.base_entities.entity_distribution.package_distribution import PackageDistribution
@@ -36,17 +36,16 @@ class PackageDeliveryPlanDistribution(Distribution):
         self._pitch_distribution = pitch_distribution
         self._package_type_distribution = package_type_distribution
 
-    def choose_rand(self, random: Random, base_loc: Point2D = create_zero_point_2d(), amount: Union[int, Range] = 1) -> List[
-        PackageDeliveryPlan]:
-        if isinstance(amount, Range):
-            amount = math.floor(UniformDistribution(amount).choose_uniform_in_range(random))
+    def choose_rand(self, random: Random, base_loc: Point2D = create_zero_point_2d(), amount: Union[int, Range] = 1) -> \
+            List[PackageDeliveryPlan]:
+        amount = DistributionUtils.extract_amount_in_range(amount, random)
         sampled_distributions = self._calc_samples_from_distributions(amount, random)
         PackageDeliveryPlanDistribution._update_the_location_of_sampled_points(base_loc, sampled_distributions)
-        pdp_attrib_samples = LocalDistribution.convert_list_dict_to_individual_dicts(sampled_distributions)
+        pdp_attrib_samples = DistributionUtils.convert_list_dict_to_individual_dicts(sampled_distributions)
         return PackageDeliveryPlanDistribution._calc_result_list(pdp_attrib_samples)
 
     def _calc_samples_from_distributions(self, amount, random):
-        return LocalDistribution.choose_rand_by_attrib(
+        return DistributionUtils.choose_rand_by_attrib(
             internal_sample_dict=
             {'id': self._id_distribution,
              'drop_point': self._relative_drop_point_distribution,
@@ -57,9 +56,9 @@ class PackageDeliveryPlanDistribution(Distribution):
 
     @staticmethod
     def _update_the_location_of_sampled_points(base_loc: Point2D, sampled_distributions: Dict[str, list]):
-        sampled_distributions['drop_point'] = LocalDistribution.add_base_point_to_relative_points(
+        sampled_distributions['drop_point'] = DistributionUtils.add_base_point_to_relative_points(
             relative_points=sampled_distributions['drop_point'], base_point=base_loc)
 
     @staticmethod
     def _calc_result_list(pdp_attrib_samples: List[Dict]) -> List[PackageDeliveryPlan]:
-        return [LocalDistribution.initialize_internal(PackageDeliveryPlan, pdp_dict) for pdp_dict in pdp_attrib_samples]
+        return [DistributionUtils.initialize_internal(PackageDeliveryPlan, pdp_dict) for pdp_dict in pdp_attrib_samples]
