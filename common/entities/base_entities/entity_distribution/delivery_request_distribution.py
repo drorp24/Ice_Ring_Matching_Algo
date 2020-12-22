@@ -59,7 +59,7 @@ class DeliveryRequestDistribution(HierarchialDistribution):
             amount=dr_amount)
 
     @staticmethod
-    def _update_the_location_of_sampled_points(base_loc, sampled_distributions):
+    def _update_the_location_of_sampled_points(base_loc: Point2D, sampled_distributions: Dict):
         sampled_distributions['location'] = LocalDistribution.add_base_point_to_relative_points(
             relative_points=sampled_distributions['location'], base_point=base_loc)
 
