@@ -44,6 +44,12 @@ class PackageDeliveryPlanDistribution(Distribution):
         pdp_attrib_samples = convert_list_dict_to_individual_dicts(sampled_distributions)
         return PackageDeliveryPlanDistribution._calc_result_list(pdp_attrib_samples)
 
+    def distribution_class(self) -> type:
+        return PackageDeliveryPlan
+
+    def distribution_class(self) -> type:
+        return PackageDeliveryPlan
+
     def _calc_samples_from_distributions(self, amount, random):
         return choose_rand_by_attrib(
             internal_sample_dict=

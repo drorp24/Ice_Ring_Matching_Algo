@@ -14,6 +14,9 @@ class PointLocationDistribution(Distribution):
     def choose_rand(self, random: Random, amount: int) -> List[Point2D]:
         pass
 
+    def distribution_class(self) -> type:
+        return Point2D
+
 
 class UniformPointInBboxDistribution(PointLocationDistribution):
 
@@ -54,7 +57,7 @@ class MultiPointInBboxDistribution(PointLocationDistribution):
         return [spd.choose_rand(random)[0] for spd in selected_point_distributions]
 
 
-class ChoiceNormalDistribution(PointLocationDistribution):
+class ChoiceNormalPointDistribution(PointLocationDistribution):
 
     def __init__(self, center_points: [Point2D], sigma_x_range: Range = Range(0, 1),
                  sigma_y_range: Range = Range(0, 1)):

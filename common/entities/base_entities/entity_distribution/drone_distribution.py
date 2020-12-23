@@ -14,3 +14,6 @@ class PlatformTypeDistribution(Distribution):
     def choose_rand(self, random: Random, amount: int):
         platform_choice_distribution = ChoiceDistribution(self._platform_type_options)
         return platform_choice_distribution.choose_rand(random, amount)
+
+    def distribution_class(self) -> type:
+        return PlatformType

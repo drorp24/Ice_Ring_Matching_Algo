@@ -7,7 +7,7 @@ from common.entities.distribution.distribution import Range
 from common.entities.base_entities.drone_loading_dock import DroneLoadingDock, DroneLoadingDockDistribution
 from common.graph.operational import graph_creator
 from common.graph.operational.operational_graph import OperationalGraph
-from geometry.distribution.geo_distribution import ChoiceNormalDistribution
+from geometry.distribution.geo_distribution import ChoiceNormalPointDistribution
 from geometry.geo_factory import create_point_2d
 from visualization.basic.pltdrawer2d import create_drawer_2d
 from visualization.operational.operational_drawer2d import add_delivery_request, add_operational_graph
@@ -63,10 +63,10 @@ def _create_example_dr_distribution():
     cd_deltas, cd_sig_x, cd_sig_y = _create_cd_locations()
     pdp_deltas, pdp_sig_x, pdp_sig_y = _create_pdp_locations()
     dr_distrib = build_delivery_request_distribution(
-        relative_dr_location_distribution=ChoiceNormalDistribution(dr_centers, dr_sig_x, dr_sig_y),
-        relative_do_location_distribution=ChoiceNormalDistribution(do_deltas, do_sig_x, do_sig_y),
-        relative_cd_location_distribution=ChoiceNormalDistribution(cd_deltas, cd_sig_x, cd_sig_y),
-        relative_pdp_location_distribution=ChoiceNormalDistribution(pdp_deltas, pdp_sig_x, pdp_sig_y))
+        relative_dr_location_distribution=ChoiceNormalPointDistribution(dr_centers, dr_sig_x, dr_sig_y),
+        relative_do_location_distribution=ChoiceNormalPointDistribution(do_deltas, do_sig_x, do_sig_y),
+        relative_cd_location_distribution=ChoiceNormalPointDistribution(cd_deltas, cd_sig_x, cd_sig_y),
+        relative_pdp_location_distribution=ChoiceNormalPointDistribution(pdp_deltas, pdp_sig_x, pdp_sig_y))
     dr_struct = DeliveryRequestDatasetStructure(num_of_delivery_requests=4,
                                                 num_of_delivery_options_per_delivery_request=6,
                                                 num_of_customer_deliveries_per_delivery_option=5,

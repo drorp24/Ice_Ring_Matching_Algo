@@ -41,6 +41,7 @@ def add_base_point_to_relative_points(relative_points: List[Point2D], base_point
 
 def get_updated_internal_amount(distribution: type, amount: Dict[type, Union[int, Range]]) -> Dict[type, int]:
     try:
+        validate_amount_has_distribution()
         internal_amount = distribution.get_base_amount()
         internal_amount.update(amount)
         return internal_amount

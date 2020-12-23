@@ -12,6 +12,10 @@ class Distribution(ABC):
     def choose_rand(self, random: Random, amount: int):
         raise NotImplementedError
 
+    @abstractmethod
+    def distribution_class(self) -> type:
+        raise NotImplementedError
+
 
 class HierarchialDistribution(Distribution):
 

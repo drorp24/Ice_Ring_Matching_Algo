@@ -38,6 +38,9 @@ class CustomerDeliveryDistribution(HierarchialDistribution):
         return CustomerDeliveryDistribution._calc_result_list(internal_amount, pdp_distribution, random,
                                                               sampled_distributions)
 
+    def distribution_class(self) -> type:
+        return CustomerDelivery
+
     def choose_internal_distribution(self, random):
         return UniformChoiceDistribution(self._pdp_distributions).choose_rand(random=random, amount=1)[0]
 

@@ -29,6 +29,7 @@ DEFAULT_DR_PRIORITY_DISTRIB = PriorityDistribution(list(range(0, 100, 3)))
 
 
 class DeliveryRequestDistribution(HierarchialDistribution):
+
     def __init__(self,
                  relative_location_distribution: PointLocationDistribution = DEFAULT_ZERO_LOCATION_DISTRIBUTION,
                  delivery_option_distributions: [DeliveryOptionDistribution] = [DEFAULT_DO_DISTRIB],
@@ -47,6 +48,9 @@ class DeliveryRequestDistribution(HierarchialDistribution):
         DeliveryRequestDistribution._update_the_location_of_sampled_points(base_loc, sampled_distributions)
         do_distribution = self.choose_internal_distribution(random)
         return self._calc_result_list(do_distribution, internal_amount, random, sampled_distributions)
+
+    def distribution_class(self) -> type:
+        return DeliveryRequest
 
     def choose_internal_distribution(self, random):
         return UniformChoiceDistribution(self._do_distribution_options).choose_rand(random, 1)[0]
