@@ -22,5 +22,6 @@ class DroneLoadingStationDistribution(Distribution):
         locations = [base_location.add_vector(delta.to_vector()) for delta in delta_locations]
         return list(map(DroneLoadingStation, locations))
 
-    def distribution_class(self) -> type:
+    @classmethod
+    def distribution_class(cls) -> type:
         return DroneLoadingStation

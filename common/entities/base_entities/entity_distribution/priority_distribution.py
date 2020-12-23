@@ -7,5 +7,6 @@ class PriorityDistribution(UniformChoiceDistribution):
     def __init__(self, priorities: List[float]):
         super().__init__(priorities)
 
-    def distribution_class(self) -> type:
+    @classmethod
+    def distribution_class(cls) -> type:
         return float

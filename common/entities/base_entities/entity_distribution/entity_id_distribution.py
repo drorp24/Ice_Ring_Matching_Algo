@@ -13,7 +13,9 @@ class EntityIDDistribution(UniformChoiceDistribution):
     def choose_rand(self, random: Random, amount: int = 1) -> List[EntityID]:
         return super().choose_rand(random, amount)
 
-    def distribution_class(self) -> type:
+    @classmethod
+    def distribution_class(cls) -> type:
         return EntityID
+
 
 DEFAULT_SINGLE_ID_DISTRIB = EntityIDDistribution([EntityID(uuid.uuid4()), EntityID(uuid.uuid4())])

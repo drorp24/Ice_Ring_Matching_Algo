@@ -12,8 +12,9 @@ class Distribution(ABC):
     def choose_rand(self, random: Random, amount: int):
         raise NotImplementedError
 
+    @classmethod
     @abstractmethod
-    def distribution_class(self) -> type:
+    def distribution_class(cls) -> type:
         raise NotImplementedError
 
 

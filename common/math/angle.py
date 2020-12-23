@@ -89,3 +89,7 @@ class AngleUniformDistribution(UniformDistribution):
     def choose_rand(self, random: Random, amount: int = 1) -> List[Angle]:
         return [Angle(angle_degree, AngleUnit.DEGREE) for angle_degree in
                 super(AngleUniformDistribution, self).choose_rand(random, amount)]
+
+    @classmethod
+    def distribution_class(cls) -> type:
+        return Angle

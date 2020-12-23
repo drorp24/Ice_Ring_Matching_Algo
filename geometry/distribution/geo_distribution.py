@@ -14,7 +14,8 @@ class PointLocationDistribution(Distribution):
     def choose_rand(self, random: Random, amount: int) -> List[Point2D]:
         pass
 
-    def distribution_class(self) -> type:
+    @classmethod
+    def distribution_class(cls) -> type:
         return Point2D
 
 

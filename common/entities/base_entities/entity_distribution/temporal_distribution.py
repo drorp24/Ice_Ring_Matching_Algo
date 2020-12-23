@@ -14,7 +14,8 @@ class DateTimeDistribution(UniformChoiceDistribution):
     def choose_rand(self, random: Random, amount: int = 1) -> List[DateTimeExtension]:
         return super().choose_rand(random, amount)
 
-    def distribution_class(self) -> type:
+    @classmethod
+    def distribution_class(cls) -> type:
         return DateTimeExtension
 
 
@@ -25,7 +26,8 @@ class TimeDeltaDistribution(UniformChoiceDistribution):
     def choose_rand(self, random: Random, amount: int = 1) -> List[TimeDeltaExtension]:
         return super().choose_rand(random, amount)
 
-    def distribution_class(self) -> type:
+    @classmethod
+    def distribution_class(cls) -> type:
         return TimeDeltaExtension
 
 
@@ -42,7 +44,8 @@ class TimeWindowDistribution(Distribution):
         return [TimeWindowExtension(start_time, start_time.add_time_delta(delta)) for (start_time, delta) in
                 zip(start_times, deltas)]
 
-    def distribution_class(self) -> type:
+    @classmethod
+    def distribution_class(cls) -> type:
         return TimeWindowExtension
 
 
