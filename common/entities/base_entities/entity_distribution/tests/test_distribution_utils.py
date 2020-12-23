@@ -10,8 +10,6 @@ from common.entities.base_entities.package_delivery_plan import PackageDeliveryP
 from common.entities.distribution.distribution import Range
 
 
-
-
 class BaseDistributionUtilsTest(unittest.TestCase):
 
     @classmethod
@@ -51,7 +49,8 @@ class BaseDistributionUtilsTest(unittest.TestCase):
 
         try:
             validate_amount_input(DeliveryOptionDistribution,
-                                  amount={JohnSmith: 33, DeliveryOption: 24, CustomerDelivery: 11, PackageDeliveryPlan: 2})
+                                  amount={JohnSmith: 33, DeliveryOption: 24, CustomerDelivery: 11,
+                                          PackageDeliveryPlan: 2})
             self.fail()
         except Exception:
             pass
