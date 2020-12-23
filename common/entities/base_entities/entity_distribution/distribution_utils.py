@@ -17,8 +17,8 @@ def initialize_internal(MetaClassToDistrib: ABCMeta,
     return MetaClassToDistrib.dict_to_obj(internal_dict)
 
 
-def choose_rand_by_attrib(internal_sample_dict: Dict[str, Distribution], random: Random, amount: int = 1) -> Dict[
-    str, list]:
+def choose_rand_by_attrib(internal_sample_dict: Dict[str, Distribution],
+                          random: Random, amount: int = 1) -> Dict[str, list]:
     return dict(map(lambda x: (x[0], x[1].choose_rand(random=random, amount=amount)), internal_sample_dict.items()))
 
 
