@@ -5,7 +5,8 @@ from common.entities.base_entities.customer_delivery import CustomerDelivery
 from common.entities.base_entities.delivery_option import DeliveryOption
 from common.entities.base_entities.entity_distribution.customer_delivery_distribution import \
     CustomerDeliveryDistribution, DEFAULT_PDP_DISTRIB
-from common.entities.base_entities.entity_distribution.distribution_utils import DistributionUtils
+from common.entities.base_entities.entity_distribution.distribution_utils import get_updated_internal_amount, \
+    extract_amount_in_range, add_base_point_to_relative_points, choose_rand_by_attrib
 from common.entities.base_entities.package_delivery_plan import PackageDeliveryPlan
 from common.entities.distribution.distribution import UniformChoiceDistribution, HierarchialDistribution, Range
 from geometry.distribution.geo_distribution import PointLocationDistribution, DEFAULT_ZERO_LOCATION_DISTRIBUTION
@@ -24,25 +25,26 @@ class DeliveryOptionDistribution(HierarchialDistribution):
 
     def choose_rand(self, random: Random, base_loc: Point2D = create_zero_point_2d(),
                     amount: Dict[type, Union[int, Range]] = {}) -> List[DeliveryOption]:
-        internal_amount = DistributionUtils.get_updated_internal_amount(DeliveryOptionDistribution, amount)
-        do_amount = DistributionUtils.extract_amount_in_range(internal_amount.pop(DeliveryOption), random)
+        internal_amount = get_updated_internal_amount(DeliveryOptionDistribution, amount)
+        do_amount = extract_amount_in_range(internal_amount.pop(DeliveryOption), random)
         sampled_distributions = self._calc_samples_from_distributions(do_amount, random)
         DeliveryOptionDistribution._update_location_of_sampled_points(base_loc, sampled_distributions)
         cd_distributions = self.choose_internal_distribution(random)
-        return DeliveryOptionDistribution._calc_result_list(cd_distributions, internal_amount, random, sampled_distributions)
+        return DeliveryOptionDistribution._calc_result_list(cd_distributions, internal_amount, random,
+                                                            sampled_distributions)
 
     def choose_internal_distribution(self, random):
         return UniformChoiceDistribution(self._customer_delivery_distributions).choose_rand(random, 1)[0]
 
     def _calc_samples_from_distributions(self, do_amount: int, random: Random) -> Dict[str, list]:
-        return DistributionUtils.choose_rand_by_attrib(
+        return choose_rand_by_attrib(
             internal_sample_dict={'location': self._relative_location_distribution},
             random=random,
             amount=do_amount)
 
     @staticmethod
     def _update_location_of_sampled_points(base_loc: Point2D, sampled_distributions: Dict):
-        sampled_distributions['location'] = DistributionUtils.add_base_point_to_relative_points(
+        sampled_distributions['location'] = add_base_point_to_relative_points(
             relative_points=sampled_distributions['location'], base_point=base_loc)
 
     @staticmethod

@@ -9,7 +9,8 @@ from common.entities.base_entities.delivery_request import DeliveryRequest, \
     create_default_time_window_for_delivery_request
 from common.entities.base_entities.entity_distribution.delivery_option_distribution import DeliveryOptionDistribution, \
     DEFAULT_CD_DISTRIB
-from common.entities.base_entities.entity_distribution.distribution_utils import DistributionUtils
+from common.entities.base_entities.entity_distribution.distribution_utils import add_base_point_to_relative_points, \
+    get_updated_internal_amount, extract_amount_in_range, choose_rand_by_attrib
 from common.entities.base_entities.entity_distribution.priority_distribution import PriorityDistribution
 from common.entities.base_entities.entity_distribution.temporal_distribution import TimeWindowDistribution
 from common.entities.base_entities.package_delivery_plan import PackageDeliveryPlan
@@ -40,8 +41,8 @@ class DeliveryRequestDistribution(HierarchialDistribution):
 
     def choose_rand(self, random: Random, base_loc: Point2D = create_zero_point_2d(),
                     amount: Dict[type, Union[int, Range]] = {}) -> List[DeliveryRequest]:
-        internal_amount = DistributionUtils.get_updated_internal_amount(DeliveryRequestDistribution, amount)
-        dr_amount = DistributionUtils.extract_amount_in_range(internal_amount.pop(DeliveryRequest), random)
+        internal_amount = get_updated_internal_amount(DeliveryRequestDistribution, amount)
+        dr_amount = extract_amount_in_range(internal_amount.pop(DeliveryRequest), random)
         sampled_distributions = self._calc_samples_from_distributions(dr_amount, random)
         DeliveryRequestDistribution._update_the_location_of_sampled_points(base_loc, sampled_distributions)
         do_distribution = self.choose_internal_distribution(random)
@@ -51,7 +52,7 @@ class DeliveryRequestDistribution(HierarchialDistribution):
         return UniformChoiceDistribution(self._do_distribution_options).choose_rand(random, 1)[0]
 
     def _calc_samples_from_distributions(self, dr_amount: int, random: Random):
-        return DistributionUtils.choose_rand_by_attrib(
+        return choose_rand_by_attrib(
             internal_sample_dict={'location': self._relative_location_distribution,
                                   'time_window': self._time_window_distributions,
                                   'priority': self._priority_distribution},
@@ -60,7 +61,7 @@ class DeliveryRequestDistribution(HierarchialDistribution):
 
     @staticmethod
     def _update_the_location_of_sampled_points(base_loc: Point2D, sampled_distributions: Dict):
-        sampled_distributions['location'] = DistributionUtils.add_base_point_to_relative_points(
+        sampled_distributions['location'] = add_base_point_to_relative_points(
             relative_points=sampled_distributions['location'], base_point=base_loc)
 
     @staticmethod

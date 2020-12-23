@@ -2,7 +2,8 @@ from random import Random
 from typing import List, Dict, Union
 
 from common.entities.base_entities.customer_delivery import CustomerDelivery
-from common.entities.base_entities.entity_distribution.distribution_utils import DistributionUtils
+from common.entities.base_entities.entity_distribution.distribution_utils import choose_rand_by_attrib, \
+    add_base_point_to_relative_points, get_updated_internal_amount, extract_amount_in_range
 from common.entities.base_entities.entity_distribution.package_delivery_plan_distribution import \
     PackageDeliveryPlanDistribution, DEFAULT_AZI_DISTRIB, DEFAULT_PITCH_DISTRIB, DEFAULT_PACKAGE_DISTRIB, \
     DEFAULT_RELATIVE_DROP_DISTRIB
@@ -27,8 +28,8 @@ class CustomerDeliveryDistribution(HierarchialDistribution):
 
     def choose_rand(self, random: Random, base_loc: Point2D = create_zero_point_2d(),
                     amount: Dict[type, Union[int, Range]] = {}) -> List[CustomerDelivery]:
-        internal_amount = DistributionUtils.get_updated_internal_amount(CustomerDeliveryDistribution, amount)
-        cd_amount = DistributionUtils.extract_amount_in_range(internal_amount.pop(CustomerDelivery), random)
+        internal_amount = get_updated_internal_amount(CustomerDeliveryDistribution, amount)
+        cd_amount = extract_amount_in_range(internal_amount.pop(CustomerDelivery), random)
         sampled_distributions = self._calc_samples_from_distributions(cd_amount, random)
         CustomerDeliveryDistribution._update_the_location_of_sampled_points(base_loc, sampled_distributions)
         pdp_distribution = self.choose_internal_distribution(random)
@@ -42,11 +43,11 @@ class CustomerDeliveryDistribution(HierarchialDistribution):
 
     @staticmethod
     def _update_the_location_of_sampled_points(base_loc: Point2D, sampled_distributions: Dict):
-        sampled_distributions['location'] = DistributionUtils.add_base_point_to_relative_points(
+        sampled_distributions['location'] = add_base_point_to_relative_points(
             relative_points=sampled_distributions['location'], base_point=base_loc)
 
     def _calc_samples_from_distributions(self, cd_amount: int, random: Random) -> Dict[str, list]:
-        return DistributionUtils.choose_rand_by_attrib(
+        return choose_rand_by_attrib(
             internal_sample_dict={'location': self._relative_location_distribution},
             random=random,
             amount=cd_amount)
