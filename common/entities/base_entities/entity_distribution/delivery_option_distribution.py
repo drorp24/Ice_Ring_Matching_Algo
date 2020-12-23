@@ -6,7 +6,7 @@ from common.entities.base_entities.delivery_option import DeliveryOption
 from common.entities.base_entities.entity_distribution.customer_delivery_distribution import \
     CustomerDeliveryDistribution, DEFAULT_PDP_DISTRIB
 from common.entities.base_entities.entity_distribution.distribution_utils import get_updated_internal_amount, \
-    extract_amount_in_range, add_base_point_to_relative_points, choose_rand_by_attrib
+    extract_amount_in_range, add_base_point_to_relative_points, choose_rand_by_attrib, validate_amount_input
 from common.entities.base_entities.package_delivery_plan import PackageDeliveryPlan
 from common.entities.distribution.distribution import UniformChoiceDistribution, HierarchialDistribution, Range
 from geometry.distribution.geo_distribution import PointLocationDistribution, DEFAULT_ZERO_LOCATION_DISTRIBUTION
@@ -25,6 +25,7 @@ class DeliveryOptionDistribution(HierarchialDistribution):
 
     def choose_rand(self, random: Random, base_loc: Point2D = create_zero_point_2d(),
                     amount: Dict[type, Union[int, Range]] = {}) -> List[DeliveryOption]:
+        validate_amount_input(self, amount)
         internal_amount = get_updated_internal_amount(DeliveryOptionDistribution, amount)
         do_amount = extract_amount_in_range(internal_amount.pop(DeliveryOption), random)
         sampled_distributions = self._calc_samples_from_distributions(do_amount, random)

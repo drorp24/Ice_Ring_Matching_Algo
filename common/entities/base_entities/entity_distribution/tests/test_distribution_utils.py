@@ -5,9 +5,11 @@ from common.entities.base_entities.customer_delivery import CustomerDelivery
 from common.entities.base_entities.delivery_option import DeliveryOption
 from common.entities.base_entities.entity_distribution.delivery_option_distribution import DeliveryOptionDistribution
 from common.entities.base_entities.entity_distribution.distribution_utils import extract_amount_in_range, \
-    get_updated_internal_amount
+    get_updated_internal_amount, validate_amount_input
 from common.entities.base_entities.package_delivery_plan import PackageDeliveryPlan
 from common.entities.distribution.distribution import Range
+
+
 
 
 class BaseDistributionUtilsTest(unittest.TestCase):
@@ -34,3 +36,22 @@ class BaseDistributionUtilsTest(unittest.TestCase):
         amount = get_updated_internal_amount(distribution=DeliveryOptionDistribution,
                                              amount={CustomerDelivery: Range(3, 6)})
         self.assertEqual(amount, {DeliveryOption: 1, CustomerDelivery: Range(3, 6), PackageDeliveryPlan: 1})
+
+    def test_validation_of_amount(self):
+        try:
+            validate_amount_input(DeliveryOptionDistribution,
+                                  amount={DeliveryOption: 24, CustomerDelivery: 11, PackageDeliveryPlan: 2})
+        except Exception:
+            self.fail()
+
+    def test_validation_of_amount_given_illegal_input(self):
+
+        class JohnSmith(object):
+            pass
+
+        try:
+            validate_amount_input(DeliveryOptionDistribution,
+                                  amount={JohnSmith: 33, DeliveryOption: 24, CustomerDelivery: 11, PackageDeliveryPlan: 2})
+            self.fail()
+        except Exception:
+            pass

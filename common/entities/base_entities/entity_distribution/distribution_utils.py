@@ -50,9 +50,18 @@ def get_updated_internal_amount(distribution: HierarchialDistribution,
         raise UndefinedBaseAmountException()
 
 
+def validate_amount_input(distribution: HierarchialDistribution, amount: Dict[type, Union[int, Range]]):
+    if not all([key in distribution.get_all_internal_types() for key in amount.keys()]):
+        raise BadAmountInputException()
+
+
 def get_base_amount(distribution: HierarchialDistribution) -> Dict[type, int]:
     return {d: 1 for d in distribution.get_all_internal_types()}
 
 
 class UndefinedBaseAmountException(Exception):
+    pass
+
+
+class BadAmountInputException(Exception):
     pass

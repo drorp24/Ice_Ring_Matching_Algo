@@ -10,7 +10,7 @@ from common.entities.base_entities.delivery_request import DeliveryRequest, \
 from common.entities.base_entities.entity_distribution.delivery_option_distribution import DeliveryOptionDistribution, \
     DEFAULT_CD_DISTRIB
 from common.entities.base_entities.entity_distribution.distribution_utils import add_base_point_to_relative_points, \
-    get_updated_internal_amount, extract_amount_in_range, choose_rand_by_attrib
+    get_updated_internal_amount, extract_amount_in_range, choose_rand_by_attrib, validate_amount_input
 from common.entities.base_entities.entity_distribution.priority_distribution import PriorityDistribution
 from common.entities.base_entities.entity_distribution.temporal_distribution import TimeWindowDistribution
 from common.entities.base_entities.package_delivery_plan import PackageDeliveryPlan
@@ -42,6 +42,7 @@ class DeliveryRequestDistribution(HierarchialDistribution):
 
     def choose_rand(self, random: Random, base_loc: Point2D = create_zero_point_2d(),
                     amount: Dict[type, Union[int, Range]] = {}) -> List[DeliveryRequest]:
+        validate_amount_input(self, amount)
         internal_amount = get_updated_internal_amount(DeliveryRequestDistribution, amount)
         dr_amount = extract_amount_in_range(internal_amount.pop(DeliveryRequest), random)
         sampled_distributions = self._calc_samples_from_distributions(dr_amount, random)

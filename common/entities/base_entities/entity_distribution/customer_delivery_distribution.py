@@ -3,7 +3,7 @@ from typing import List, Dict, Union
 
 from common.entities.base_entities.customer_delivery import CustomerDelivery
 from common.entities.base_entities.entity_distribution.distribution_utils import choose_rand_by_attrib, \
-    add_base_point_to_relative_points, get_updated_internal_amount, extract_amount_in_range
+    add_base_point_to_relative_points, get_updated_internal_amount, extract_amount_in_range, validate_amount_input
 from common.entities.base_entities.entity_distribution.package_delivery_plan_distribution import \
     PackageDeliveryPlanDistribution, DEFAULT_AZI_DISTRIB, DEFAULT_PITCH_DISTRIB, DEFAULT_PACKAGE_DISTRIB, \
     DEFAULT_RELATIVE_DROP_DISTRIB
@@ -29,6 +29,7 @@ class CustomerDeliveryDistribution(HierarchialDistribution):
 
     def choose_rand(self, random: Random, base_loc: Point2D = create_zero_point_2d(),
                     amount: Dict[type, Union[int, Range]] = {}) -> List[CustomerDelivery]:
+        validate_amount_input(self, amount)
         internal_amount = get_updated_internal_amount(CustomerDeliveryDistribution, amount)
         cd_amount = extract_amount_in_range(internal_amount.pop(CustomerDelivery), random)
         sampled_distributions = self._calc_samples_from_distributions(cd_amount, random)
