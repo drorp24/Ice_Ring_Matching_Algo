@@ -16,6 +16,6 @@ class PackageDistribution(ChoiceDistribution):
         package_names = super().choose_rand(random=random, amount=amount)
         return [PackageType[package_name] for package_name in package_names]
 
-    @staticmethod
-    def distribution_class() -> type:
+    @classmethod
+    def distribution_class(cls) -> type:
         return PackageType

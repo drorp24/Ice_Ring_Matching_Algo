@@ -49,7 +49,8 @@ class DeliveryRequestDistribution(HierarchialDistribution):
         do_distribution = self.choose_internal_distribution(random)
         return self._calc_result_list(do_distribution, internal_amount, random, sampled_distributions)
 
-    def distribution_class(self) -> type:
+    @classmethod
+    def distribution_class(cls) -> type:
         return DeliveryRequest
 
     def choose_internal_distribution(self, random):
@@ -77,5 +78,5 @@ class DeliveryRequestDistribution(HierarchialDistribution):
                                            sampled_distributions['priority'])]
 
     @staticmethod
-    def get_base_amount() -> Dict[type, int]:
-        return {DeliveryRequest: 1, DeliveryOption: 1, CustomerDelivery: 1, PackageDeliveryPlan: 1}
+    def get_all_internal_types():
+        return [DeliveryRequest, DeliveryOption, CustomerDelivery, PackageDeliveryPlan]

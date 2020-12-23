@@ -24,6 +24,11 @@ class HierarchialDistribution(Distribution):
     def choose_rand(self, random: Random, amount: Dict[type, int]):
         raise NotImplementedError
 
+    @staticmethod
+    @abstractmethod
+    def get_all_internal_types():
+        raise NotImplementedError
+
 
 class ChoiceDistribution(Distribution):
 
@@ -48,7 +53,12 @@ class ChoiceDistribution(Distribution):
     def choose_rand(self, random: Random, amount=1):
         values = list(self.options_to_prob.keys())
         probs = list(self.options_to_prob.values())
-        return random.choices(values, ChoiceDistribution.get_safe_probabilities(probs), k=amount)
+        return random.choices(values, ChoiceDistribution.get_safe_probabilities(probs), k=amount)\
+
+
+    @classmethod
+    def distribution_class(cls) -> type:
+        return object
 
     def __str__(self):
         return str(self.options_to_prob)
@@ -69,6 +79,10 @@ class UniformChoiceDistribution(Distribution):
     def choose_rand(self, random: Random, amount: int = 1) -> List:
         return random.choices(self._values, k=amount)
 
+    @classmethod
+    def distribution_class(cls) -> type:
+        return object
+
 
 class UniformDistribution(Distribution):
 
@@ -82,6 +96,10 @@ class UniformDistribution(Distribution):
     def choose_uniform_in_range(self, random: Random) -> object:
         # uniform sample from within range chosen by probability
         return random.uniform(self._value_range.start, self._value_range.stop)
+
+    @classmethod
+    def distribution_class(cls) -> type:
+        return float
 
 
 class MultiUniformDistribution(Distribution):
@@ -97,6 +115,10 @@ class MultiUniformDistribution(Distribution):
         range_to_sample_from: Range = ChoiceDistribution(self._range_to_probability).choose_rand(random)[0]
         value_in_range = random.uniform(range_to_sample_from.start, range_to_sample_from.stop)
         return value_in_range
+
+    @classmethod
+    def distribution_class(cls) -> type:
+        return object
 
 
 @dataclass

@@ -33,7 +33,8 @@ class DeliveryOptionDistribution(HierarchialDistribution):
         return DeliveryOptionDistribution._calc_result_list(cd_distributions, internal_amount, random,
                                                             sampled_distributions)
 
-    def distribution_class(self) -> type:
+    @classmethod
+    def distribution_class(cls) -> type:
         return DeliveryOption
 
     def choose_internal_distribution(self, random):
@@ -56,5 +57,5 @@ class DeliveryOptionDistribution(HierarchialDistribution):
                 for loc in sampled_distributions['location']]
 
     @staticmethod
-    def get_base_amount() -> Dict[type, int]:
-        return {DeliveryOption: 1, CustomerDelivery: 1, PackageDeliveryPlan: 1}
+    def get_all_internal_types():
+        return [DeliveryOption, CustomerDelivery, PackageDeliveryPlan]

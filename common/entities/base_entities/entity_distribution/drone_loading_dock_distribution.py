@@ -40,5 +40,6 @@ class DroneLoadingDockDistribution(Distribution):
         return [DroneLoadingDock(dl, pt, tw)
                 for (dl, pt, tw) in zip(drone_loading_stations, platform_types, time_windows)]
 
-    def distribution_class(self) -> type:
+    @classmethod
+    def distribution_class(cls) -> type:
         return DroneLoadingDock

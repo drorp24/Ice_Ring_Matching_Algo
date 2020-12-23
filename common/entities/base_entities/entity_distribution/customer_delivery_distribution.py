@@ -8,7 +8,8 @@ from common.entities.base_entities.entity_distribution.package_delivery_plan_dis
     PackageDeliveryPlanDistribution, DEFAULT_AZI_DISTRIB, DEFAULT_PITCH_DISTRIB, DEFAULT_PACKAGE_DISTRIB, \
     DEFAULT_RELATIVE_DROP_DISTRIB
 from common.entities.base_entities.package_delivery_plan import PackageDeliveryPlan
-from common.entities.distribution.distribution import UniformChoiceDistribution, HierarchialDistribution, Range
+from common.entities.distribution.distribution import UniformChoiceDistribution, HierarchialDistribution, Range, \
+    Distribution
 from geometry.distribution.geo_distribution import PointLocationDistribution
 from geometry.geo2d import Point2D
 from geometry.geo_factory import create_zero_point_2d
@@ -38,7 +39,8 @@ class CustomerDeliveryDistribution(HierarchialDistribution):
         return CustomerDeliveryDistribution._calc_result_list(internal_amount, pdp_distribution, random,
                                                               sampled_distributions)
 
-    def distribution_class(self) -> type:
+    @classmethod
+    def distribution_class(cls) -> type:
         return CustomerDelivery
 
     def choose_internal_distribution(self, random):
@@ -63,5 +65,5 @@ class CustomerDeliveryDistribution(HierarchialDistribution):
             for loc in sampled_distributions['location']]
 
     @staticmethod
-    def get_base_amount() -> Dict[type, int]:
-        return {CustomerDelivery: 1, PackageDeliveryPlan: 1}
+    def get_all_internal_types() -> List[type]:
+        return [CustomerDelivery, PackageDeliveryPlan]

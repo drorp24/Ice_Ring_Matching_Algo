@@ -1,11 +1,10 @@
 import math
-import re
 from abc import ABCMeta
 from random import Random
-from typing import Dict, List, Union, Type
+from typing import Dict, List, Union
 from uuid import UUID
 
-from common.entities.distribution.distribution import Distribution, Range, UniformDistribution
+from common.entities.distribution.distribution import Distribution, Range, UniformDistribution, HierarchialDistribution
 from geometry.geo2d import Point2D
 
 
@@ -39,14 +38,20 @@ def add_base_point_to_relative_points(relative_points: List[Point2D], base_point
     return [base_point.add_vector(p.to_vector()) for p in relative_points]
 
 
-def get_updated_internal_amount(distribution: Type[Distribution], amount: Dict[type, Union[int, Range]]) -> Dict[type, int]:
+def get_updated_internal_amount(distribution: HierarchialDistribution,
+                                amount: Dict[type, Union[int, Range]]) -> Dict[type, int]:
     try:
-        distribution.distribution_class
-        internal_amount = distribution.get_base_amount()
+        internal_amount = get_base_amount(distribution)
         internal_amount.update(amount)
+        if distribution.distribution_class() not in internal_amount.keys():
+            raise UndefinedBaseAmountException()
         return internal_amount
     except TypeError:
         raise UndefinedBaseAmountException()
+
+
+def get_base_amount(distribution: HierarchialDistribution) -> Dict[type, int]:
+    return {d: 1 for d in distribution.get_all_internal_types()}
 
 
 class UndefinedBaseAmountException(Exception):
