@@ -12,11 +12,21 @@ class Distribution(ABC):
     def choose_rand(self, random: Random, amount: int):
         raise NotImplementedError
 
+    @classmethod
+    @abstractmethod
+    def distribution_class(cls) -> type:
+        raise NotImplementedError
+
 
 class HierarchialDistribution(Distribution):
 
     @abstractmethod
     def choose_rand(self, random: Random, amount: Dict[type, int]):
+        raise NotImplementedError
+
+    @staticmethod
+    @abstractmethod
+    def get_all_internal_types():
         raise NotImplementedError
 
 
@@ -43,7 +53,12 @@ class ChoiceDistribution(Distribution):
     def choose_rand(self, random: Random, amount=1):
         values = list(self.options_to_prob.keys())
         probs = list(self.options_to_prob.values())
-        return random.choices(values, ChoiceDistribution.get_safe_probabilities(probs), k=amount)
+        return random.choices(values, ChoiceDistribution.get_safe_probabilities(probs), k=amount)\
+
+
+    @classmethod
+    def distribution_class(cls) -> type:
+        return object
 
     def __str__(self):
         return str(self.options_to_prob)
@@ -64,6 +79,10 @@ class UniformChoiceDistribution(Distribution):
     def choose_rand(self, random: Random, amount: int = 1) -> List:
         return random.choices(self._values, k=amount)
 
+    @classmethod
+    def distribution_class(cls) -> type:
+        return object
+
 
 class UniformDistribution(Distribution):
 
@@ -72,7 +91,15 @@ class UniformDistribution(Distribution):
 
     def choose_rand(self, random: Random, amount: int = 1) -> List:
         # uniform sample from within range chosen by probability
-        return [random.uniform(self._value_range.start, self._value_range.stop) for i in range(amount)]
+        return [random.uniform(self._value_range.start, self._value_range.stop) for _ in range(amount)]
+
+    def choose_uniform_in_range(self, random: Random) -> object:
+        # uniform sample from within range chosen by probability
+        return random.uniform(self._value_range.start, self._value_range.stop)
+
+    @classmethod
+    def distribution_class(cls) -> type:
+        return float
 
 
 class MultiUniformDistribution(Distribution):
@@ -89,6 +116,10 @@ class MultiUniformDistribution(Distribution):
         value_in_range = random.uniform(range_to_sample_from.start, range_to_sample_from.stop)
         return value_in_range
 
+    @classmethod
+    def distribution_class(cls) -> type:
+        return object
+
 
 @dataclass
 class Range:
@@ -100,6 +131,9 @@ class Range:
 
     def __eq__(self, other: Range):
         return self.start == other.start and self.stop == other.stop
+
+    def __contains__(self, item: float):
+        return self.start <= item <= self.stop
 
 
 class InvalidProbabilityException(Exception):
