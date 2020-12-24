@@ -87,7 +87,7 @@ class BasicMinimumEnd2EndExperiment():
                                                                                                         31.79,31.79
                                                                                                         )),
                                          time_window_distributions=create_standad_full_day_test_time()))
-        self.matcher_config = Path("jsons/test_matcher_config.json")
+        self.matcher_config = Path("end_to_end/tests/jsons/test_matcher_config.json")
 
     def test_small_scenario(self):
         empty_drone_delivery_board = _create_empty_drone_delivery_board(size=20)
@@ -103,9 +103,6 @@ class BasicMinimumEnd2EndExperiment():
         operational_drawer2d.add_operational_graph(dr_drawer, fully_connected_graph,draw_internal=True, draw_edges=False)
         dr_drawer.draw(False)
 
-        row_names = ["Dropped Out"] + [delivery.total_amount_per_package_type for delivery in
-                                       delivery_board.drone_deliveries]
-        drawer = create_gantt_drawer(zero_time=DateTimeExtension.from_dt(fully_connected_graph.zero_time),
         board_map_drawer = create_drawer_2d(Drawer2DCoordinateSys.GEOGRAPHIC)
         operational_drawer2d.add_delivery_board(board_map_drawer, delivery_board, draw_dropped=True)
         board_map_drawer.draw(False)
