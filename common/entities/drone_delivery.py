@@ -40,9 +40,8 @@ class MatchedDroneLoadingDock:
 
     def __str__(self):
         return '[MatchedDroneLoadingDock(graph_index=' + str(
-            self.graph_index) + ', min_time=' + self.delivery_min_time.get_internal().strftime(
-            "%m %d %Y %H:%M:%S") + ', max_time=' + self.delivery_max_time.get_internal().strftime(
-            "%m %d %Y %H:%M:%S") + ')]'
+            self.graph_index) + ', min_time=' + self.delivery_min_time.str_format_time() + \
+               ', max_time=' + self.delivery_max_time.str_format_time() + ')]'
 
 
 @dataclass
@@ -59,14 +58,12 @@ class MatchedDeliveryRequest:
                and self.delivery_min_time == other.delivery_min_time \
                and self.delivery_max_time == other.delivery_max_time
 
-    # TODO: handle time format
     def __str__(self):
         return '[MatchedDeliveryRequest(graph_index=' + str(self.graph_index) + ', priority=' + str(
-            self.delivery_request.priority) + ', min_time=' + self.delivery_min_time.get_internal().strftime(
-            "%m %d %Y %H:%M:%S") + ', max_time=' + self.delivery_max_time.get_internal().strftime(
-            "%m %d %Y %H:%M:%S") + ', delivered=' + str(
+            self.delivery_request.priority) + ', min_time=' + self.delivery_min_time.str_format_time() + \
+               ', max_time=' + self.delivery_max_time.str_format_time() + ', delivered=' + str(
             self.delivery_request.delivery_options[
-                self.matched_delivery_option_index].get_amount_per_package_type()) + ')]'
+                self.matched_delivery_option_index].get_package_types_volume_map()) + ')]'
 
 
 # TODO change to MatchedDroneDelivery
@@ -93,11 +90,16 @@ class DroneDelivery(EmptyDroneDelivery):
 
     def __str__(self):
         if len(self._matched_requests) == 0:
-            return "\n[DroneDelivery id={id} - No match found]".format(id=self.id)
+            return "\n[DroneDelivery id={id} - origin {origin_capacity} No match found]".format(
+                id=self.id,
+                origin_capacity=self.drone_formation.get_package_type_volumes(), )
 
-        return "\n[DroneDelivery id={id} {total_amount_per_package_type} total priority={priority} total time in " \
+        return "\n[DroneDelivery id={id} origin {origin_capacity} matched " \
+               "{total_amount_per_package_type} total priority={priority} total time in " \
                "minutes={total_time}]\n{start_drone_loading_docks}\n{matched_requests}\n{end_drone_loading_docks}" \
-            .format(id=self.id, total_amount_per_package_type=str(self.total_amount_per_package_type),
+            .format(id=self.id,
+                    origin_capacity=self.drone_formation.get_package_type_volumes(),
+                    total_amount_per_package_type=str(self.total_amount_per_package_type),
                     priority=str(self.total_priority), total_time=str(self.total_time_in_minutes),
                     start_drone_loading_docks=str(self.start_drone_loading_docks),
                     matched_requests='\n'.join(map(str, self._matched_requests)),
@@ -134,7 +136,7 @@ class DroneDelivery(EmptyDroneDelivery):
             total_amount_per_package_type = [x + y for x, y in zip(total_amount_per_package_type,
                                                                    matched_request.delivery_request.delivery_options[
                                                                        matched_request.matched_delivery_option_index].
-                                                                   get_amount_per_package_type().
+                                                                   get_package_types_volume_map().
                                                                    get_package_types_volumes())]
 
             self._total_priority += matched_request.delivery_request.priority

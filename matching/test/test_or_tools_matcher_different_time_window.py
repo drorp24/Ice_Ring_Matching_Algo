@@ -1,6 +1,3 @@
-#TODO : fix test - check why dr1 is dropped, and why changing depot TW has no effect
-
-
 from datetime import datetime, timedelta, date, time
 from typing import List
 from unittest import TestCase
@@ -46,7 +43,6 @@ class ORToolsMatcherDifferentTWTestCase(TestCase):
     def test_matcher(self):
         matcher = ORToolsMatcher(self.match_input)
         actual_delivery_board = matcher.match()
-        print(actual_delivery_board)
 
         expected_drone_deliveries = self._create_drone_deliveries(delivery_requests=self.delivery_requests,
                                                                   empty_board=self.empty_board,
@@ -54,8 +50,6 @@ class ORToolsMatcherDifferentTWTestCase(TestCase):
         expected_matched_board = DroneDeliveryBoard(
             drone_deliveries=[expected_drone_deliveries[0], expected_drone_deliveries[1]],
             dropped_delivery_requests=[])
-
-        print(expected_matched_board)
 
         self.assertEqual(expected_matched_board, actual_delivery_board)
 
@@ -110,7 +104,7 @@ class ORToolsMatcherDifferentTWTestCase(TestCase):
 
     @staticmethod
     def _create_graph(delivery_requests: List[DeliveryRequest], loading_dock: DroneLoadingDock) -> OperationalGraph:
-        graph = OperationalGraph(zero_time=ZERO_TIME)
+        graph = OperationalGraph(zero_time=ZERO_TIME.get_internal())
         graph.add_drone_loading_docks([loading_dock])
         graph.add_delivery_requests(delivery_requests)
         build_fully_connected_graph(graph)
@@ -154,13 +148,13 @@ class ORToolsMatcherDifferentTWTestCase(TestCase):
                                          drone_formation=empty_board.empty_drone_deliveries[0].drone_formation,
                                          matched_requests=[
                                              MatchedDeliveryRequest(
-                                             graph_index=1,
-                                             delivery_request=delivery_requests[0],
-                                             matched_delivery_option_index=0,
-                                             delivery_min_time=DateTimeExtension.from_dt(
-                                                 datetime(2020, 1, 23, 11, 35, 00)),
-                                             delivery_max_time=DateTimeExtension.from_dt(
-                                                 datetime(2020, 1, 23, 11, 50, 00))),
+                                                 graph_index=1,
+                                                 delivery_request=delivery_requests[0],
+                                                 matched_delivery_option_index=0,
+                                                 delivery_min_time=DateTimeExtension.from_dt(
+                                                     datetime(2020, 1, 23, 11, 35, 00)),
+                                                 delivery_max_time=DateTimeExtension.from_dt(
+                                                     datetime(2020, 1, 23, 11, 50, 00))),
                                              MatchedDeliveryRequest(
                                                  graph_index=2,
                                                  delivery_request=delivery_requests[1],

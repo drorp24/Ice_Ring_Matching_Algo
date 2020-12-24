@@ -18,23 +18,19 @@ def generate_matched_request_bar_colors() -> [Color]:
 
 DROPPED_ROW_NUMBER = 1
 MATCHED_REQUEST_BAR_COLORS = generate_matched_request_bar_colors()
+OPERATING_TIME_WINDOW_COLOR = Color.Red
 
 
 def add_delivery_board(drawer: GanttDrawer, board: DroneDeliveryBoard, draw_dropped=True):
     for i, delivery in enumerate(board.drone_deliveries):
+        delivery_row = i + 1 + DROPPED_ROW_NUMBER
         if len(delivery.matched_requests) is 0:
             continue
-        delivery_row = i + 1 + DROPPED_ROW_NUMBER
-        drawer.add_row_background_area(
+        drawer.add_row_area(
             row=delivery_row,
-            time_window=TimeWindowExtension(drawer.get_zero_time(),
-                                            delivery.start_drone_loading_docks.delivery_min_time),
-            color=Color.Orange)
-        drawer.add_row_background_area(
-            row=delivery_row,
-            time_window=TimeWindowExtension(delivery.end_drone_loading_docks.delivery_min_time,
-                                            drawer.get_end_time()),
-            color=Color.Orange)
+            time_window=TimeWindowExtension(delivery.start_drone_loading_docks.delivery_min_time,
+                                            delivery.end_drone_loading_docks.delivery_min_time),
+            edgecolor=OPERATING_TIME_WINDOW_COLOR)
         for request in delivery.matched_requests:
             drawer.add_bar(
                 row=delivery_row,
@@ -42,7 +38,7 @@ def add_delivery_board(drawer: GanttDrawer, board: DroneDeliveryBoard, draw_drop
                 name=str(request.graph_index),
                 time_mark=request.delivery_min_time,
                 side_text=str(request.delivery_request.priority),
-                color=MATCHED_REQUEST_BAR_COLORS[request.graph_index])
+                color=MATCHED_REQUEST_BAR_COLORS[request.graph_index % len(MATCHED_REQUEST_BAR_COLORS)])
     if draw_dropped:
         for i, dropped in enumerate(board.dropped_delivery_requests):
             drawer.add_bar(

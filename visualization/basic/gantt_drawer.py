@@ -11,7 +11,9 @@ class GanttDrawer(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def add_row_background_area(self, row: int, time_window: TimeWindowExtension, color: Color = Color.Orange) -> None:
+    def add_row_area(self, row: int, time_window: TimeWindowExtension,
+                     facecolor: Color = Color.Red, face_alpha: float = 0,
+                     edgecolor: Color = Color.Red) -> None:
         raise NotImplementedError
 
     @abstractmethod

@@ -24,6 +24,9 @@ UNTIL = 'until'
 SEC_IN_MIN = 60
 MIN_IN_HOUR = 60
 
+DATETIME_DEFAULT_FORMAT = "%d/%m/%Y %H:%M:%S"
+
+
 class Temporal(ABC):
 
     @property
@@ -60,7 +63,7 @@ class TimeWindowExtension(JsonableBaseEntity):
 
     def overlaps(self, other: TimeWindowExtension) -> bool:
         return self.get_internal().overlaps(other.get_internal())
-        #return int(self._internal.since.timestamp()), int(self._internal.until.timestamp())
+        # return int(self._internal.since.timestamp()), int(self._internal.until.timestamp())
 
     def get_relative_time_in_min(self, zero_time: DateTimeExtension) -> (float, float):
         return self.since.get_time_delta(zero_time).in_minutes(), self.until.get_time_delta(zero_time).in_minutes()
@@ -112,6 +115,9 @@ class DateTimeExtension(BaseEntity):
         date_dict = DateTimeExtension.extract_date_dict_from_datetime(self.get_internal())
         time_dict = DateTimeExtension.extract_time_dict_from_datetime(self.get_internal())
         return {**date_dict, **time_dict}
+
+    def str_format_time(self, fmt: str = DATETIME_DEFAULT_FORMAT) -> str:
+        return self._date_time.strftime(fmt)
 
     @staticmethod
     def from_dict(date_time_dict: Dict) -> DateTimeExtension:

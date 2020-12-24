@@ -2,7 +2,7 @@ from enum import Enum, auto
 from enum import IntEnum
 
 from common.entities.drone import DroneConfiguration, PlatformType, Configurations, \
-    DroneConfigurations
+    DroneConfigurations, PackageTypesVolumeMap
 from common.entities.package import PackageType
 
 
@@ -34,8 +34,9 @@ class DroneFormation:
     def get_package_type_volume(self, package_type: PackageType) -> int:
         return self.size * self._drone_configuration.package_type_map.get_package_type_volume(package_type)
 
-    def get_package_type_volumes(self) -> [int]:
-        return self._drone_configuration.package_type_map.get_package_types_volumes()
+    def get_package_type_volumes(self) -> PackageTypesVolumeMap:
+        return PackageTypesVolumeMap(
+            list(map(lambda x: x * self._size, self._drone_configuration.package_type_map.get_package_types_volumes())))
 
     def get_package_type_formation(self) -> PackageType:
         package_type_volumes = self._drone_configuration.package_type_map.get_package_types_volumes()
