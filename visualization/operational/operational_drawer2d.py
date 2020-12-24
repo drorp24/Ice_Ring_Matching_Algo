@@ -1,11 +1,10 @@
 import random
-
-from common.entities.customer_delivery import CustomerDelivery
-from common.entities.delivery_option import DeliveryOption
-from common.entities.delivery_request import DeliveryRequest
-from common.entities.drone_delivery_board import DroneDeliveryBoard
-from common.entities.drone_loading_dock import DroneLoadingDock
-from common.entities.package_delivery_plan import PackageDeliveryPlan
+from common.entities.base_entities.customer_delivery import CustomerDelivery
+from common.entities.base_entities.delivery_option import DeliveryOption
+from common.entities.base_entities.delivery_request import DeliveryRequest
+from common.entities.base_entities.drone_loading_dock import DroneLoadingDock
+from common.entities.base_entities.package_delivery_plan import PackageDeliveryPlan
+from common.entities.base_entities.drone_delivery_board import DroneDeliveryBoard
 from common.graph.operational.operational_graph import OperationalGraph, OperationalEdge
 from geometry.geo_factory import create_line_string_2d
 from visualization.basic.color import Color

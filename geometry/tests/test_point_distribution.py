@@ -1,7 +1,7 @@
 import unittest
 from random import Random
 
-from geometry.geo_distribution import UniformPointInBboxDistribution, MultiPointInBboxDistribution
+from geometry.distribution.geo_distribution import UniformPointInBboxDistribution, MultiPointInBboxDistribution
 from geometry.geo_factory import create_polygon_2d, create_point_2d
 
 

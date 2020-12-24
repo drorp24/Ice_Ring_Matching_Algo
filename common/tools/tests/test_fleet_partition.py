@@ -1,6 +1,6 @@
 from common.tools.fleet_reader import FleetReader
-from common.entities.drone import PlatformType
-from common.entities.drone_formation import FormationSize
+from common.entities.base_entities.drone import PlatformType
+from common.entities.base_entities.drone_formation import FormationSize
 from common.tools.fleet_partition import FleetPartition
 import unittest
 from common.tools.tests.path_utils import create_path_from_current_directory, Path

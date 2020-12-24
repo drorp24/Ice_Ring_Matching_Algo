@@ -1,6 +1,6 @@
 from typing import Union
 
-from common.entities.package import PackageType
+from common.entities.base_entities.package import PackageType
 from common.math.angle import Angle
 from geometry.geo2d import Polygon2D, Point2D, EmptyGeometry2D
 from geometry.geo_factory import create_polygon_2d_from_ellipse

@@ -1,9 +1,9 @@
 import math
 from math import ceil
 from typing import List
-from common.entities.delivery_request import DeliveryRequest
-from common.entities.drone_loading_dock import DroneLoadingDock
-from common.entities.temporal import Temporal
+from common.entities.base_entities.delivery_request import DeliveryRequest
+from common.entities.base_entities.drone_loading_dock import DroneLoadingDock
+from common.entities.base_entities.temporal import Temporal
 from common.graph.operational.operational_graph import OperationalGraph, OperationalEdge, OperationalEdgeAttribs, \
     OperationalNode
 from geometry.utils import Localizable

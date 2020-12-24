@@ -4,7 +4,7 @@ from uuid import UUID
 
 from optional import Optional
 
-from common.entities.package_delivery_plan import PackageDeliveryPlan
+from common.entities.base_entities.package_delivery_plan import PackageDeliveryPlan
 from common.math.angle import Angle
 from grid.grid_location import GridLocation
 

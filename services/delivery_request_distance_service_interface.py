@@ -1,6 +1,6 @@
 from abc import ABC
 
-from common.entities.delivery_request import DeliveryRequest
+from common.entities.base_entities.delivery_request import DeliveryRequest
 
 
 class DeliveryRequestDistanceServiceInterface(ABC):

@@ -2,7 +2,7 @@ from dataclasses import dataclass
 
 from optional import Optional
 
-from common.entities.package import PackageType
+from common.entities.base_entities.package import PackageType
 from common.math.angle import Angle
 from geometry.geo_factory import create_point_2d
 from grid.grid_location import GridLocation

@@ -3,11 +3,11 @@ from typing import Tuple, List
 
 import numpy as np
 
-from common.entities.delivery_request import DeliveryRequest
-from common.entities.drone_loading_dock import DroneLoadingDock
-from common.entities.package import PackageType
-from common.entities.temporal import DateTimeExtension
+from common.entities.base_entities.package import PackageType
 from common.graph.operational.export_graph import GraphExporter, OperationalGraph
+from common.entities.base_entities.drone_loading_dock import DroneLoadingDock
+from common.entities.base_entities.delivery_request import DeliveryRequest
+from common.entities.base_entities.temporal import DateTimeExtension
 
 
 class OrtoolsGraphExporter(GraphExporter):
@@ -33,7 +33,6 @@ class OrtoolsGraphExporter(GraphExporter):
             origin_idx = nodes.index(edge.start_node)
             destination_idx = nodes.index(edge.end_node)
             travel_times[origin_idx, destination_idx] = edge.attributes.cost
-            #travel_times[destination_idx, origin_idx] = edge.attributes.cost
         return travel_times.tolist()
 
     def export_basis_nodes_indices(self, graph: OperationalGraph) -> List[int]:

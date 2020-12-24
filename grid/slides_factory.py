@@ -3,7 +3,7 @@ from typing import List
 
 import numpy as np
 
-from common.entities.package import PackageType
+from common.entities.base_entities.package import PackageType
 from common.math.angle import AngleUnit, Angle
 from grid.slide import Slide, SlideProperties
 from grid.slides_container import SlidesContainer

@@ -2,12 +2,14 @@ import unittest
 from datetime import date, time, datetime
 from random import Random
 
-from common.entities.delivery_request import DeliveryRequestDistribution
-from common.entities.package import PackageType
-from common.entities.temporal import DateTimeExtension
+from common.entities.base_entities.delivery_request import DeliveryRequest
+from common.entities.base_entities.entity_distribution.delivery_request_distribution import DeliveryRequestDistribution
+from common.entities.base_entities.entity_distribution.drone_loading_dock_distribution import \
+    DroneLoadingDockDistribution
+from common.entities.base_entities.package import PackageType
+from common.entities.base_entities.temporal import DateTimeExtension
 from common.graph.operational.operational_graph import OperationalGraph, OperationalEdge, OperationalNode, \
     OperationalEdgeAttribs
-from common.entities.drone_loading_dock import DroneLoadingDockDistribution
 from common.graph.operational.export_ortools_graph import OrtoolsGraphExporter
 
 
@@ -15,7 +17,8 @@ class BasicOrtoolsExporterTestCases(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.dr_dataset_random = DeliveryRequestDistribution().choose_rand(random=Random(100), amount=10)
+        cls.dr_dataset_random = DeliveryRequestDistribution().choose_rand(random=Random(100),
+                                                                          amount={DeliveryRequest: 10})
         cls.dld_dataset_random = DroneLoadingDockDistribution().choose_rand(random=Random(100), amount=3)
         cls.edges = cls.generate_edges()
         cls.graph_exporter = OrtoolsGraphExporter()
