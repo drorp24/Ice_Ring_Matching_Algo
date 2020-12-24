@@ -1,5 +1,5 @@
 from common.tools.fleet_property_sets import *
-from common.entities.drone import PlatformType, Configurations
+from common.entities.base_entities.drone import PlatformType, Configurations
 from pathlib import Path
 from common.utils.json_file_handler import create_dict_from_json
 from enum import Enum

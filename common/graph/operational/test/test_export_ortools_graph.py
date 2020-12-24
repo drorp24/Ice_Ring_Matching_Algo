@@ -1,11 +1,13 @@
 import unittest
 from random import Random
 
-from common.entities.delivery_request import DeliveryRequestDistribution
-from common.entities.package import PackageType
+from common.entities.base_entities.delivery_request import DeliveryRequest
+from common.entities.base_entities.entity_distribution.delivery_request_distribution import DeliveryRequestDistribution
+from common.entities.base_entities.entity_distribution.drone_loading_dock_distribution import \
+    DroneLoadingDockDistribution
+from common.entities.base_entities.package import PackageType
 from common.graph.operational.operational_graph import OperationalGraph, OperationalEdge, OperationalNode, \
     OperationalEdgeAttribs
-from common.entities.drone_loading_dock import DroneLoadingDockDistribution
 from common.graph.operational.export_ortools_graph import OrtoolsGraphExporter
 
 
@@ -13,7 +15,8 @@ class BasicOrtoolsExporterTestCases(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.dr_dataset_random = DeliveryRequestDistribution().choose_rand(random=Random(100), amount=10)
+        cls.dr_dataset_random = DeliveryRequestDistribution().choose_rand(random=Random(100),
+                                                                          amount={DeliveryRequest: 10})
         cls.dld_dataset_random = DroneLoadingDockDistribution().choose_rand(random=Random(100), amount=3)
         cls.edges = cls.generate_edges()
         cls.graph_exporter = OrtoolsGraphExporter()
@@ -71,10 +74,9 @@ class BasicOrtoolsExporterTestCases(unittest.TestCase):
     def test_drone_loading_docks_indices(self):
         drd_indices = self.graph_exporter.export_basis_nodes_indices(self.operational_graph)
         self.assertEqual(len(self.dld_dataset_random), len(drd_indices))
-        self.assertEqual(drd_indices, list(range(10,13)))
+        self.assertEqual(drd_indices, list(range(10, 13)))
 
     def test_package_type_demands(self):
-        large_package_demands = self.graph_exporter.export_package_type_demands(self.operational_graph, PackageType.LARGE)
+        large_package_demands = self.graph_exporter.export_package_type_demands(self.operational_graph,
+                                                                                PackageType.LARGE)
         self.assertEqual(len(large_package_demands), len(self.dr_dataset_random))
-
-

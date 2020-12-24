@@ -3,9 +3,9 @@ from typing import List
 
 from optional import Optional
 
-from common.entities.delivery_option import DeliveryOption
-from common.entities.delivery_request import DeliveryRequest
-from common.entities.package_delivery_plan import PackageDeliveryPlan
+from common.entities.base_entities.delivery_option import DeliveryOption
+from common.entities.base_entities.delivery_request import DeliveryRequest
+from common.entities.base_entities.package_delivery_plan import PackageDeliveryPlan
 from common.math.angle import Angle
 from grid.azimuth_options import AzimuthOptions
 from grid.grid_cell import EnvelopeGridCell

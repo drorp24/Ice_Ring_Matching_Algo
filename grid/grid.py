@@ -1,7 +1,7 @@
 import math
 from statistics import mean
 from typing import List
-from common.entities.delivery_request import DeliveryRequest
+from common.entities.base_entities.delivery_request import DeliveryRequest
 from grid.grid_cell_services import GridCellServices
 from grid.delivery_request_envelope_cells import DeliveryRequestPotentialEnvelopes
 from grid.slides_container import SlidesContainer

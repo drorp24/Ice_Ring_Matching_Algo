@@ -3,18 +3,25 @@ from datetime import time, date, timedelta
 from math import sqrt
 from random import Random
 
-from common.entities.delivery_request import build_delivery_request_distribution
-from common.entities.delivery_option import DeliveryOptionDistribution
-from common.entities.delivery_request import DeliveryRequestDistribution, PriorityDistribution, DeliveryRequest
-from common.entities.delivery_request_generator import DeliveryRequestDatasetGenerator, DeliveryRequestDatasetStructure
-from common.entities.drone_loading_dock import DroneLoadingDockDistribution, DroneLoadingDock
-from common.entities.temporal import TimeWindowDistribution, DateTimeDistribution, DateTimeExtension, \
-    TimeDeltaExtension, TimeDeltaDistribution, TimeWindowExtension
+from common.entities.base_entities.delivery_request import DeliveryRequest
+from common.entities.base_entities.drone_loading_dock import DroneLoadingDock
+from common.entities.base_entities.entity_distribution.delivery_option_distribution import DeliveryOptionDistribution
+from common.entities.base_entities.entity_distribution.delivery_request_distribution import DeliveryRequestDistribution, \
+    PriorityDistribution
+from common.entities.base_entities.entity_distribution.delivery_requestion_dataset_builder import \
+    build_delivery_request_distribution
+from common.entities.base_entities.entity_distribution.drone_loading_dock_distribution import \
+    DroneLoadingDockDistribution
+from common.entities.base_entities.entity_distribution.temporal_distribution import TimeDeltaDistribution, \
+    TimeWindowDistribution, DateTimeDistribution
+from common.entities.base_entities.temporal import DateTimeExtension, TimeDeltaExtension, TimeWindowExtension
+from common.entities.generator.delivery_request_generator import DeliveryRequestDatasetGenerator, \
+    DeliveryRequestDatasetStructure
+from common.graph.operational.graph_creator import add_locally_connected_dr_graph, add_fully_connected_loading_docks
 from common.graph.operational.operational_graph import OperationalEdge, \
     OperationalEdgeAttribs, OperationalNode, NonLocalizableNodeException, NonTemporalNodeException
 from common.graph.operational.operational_graph import OperationalGraph
-from common.graph.operational.graph_creator import add_locally_connected_dr_graph, add_fully_connected_loading_docks
-from geometry.geo_distribution import UniformPointInBboxDistribution
+from geometry.distribution.geo_distribution import UniformPointInBboxDistribution
 from geometry.geo_factory import create_point_2d, create_polygon_2d
 
 
@@ -22,7 +29,7 @@ class BasicDeliveryRequestGraphTestCases(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.dr_dataset_random = DeliveryRequestDistribution().choose_rand(random=Random(100), amount=10)
+        cls.dr_dataset_random = DeliveryRequestDistribution().choose_rand(random=Random(100), amount={DeliveryRequest: 10})
         cls.dld_dataset_random = DroneLoadingDockDistribution().choose_rand(random=Random(100), amount=3)
         cls.dr_dataset_morning = create_morning_dr_dataset()
         cls.dr_dataset_afternoon = create_afternoon_dr_dataset()

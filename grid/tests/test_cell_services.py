@@ -3,8 +3,8 @@ from uuid import UUID
 
 from optional import Optional
 
-from common.entities.package import PackageType
-from common.entities.package_delivery_plan import PackageDeliveryPlan
+from common.entities.base_entities.package import PackageType
+from common.entities.base_entities.package_delivery_plan import PackageDeliveryPlan
 from common.math.angle import Angle, AngleUnit
 from geometry.geo_factory import create_point_2d
 from grid.grid_cell import EnvelopeGridCell

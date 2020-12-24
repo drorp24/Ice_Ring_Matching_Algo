@@ -6,15 +6,17 @@ from uuid import UUID
 
 import numpy as np
 
-from common.entities.customer_delivery import CustomerDelivery
-from common.entities.delivery_option import DeliveryOption
-from common.entities.delivery_request import DeliveryRequest, build_delivery_request_distribution
-from common.entities.delivery_request_generator import DeliveryRequestDatasetGenerator, DeliveryRequestDatasetStructure
-from common.entities.package import PackageType
-from common.entities.package_delivery_plan import PackageDeliveryPlan
-from common.entities.temporal import TimeWindowExtension, DateTimeExtension
+from common.entities.base_entities.customer_delivery import CustomerDelivery
+from common.entities.base_entities.delivery_option import DeliveryOption
+from common.entities.base_entities.delivery_request import DeliveryRequest
+from common.entities.base_entities.entity_distribution.delivery_requestion_dataset_builder import \
+    build_delivery_request_distribution
+from common.entities.generator.delivery_request_generator import DeliveryRequestDatasetGenerator, DeliveryRequestDatasetStructure
+from common.entities.base_entities.package import PackageType
+from common.entities.base_entities.package_delivery_plan import PackageDeliveryPlan
+from common.entities.base_entities.temporal import TimeWindowExtension, DateTimeExtension
 from common.math.angle import Angle, AngleUnit
-from geometry.geo_distribution import UniformPointInBboxDistribution
+from geometry.distribution.geo_distribution import UniformPointInBboxDistribution
 from geometry.geo_factory import create_point_2d
 from grid.grid import DeliveryRequestsGrid
 from grid.slides_container import SlidesContainer

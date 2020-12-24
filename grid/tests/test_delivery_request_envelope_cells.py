@@ -2,12 +2,12 @@ import unittest
 from datetime import date, time
 from uuid import UUID
 
-from common.entities.customer_delivery import CustomerDelivery
-from common.entities.delivery_option import DeliveryOption
-from common.entities.delivery_request import DeliveryRequest
-from common.entities.package import PackageType
-from common.entities.package_delivery_plan import PackageDeliveryPlan
-from common.entities.temporal import TimeWindowExtension, DateTimeExtension
+from common.entities.base_entities.customer_delivery import CustomerDelivery
+from common.entities.base_entities.delivery_option import DeliveryOption
+from common.entities.base_entities.delivery_request import DeliveryRequest
+from common.entities.base_entities.package import PackageType
+from common.entities.base_entities.package_delivery_plan import PackageDeliveryPlan
+from common.entities.base_entities.temporal import TimeWindowExtension, DateTimeExtension
 from common.math.angle import Angle, AngleUnit
 from geometry.geo_factory import create_point_2d
 from grid.azimuth_options import AzimuthOptions
