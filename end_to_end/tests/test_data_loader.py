@@ -1,6 +1,7 @@
 import unittest
 from datetime import date, time
 
+from common.entities.base_entities.temporal import DateTimeExtension
 from end_to_end.minimum_end_to_end import MinimumEnd2EndConfig, DataLoader
 from end_to_end.scenario import Scenario
 
@@ -21,7 +22,7 @@ class BasicDataLoaderTest(unittest.TestCase):
 
     def test_get_fleet_partition(self):
         empty_drone_delivery_board = self.data_loader.get_empty_drone_delivery_board()
-        self.assertEqual(len(empty_drone_delivery_board.empty_drone_deliveries()), 15)
+        self.assertEqual(len(empty_drone_delivery_board.empty_drone_deliveries), 15)
 
     def test_get_zero_time(self):
         zero_time_extension = DateTimeExtension(dt_date=date(2021, 1, 1), dt_time=time(6, 0, 0))
