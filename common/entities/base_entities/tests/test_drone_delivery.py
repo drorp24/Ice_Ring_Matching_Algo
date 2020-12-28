@@ -8,8 +8,10 @@ from common.entities.base_entities.drone_delivery import DroneDelivery, EmptyDro
     MatchedDeliveryRequest
 from common.entities.base_entities.drone_delivery_board import EmptyDroneDeliveryBoard, DroneDeliveryBoard, DroppedDeliveryRequest
 from common.entities.base_entities.drone_formation import DroneFormations, FormationSize, FormationOptions
+from common.entities.base_entities.drone_loading_dock import DroneLoadingDock
 from common.entities.base_entities.entity_distribution.delivery_request_distribution import DeliveryRequestDistribution
-from common.entities.base_entities.drone_loading_dock import DroneLoadingDockDistribution
+from common.entities.base_entities.entity_distribution.drone_loading_dock_distribution import \
+    DroneLoadingDockDistribution
 from common.entities.base_entities.temporal import DateTimeExtension
 
 
@@ -51,7 +53,7 @@ class BasicDroneDeliveryGenerationTests(unittest.TestCase):
             delivery_max_time=DateTimeExtension(
                 dt_date=date(2020, 1, 23), dt_time=time(12, 30, 0)))
 
-        cls.dropped_delivery_request = DroppedDeliveryRequest(graph_index=4, delivery_request=cls.delivery_requests[3])
+        cls.dropped_delivery_request = DroppedDeliveryRequest(graph_index=4, delivery_request=cls.delivery_requests[2])
 
         drone_loading_dock_distribution = DroneLoadingDockDistribution()
         docks = drone_loading_dock_distribution.choose_rand(Random(100), amount=1)

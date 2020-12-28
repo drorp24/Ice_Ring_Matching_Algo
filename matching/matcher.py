@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from common.entities.drone_delivery_board import DroneDeliveryBoard
+from common.entities.base_entities.drone_delivery_board import DroneDeliveryBoard
 from matching.matcher_input import MatcherInput
 
 

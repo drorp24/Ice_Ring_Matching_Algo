@@ -4,7 +4,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.ticker import FixedLocator, NullFormatter, FixedFormatter
 
-from common.entities.temporal import DateTimeExtension, TimeWindowExtension, MIN_IN_HOUR, TimeDeltaExtension
+from common.entities.base_entities.temporal import DateTimeExtension, TimeWindowExtension, TimeDeltaExtension, \
+    MIN_IN_HOUR
 from visualization.basic.color import Color
 from visualization.basic.gantt_drawer import GanttDrawer
 

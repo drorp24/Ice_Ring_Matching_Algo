@@ -4,9 +4,9 @@ from typing import List
 from ortools.constraint_solver import pywrapcp
 from ortools.constraint_solver.pywrapcp import RoutingIndexManager, RoutingModel, Assignment
 
-from common.entities.drone_delivery import MatchedDeliveryRequest, DroneDelivery, MatchedDroneLoadingDock
-from common.entities.drone_delivery_board import DroneDeliveryBoard, DroppedDeliveryRequest
-from common.entities.temporal import TimeDeltaExtension, DateTimeExtension
+from common.entities.base_entities.drone_delivery import DroneDelivery, MatchedDroneLoadingDock, MatchedDeliveryRequest
+from common.entities.base_entities.drone_delivery_board import DroneDeliveryBoard, DroppedDeliveryRequest
+from common.entities.base_entities.temporal import DateTimeExtension, TimeDeltaExtension
 from common.graph.operational.export_ortools_graph import OrtoolsGraphExporter
 from matching.matcher import Matcher
 from matching.matcher_input import MatcherInput

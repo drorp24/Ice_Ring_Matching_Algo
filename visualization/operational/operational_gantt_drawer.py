@@ -1,7 +1,7 @@
 import random
 
-from common.entities.drone_delivery_board import DroneDeliveryBoard
-from common.entities.temporal import TimeWindowExtension
+from common.entities.base_entities.drone_delivery_board import DroneDeliveryBoard
+from common.entities.base_entities.temporal import TimeWindowExtension
 from visualization.basic.color import Color
 from visualization.basic.gantt_drawer import GanttDrawer
 

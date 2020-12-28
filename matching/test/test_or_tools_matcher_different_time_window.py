@@ -3,19 +3,19 @@ from typing import List
 from unittest import TestCase
 from uuid import UUID
 
-from common.entities.customer_delivery import CustomerDelivery
-from common.entities.delivery_option import DeliveryOption
-from common.entities.delivery_request import DeliveryRequest
-from common.entities.drone import PlatformType
-from common.entities.drone_delivery import EmptyDroneDelivery, DroneDelivery, MatchedDeliveryRequest, \
+from common.entities.base_entities.customer_delivery import CustomerDelivery
+from common.entities.base_entities.delivery_option import DeliveryOption
+from common.entities.base_entities.delivery_request import DeliveryRequest
+from common.entities.base_entities.drone import PlatformType
+from common.entities.base_entities.drone_delivery import EmptyDroneDelivery, DroneDelivery, MatchedDeliveryRequest, \
     MatchedDroneLoadingDock
-from common.entities.drone_delivery_board import EmptyDroneDeliveryBoard, DroneDeliveryBoard, DroppedDeliveryRequest
-from common.entities.drone_formation import FormationSize, FormationOptions, DroneFormations
-from common.entities.drone_loading_dock import DroneLoadingDock
-from common.entities.drone_loading_station import DroneLoadingStation
-from common.entities.package import PackageType
-from common.entities.package_delivery_plan import PackageDeliveryPlan
-from common.entities.temporal import TimeWindowExtension, DateTimeExtension, TimeDeltaExtension
+from common.entities.base_entities.drone_delivery_board import DroneDeliveryBoard, EmptyDroneDeliveryBoard
+from common.entities.base_entities.drone_formation import DroneFormations, FormationOptions, FormationSize
+from common.entities.base_entities.drone_loading_dock import DroneLoadingDock
+from common.entities.base_entities.drone_loading_station import DroneLoadingStation
+from common.entities.base_entities.package import PackageType
+from common.entities.base_entities.package_delivery_plan import PackageDeliveryPlan
+from common.entities.base_entities.temporal import DateTimeExtension, TimeWindowExtension, TimeDeltaExtension
 from common.graph.operational.graph_creator import build_fully_connected_graph
 from common.graph.operational.operational_graph import OperationalGraph
 from common.math.angle import Angle, AngleUnit

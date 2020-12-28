@@ -10,26 +10,6 @@ from geometry.geo_factory import create_point_2d, convert_dict_to_point_2d
 DEFAULT_LOADING_STATION_LOCATION_DISTRIB = UniformPointInBboxDistribution(0, 100, 0, 100)
 
 
-class DroneLoadingStation(JsonableBaseEntity):
-
-    def __init__(self, location: Point2D):
-        self._location = location
-
-    @property
-    def location(self) -> Point2D:
-        return self._location
-
-    def __eq__(self, other):
-        return self.__class__ == other.__class__ and self.location == other.location
-
-    def __hash__(self):
-        return hash(self._location)
-
-    @classmethod
-    def dict_to_obj(cls, dict_input):
-        return DroneLoadingStation(location=convert_dict_to_point_2d(dict_input['location']))
-
-
 class DroneLoadingStationDistribution(Distribution):
 
     def __init__(self,

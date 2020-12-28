@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 
-from common.entities.base_entity import JsonableBaseEntity
-from common.entities.temporal import DateTimeExtension
+from common.entities.base_entities.base_entity import JsonableBaseEntity
+from common.entities.base_entities.temporal import DateTimeExtension
 
 
 class MatcherSolver(JsonableBaseEntity):

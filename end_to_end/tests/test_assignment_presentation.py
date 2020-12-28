@@ -1,24 +1,27 @@
 import unittest
 from datetime import time, date, timedelta
 from pathlib import Path
-from pprint import pprint
 from random import Random
-from typing import List
-from common.entities.drone_formation import FormationSize
-import numpy as np
-from common.entities.delivery_request import build_delivery_request_distribution, \
-    DeliveryRequest, PriorityDistribution
-from common.entities.drone_loading_dock import DroneLoadingDockDistribution
-from common.entities.drone_loading_station import DroneLoadingStationDistribution
-from common.entities.package import PackageDistribution, PackageType
-from common.entities.temporal import DateTimeExtension, TimeWindowDistribution, TimeDeltaDistribution, \
-    TimeDeltaExtension, DateTimeDistribution
-from common.graph.operational.export_ortools_graph import OrtoolsGraphExporter
+
+from common.entities.base_entities.delivery_request import DeliveryRequest
+from common.entities.base_entities.drone_loading_dock import DroneLoadingDock
+from common.entities.base_entities.entity_distribution.delivery_requestion_dataset_builder import \
+    build_delivery_request_distribution
+from common.entities.base_entities.entity_distribution.drone_loading_dock_distribution import \
+    DroneLoadingDockDistribution
+from common.entities.base_entities.entity_distribution.drone_loading_station_distribution import \
+    DroneLoadingStationDistribution
+from common.entities.base_entities.entity_distribution.package_distribution import PackageDistribution
+from common.entities.base_entities.entity_distribution.priority_distribution import PriorityDistribution
+from common.entities.base_entities.entity_distribution.temporal_distribution import TimeDeltaDistribution, \
+    TimeWindowDistribution, DateTimeDistribution
+from common.entities.base_entities.package import PackageType
+from common.entities.base_entities.temporal import DateTimeExtension, TimeDeltaExtension
 from common.tools.empty_drone_delivery_board_generation import build_empty_drone_delivery_board
 from common.tools.fleet_property_sets import *
 from end_to_end.minimum_end_to_end import MinimumEnd2EndConfig, DataLoader, MinimumEnd2End
 from end_to_end.scenario import ScenarioDistribution
-from geometry.geo_distribution import NormalPointDistribution, UniformPointInBboxDistribution
+from geometry.distribution.geo_distribution import NormalPointDistribution, UniformPointInBboxDistribution
 from geometry.geo_factory import create_point_2d
 from visualization.basic.drawer2d import Drawer2DCoordinateSys
 from visualization.basic.pltdrawer2d import create_drawer_2d
@@ -103,7 +106,7 @@ class BasicMinimumEnd2EndPresentation(unittest.TestCase):
     def test_small_scenario(self):
         empty_drone_delivery_board = _create_empty_drone_delivery_board(size=20)
         minimum_end_to_end = MinimumEnd2End(
-            scenario=self.scenario_distribution.choose_rand(random=Random(10), amount=37),
+            scenario=self.scenario_distribution.choose_rand(random=Random(10), amount={DeliveryRequest: 37, DroneLoadingDock: 1})[0],
             empty_drone_delivery_board=empty_drone_delivery_board)
         fully_connected_graph = minimum_end_to_end.create_fully_connected_graph_model()
         # graph_exporter = OrtoolsGraphExporter()

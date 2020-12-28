@@ -1,6 +1,6 @@
 from ortools.constraint_solver.pywrapcp import RoutingIndexManager, RoutingModel
 
-from common.entities.package import PackageType
+from common.entities.base_entities.package import PackageType
 from common.graph.operational.export_ortools_graph import OrtoolsGraphExporter
 from matching.matcher import MatcherInput
 

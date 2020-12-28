@@ -2,8 +2,8 @@ from datetime import date, time
 from pathlib import Path
 from unittest import TestCase
 
-from common.entities.base_entity import JsonableBaseEntity
-from common.entities.temporal import DateTimeExtension
+from common.entities.base_entities.base_entity import JsonableBaseEntity
+from common.entities.base_entities.temporal import DateTimeExtension
 from matching.matcher_config import MatcherConfigProperties, MatcherSolver, MatcherConstraints, \
     PriorityConstraints, TimeConstraints, CapacityConstraints, MatcherConfig
 

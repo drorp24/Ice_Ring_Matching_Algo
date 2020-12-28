@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from common.entities.temporal import DateTimeExtension
+from common.entities.base_entities.temporal import DateTimeExtension
 from common.graph.operational.operational_graph import *
 
 

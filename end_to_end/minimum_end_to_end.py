@@ -1,9 +1,9 @@
 from ctypes import Union
 from pathlib import Path
 
-from common.entities.base_entity import JsonableBaseEntity
-from common.entities.drone_delivery_board import EmptyDroneDeliveryBoard, DroneDeliveryBoard
-from common.entities.temporal import DateTimeExtension
+from common.entities.base_entities.base_entity import JsonableBaseEntity
+from common.entities.base_entities.drone_delivery_board import EmptyDroneDeliveryBoard, DroneDeliveryBoard
+from common.entities.base_entities.temporal import DateTimeExtension
 from common.graph.operational.graph_creator import *
 from common.tools.empty_drone_delivery_board_generation import generate_empty_delivery_board, FleetReader
 from end_to_end.scenario import Scenario

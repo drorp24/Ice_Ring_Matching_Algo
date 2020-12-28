@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from common.entities.temporal import DateTimeExtension, TimeWindowExtension
+from common.entities.base_entities.temporal import TimeWindowExtension, DateTimeExtension
 from visualization.basic.color import Color
 
 

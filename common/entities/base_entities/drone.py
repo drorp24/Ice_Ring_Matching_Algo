@@ -1,8 +1,7 @@
 from enum import Enum
 
 from common.entities.base_entities.package import PackageType
-from common.entities.base_entity import JsonableBaseEntity
-from common.entities.disribution.distribution import Distribution, ChoiceDistribution
+from common.entities.base_entities.base_entity import JsonableBaseEntity
 
 class PlatformType(JsonableBaseEntity, Enum):
     platform_1 = 4

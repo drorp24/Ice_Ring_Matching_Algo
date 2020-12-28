@@ -23,7 +23,7 @@ class CustomerDelivery(JsonableBaseEntity, Localizable):
     def calc_bounds(self) -> Polygon2D:
         return calc_convex_hull_polygon([pdp.drop_point for pdp in self._package_delivery_plans])
 
-    def get_amount_of_package_type(self, package_type: PackageType) -> int:
+    def get_package_type_volume(self, package_type: PackageType) -> int:
         package_delivery_plans = self.package_delivery_plans
         return len(list(filter(lambda x: x.package_type == package_type, package_delivery_plans)))
 

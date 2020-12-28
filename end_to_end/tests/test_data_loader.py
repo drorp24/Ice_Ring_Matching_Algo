@@ -1,7 +1,6 @@
 import unittest
 from datetime import date, time
 
-from common.entities.temporal import DateTimeExtension
 from end_to_end.minimum_end_to_end import MinimumEnd2EndConfig, DataLoader
 from end_to_end.scenario import Scenario
 #TODO: fix test
