@@ -1,10 +1,11 @@
 import unittest
 
+from common.entities.base_entities.drone import PlatformType, Configurations
 from common.entities.base_entities.drone_delivery_board import EmptyDroneDeliveryBoard
 from common.entities.base_entities.drone_formation import DroneFormation, FormationSize
 from common.tools.empty_drone_delivery_board_generation import generate_empty_delivery_board
-from common.tools.fleet_reader import PlatformPropertySet, PlatformType, \
-    PlatformFormationsSizePolicyPropertySet, PlatformConfigurationsPolicyPropertySet, Configurations
+from common.tools.fleet_property_sets import PlatformPropertySet, PlatformFormationsSizePolicyPropertySet, \
+    PlatformConfigurationsPolicyPropertySet
 
 
 class TestEmptyDroneDeliveryBoardGenerator(unittest.TestCase):
