@@ -38,7 +38,7 @@ class OperationalNode(JsonableBaseEntity):
     @classmethod
     def dict_to_obj(cls, dict_input):
         assert (dict_input['__class__'] == cls.__name__)
-        return OperationalNode(name_to_class(dict_input['internal_node']['__class__'])
+        return OperationalNode(name_to_class(dict_input['internal_node']['__class__'], __name__)
                                .dict_to_obj(dict_input['internal_node']))
 
     def __eq__(self, other):
@@ -52,20 +52,48 @@ class OperationalNode(JsonableBaseEntity):
 class OperationalEdgeAttribs(JsonableBaseEntity):
 
     def __init__(self, cost: int):
-        self.cost = cost
+        self._cost = cost
+
+    @property
+    def cost(self):
+        return self._cost
 
     @classmethod
     def dict_to_obj(cls, dict_input):
         assert (dict_input['__class__'] == cls.__name__)
         return OperationalEdgeAttribs(dict_input['cost'])
 
+    def __eq__(self, other: OperationalEdgeAttribs):
+        return self.cost == other.cost
 
-class OperationalEdge(object):
+    def __hash__(self):
+        return hash(self._cost)
+
+
+class OperationalEdge(JsonableBaseEntity):
 
     def __init__(self, start_node: OperationalNode, end_node: OperationalNode, attributes: OperationalEdgeAttribs):
-        self.start_node = start_node
-        self.end_node = end_node
-        self.attributes = attributes
+        self._start_node = start_node
+        self._end_node = end_node
+        self._attributes = attributes
+
+    @property
+    def start_node(self):
+        return self._start_node
+
+    @property
+    def end_node(self):
+        return self._end_node
+
+    @property
+    def attributes(self):
+        return self._attributes
+
+    @classmethod
+    def dict_to_obj(cls, dict_input):
+        assert (dict_input['__class__'] == cls.__name__)
+        return OperationalEdge(OperationalNode.dict_to_obj(dict_input['start_node']),
+                               OperationalNode.dict_to_obj(dict_input['end_node']))
 
     def to_tuple(self):
         return self.start_node, self.end_node, self.attributes.__dict__

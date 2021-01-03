@@ -6,7 +6,7 @@ from common.entities.base_entities.drone_loading_dock import DroneLoadingDock
 from common.entities.base_entities.entity_distribution.delivery_request_distribution import DeliveryRequestDistribution
 from common.entities.base_entities.entity_distribution.drone_loading_dock_distribution import \
     DroneLoadingDockDistribution
-from common.graph.operational.operational_graph import OperationalNode
+from common.graph.operational.operational_graph import OperationalNode, OperationalEdgeAttribs
 
 
 class BasicGraphNodeTestCases(unittest.TestCase):
@@ -20,11 +20,13 @@ class BasicGraphNodeTestCases(unittest.TestCase):
         cls.dld_dataset_random = DroneLoadingDockDistribution().choose_rand(random=Random(100), amount=2)
         cls.example_node_drone_loading_dock = OperationalNode(internal_node=cls.dld_dataset_random[0])
 
+        cls.example_op_edge_attribs = OperationalEdgeAttribs(42)
+
     def test_delivery_request_operational_node_to_dict(self):
         op_node_dict = self.example_node_delivery_request.__dict__()
         self.assertTrue('internal_node' in op_node_dict.keys())
         self.assertTrue(op_node_dict['__class__'] is 'OperationalNode')
-        self.assertTrue(op_node_dict['internal_node']['__class__'] is 'DeliveryRequest')
+        self.assertTrue(op_node_dict['internal_node']['__class__'] is DeliveryRequest.__name__)
         self.assertEqual(DeliveryRequest.dict_to_obj(op_node_dict['internal_node']),
                          self.example_node_delivery_request.internal_node)
         self.assertEqual(OperationalNode.dict_to_obj(op_node_dict), self.example_node_delivery_request)
@@ -33,7 +35,12 @@ class BasicGraphNodeTestCases(unittest.TestCase):
         op_node_dict = self.example_node_drone_loading_dock.__dict__()
         self.assertTrue('internal_node' in op_node_dict.keys())
         self.assertTrue(op_node_dict['__class__'] is 'OperationalNode')
-        self.assertTrue(op_node_dict['internal_node']['__class__'] is 'DroneLoadingDock')
+        self.assertTrue(op_node_dict['internal_node']['__class__'] is DroneLoadingDock.__name__)
         self.assertEqual(DroneLoadingDock.dict_to_obj(op_node_dict['internal_node']),
                          self.example_node_drone_loading_dock.internal_node)
         self.assertEqual(OperationalNode.dict_to_obj(op_node_dict), self.example_node_drone_loading_dock)
+
+    def test_edge_attributes(self):
+        op_edge_attribs_dict = self.example_op_edge_attribs.__dict__()
+        self.assertTrue(op_edge_attribs_dict['__class__'] is OperationalEdgeAttribs.__name__)
+        self.assertEqual(OperationalEdgeAttribs.dict_to_obj(op_edge_attribs_dict), self.example_op_edge_attribs)
