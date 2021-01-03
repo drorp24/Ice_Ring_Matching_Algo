@@ -1,13 +1,14 @@
 import unittest
 
 from common.entities.base_entities.drone import PlatformType, Configurations
-from common.entities.base_entities.drone_formation import FormationSize
-from common.tools.fleet_partition import FleetPartition
-from common.tools.fleet_property_sets import PlatformPropertySet, PlatformFormationsSizePolicyPropertySet, \
+from common.entities.base_entities.drone_delivery_board import EmptyDroneDeliveryBoard
+from common.entities.base_entities.drone_formation import DroneFormation, FormationSize
+from common.entities.base_entities.fleet.empty_drone_delivery_board_generation import generate_empty_delivery_board
+from common.entities.base_entities.fleet.fleet_property_sets import PlatformPropertySet, PlatformFormationsSizePolicyPropertySet, \
     PlatformConfigurationsPolicyPropertySet
 
 
-class FleetPartitionTestCase(unittest.TestCase):
+class TestEmptyDroneDeliveryBoardGenerator(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
@@ -35,19 +36,9 @@ class FleetPartitionTestCase(unittest.TestCase):
                  Configurations.TINY_X32: 0.0}),
             size=30)
 
-        cls.formation_size_policy_property_set = PlatformFormationsSizePolicyPropertySet(
-            {FormationSize.MINI: 1.0, FormationSize.MEDIUM: 0.0})
-
-    def test_none_zero_formation_policy(self):
-        platform_property_set = self.platform_property_set_1
-        FleetPartition.extract_parameters(platform_property_set)
-        formation_sizes_amounts = FleetPartition.solve()
-        self.assertEqual(formation_sizes_amounts.amounts[FormationSize.MINI], 5)
-        self.assertEqual(formation_sizes_amounts.amounts[FormationSize.MEDIUM], 5)
-
-    def test_with_zero_formation_policy(self):
-        platform_property_set = self.platform_property_set_2
-        FleetPartition.extract_parameters(platform_property_set)
-        formation_sizes_amounts = FleetPartition.solve()
-        self.assertEqual(formation_sizes_amounts.amounts[FormationSize.MINI], 15)
-        self.assertEqual(formation_sizes_amounts.amounts[FormationSize.MEDIUM], 0)
+    def test_empty_drone_delivery_board(self):
+        empty_drone_delivery_board = generate_empty_delivery_board(
+            [self.platform_property_set_1, self.platform_property_set_2])
+        self.assertIsInstance(empty_drone_delivery_board, EmptyDroneDeliveryBoard)
+        self.assertEqual(len(empty_drone_delivery_board.empty_drone_deliveries), 24)
+        self.assertIsInstance(empty_drone_delivery_board.empty_drone_deliveries[0].drone_formation, DroneFormation)

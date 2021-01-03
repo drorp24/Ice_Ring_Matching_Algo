@@ -5,9 +5,9 @@ import numpy as np
 
 from common.entities.base_entities.drone import PlatformType
 from common.entities.base_entities.drone_formation import FormationSize, DroneFormation, DroneFormationOptions, DroneFormations
-from common.tools.fleet_partition import FormationSizesAmounts
-from common.tools.fleet_property_sets import PlatformPropertySet
-from common.tools.mip_solver import MIPSolver, MIPData, MIPParameters
+from common.entities.base_entities.fleet.fleet_partition import FormationSizesAmounts
+from common.entities.base_entities.fleet.fleet_property_sets import PlatformPropertySet
+from common.math.mip_solver import MIPSolver, MIPData, MIPParameters
 
 
 @dataclass

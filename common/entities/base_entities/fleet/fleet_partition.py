@@ -4,8 +4,8 @@ from typing import Any
 import numpy as np
 
 from common.entities.base_entities.drone_formation import FormationSize
-from common.tools.fleet_property_sets import PlatformPropertySet
-from common.tools.mip_solver import MIPSolver, MIPData, MIPParameters
+from common.entities.base_entities.fleet.fleet_property_sets import PlatformPropertySet
+from common.math.mip_solver import MIPSolver, MIPData, MIPParameters
 
 
 @dataclass

@@ -2,9 +2,9 @@ import unittest
 
 from common.entities.base_entities.drone import PlatformType, Configurations
 from common.entities.base_entities.drone_formation import FormationSize, DroneFormations, FormationOptions
-from common.tools.fleet_configuration_attribution import FleetConfigurationAttribution
-from common.tools.fleet_partition import FleetPartition
-from common.tools.fleet_property_sets import PlatformPropertySet, PlatformFormationsSizePolicyPropertySet, \
+from common.entities.base_entities.fleet.fleet_configuration_attribution import FleetConfigurationAttribution
+from common.entities.base_entities.fleet.fleet_partition import FleetPartition
+from common.entities.base_entities.fleet.fleet_property_sets import PlatformPropertySet, PlatformFormationsSizePolicyPropertySet, \
     PlatformConfigurationsPolicyPropertySet
 
 
