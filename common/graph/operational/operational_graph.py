@@ -5,6 +5,7 @@ from typing import List, Union
 
 from networkx import DiGraph, subgraph
 
+from common.entities.base_entities.base_entity import JsonableBaseEntity
 from common.entities.base_entities.delivery_request import DeliveryRequest
 from common.entities.base_entities.drone_loading_dock import DroneLoadingDock
 from common.entities.base_entities.temporal import TimeWindowExtension, Temporal
@@ -12,7 +13,7 @@ from geometry.geo2d import Polygon2D
 from geometry.utils import Localizable
 
 
-class OperationalNode:
+class OperationalNode(JsonableBaseEntity):
 
     def __init__(self, internal_node: Union[DeliveryRequest, DroneLoadingDock]):
         assert_node_is_localizable(internal_node)
@@ -34,6 +35,10 @@ class OperationalNode:
     @property
     def time_window(self) -> TimeWindowExtension:
         return self.internal_node.time_window
+
+    @classmethod
+    def dict_to_obj(cls, dict_input):
+        pass
 
     def __eq__(self, other):
         return self.__class__ == other.__class__ and self.internal_node == other.internal_node
