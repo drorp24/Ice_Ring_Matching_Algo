@@ -9,6 +9,7 @@ from common.entities.base_entities.base_entity import JsonableBaseEntity
 from common.entities.base_entities.delivery_request import DeliveryRequest
 from common.entities.base_entities.drone_loading_dock import DroneLoadingDock
 from common.entities.base_entities.temporal import TimeWindowExtension, Temporal
+from common.utils.class_controller import name_to_class
 from geometry.geo2d import Polygon2D
 from geometry.utils import Localizable
 
@@ -36,7 +37,9 @@ class OperationalNode(JsonableBaseEntity):
 
     @classmethod
     def dict_to_obj(cls, dict_input):
-        pass
+        assert (dict_input['__class__'] == cls.__name__)
+        return OperationalNode(name_to_class(dict_input['internal_node']['__class__'])
+                               .dict_to_obj(dict_input['internal_node']))
 
     def __eq__(self, other):
         return self.__class__ == other.__class__ and self.internal_node == other.internal_node
@@ -46,10 +49,15 @@ class OperationalNode(JsonableBaseEntity):
 
 
 @dataclass
-class OperationalEdgeAttribs:
+class OperationalEdgeAttribs(JsonableBaseEntity):
 
     def __init__(self, cost: int):
         self.cost = cost
+
+    @classmethod
+    def dict_to_obj(cls, dict_input):
+        assert (dict_input['__class__'] == cls.__name__)
+        return OperationalEdgeAttribs(dict_input['cost'])
 
 
 class OperationalEdge(object):

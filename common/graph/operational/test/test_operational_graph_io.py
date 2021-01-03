@@ -25,13 +25,15 @@ class BasicGraphNodeTestCases(unittest.TestCase):
         self.assertTrue('internal_node' in op_node_dict.keys())
         self.assertTrue(op_node_dict['__class__'] is 'OperationalNode')
         self.assertTrue(op_node_dict['internal_node']['__class__'] is 'DeliveryRequest')
-        self.assertTrue(DeliveryRequest.dict_to_obj(op_node_dict['internal_node']),
-                        self.example_node_delivery_request.internal_node)
+        self.assertEqual(DeliveryRequest.dict_to_obj(op_node_dict['internal_node']),
+                         self.example_node_delivery_request.internal_node)
+        self.assertEqual(OperationalNode.dict_to_obj(op_node_dict), self.example_node_delivery_request)
 
     def test_drone_loading_dock_operational_node_to_dict(self):
         op_node_dict = self.example_node_drone_loading_dock.__dict__()
         self.assertTrue('internal_node' in op_node_dict.keys())
         self.assertTrue(op_node_dict['__class__'] is 'OperationalNode')
         self.assertTrue(op_node_dict['internal_node']['__class__'] is 'DroneLoadingDock')
-        self.assertTrue(DroneLoadingDock.dict_to_obj(op_node_dict['internal_node']),
-                        self.example_node_drone_loading_dock.internal_node)
+        self.assertEqual(DroneLoadingDock.dict_to_obj(op_node_dict['internal_node']),
+                         self.example_node_drone_loading_dock.internal_node)
+        self.assertEqual(OperationalNode.dict_to_obj(op_node_dict), self.example_node_drone_loading_dock)
