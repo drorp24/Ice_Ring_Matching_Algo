@@ -92,8 +92,9 @@ class OperationalEdge(JsonableBaseEntity):
     @classmethod
     def dict_to_obj(cls, dict_input):
         assert (dict_input['__class__'] == cls.__name__)
-        return OperationalEdge(OperationalNode.dict_to_obj(dict_input['start_node']),
-                               OperationalNode.dict_to_obj(dict_input['end_node']))
+        return OperationalEdge(start_node=OperationalNode.dict_to_obj(dict_input['start_node']),
+                               end_node=OperationalNode.dict_to_obj(dict_input['end_node']),
+                               attributes=OperationalEdgeAttribs.dict_to_obj(dict_input['attributes']))
 
     def to_tuple(self):
         return self.start_node, self.end_node, self.attributes.__dict__
@@ -101,11 +102,20 @@ class OperationalEdge(JsonableBaseEntity):
     def __hash__(self):
         return self.to_tuple().__hash__()
 
+    def __eq__(self, other: OperationalEdge):
+        return self.start_node == other.start_node and \
+               self.end_node == other.end_node and \
+               self.attributes == other.attributes
 
-class OperationalGraph:
+
+class OperationalGraph(JsonableBaseEntity):
 
     def __init__(self):
         self._internal_graph = DiGraph()
+
+    @property
+    def internal_graph(self):
+        return self._internal_graph
 
     @property
     def nodes(self) -> List[OperationalNode]:
@@ -114,8 +124,13 @@ class OperationalGraph:
     @property
     def edges(self) -> List[OperationalEdge]:
         internal_edges = self._internal_graph.edges.data(data=True)
-        return [OperationalEdge(edge[0], edge[1], OperationalEdgeAttribs(edge[2]["cost"])) for edge in
+        return [OperationalEdge(edge[0], edge[1], OperationalEdgeAttribs(edge[2]['cost'])) for edge in
                 internal_edges]
+
+    @classmethod
+    def dict_to_obj(cls, dict_input):
+        assert (dict_input['__class__'] == cls.__name__)
+        pass
 
     def is_empty(self):
         return self._internal_graph.nodes.__len__() == 0
