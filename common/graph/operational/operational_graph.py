@@ -28,12 +28,10 @@ class OperationalNode(JsonableBaseEntity):
     def internal_type(self):
         return type(self.internal_node)
 
-    @property
-    def priority(self) -> int:
+    def get_priority(self) -> int:
         return self.internal_node.priority
 
-    @property
-    def time_window(self) -> TimeWindowExtension:
+    def get_time_window(self) -> TimeWindowExtension:
         return self.internal_node.time_window
 
     @classmethod
@@ -102,12 +100,12 @@ class OperationalGraph:
         self._internal_graph.add_edges_from([dr.to_tuple() for dr in operational_edges])
 
     def calc_subgraph_in_time_window(self, time_window_scope: TimeWindowExtension) -> OperationalGraph:
-        nodes_at_time = [node for node in self.nodes if node.time_window in time_window_scope]
+        nodes_at_time = [node for node in self.nodes if node.get_time_window() in time_window_scope]
         extracted_subgraph = self._extract_internal_subgraph_of_nodes(nodes_at_time)
         return OperationalGraph._create_from_extracted_subgraph(extracted_subgraph)
 
     def calc_subgraph_below_priority(self, max_priority: int) -> OperationalGraph:
-        nodes_below_priority = [node for node in self.nodes if node.priority < max_priority]
+        nodes_below_priority = [node for node in self.nodes if node.get_priority() < max_priority]
         extracted_subgraph = self._extract_internal_subgraph_of_nodes(nodes_below_priority)
         return OperationalGraph._create_from_extracted_subgraph(extracted_subgraph)
 
