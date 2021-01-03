@@ -96,11 +96,11 @@ class OperationalEdge(JsonableBaseEntity):
                                end_node=OperationalNode.dict_to_obj(dict_input['end_node']),
                                attributes=OperationalEdgeAttribs.dict_to_obj(dict_input['attributes']))
 
-    def to_tuple(self):
-        return self.start_node, self.end_node, self.attributes.__dict__
+    def to_internal_tuple(self):
+        return self.start_node, self.end_node, self.attributes.__dict__()
 
     def __hash__(self):
-        return self.to_tuple().__hash__()
+        return self.to_internal_tuple().__hash__()
 
     def __eq__(self, other: OperationalEdge):
         return self.start_node == other.start_node and \
@@ -113,24 +113,25 @@ class OperationalGraph(JsonableBaseEntity):
     def __init__(self):
         self._internal_graph = DiGraph()
 
-    @property
-    def internal_graph(self):
+    def get_internal_graph(self):
         return self._internal_graph
 
     @property
     def nodes(self) -> List[OperationalNode]:
-        return self._internal_graph.nodes(data=False)
+        return list(self._internal_graph.nodes(data=False))
 
     @property
     def edges(self) -> List[OperationalEdge]:
         internal_edges = self._internal_graph.edges.data(data=True)
-        return [OperationalEdge(edge[0], edge[1], OperationalEdgeAttribs(edge[2]['cost'])) for edge in
-                internal_edges]
+        return [OperationalEdge(edge[0], edge[1], OperationalEdgeAttribs(edge[2]['cost'])) for edge in internal_edges]
 
     @classmethod
     def dict_to_obj(cls, dict_input):
         assert (dict_input['__class__'] == cls.__name__)
-        pass
+        og = OperationalGraph()
+        og.add_operational_nodes([OperationalNode.dict_to_obj(node) for node in dict_input['nodes']])
+        og.add_operational_edges([OperationalEdge.dict_to_obj(edge) for edge in dict_input['edges']])
+        return og
 
     def is_empty(self):
         return self._internal_graph.nodes.__len__() == 0
@@ -148,7 +149,7 @@ class OperationalGraph(JsonableBaseEntity):
         self._internal_graph.add_nodes_from(operational_nodes)
 
     def add_operational_edges(self, operational_edges: [OperationalEdge]):
-        self._internal_graph.add_edges_from([dr.to_tuple() for dr in operational_edges])
+        self._internal_graph.add_edges_from(list(map(lambda oe: oe.to_internal_tuple(), operational_edges)))
 
     def calc_subgraph_in_time_window(self, time_window_scope: TimeWindowExtension) -> OperationalGraph:
         nodes_at_time = [node for node in self.nodes if node.get_time_window() in time_window_scope]
@@ -173,6 +174,12 @@ class OperationalGraph(JsonableBaseEntity):
         internal_subgraph = OperationalGraph()
         internal_subgraph.set_internal_graph(extracted_subgraph)
         return internal_subgraph
+
+    def __hash__(self):
+        return hash(self._internal_graph)
+
+    def __eq__(self, other):
+        return self.nodes == other.nodes and self.edges == other.edges
 
 
 def assert_node_is_temporal(internal_node) -> None:

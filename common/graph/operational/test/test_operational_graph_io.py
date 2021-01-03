@@ -6,7 +6,8 @@ from common.entities.base_entities.drone_loading_dock import DroneLoadingDock
 from common.entities.base_entities.entity_distribution.delivery_request_distribution import DeliveryRequestDistribution
 from common.entities.base_entities.entity_distribution.drone_loading_dock_distribution import \
     DroneLoadingDockDistribution
-from common.graph.operational.operational_graph import OperationalNode, OperationalEdgeAttribs, OperationalEdge
+from common.graph.operational.operational_graph import OperationalNode, OperationalEdgeAttribs, OperationalEdge, \
+    OperationalGraph
 
 
 class BasicGraphNodeTestCases(unittest.TestCase):
@@ -26,6 +27,12 @@ class BasicGraphNodeTestCases(unittest.TestCase):
         cls.example_op_edge = OperationalEdge(start_node=cls.example_node_delivery_request_0,
                                               end_node=cls.example_node_delivery_request_1,
                                               attributes=OperationalEdgeAttribs(100))
+
+        cls.example_operational_graph = OperationalGraph()
+        cls.example_operational_graph.add_operational_nodes([cls.example_node_delivery_request_0,
+                                                             cls.example_node_delivery_request_1,
+                                                             cls.example_node_drone_loading_dock])
+        cls.example_operational_graph.add_operational_edges([cls.example_op_edge])
 
     def test_delivery_request_operational_node_to_dict(self):
         op_node_dict = self.example_node_delivery_request_0.__dict__()
@@ -51,6 +58,7 @@ class BasicGraphNodeTestCases(unittest.TestCase):
         self.assertEqual(OperationalEdgeAttribs.dict_to_obj(op_edge_attribs_dict), self.example_op_edge_attribs)
 
     def test_operational_edge_is_equal_after_dict(self):
-        example_op_edge_dict = self.example_op_edge.__dict__()
-        self.assertTrue(example_op_edge_dict['__class__'] is OperationalEdge.__name__)
-        self.assertEqual(OperationalEdge.dict_to_obj(example_op_edge_dict), self.example_op_edge)
+        example_operational_graph_dict = self.example_operational_graph.__dict__()
+        self.assertTrue(example_operational_graph_dict['__class__'] is OperationalGraph.__name__)
+        obj1 = OperationalGraph.dict_to_obj(example_operational_graph_dict)
+        self.assertEqual(obj1, self.example_operational_graph)
