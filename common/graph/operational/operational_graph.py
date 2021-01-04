@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import inspect
 from dataclasses import dataclass
 from typing import List, Union
 
@@ -9,7 +10,7 @@ from common.entities.base_entities.base_entity import JsonableBaseEntity
 from common.entities.base_entities.delivery_request import DeliveryRequest
 from common.entities.base_entities.drone_loading_dock import DroneLoadingDock
 from common.entities.base_entities.temporal import TimeWindowExtension, Temporal
-from common.utils.class_controller import name_to_class
+from common.utils.class_controller import name_to_class, get_all_module_class_names_from_globals
 from geometry.geo2d import Polygon2D
 from geometry.utils import Localizable
 
@@ -38,7 +39,10 @@ class OperationalNode(JsonableBaseEntity):
     @classmethod
     def dict_to_obj(cls, dict_input):
         assert (dict_input['__class__'] == cls.__name__)
-        return OperationalNode(name_to_class(dict_input['internal_node']['__class__'], __name__)
+        module_location = __name__
+        internal_class_name = dict_input['internal_node']['__class__']
+        assert (internal_class_name in get_all_module_class_names_from_globals(globals()))
+        return OperationalNode(name_to_class(internal_class_name, module_location)
                                .dict_to_obj(dict_input['internal_node']))
 
     def __eq__(self, other):

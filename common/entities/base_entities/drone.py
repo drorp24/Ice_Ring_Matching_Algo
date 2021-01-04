@@ -13,10 +13,6 @@ class PlatformType(Enum):
         assert (split_name[0] == 'PlatformType')
         return PlatformType[split_name[1]]
 
-    @staticmethod
-    def get_all_names():
-        return list(PlatformType.__members__.keys())
-
     def __dict__(self):
         return {'__enum__': str(self)}
 
