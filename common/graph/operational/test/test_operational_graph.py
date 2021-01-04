@@ -121,7 +121,7 @@ class BasicDeliveryRequestGraphTestCases(unittest.TestCase):
         drg1 = OperationalGraph()
         drg1.add_drone_loading_docks(self.dld_dataset_random)
         drg2 = OperationalGraph()
-        drg2.set_internal_graph(drg1._internal_graph)
+        drg2.set_internal_graph(drg1.get_internal_graph())
         self.assertFalse(drg1.is_empty())
         self.assertEqual(_get_dr_from_dr_graph(drg1), _get_dr_from_dr_graph(drg2))
 
@@ -129,7 +129,7 @@ class BasicDeliveryRequestGraphTestCases(unittest.TestCase):
         drg1 = OperationalGraph()
         drg1.add_delivery_requests(self.dr_dataset_random)
         drg2 = OperationalGraph()
-        drg2.set_internal_graph(drg1._internal_graph)
+        drg2.set_internal_graph(drg1.get_internal_graph())
         self.assertFalse(drg1.is_empty())
         self.assertEqual(_get_dr_from_dr_graph(drg1), _get_dr_from_dr_graph(drg2))
 
