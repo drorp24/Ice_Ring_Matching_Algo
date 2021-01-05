@@ -70,10 +70,6 @@ class PackageType(Enum):
     MEDIUM = Package(4)
     LARGE = Package(8)
 
-    @staticmethod
-    def get_all_names():
-        return list(PackageType.__members__.keys())
-
     @classmethod
     def dict_to_obj(cls, input_dict):
         split_package_type = input_dict['__enum__'].split('.')

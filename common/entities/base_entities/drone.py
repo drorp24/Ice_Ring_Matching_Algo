@@ -7,6 +7,18 @@ class PlatformType(Enum):
     platform_1 = 4
     platform_2 = 6
 
+    @classmethod
+    def dict_to_obj(cls, input_dict):
+        split_name = input_dict['__enum__'].split('.')
+        assert (split_name[0] == 'PlatformType')
+        return PlatformType[split_name[1]]
+
+    def __dict__(self):
+        return {'__enum__': str(self)}
+
+    def __repr__(self):
+        return 'PlatformType: ' + str(self.__dict__())
+
 
 class _PackageTypesVolumeMap:
 
