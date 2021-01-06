@@ -12,4 +12,5 @@ def get_azimuth_quantization_value(azimuth: Angle, levels: int = 8) -> Angle:
 
 
 def get_azimuth_quantization_values(levels: int = 8) -> List[Angle]:
-    return list(map(lambda x: Angle(x, unit=AngleUnit.DEGREE), range(MIN_AZIMUTH_DEGREES, MAX_AZIMUTH_DEGREES, levels)))
+    step = int((MAX_AZIMUTH_DEGREES - MIN_AZIMUTH_DEGREES) / levels)
+    return list(map(lambda x: Angle(x, unit=AngleUnit.DEGREE), range(MIN_AZIMUTH_DEGREES, MAX_AZIMUTH_DEGREES, step)))

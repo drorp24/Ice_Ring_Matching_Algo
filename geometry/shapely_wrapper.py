@@ -12,6 +12,7 @@ from geometry.utils import GeometryUtils
 
 EPSILON_FOR_EQUAL_AREA: float = 0.00001
 
+
 class _ShapelyGeometry(JsonableBaseEntity):
 
     def __init__(self, shapely_obj: BaseGeometry):

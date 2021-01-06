@@ -26,6 +26,20 @@ class AngleUnit(Enum):
         return hash(self.name)
 
 
+class NoneAngle:
+    def __init__(self):
+        self._value = None
+        self._unit = None
+
+    @property
+    def degrees(self):
+        return self._value
+
+    @property
+    def radians(self):
+        return self._value
+
+
 class Angle(JsonableBaseEntity):
 
     def __init__(self, value: float, unit: AngleUnit):
