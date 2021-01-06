@@ -1,3 +1,4 @@
+import itertools
 from abc import abstractmethod
 from random import Random
 from typing import List
@@ -56,6 +57,23 @@ class MultiPointInBboxDistribution(PointLocationDistribution):
     def choose_rand(self, random: Random, amount: int = 1) -> List[Point2D]:
         selected_point_distributions = ChoiceDistribution(self._point_dist_to_prob).choose_rand(random, amount)
         return [spd.choose_rand(random)[0] for spd in selected_point_distributions]
+
+
+class MultiNormalPointDistribution(PointLocationDistribution):
+    def __init__(self, center_points: [Point2D], sigma_x_range: Range = Range(0, 1),
+                 sigma_y_range: Range = Range(0, 1)):
+        self._centers = center_points
+        self._sigma_x_distribution = UniformDistribution(sigma_x_range)
+        self._sigma_y_distribution = UniformDistribution(sigma_y_range)
+
+    def choose_rand(self, random: Random, amount: int = 1) -> List[Point2D]:
+        all_points = [NormalPointDistribution(center_point=center,
+                                              sigma_x=self._sigma_x_distribution.choose_rand(random, 1)[0],
+                                              sigma_y=self._sigma_y_distribution.choose_rand(random, 1)[
+                                                  0]).choose_rand(
+            random, int(amount / len(self._centers))) for center in self._centers]
+
+        return list(itertools.chain.from_iterable(all_points))
 
 
 class ChoiceNormalPointDistribution(PointLocationDistribution):
