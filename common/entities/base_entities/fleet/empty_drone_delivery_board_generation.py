@@ -4,21 +4,21 @@ from common.entities.base_entities.drone_delivery import EmptyDroneDelivery
 from common.entities.base_entities.drone_delivery_board import EmptyDroneDeliveryBoard
 from common.entities.base_entities.fleet.fleet_configuration_attribution import DroneFormationsPerTypeAmounts, FleetConfigurationAttribution
 from common.entities.base_entities.fleet.fleet_partition import FormationSizesAmounts, FleetPartition
-from common.entities.base_entities.fleet.fleet_property_sets import PlatformPropertySet
+from common.entities.base_entities.fleet.fleet_property_sets import DroneSetProperties
 
 
-def _calc_formation_amounts(platform_properties: PlatformPropertySet) -> FormationSizesAmounts:
+def _calc_formation_amounts(platform_properties: DroneSetProperties) -> FormationSizesAmounts:
     FleetPartition.extract_parameters(platform_properties)
     return FleetPartition.solve()
 
 
 def _calc_drone_formation_amounts(formation_sizes_amounts: FormationSizesAmounts,
-                                  platform_properties: PlatformPropertySet) -> DroneFormationsPerTypeAmounts:
+                                  platform_properties: DroneSetProperties) -> DroneFormationsPerTypeAmounts:
     FleetConfigurationAttribution.extract_parameters(formation_sizes_amounts, platform_properties)
     return FleetConfigurationAttribution.solve()
 
 
-def calc_drone_deliveries(platform_properties: PlatformPropertySet) -> [EmptyDroneDelivery]:
+def calc_drone_deliveries(platform_properties: DroneSetProperties) -> [EmptyDroneDelivery]:
     empty_deliveries = []
     formation_sizes_amounts = _calc_formation_amounts(platform_properties)
     drone_formations_per_type_amounts = _calc_drone_formation_amounts(formation_sizes_amounts, platform_properties)
@@ -28,7 +28,7 @@ def calc_drone_deliveries(platform_properties: PlatformPropertySet) -> [EmptyDro
     return empty_deliveries
 
 
-def generate_empty_delivery_board(platforms_properties: [PlatformPropertySet]) -> EmptyDroneDeliveryBoard:
+def generate_empty_delivery_board(platforms_properties: [DroneSetProperties]) -> EmptyDroneDeliveryBoard:
     total_drone_deliveries = []
     for platform_property in platforms_properties:
         total_drone_deliveries += calc_drone_deliveries(platform_property)

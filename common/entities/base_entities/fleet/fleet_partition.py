@@ -3,37 +3,37 @@ from typing import Any
 
 import numpy as np
 
-from common.entities.base_entities.drone_formation import FormationSize
-from common.entities.base_entities.fleet.fleet_property_sets import PlatformPropertySet
+from common.entities.base_entities.drone_formation import DroneFormationType
+from common.entities.base_entities.fleet.fleet_property_sets import DroneSetProperties
 from common.math.mip_solver import MIPSolver, MIPData, MIPParameters
 
 
 @dataclass
 class FleetPartitionParameters:
     formation_size_num: int
-    fleet_size: int
-    formation_sizes: [int]
+    fleet_drone_amount: int
+    formation_size_options: [int]
     formation_size_distribution: [float]
 
 
 @dataclass
 class FormationSizesAmounts:
-    amounts: {FormationSize, int}
+    amounts: {DroneFormationType, int}
 
 
 class FleetPartition(object):
     fleet_partition_parameters: FleetPartitionParameters = FleetPartitionParameters(0, 0, [], [])
 
     @classmethod
-    def extract_parameters(cls, platform_property_set: PlatformPropertySet):
-        cls.fleet_partition_parameters.fleet_size = platform_property_set.size
+    def extract_parameters(cls, platform_property_set: DroneSetProperties):
+        cls.fleet_partition_parameters.fleet_drone_amount = platform_property_set.drone_amount
         cls.fleet_partition_parameters.formation_size_distribution = list(
-            platform_property_set.formation_policy.formation_size_policy.values())
+            platform_property_set.drone_platform_formation_policy.formation_size_policy.values())
         cls.fleet_partition_parameters.formation_size_num = len(
-            platform_property_set.formation_policy.formation_size_policy)
-        cls.fleet_partition_parameters.formation_sizes = [formation_size.value
-                                                          for formation_size in
-                                                          list(platform_property_set.formation_policy.
+            platform_property_set.drone_platform_formation_policy.formation_size_policy)
+        cls.fleet_partition_parameters.formation_size_options = [formation_size.value
+                                                                 for formation_size in
+                                                                 list(platform_property_set.drone_platform_formation_policy.
                                                                formation_size_policy.keys())]
 
     @classmethod
@@ -43,7 +43,7 @@ class FleetPartition(object):
     @classmethod
     def _export_formation_amounts(cls, variables) -> FormationSizesAmounts:
         formation_amounts = {formation_size: variables[i].solution_value() for i, formation_size in
-                             enumerate(FormationSize)}
+                             enumerate(DroneFormationType)}
         return FormationSizesAmounts(formation_amounts)
 
     @classmethod
@@ -78,13 +78,13 @@ class FleetPartition(object):
         num_vars = cls._calc_number_variables()
         constraints_matrix = np.zeros((1, num_vars))
         for i in range(num_vars):
-            constraints_matrix[0, i] = cls.fleet_partition_parameters.formation_sizes[i]
+            constraints_matrix[0, i] = cls.fleet_partition_parameters.formation_size_options[i]
         return constraints_matrix.tolist()
 
     @classmethod
     def _calc_equality_bounds(cls) -> Any:
         bounds = np.zeros(1)
-        bounds[0] = cls.fleet_partition_parameters.fleet_size
+        bounds[0] = cls.fleet_partition_parameters.fleet_drone_amount
         return bounds.tolist()
 
     @classmethod

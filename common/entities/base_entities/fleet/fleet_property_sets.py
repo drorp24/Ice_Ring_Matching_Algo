@@ -1,22 +1,27 @@
 from dataclasses import dataclass
 
-from common.entities.base_entities.drone import PlatformType, Configurations
-from common.entities.base_entities.drone_formation import FormationSize
+from common.entities.base_entities.base_entity import JsonableBaseEntity
+from common.entities.base_entities.drone import DroneType, PackageConfigurations
+from common.entities.base_entities.drone_formation import DroneFormationType
 
 
 @dataclass
-class PlatformFormationsSizePolicyPropertySet:
-    formation_size_policy: {FormationSize, float}
+class DroneFormationPolicy:
+    formation_size_policy: {DroneFormationType, float}
 
 
 @dataclass
-class PlatformConfigurationsPolicyPropertySet:
-    configurations_policy: {Configurations, float}
+class PackageConfigurationsPolicy:
+    package_configurations_policy: {PackageConfigurations, float}
 
 
 @dataclass
-class PlatformPropertySet:
-    platform_type: PlatformType
-    configuration_policy: PlatformConfigurationsPolicyPropertySet
-    formation_policy: PlatformFormationsSizePolicyPropertySet
-    size: int
+class DroneSetProperties(JsonableBaseEntity):
+    drone_type: DroneType
+    package_configuration_policy: PackageConfigurationsPolicy
+    drone_platform_formation_policy: DroneFormationPolicy
+    drone_amount: int
+
+    @classmethod
+    def dict_to_obj(cls, dict_input):
+        DroneSetProperties()

@@ -3,10 +3,10 @@ from typing import Any
 
 import numpy as np
 
-from common.entities.base_entities.drone import PlatformType
-from common.entities.base_entities.drone_formation import FormationSize, DroneFormation, DroneFormationOptions, DroneFormations
+from common.entities.base_entities.drone import DroneType
+from common.entities.base_entities.drone_formation import DroneFormationType, DroneFormation, DroneFormationOptions, DroneFormations
 from common.entities.base_entities.fleet.fleet_partition import FormationSizesAmounts
-from common.entities.base_entities.fleet.fleet_property_sets import PlatformPropertySet
+from common.entities.base_entities.fleet.fleet_property_sets import DroneSetProperties
 from common.math.mip_solver import MIPSolver, MIPData, MIPParameters
 
 
@@ -18,8 +18,8 @@ class ConfigurationAttributionParameters:
     fleet_size: int
     configuration_options_size: int
     total_formation_size: int
-    platform_type: PlatformType
-    formation_size_type: [FormationSize]
+    platform_type: DroneType
+    formation_size_type: [DroneFormationType]
     configurations: []
     formation_amounts_intervals: []
 
@@ -31,27 +31,27 @@ class DroneFormationsPerTypeAmounts:
 
 class FleetConfigurationAttribution:
     configuration_attribution_parameters: ConfigurationAttributionParameters = \
-        ConfigurationAttributionParameters([], [], [], 0, 0, 0, PlatformType.platform_1, [], [], [])
+        ConfigurationAttributionParameters([], [], [], 0, 0, 0, DroneType.drone_platform_1, [], [], [])
 
     @classmethod
     def extract_parameters(cls, formation_sizes_amounts: FormationSizesAmounts,
-                           platform_property_set: PlatformPropertySet):
-        cls.configuration_attribution_parameters.fleet_size = platform_property_set.size
+                           platform_property_set: DroneSetProperties):
+        cls.configuration_attribution_parameters.fleet_size = platform_property_set.drone_amount
         cls.configuration_attribution_parameters.formation_amounts = list(formation_sizes_amounts.amounts.values())
         cls.configuration_attribution_parameters.formation_size_type = list(formation_sizes_amounts.amounts.keys())
         cls.configuration_attribution_parameters.formation_sizes = [
             s.value for s in formation_sizes_amounts.amounts.keys()]
         cls.configuration_attribution_parameters.configurations = list(
-            platform_property_set.configuration_policy.configurations_policy.keys())
+            platform_property_set.package_configuration_policy.package_configurations_policy.keys())
         cls.configuration_attribution_parameters.configuration_options_size = len(
-            platform_property_set.configuration_policy.configurations_policy)
+            platform_property_set.package_configuration_policy.package_configurations_policy)
         cls.configuration_attribution_parameters.configurations = list(
-            platform_property_set.configuration_policy.configurations_policy.keys())
+            platform_property_set.package_configuration_policy.package_configurations_policy.keys())
         cls.configuration_attribution_parameters.configurations_policy = list(
-            platform_property_set.configuration_policy.configurations_policy.values())
+            platform_property_set.package_configuration_policy.package_configurations_policy.values())
         cls.configuration_attribution_parameters.total_formation_size = int(sum(
             cls.configuration_attribution_parameters.formation_amounts))
-        cls.configuration_attribution_parameters.platform_type = platform_property_set.platform_type
+        cls.configuration_attribution_parameters.platform_type = platform_property_set.drone_type
         cls.configuration_attribution_parameters.formation_amounts_intervals = [
             range(int(sum(cls.configuration_attribution_parameters.formation_amounts[0:i])),
                   int(sum(cls.configuration_attribution_parameters.formation_amounts[0:i + 1])))
@@ -126,7 +126,7 @@ class FleetConfigurationAttribution:
         return MIPData(data)
 
     @classmethod
-    def _get_formation_size_type(cls, index: int) -> FormationSize:
+    def _get_formation_size_type(cls, index: int) -> DroneFormationType:
         formation_amounts_intervals = cls.configuration_attribution_parameters.formation_amounts_intervals
         for interval in formation_amounts_intervals:
             if index in interval:
