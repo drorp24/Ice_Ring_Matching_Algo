@@ -11,28 +11,28 @@ class BasicDroneFormationTypeGenerationTests(unittest.TestCase):
     def setUpClass(cls):
         cls._2X_PLATFORM_1_2X8 = DroneFormations.get_drone_formation(DroneFormationType.PAIR,
                                                                      PackageConfigurationOptions.LARGE_PACKAGES,
-                                                                     DroneType.drone_platform_1)
+                                                                     DroneType.drone_type_1)
         cls._4X_PLATFORM_1_2X8 = DroneFormations.get_drone_formation(DroneFormationType.QUAD,
                                                                      PackageConfigurationOptions.LARGE_PACKAGES,
-                                                                     DroneType.drone_platform_1)
+                                                                     DroneType.drone_type_1)
         cls._2X_PLATFORM_1_4X4 = DroneFormations.get_drone_formation(DroneFormationType.PAIR,
                                                                      PackageConfigurationOptions.MEDIUM_PACKAGES,
-                                                                     DroneType.drone_platform_1)
+                                                                     DroneType.drone_type_1)
         cls._4X_PLATFORM_1_4X4 = DroneFormations.get_drone_formation(DroneFormationType.QUAD,
                                                                      PackageConfigurationOptions.MEDIUM_PACKAGES,
-                                                                     DroneType.drone_platform_1)
+                                                                     DroneType.drone_type_1)
         cls._2X_PLATFORM_2_4X8 = DroneFormations.get_drone_formation(DroneFormationType.PAIR,
                                                                      PackageConfigurationOptions.LARGE_PACKAGES,
-                                                                     DroneType.drone_platform_2)
+                                                                     DroneType.drone_type_2)
         cls._4X_PLATFORM_2_8X4 = DroneFormations.get_drone_formation(DroneFormationType.QUAD,
                                                                      PackageConfigurationOptions.MEDIUM_PACKAGES,
-                                                                     DroneType.drone_platform_2)
+                                                                     DroneType.drone_type_2)
         cls._2X_PLATFORM_2_16X2 = DroneFormations.get_drone_formation(DroneFormationType.PAIR,
                                                                       PackageConfigurationOptions.SMALL_PACKAGES,
-                                                                      DroneType.drone_platform_2)
+                                                                      DroneType.drone_type_2)
         cls._2X_PLATFORM_2_32X1 = DroneFormations.get_drone_formation(DroneFormationType.PAIR,
                                                                       PackageConfigurationOptions.TINY_PACKAGES,
-                                                                      DroneType.drone_platform_2)
+                                                                      DroneType.drone_type_2)
 
     def test_formation_size(self):
         self.assertEqual(self._2X_PLATFORM_1_2X8.size, DroneFormationType.PAIR)

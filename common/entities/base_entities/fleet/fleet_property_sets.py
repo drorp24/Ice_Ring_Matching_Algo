@@ -6,8 +6,8 @@ from common.entities.base_entities.drone_formation import DroneFormationType
 
 
 @dataclass
-class DroneFormationPolicy:
-    formation_size_policy: {DroneFormationType, float}
+class DroneFormationTypePolicy:
+    formation_type_policy: {DroneFormationType, float}
 
 
 @dataclass
@@ -18,8 +18,8 @@ class PackageConfigurationsPolicy:
 @dataclass
 class DroneSetProperties(JsonableBaseEntity):
     drone_type: DroneType
+    drone_formation_policy: DroneFormationTypePolicy
     package_configuration_policy: PackageConfigurationsPolicy
-    drone_platform_formation_policy: DroneFormationPolicy
     drone_amount: int
 
     @classmethod

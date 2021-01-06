@@ -10,45 +10,52 @@ from common.math.mip_solver import MIPSolver, MIPData, MIPParameters
 
 @dataclass
 class FleetPartitionParameters:
-    formation_size_num: int
+    formation_type_options: [int]
+    formation_type_probabilities: [float]
     fleet_drone_amount: int
-    formation_size_options: [int]
-    formation_size_distribution: [float]
+
+    def amount_of_options(self) -> int:
+        return len(self.formation_type_options)
 
 
 @dataclass
-class FormationSizesAmounts:
+class FormationTypeAmounts:
     amounts: {DroneFormationType, int}
 
 
 class FleetPartition(object):
-    fleet_partition_parameters: FleetPartitionParameters = FleetPartitionParameters(0, 0, [], [])
+    fleet_partition_parameters: FleetPartitionParameters = FleetPartitionParameters([], [], 0)
 
     @classmethod
-    def extract_parameters(cls, platform_property_set: DroneSetProperties):
-        cls.fleet_partition_parameters.fleet_drone_amount = platform_property_set.drone_amount
-        cls.fleet_partition_parameters.formation_size_distribution = list(
-            platform_property_set.drone_platform_formation_policy.formation_size_policy.values())
-        cls.fleet_partition_parameters.formation_size_num = len(
-            platform_property_set.drone_platform_formation_policy.formation_size_policy)
-        cls.fleet_partition_parameters.formation_size_options = [formation_size.value
-                                                                 for formation_size in
-                                                                 list(platform_property_set.drone_platform_formation_policy.
-                                                               formation_size_policy.keys())]
+    def extract_parameters(cls, drone_set_properties: DroneSetProperties):
+        cls.fleet_partition_parameters.fleet_drone_amount = drone_set_properties.drone_amount
+        formation_type_policy = drone_set_properties.drone_formation_policy.formation_type_policy
+        cls.fleet_partition_parameters.formation_type_options = FleetPartition \
+            .get_amount_of_drones_per_type_in_policy(formation_type_policy)
+        cls.fleet_partition_parameters.formation_type_probabilities = FleetPartition \
+            .get_probs_per_type_in_policy(formation_type_policy)
+
+    @classmethod
+    def get_probs_per_type_in_policy(cls, formation_type_policy):
+        return list(formation_type_policy.values())
+
+    @classmethod
+    def get_amount_of_drones_per_type_in_policy(cls, formation_type_policy):
+        return list(map(lambda ft: ft.get_amount_of_drones(), formation_type_policy.keys()))
 
     @classmethod
     def _calc_number_variables(cls) -> int:
-        return cls.fleet_partition_parameters.formation_size_num
+        return cls.fleet_partition_parameters.amount_of_options()
 
     @classmethod
-    def _export_formation_amounts(cls, variables) -> FormationSizesAmounts:
-        formation_amounts = {formation_size: variables[i].solution_value() for i, formation_size in
+    def _export_formation_amounts(cls, variables) -> FormationTypeAmounts:
+        formation_amounts = {formation_type: variables[i].solution_value() for i, formation_type in
                              enumerate(DroneFormationType)}
-        return FormationSizesAmounts(formation_amounts)
+        return FormationTypeAmounts(formation_amounts)
 
     @classmethod
     def _calc_objective_coefficients(cls) -> Any:
-        formation_size_distribution = cls.fleet_partition_parameters.formation_size_distribution
+        formation_size_distribution = cls.fleet_partition_parameters.formation_type_probabilities
         non_zero_indices = [i for i, e in enumerate(formation_size_distribution) if e != 0]
         num_vars = cls._calc_number_variables()
         objective_coefficients = np.ones(num_vars)
@@ -59,7 +66,7 @@ class FleetPartition(object):
 
     @classmethod
     def _calc_inequality_constraints_coefficients(cls) -> Any:
-        formation_size_distribution = cls.fleet_partition_parameters.formation_size_distribution
+        formation_size_distribution = cls.fleet_partition_parameters.formation_type_probabilities
         non_zero_indices = [i for i, e in enumerate(formation_size_distribution) if e != 0]
         num_vars = cls._calc_number_variables()
         constraints_matrix = np.zeros((1, num_vars))
@@ -78,7 +85,7 @@ class FleetPartition(object):
         num_vars = cls._calc_number_variables()
         constraints_matrix = np.zeros((1, num_vars))
         for i in range(num_vars):
-            constraints_matrix[0, i] = cls.fleet_partition_parameters.formation_size_options[i]
+            constraints_matrix[0, i] = cls.fleet_partition_parameters.formation_type_options[i]
         return constraints_matrix.tolist()
 
     @classmethod
@@ -103,7 +110,7 @@ class FleetPartition(object):
         return MIPData(data)
 
     @classmethod
-    def solve(cls) -> FormationSizesAmounts:
+    def solve(cls) -> FormationTypeAmounts:
         mip_data = cls._formulate_as_mip_problem()
         mip_solver = MIPSolver()
         variables = mip_solver.set_variables(parameters=mip_data)

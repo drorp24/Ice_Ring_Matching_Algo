@@ -3,16 +3,16 @@ import uuid
 from common.entities.base_entities.drone_delivery import EmptyDroneDelivery
 from common.entities.base_entities.drone_delivery_board import EmptyDroneDeliveryBoard
 from common.entities.base_entities.fleet.fleet_configuration_attribution import DroneFormationsPerTypeAmounts, FleetConfigurationAttribution
-from common.entities.base_entities.fleet.fleet_partition import FormationSizesAmounts, FleetPartition
+from common.entities.base_entities.fleet.fleet_partition import FormationTypeAmounts, FleetPartition
 from common.entities.base_entities.fleet.fleet_property_sets import DroneSetProperties
 
 
-def _calc_formation_amounts(platform_properties: DroneSetProperties) -> FormationSizesAmounts:
+def _calc_formation_amounts(platform_properties: DroneSetProperties) -> FormationTypeAmounts:
     FleetPartition.extract_parameters(platform_properties)
     return FleetPartition.solve()
 
 
-def _calc_drone_formation_amounts(formation_sizes_amounts: FormationSizesAmounts,
+def _calc_drone_formation_amounts(formation_sizes_amounts: FormationTypeAmounts,
                                   platform_properties: DroneSetProperties) -> DroneFormationsPerTypeAmounts:
     FleetConfigurationAttribution.extract_parameters(formation_sizes_amounts, platform_properties)
     return FleetConfigurationAttribution.solve()

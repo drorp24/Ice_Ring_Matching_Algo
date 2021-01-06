@@ -5,7 +5,7 @@ import numpy as np
 
 from common.entities.base_entities.drone import DroneType
 from common.entities.base_entities.drone_formation import DroneFormationType, DroneFormation, DroneFormationOptions, DroneFormations
-from common.entities.base_entities.fleet.fleet_partition import FormationSizesAmounts
+from common.entities.base_entities.fleet.fleet_partition import FormationTypeAmounts
 from common.entities.base_entities.fleet.fleet_property_sets import DroneSetProperties
 from common.math.mip_solver import MIPSolver, MIPData, MIPParameters
 
@@ -31,10 +31,10 @@ class DroneFormationsPerTypeAmounts:
 
 class FleetConfigurationAttribution:
     configuration_attribution_parameters: ConfigurationAttributionParameters = \
-        ConfigurationAttributionParameters([], [], [], 0, 0, 0, DroneType.drone_platform_1, [], [], [])
+        ConfigurationAttributionParameters([], [], [], 0, 0, 0, DroneType.drone_type_1, [], [], [])
 
     @classmethod
-    def extract_parameters(cls, formation_sizes_amounts: FormationSizesAmounts,
+    def extract_parameters(cls, formation_sizes_amounts: FormationTypeAmounts,
                            platform_property_set: DroneSetProperties):
         cls.configuration_attribution_parameters.fleet_size = platform_property_set.drone_amount
         cls.configuration_attribution_parameters.formation_amounts = list(formation_sizes_amounts.amounts.values())

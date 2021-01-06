@@ -7,7 +7,7 @@ from common.entities.base_entities.drone_formation import DroneFormationType, Dr
 from common.entities.base_entities.fleet.empty_drone_delivery_board_generation import generate_empty_delivery_board
 from common.entities.base_entities.fleet.fleet_configuration_attribution import FleetConfigurationAttribution
 from common.entities.base_entities.fleet.fleet_partition import FleetPartition
-from common.entities.base_entities.fleet.fleet_property_sets import DroneSetProperties, DroneFormationPolicy, \
+from common.entities.base_entities.fleet.fleet_property_sets import DroneSetProperties, DroneFormationTypePolicy, \
     PackageConfigurationsPolicy
 
 
@@ -17,7 +17,7 @@ class TestFleetConfigurationAttribution(unittest.TestCase):
     def setUpClass(cls):
         cls.drone_set_properties_1 = TestFleetConfigurationAttribution.define_drone_set_properties_1()
         cls.drone_set_properties_2 = TestFleetConfigurationAttribution.define_drone_set_properties_2()
-        cls.formation_size_policy = DroneFormationPolicy({DroneFormationType.PAIR: 1.0, DroneFormationType.QUAD: 0.0})
+        cls.formation_size_policy = DroneFormationTypePolicy({DroneFormationType.PAIR: 1.0, DroneFormationType.QUAD: 0.0})
 
     def test_fleet_configuration_with_none_zero_policy(self):
         drone_set_properties = self.drone_set_properties_1
@@ -27,14 +27,14 @@ class TestFleetConfigurationAttribution(unittest.TestCase):
         fleet_configuration = FleetConfigurationAttribution.solve()
 
         expected_outcome = {
-            (DroneType.drone_platform_1, DroneFormationType.PAIR, PackageConfigurationOptions.LARGE_PACKAGES): 1,
-            (DroneType.drone_platform_1, DroneFormationType.QUAD, PackageConfigurationOptions.LARGE_PACKAGES): 0,
-            (DroneType.drone_platform_1, DroneFormationType.PAIR, PackageConfigurationOptions.MEDIUM_PACKAGES): 4,
-            (DroneType.drone_platform_1, DroneFormationType.QUAD, PackageConfigurationOptions.MEDIUM_PACKAGES): 1,
-            (DroneType.drone_platform_1, DroneFormationType.PAIR, PackageConfigurationOptions.SMALL_PACKAGES): 0,
-            (DroneType.drone_platform_1, DroneFormationType.QUAD, PackageConfigurationOptions.SMALL_PACKAGES): 2,
-            (DroneType.drone_platform_1, DroneFormationType.PAIR, PackageConfigurationOptions.TINY_PACKAGES): 0,
-            (DroneType.drone_platform_1, DroneFormationType.QUAD, PackageConfigurationOptions.TINY_PACKAGES): 1
+            (DroneType.drone_type_1, DroneFormationType.PAIR, PackageConfigurationOptions.LARGE_PACKAGES): 1,
+            (DroneType.drone_type_1, DroneFormationType.QUAD, PackageConfigurationOptions.LARGE_PACKAGES): 0,
+            (DroneType.drone_type_1, DroneFormationType.PAIR, PackageConfigurationOptions.MEDIUM_PACKAGES): 4,
+            (DroneType.drone_type_1, DroneFormationType.QUAD, PackageConfigurationOptions.MEDIUM_PACKAGES): 1,
+            (DroneType.drone_type_1, DroneFormationType.PAIR, PackageConfigurationOptions.SMALL_PACKAGES): 0,
+            (DroneType.drone_type_1, DroneFormationType.QUAD, PackageConfigurationOptions.SMALL_PACKAGES): 2,
+            (DroneType.drone_type_1, DroneFormationType.PAIR, PackageConfigurationOptions.TINY_PACKAGES): 0,
+            (DroneType.drone_type_1, DroneFormationType.QUAD, PackageConfigurationOptions.TINY_PACKAGES): 1
         }
 
         self._assert_fleet_configuration_is_correct(expected_outcome, fleet_configuration)
@@ -47,14 +47,14 @@ class TestFleetConfigurationAttribution(unittest.TestCase):
         fleet_configuration = FleetConfigurationAttribution.solve()
 
         expected_outcome = {
-            (DroneType.drone_platform_2, DroneFormationType.PAIR, PackageConfigurationOptions.LARGE_PACKAGES): 0,
-            (DroneType.drone_platform_2, DroneFormationType.QUAD, PackageConfigurationOptions.LARGE_PACKAGES): 0,
-            (DroneType.drone_platform_2, DroneFormationType.PAIR, PackageConfigurationOptions.MEDIUM_PACKAGES): 6,
-            (DroneType.drone_platform_2, DroneFormationType.QUAD, PackageConfigurationOptions.MEDIUM_PACKAGES): 0,
-            (DroneType.drone_platform_2, DroneFormationType.PAIR, PackageConfigurationOptions.SMALL_PACKAGES): 9,
-            (DroneType.drone_platform_2, DroneFormationType.QUAD, PackageConfigurationOptions.SMALL_PACKAGES): 0,
-            (DroneType.drone_platform_2, DroneFormationType.PAIR, PackageConfigurationOptions.TINY_PACKAGES): 0,
-            (DroneType.drone_platform_2, DroneFormationType.QUAD, PackageConfigurationOptions.TINY_PACKAGES): 0
+            (DroneType.drone_type_2, DroneFormationType.PAIR, PackageConfigurationOptions.LARGE_PACKAGES): 0,
+            (DroneType.drone_type_2, DroneFormationType.QUAD, PackageConfigurationOptions.LARGE_PACKAGES): 0,
+            (DroneType.drone_type_2, DroneFormationType.PAIR, PackageConfigurationOptions.MEDIUM_PACKAGES): 6,
+            (DroneType.drone_type_2, DroneFormationType.QUAD, PackageConfigurationOptions.MEDIUM_PACKAGES): 0,
+            (DroneType.drone_type_2, DroneFormationType.PAIR, PackageConfigurationOptions.SMALL_PACKAGES): 9,
+            (DroneType.drone_type_2, DroneFormationType.QUAD, PackageConfigurationOptions.SMALL_PACKAGES): 0,
+            (DroneType.drone_type_2, DroneFormationType.PAIR, PackageConfigurationOptions.TINY_PACKAGES): 0,
+            (DroneType.drone_type_2, DroneFormationType.QUAD, PackageConfigurationOptions.TINY_PACKAGES): 0
         }
 
         self._assert_fleet_configuration_is_correct(expected_outcome, fleet_configuration)
@@ -83,8 +83,8 @@ class TestFleetConfigurationAttribution(unittest.TestCase):
     @classmethod
     def define_drone_set_properties_1(cls):
         return DroneSetProperties(
-            drone_type=DroneType.drone_platform_1,
-            drone_platform_formation_policy=DroneFormationPolicy(
+            drone_type=DroneType.drone_type_1,
+            drone_formation_policy=DroneFormationTypePolicy(
                 {DroneFormationType.PAIR: 0.5,
                  DroneFormationType.QUAD: 0.5}),
             package_configuration_policy=PackageConfigurationsPolicy(
@@ -97,8 +97,8 @@ class TestFleetConfigurationAttribution(unittest.TestCase):
     @classmethod
     def define_drone_set_properties_2(cls):
         return DroneSetProperties(
-            drone_type=DroneType.drone_platform_2,
-            drone_platform_formation_policy=DroneFormationPolicy(
+            drone_type=DroneType.drone_type_2,
+            drone_formation_policy=DroneFormationTypePolicy(
                 {DroneFormationType.PAIR: 1.0,
                  DroneFormationType.QUAD: 0.0}),
             package_configuration_policy=PackageConfigurationsPolicy(

@@ -4,8 +4,8 @@ from common.entities.base_entities.package import PackageType
 
 
 class DroneType(Enum):
-    drone_platform_1 = 4
-    drone_platform_2 = 6
+    drone_type_1 = 4
+    drone_type_2 = 6
 
     @classmethod
     def dict_to_obj(cls, input_dict):
@@ -42,7 +42,7 @@ class _PackageTypesVolumeMap:
         return self._dict.values()
 
 
-class DroneConfiguration:
+class DronePackageConfiguration:
 
     def __init__(self, platform_type: DroneType, package_types_map: _PackageTypesVolumeMap):
         self._platform_type = platform_type
@@ -74,12 +74,12 @@ class PackageConfigurations(Enum):
     TINY_X32 = _PackageTypesVolumeMap([32, 0, 0, 0])
 
 
-class DroneConfigurationOptions:
+class DroneTypeToPackageConfigurationOptions:
     drone_configurations_map: {DroneType: [PackageConfigurations]} = \
-        {DroneType.drone_platform_1: [PackageConfigurations.LARGE_X2, PackageConfigurations.MEDIUM_X4, PackageConfigurations.SMALL_X8,
-                                      PackageConfigurations.TINY_X16],
-         DroneType.drone_platform_2: [PackageConfigurations.LARGE_X4, PackageConfigurations.MEDIUM_X8, PackageConfigurations.SMALL_X16,
-                                      PackageConfigurations.TINY_X32]}
+        {DroneType.drone_type_1: [PackageConfigurations.LARGE_X2, PackageConfigurations.MEDIUM_X4, PackageConfigurations.SMALL_X8,
+                                  PackageConfigurations.TINY_X16],
+         DroneType.drone_type_2: [PackageConfigurations.LARGE_X4, PackageConfigurations.MEDIUM_X8, PackageConfigurations.SMALL_X16,
+                                  PackageConfigurations.TINY_X32]}
 
     @classmethod
     def add_configuration_option(cls, configuration_option: {DroneType: [PackageConfigurations]}):
@@ -87,17 +87,17 @@ class DroneConfigurationOptions:
             cls.drone_configurations_map[key] = configuration_option[key]
 
     @classmethod
-    def get_drone_configuration(cls, platform_type: DroneType, configuration: PackageConfigurations) -> DroneConfiguration:
+    def get_drone_configuration(cls, platform_type: DroneType, configuration: PackageConfigurations) -> DronePackageConfiguration:
         index = cls.drone_configurations_map[platform_type].index(configuration)
-        return DroneConfiguration(platform_type, cls.drone_configurations_map[platform_type][index].value)
+        return DronePackageConfiguration(platform_type, cls.drone_configurations_map[platform_type][index].value)
 
 
 class DroneConfigurations:
-    drone_configurations_map: {DroneType: {PackageConfigurations: DroneConfiguration}} = \
-        {platform_type: {configuration: DroneConfigurationOptions.get_drone_configuration(platform_type, configuration)
+    drone_configurations_map: {DroneType: {PackageConfigurations: DronePackageConfiguration}} = \
+        {platform_type: {configuration: DroneTypeToPackageConfigurationOptions.get_drone_configuration(platform_type, configuration)
                          for configuration in configurations}
-         for platform_type, configurations in DroneConfigurationOptions.drone_configurations_map.items()}
+         for platform_type, configurations in DroneTypeToPackageConfigurationOptions.drone_configurations_map.items()}
 
     @classmethod
-    def get_drone_configuration(cls, platform_type: DroneType, configuration: PackageConfigurations) -> DroneConfiguration:
+    def get_drone_configuration(cls, platform_type: DroneType, configuration: PackageConfigurations) -> DronePackageConfiguration:
         return cls.drone_configurations_map[platform_type][configuration]
