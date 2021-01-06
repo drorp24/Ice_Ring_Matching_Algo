@@ -1,5 +1,6 @@
 from enum import Enum, auto
 from enum import IntEnum
+from functools import lru_cache
 
 from common.entities.base_entities.drone import DroneConfiguration, PlatformType, Configurations, \
     DroneConfigurations, PackageTypesVolumeMap
@@ -44,6 +45,12 @@ class DroneFormation:
         if len(package_type_indexes) != 1:
             raise TypeError(f"The drone formation should has only one package type")
         return self.get_package_types()[package_type_indexes[0]]
+
+    @property
+    @lru_cache()
+    def max_route_times_in_minutes(self) -> int:
+        # TODO: Change to real endurance
+        return self.get_platform_type().value * 100
 
 
 class AutoName(Enum):

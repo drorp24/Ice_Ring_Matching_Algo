@@ -49,5 +49,25 @@ class TimeWindowDistribution(Distribution):
         return TimeWindowExtension
 
 
+class ExactTimeWindowDistribution(TimeWindowDistribution):
+
+    def __init__(self, time_windows=List[TimeWindowExtension]):
+        self._time_windows = time_windows
+        self._amount_count = 0
+
+    def choose_rand(self, random: Random, amount: int = 1) -> List[TimeWindowExtension]:
+        if self._amount_count + amount > len(self._time_windows):
+            raise RuntimeError(
+                f"Used {self._amount_count} randomized choices which is \
+                more than the initially given {len(self._time_windows)} ")
+        choices = self._time_windows[self._amount_count: self._amount_count + amount]
+        self._amount_count += amount
+        return choices
+
+    @classmethod
+    def distribution_class(cls) -> type:
+        return TimeWindowExtension
+
+
 class NoViableTimesGivenDistribution(Exception):
     pass

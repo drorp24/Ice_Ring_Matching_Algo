@@ -4,7 +4,8 @@ from pprint import pprint
 from random import Random
 from uuid import UUID
 
-from common.entities.base_entities.entity_distribution.package_distribution import PackageDistribution
+from common.entities.base_entities.entity_distribution.package_distribution import PackageDistribution, \
+    ExactPackageDistribution
 from common.entities.base_entities.package import PackageType
 from common.entities.base_entities.package_delivery_plan import PackageDeliveryPlan
 from common.entities.distribution.test.test_distribution import assert_samples_approx_expected
@@ -171,6 +172,19 @@ class BasicPackageGeneration(unittest.TestCase):
 
         for package in PackageType.get_all_names():
             assert_samples_approx_expected(self, package, expected_prob, sample_count)
+
+    def test_exact_package_distribution(self):
+        expected_pt_1 = PackageType.TINY
+        expected_pt_2 = PackageType.MEDIUM
+        expected_pt_3 = PackageType.LARGE
+        exact_pt_dist = ExactPackageDistribution([expected_pt_1,
+                                                  expected_pt_2,
+                                                  expected_pt_3])
+        actual_pt_1 = exact_pt_dist.choose_rand(Random(42), 1)
+        actual_pt_2_3 = exact_pt_dist.choose_rand(Random(42), 2)
+        self.assertEqual([expected_pt_1], actual_pt_1)
+        self.assertEqual([expected_pt_2, expected_pt_3], actual_pt_2_3)
+        self.assertRaises(RuntimeError, exact_pt_dist.choose_rand, (Random(42), 1))
 
     def print_example_package(self):
         pprint(PackageType.TINY)

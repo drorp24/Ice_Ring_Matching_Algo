@@ -11,7 +11,8 @@ class BasicMinimumEnd2End(unittest.TestCase):
         cls.minimum_end_2_end_config = MinimumEnd2EndConfig.dict_to_obj(
             MinimumEnd2EndConfig.json_to_dict('end_to_end/tests/jsons/test_config.json'))
         cls.data_loader = DataLoader(cls.minimum_end_2_end_config)
-        cls.minimum_end_2_end = MinimumEnd2End(cls.data_loader.get_scenario(), cls.data_loader.get_empty_drone_delivery_board())
+        cls.minimum_end_2_end = MinimumEnd2End(cls.data_loader.get_scenario(),
+                                               cls.data_loader.get_empty_drone_delivery_board())
 
     def test_create_graph_model(self):
         operational_graph = self.minimum_end_2_end.create_fully_connected_graph_model()
@@ -27,4 +28,3 @@ class BasicMinimumEnd2End(unittest.TestCase):
         self.assertEqual(delivery_board.total_amount_per_package_type.get_package_type_volume(PackageType.MEDIUM), 1)
         self.assertEqual(delivery_board.total_amount_per_package_type.get_package_type_volume(PackageType.LARGE), 4)
         self.assertEqual(delivery_board.total_priority, 477)
-

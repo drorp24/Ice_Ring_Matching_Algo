@@ -65,7 +65,7 @@ class PltGanttDrawer(GanttDrawer):
         self._ax.barh(y=y, width=until - since, height=self._row_y_factor, left=since,
                       facecolor=facecolor.get_rgb_with_alpha(face_alpha),
                       edgecolor=edgecolor.get_rgb(),
-                      linewidth=1)
+                      linewidth=2)
 
     def get_num_rows(self):
         return len(self._row_names)
