@@ -100,7 +100,6 @@ class UniformDistribution(Distribution):
     @classmethod
     def distribution_class(cls) -> type:
         return float
-        return [random.uniform(a = self._value_range.start, b = self._value_range.stop) for i in range(amount)]
 
 
 class MultiUniformDistribution(Distribution):
