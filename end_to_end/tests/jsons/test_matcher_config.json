@@ -17,7 +17,7 @@
     "solver" : {
       "__class__": "MatcherSolver",
       "name": "or_tools:automatic",
-      "timeout_sec": 60
+      "timeout_sec": 40
     },
     "constraints": {
       "__class__": "MatcherConstraints",

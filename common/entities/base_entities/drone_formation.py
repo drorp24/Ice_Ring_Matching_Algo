@@ -50,7 +50,16 @@ class DroneFormation:
     @lru_cache()
     def max_route_times_in_minutes(self) -> int:
         # TODO: Change to real endurance
-        return self.get_platform_type().value * 100
+        return self.get_platform_type().value * 10
+
+    @property
+    @lru_cache()
+    def velocity_meter_per_sec(self) -> float:
+        # TODO: Change to real velocity
+        return 10.0
+
+    def get_formation_max_range_in_meters(self) -> float:
+        return self.velocity_meter_per_sec*self.max_route_times_in_minutes*60.0
 
 
 class AutoName(Enum):

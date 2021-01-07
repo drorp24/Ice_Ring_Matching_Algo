@@ -83,22 +83,43 @@ class ORToolsMatcherMaxRouteTimeTestCase(TestCase):
         self.assertEqual(2, len(delivery_board_2.drone_deliveries[0].matched_requests))
 
     def test_when_travel_time_is_greater_than_max_route_time(self):
+        # Assumption: calc_cost in graph_creator is time based on Euclidean distance between requests
+
+        # Fleet definition:
+        empty_drone_delivery_1 = EmptyDroneDelivery("edd_1", DroneFormations.get_drone_formation(
+            FormationSize.MINI, FormationOptions.LARGE_PACKAGES, PlatformType.platform_1))
+        edd1_max_range = empty_drone_delivery_1.drone_formation.get_formation_max_range_in_meters()
+        edd1_max_endurance = empty_drone_delivery_1.drone_formation.max_route_times_in_minutes
+        empty_drone_delivery_2 = EmptyDroneDelivery("edd_2", DroneFormations.get_drone_formation(
+            FormationSize.MINI, FormationOptions.LARGE_PACKAGES, PlatformType.platform_2))
+        edd2_max_range = empty_drone_delivery_2.drone_formation.get_formation_max_range_in_meters()
+        edd2_max_endurance = empty_drone_delivery_2.drone_formation.max_route_times_in_minutes
+        edd2_velocity_per_minute = empty_drone_delivery_1.drone_formation.velocity_meter_per_sec*60.0
+
+        empty_board_1 = EmptyDroneDeliveryBoard([empty_drone_delivery_1])
+        empty_board_2 = EmptyDroneDeliveryBoard([empty_drone_delivery_2])
+
+        # Graph definition:
         dist = build_delivery_request_distribution(
             relative_pdp_location_distribution=ExactPointLocationDistribution([
-                create_point_2d(0, 5),
-                create_point_2d(0, 300)
+                create_point_2d(0, edd1_max_range/10.0),
+                create_point_2d(0, edd2_max_range/2.1)
             ]),
             time_window_distribution=ExactTimeWindowDistribution([
                 TimeWindowExtension(
                     since=ZERO_TIME,
-                    until=ZERO_TIME.add_time_delta(TimeDeltaExtension(timedelta(minutes=15)))),
+                    until=ZERO_TIME.add_time_delta(TimeDeltaExtension(timedelta(minutes=edd1_max_endurance/5.0)))),
                 TimeWindowExtension(
                     since=ZERO_TIME,
-                    until=ZERO_TIME.add_time_delta(TimeDeltaExtension(timedelta(minutes=400)))),
+                    until=ZERO_TIME.add_time_delta(TimeDeltaExtension(timedelta(minutes=edd2_max_endurance)))),
             ]),
             package_type_distribution=PackageDistribution({PackageType.LARGE.name: 1}))
         self.delivery_requests = dist.choose_rand(Random(42), amount={DeliveryRequest: 2})
+        self.graph = self._create_graph(self.delivery_requests, self.loading_dock, 1/edd2_velocity_per_minute)
+        if self.graph.get_max_cost()>edd2_max_endurance/2.0:
+            print('Check cost calculation')
 
+        # Match fleet over graph:
         match_config = MatcherConfig(MatcherConfigProperties(
             zero_time=ZERO_TIME,
             first_solution_strategy="or_tools:path_cheapest_arc",
@@ -111,15 +132,6 @@ class ORToolsMatcherMaxRouteTimeTestCase(TestCase):
                 priority_constraints=PriorityConstraints(True)),
             dropped_penalty=1000))
 
-        self.graph = self._create_graph(self.delivery_requests, self.loading_dock)
-
-        empty_drone_delivery_1 = EmptyDroneDelivery("edd_1", DroneFormations.get_drone_formation(
-            FormationSize.MINI, FormationOptions.LARGE_PACKAGES, PlatformType.platform_1))
-        empty_drone_delivery_2 = EmptyDroneDelivery("edd_2", DroneFormations.get_drone_formation(
-            FormationSize.MINI, FormationOptions.LARGE_PACKAGES, PlatformType.platform_2))
-
-        empty_board_1 = EmptyDroneDeliveryBoard([empty_drone_delivery_1])
-        empty_board_2 = EmptyDroneDeliveryBoard([empty_drone_delivery_2])
         match_input_1 = MatcherInput(self.graph, empty_board_1, match_config)
         match_input_2 = MatcherInput(self.graph, empty_board_2, match_config)
         matcher_1 = ORToolsMatcher(match_input_1)
@@ -139,9 +151,9 @@ class ORToolsMatcherMaxRouteTimeTestCase(TestCase):
                                         TimeDeltaExtension(timedelta(hours=4)))))
 
     @staticmethod
-    def _create_graph(delivery_requests: List[DeliveryRequest], loading_dock: DroneLoadingDock) -> OperationalGraph:
+    def _create_graph(delivery_requests: List[DeliveryRequest], loading_dock: DroneLoadingDock, factor: float=1.0) -> OperationalGraph:
         graph = OperationalGraph(zero_time=ZERO_TIME.get_internal())
         graph.add_drone_loading_docks([loading_dock])
         graph.add_delivery_requests(delivery_requests)
-        build_fully_connected_graph(graph)
+        build_fully_connected_graph(graph, factor)
         return graph

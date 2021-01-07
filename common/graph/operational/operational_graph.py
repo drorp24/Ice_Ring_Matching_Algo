@@ -79,6 +79,12 @@ class OperationalGraph:
         return [OperationalEdge(edge[0], edge[1], OperationalEdgeAttribs(edge[2]["cost"])) for edge in
                 internal_edges]
 
+    def get_max_cost(self) -> int:
+        return max(e.attributes.cost for e in self.edges[:])
+
+    def get_min_cost(self) -> int:
+        return min(e.attributes.cost for e in self.edges[:])
+
     def is_empty(self):
         return self.internal_graph.nodes.__len__() == 0
 
