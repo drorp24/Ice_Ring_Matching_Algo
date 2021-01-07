@@ -1,3 +1,4 @@
+import os
 import unittest
 from datetime import time, date, timedelta, datetime
 from math import sqrt
@@ -57,6 +58,7 @@ class BasicDeliveryRequestGraphTestCases(unittest.TestCase):
         self.assertEqual(len(region_dataset), num_nodes)
         self.assertEqual((num_nodes * (num_nodes - 1)), len(graph.edges))
 
+    @unittest.skipIf(os.environ.get('NO_SLOW_TESTS', False), 'slow tests')
     def test_local_graph_generation_two_separate_spatial_cliques(self):
         region_dataset = self.dr_dataset_local_region_1_morning + self.dr_dataset_local_region_2_morning
         graph = OperationalGraph(self.zero_time)
@@ -65,6 +67,7 @@ class BasicDeliveryRequestGraphTestCases(unittest.TestCase):
         self.assertEqual(len(region_dataset), num_nodes_in_graph)
         self.assertEqual(2 * (num_nodes_in_graph / 2 * (num_nodes_in_graph / 2 - 1)), len(graph.edges))
 
+    @unittest.skipIf(os.environ.get('NO_SLOW_TESTS', False), 'slow tests')
     def test_local_graph_generation_two_separate_temporal_cliques(self):
         region_dataset = self.dr_dataset_local_region_2_afternoon + self.dr_dataset_local_region_2_morning
         graph = OperationalGraph(self.zero_time)
@@ -162,6 +165,7 @@ class BasicDeliveryRequestGraphTestCases(unittest.TestCase):
         node_in_low_priority_graph = _get_dr_from_dr_graph(drg_low_priority_subgraph_of_full_day)
         self.assertEqual(nodes_in_low_priority_subgraph, node_in_low_priority_graph)
 
+    @unittest.skipIf(os.environ.get('NO_SLOW_TESTS', False), 'slow tests')
     def test_sub_graph_within_polygon(self):
         region_dataset = self.dr_dataset_local_region_1_morning + self.dr_dataset_local_region_2_morning
         graph = OperationalGraph(self.zero_time)

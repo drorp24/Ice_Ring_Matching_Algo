@@ -18,6 +18,9 @@ class DroneFormation:
         self._size = formation_size
         self._drone_configuration = drone_configuration
 
+    def __hash__(self):
+        return hash((self._size, self._drone_configuration))
+
     @property
     def size(self) -> FormationSize:
         return self._size

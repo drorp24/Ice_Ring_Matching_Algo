@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from functools import lru_cache
 
 from common.entities.base_entities.delivery_request import DeliveryRequest
 from common.entities.base_entities.drone import PackageTypeAmounts
@@ -39,17 +40,14 @@ class DroppedDeliveryRequest:
         return '[DroppedDeliveryRequest(graph_index=' + str(self.graph_index) + ', priority=' + str(
             self.delivery_request.priority) + ")]"
 
+    def __hash__(self):
+        return hash((self.graph_index, self.delivery_request))
+
 
 class DroneDeliveryBoard:
     def __init__(self, drone_deliveries: [DroneDelivery], dropped_delivery_requests: [DroppedDeliveryRequest]):
         self._drone_deliveries = drone_deliveries
         self._dropped_delivery_requests = dropped_delivery_requests
-
-        self._total_amount_per_package_type = None
-        self._total_priority = 0
-        self._total_time_in_minutes = 0
-
-        self._set_totals()
 
     def __eq__(self, other):
         return self._drone_deliveries == other.drone_deliveries \
@@ -64,6 +62,9 @@ class DroneDeliveryBoard:
         return "\n[DroneDeliveryBoard]\n{drone_deliveries_str}\n{dropped_delivery_request_str}".format(
             drone_deliveries_str=drone_deliveries_str, dropped_delivery_request_str=dropped_delivery_requests_str)
 
+    def __hash__(self):
+        return hash((tuple(self._drone_deliveries), tuple(self._dropped_delivery_requests)))
+
     @property
     def drone_deliveries(self) -> [DroneDelivery]:
         return self._drone_deliveries
@@ -72,27 +73,20 @@ class DroneDeliveryBoard:
     def dropped_delivery_requests(self) -> [DroppedDeliveryRequest]:
         return self._dropped_delivery_requests
 
-    @property
-    def total_time_in_minutes(self) -> float:
-        return self._total_time_in_minutes
+    @lru_cache()
+    def get_total_time_in_minutes(self) -> float:
+        return sum([drone_delivery.get_total_time_in_minutes() for drone_delivery in self._drone_deliveries])
 
-    @property
-    def total_amount_per_package_type(self) -> PackageTypeAmounts:
-        return self._total_amount_per_package_type
-
-    @property
-    def total_priority(self) -> int:
-        return self._total_priority
-
-    def _set_totals(self):
+    @lru_cache()
+    def get_total_amount_per_package_type(self) -> PackageTypeAmounts:
         total_amount_per_package_type = [0] * len(PackageType)
-
         for drone_delivery in self._drone_deliveries:
             total_amount_per_package_type = [x + y for x, y in zip(total_amount_per_package_type,
-                                                                   drone_delivery.total_amount_per_package_type.
+                                                                   drone_delivery.get_total_amount_per_package_type().
                                                                    get_package_type_amounts())]
+        return PackageTypeAmounts(total_amount_per_package_type)
 
-            self._total_priority += drone_delivery.total_priority
-            self._total_time_in_minutes += drone_delivery.total_time_in_minutes
+    @lru_cache()
+    def get_total_priority(self) -> int:
+        return sum(drone_delivery.get_total_priority() for drone_delivery in self._drone_deliveries)
 
-        self._total_amount_per_package_type = PackageTypeAmounts(total_amount_per_package_type)

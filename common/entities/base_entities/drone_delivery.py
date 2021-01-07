@@ -1,11 +1,13 @@
 from dataclasses import dataclass
+from functools import lru_cache
 
 from common.entities.base_entities.delivery_request import DeliveryRequest
-from common.entities.base_entities.drone_formation import DroneFormation
 from common.entities.base_entities.drone import PackageTypeAmounts
+from common.entities.base_entities.drone_formation import DroneFormation
 from common.entities.base_entities.drone_loading_dock import DroneLoadingDock
 from common.entities.base_entities.package import PackageType
 from common.entities.base_entities.temporal import DateTimeExtension
+
 
 class EmptyDroneDelivery:
     def __init__(self, id_: str, drone_formation: DroneFormation):
@@ -14,6 +16,9 @@ class EmptyDroneDelivery:
 
     def __eq__(self, other):
         return self._id == other.id and self._drone_formation == other.drone_formation
+
+    def __hash__(self):
+        return hash((self._id, self._drone_formation))
 
     @property
     def id(self) -> str:
@@ -42,6 +47,11 @@ class MatchedDroneLoadingDock:
             self.graph_index) + ', min_time=' + self.delivery_min_time.str_format_time() + \
                ', max_time=' + self.delivery_max_time.str_format_time() + ')]'
 
+    def __hash__(self):
+        return hash((self.graph_index, self.drone_loading_dock,
+                     self.delivery_min_time, self.delivery_max_time))
+
+
 
 @dataclass
 class MatchedDeliveryRequest:
@@ -64,6 +74,10 @@ class MatchedDeliveryRequest:
             self.delivery_request.delivery_options[
                 self.matched_delivery_option_index].get_package_type_amounts()) + ')]'
 
+    def __hash__(self):
+        return hash((self.graph_index, self.delivery_request, self.matched_delivery_option_index,
+                     self.delivery_min_time, self.delivery_max_time))
+
 
 # TODO change to MatchedDroneDelivery
 class DroneDelivery(EmptyDroneDelivery):
@@ -75,12 +89,6 @@ class DroneDelivery(EmptyDroneDelivery):
         self._matched_requests = matched_requests
         self._start_drone_loading_docks = start_drone_loading_docks
         self._end_drone_loading_docks = end_drone_loading_docks
-
-        self._total_amount_per_package_type = None
-        self._total_priority = 0
-        self._total_time_in_minutes = 0
-
-        self._set_totals()
 
     def __eq__(self, other):
         return super().__eq__(
@@ -98,11 +106,15 @@ class DroneDelivery(EmptyDroneDelivery):
                "minutes={total_time}]\n{start_drone_loading_docks}\n{matched_requests}\n{end_drone_loading_docks}" \
             .format(id=self.id,
                     origin_capacity=self.drone_formation.get_package_type_amounts(),
-                    total_amount_per_package_type=str(self.total_amount_per_package_type),
-                    priority=str(self.total_priority), total_time=str(self.total_time_in_minutes),
+                    total_amount_per_package_type=str(self.get_total_amount_per_package_type()),
+                    priority=str(self.get_total_priority()), total_time=str(self.get_total_time_in_minutes()),
                     start_drone_loading_docks=str(self.start_drone_loading_docks),
                     matched_requests='\n'.join(map(str, self._matched_requests)),
                     end_drone_loading_docks=str(self.end_drone_loading_docks))
+
+    def __hash__(self):
+        return hash((tuple(self._matched_requests),
+                     self._start_drone_loading_docks, self._end_drone_loading_docks))
 
     @property
     def matched_requests(self) -> [MatchedDeliveryRequest]:
@@ -116,31 +128,22 @@ class DroneDelivery(EmptyDroneDelivery):
     def end_drone_loading_docks(self) -> MatchedDroneLoadingDock:
         return self._end_drone_loading_docks
 
-    @property
-    def total_time_in_minutes(self) -> float:
-        return self._total_time_in_minutes
+    @lru_cache()
+    def get_total_time_in_minutes(self) -> float:
+        return self._end_drone_loading_docks.delivery_min_time.get_time_delta(
+            self._start_drone_loading_docks.delivery_min_time).in_minutes()
 
-    @property
-    def total_amount_per_package_type(self) -> PackageTypeAmounts:
-        return self._total_amount_per_package_type
-
-    @property
-    def total_priority(self) -> int:
-        return self._total_priority
-
-    def _set_totals(self):
+    @lru_cache()
+    def get_total_amount_per_package_type(self) -> PackageTypeAmounts:
         total_amount_per_package_type = [0] * len(PackageType)
-
         for matched_request in self._matched_requests:
             total_amount_per_package_type = [x + y for x, y in zip(total_amount_per_package_type,
-                                                                   matched_request.delivery_request.delivery_options[
-                                                                       matched_request.matched_delivery_option_index].
-                                                                   get_package_type_amounts().
-                                                                   get_package_type_amounts())]
+                                                      matched_request.delivery_request.delivery_options[
+                                                          matched_request.matched_delivery_option_index].
+                                                      get_package_type_amounts().
+                                                      get_package_type_amounts())]
+        return PackageTypeAmounts(total_amount_per_package_type)
 
-            self._total_priority += matched_request.delivery_request.priority
-
-            self._total_time_in_minutes = self._end_drone_loading_docks.delivery_min_time.get_time_delta(
-                self._start_drone_loading_docks.delivery_min_time).in_minutes()
-
-        self._total_amount_per_package_type = PackageTypeAmounts(total_amount_per_package_type)
+    @lru_cache()
+    def get_total_priority(self) -> int:
+        return sum(matched_request.delivery_request.priority for matched_request in self._matched_requests)

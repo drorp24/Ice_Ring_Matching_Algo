@@ -24,7 +24,7 @@ class BasicMinimumEnd2End(unittest.TestCase):
         delivery_board = self.minimum_end_2_end.calc_assignment(operational_graph,
                                                                 self.minimum_end_2_end_config.matcher_config_json)
         self.assertEqual(len(delivery_board.dropped_delivery_requests), 4)
-        self.assertEqual(delivery_board.total_amount_per_package_type.get_package_type_amount(PackageType.TINY), 1)
-        self.assertEqual(delivery_board.total_amount_per_package_type.get_package_type_amount(PackageType.MEDIUM), 1)
-        self.assertEqual(delivery_board.total_amount_per_package_type.get_package_type_amount(PackageType.LARGE), 4)
-        self.assertEqual(delivery_board.total_priority, 477)
+        self.assertEqual(delivery_board.get_total_amount_per_package_type().get_package_type_amount(PackageType.TINY), 1)
+        self.assertEqual(delivery_board.get_total_amount_per_package_type().get_package_type_amount(PackageType.MEDIUM), 1)
+        self.assertEqual(delivery_board.get_total_amount_per_package_type().get_package_type_amount(PackageType.LARGE), 4)
+        self.assertEqual(delivery_board.get_total_priority(), 477)

@@ -20,6 +20,13 @@ class PackageTypeAmounts:
         for count, key in enumerate(keys):
             self._dict[key] = package_type_amounts[count]
 
+    def __str__(self):
+        return '[' + ' '.join(
+            map(lambda item: str(item[0].name) + ':' + str(item[1]), self.dict.items())) + ']'
+
+    def __hash__(self):
+        return hash(tuple(self._dict))
+
     @property
     def dict(self) -> dict:
         return self._dict
@@ -33,16 +40,15 @@ class PackageTypeAmounts:
     def get_package_type_amounts(self) -> [int]:
         return list(self._dict.values())
 
-    def __str__(self):
-        return '[' + ' '.join(
-            map(lambda item: str(item[0].name) + ':' + str(item[1]), self.dict.items())) + ']'
-
 
 class DroneConfiguration:
 
     def __init__(self, platform_type: PlatformType, package_types_map: PackageTypeAmounts):
         self._platform_type = platform_type
         self._package_types_map = package_types_map
+
+    def __hash__(self):
+        return hash((self._platform_type, self._package_types_map))
 
     @property
     def platform_type(self) -> PlatformType:
