@@ -145,7 +145,7 @@ class ORToolsMatcherDifferentLoadingDockIndexTestCase(TestCase):
     @staticmethod
     def _create_graph_dock_start(delivery_requests: List[DeliveryRequest],
                                  loading_dock: DroneLoadingDock) -> OperationalGraph:
-        graph = OperationalGraph(zero_time=ZERO_TIME.get_internal())
+        graph = OperationalGraph()
         graph.add_drone_loading_docks([loading_dock])
         graph.add_delivery_requests(delivery_requests)
         build_fully_connected_graph(graph)
@@ -154,7 +154,7 @@ class ORToolsMatcherDifferentLoadingDockIndexTestCase(TestCase):
     @staticmethod
     def _create_graph_dock_end(delivery_requests: List[DeliveryRequest],
                                loading_dock: DroneLoadingDock) -> OperationalGraph:
-        graph = OperationalGraph(zero_time=ZERO_TIME.get_internal())
+        graph = OperationalGraph()
         graph.add_delivery_requests(delivery_requests)
         graph.add_drone_loading_docks([loading_dock])
         build_fully_connected_graph(graph)
@@ -163,7 +163,7 @@ class ORToolsMatcherDifferentLoadingDockIndexTestCase(TestCase):
     @staticmethod
     def _create_graph_dock_middle(delivery_requests: List[DeliveryRequest],
                                   loading_dock: DroneLoadingDock) -> OperationalGraph:
-        graph = OperationalGraph(zero_time=ZERO_TIME.get_internal())
+        graph = OperationalGraph()
         graph.add_delivery_requests([delivery_requests[0]])
         graph.add_drone_loading_docks([loading_dock])
         graph.add_delivery_requests([delivery_requests[1], delivery_requests[2]])

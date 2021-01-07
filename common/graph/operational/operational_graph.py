@@ -65,9 +65,8 @@ class OperationalEdge(object):
 
 class OperationalGraph:
 
-    def __init__(self, zero_time: datetime):
+    def __init__(self):
         self.internal_graph = DiGraph()
-        self._zero_time = zero_time
 
     @property
     def nodes(self) -> List[OperationalNode]:
@@ -117,13 +116,9 @@ class OperationalGraph:
 
     @staticmethod
     def _create_from_extracted_subgraph(extracted_subgraph: subgraph):
-        internal_subgraph = OperationalGraph(zero_time=datetime(2020, 1, 23, 12, 30, 00))
+        internal_subgraph = OperationalGraph()
         internal_subgraph.set_internal_graph(extracted_subgraph)
         return internal_subgraph
-
-    @property
-    def zero_time(self) -> datetime:
-        return self._zero_time
 
 
 def assert_node_is_temporal(internal_node) -> None:

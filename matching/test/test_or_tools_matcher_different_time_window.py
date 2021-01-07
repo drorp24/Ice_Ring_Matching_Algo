@@ -104,7 +104,7 @@ class ORToolsMatcherDifferentTWTestCase(TestCase):
 
     @staticmethod
     def _create_graph(delivery_requests: List[DeliveryRequest], loading_dock: DroneLoadingDock) -> OperationalGraph:
-        graph = OperationalGraph(zero_time=ZERO_TIME.get_internal())
+        graph = OperationalGraph()
         graph.add_drone_loading_docks([loading_dock])
         graph.add_delivery_requests(delivery_requests)
         build_fully_connected_graph(graph)

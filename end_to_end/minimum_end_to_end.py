@@ -111,7 +111,7 @@ class MinimumEnd2End:
         return MinimumEnd2End(data_loader.get_scenario(), data_loader.get_empty_drone_delivery_board())
 
     def create_fully_connected_graph_model(self) -> OperationalGraph:
-        operational_graph = OperationalGraph(self.zero_time.get_internal())
+        operational_graph = OperationalGraph()
         operational_graph.add_drone_loading_docks(self.loading_dock)
         operational_graph.add_delivery_requests(self.delivery_requests)
         build_time_overlapping_dependent_connected_graph(operational_graph)
