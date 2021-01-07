@@ -63,6 +63,6 @@ class OrtoolsGraphExporter(GraphExporter):
         delivery_requests_nodes = list(delivery_requests_nodes[delivery_request_indices])
         delivery_requests = [node.internal_node for node in delivery_requests_nodes]
         base_empty_demands = [0 for base_node in self.export_basis_nodes_indices(graph)]
-        demands = base_empty_demands + [delivery_request.delivery_options[0].get_package_type_volume(package_type)
+        demands = base_empty_demands + [delivery_request.delivery_options[0].get_package_type_amount(package_type)
                                         for i, delivery_request in enumerate(delivery_requests)]
         return demands

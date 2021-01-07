@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 
 from common.entities.base_entities.delivery_request import DeliveryRequest
-from common.entities.base_entities.drone import PackageTypesVolumeMap
+from common.entities.base_entities.drone import PackageTypeAmounts
 from common.entities.base_entities.drone_delivery import DroneDelivery, EmptyDroneDelivery
 from common.entities.base_entities.package import PackageType
 
@@ -17,7 +17,7 @@ class EmptyDroneDeliveryBoard:
         return len(self._empty_drone_deliveries)
 
     def formation_capacities(self, package_type: PackageType) -> [int]:
-        return [delivery.drone_formation.get_package_type_volume(package_type) for delivery in
+        return [delivery.drone_formation.get_package_type_amount(package_type) for delivery in
                 self._empty_drone_deliveries]
 
     def package_types(self) -> [PackageType]:
@@ -77,7 +77,7 @@ class DroneDeliveryBoard:
         return self._total_time_in_minutes
 
     @property
-    def total_amount_per_package_type(self) -> PackageTypesVolumeMap:
+    def total_amount_per_package_type(self) -> PackageTypeAmounts:
         return self._total_amount_per_package_type
 
     @property
@@ -90,9 +90,9 @@ class DroneDeliveryBoard:
         for drone_delivery in self._drone_deliveries:
             total_amount_per_package_type = [x + y for x, y in zip(total_amount_per_package_type,
                                                                    drone_delivery.total_amount_per_package_type.
-                                                                   get_package_types_volumes())]
+                                                                   get_package_type_amounts())]
 
             self._total_priority += drone_delivery.total_priority
             self._total_time_in_minutes += drone_delivery.total_time_in_minutes
 
-        self._total_amount_per_package_type = PackageTypesVolumeMap(total_amount_per_package_type)
+        self._total_amount_per_package_type = PackageTypeAmounts(total_amount_per_package_type)

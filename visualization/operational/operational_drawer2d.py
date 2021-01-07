@@ -92,7 +92,7 @@ def add_delivery_board(drawer: Drawer2D, board: DroneDeliveryBoard, draw_dropped
         locations = []
         matched_delivery_labels.append("[" + str(delivery.drone_formation.size.value) + "] * " +
                                        str(
-                                           delivery.drone_formation.drone_configuration.package_type_map.get_package_types_volumes()))
+                                           delivery.drone_formation.drone_configuration.package_type_map.get_package_type_amounts()))
         delivery_color = optional_delivery_colors[i % len(optional_delivery_colors)]
         selected_delivery_colors.append(delivery_color)
         add_drone_loading_dock(drawer, delivery.start_drone_loading_docks.drone_loading_dock)

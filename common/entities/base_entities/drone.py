@@ -12,13 +12,13 @@ class PlatformType(JsonableBaseEntity, Enum):
         return PlatformType[dict_input['name']]
 
 
-class PackageTypesVolumeMap:
+class PackageTypeAmounts:
 
-    def __init__(self, packages_types_volume: [int]):
+    def __init__(self, package_type_amounts: [int]):
         self._dict = {}
         keys = [package_type for package_type in PackageType]
         for count, key in enumerate(keys):
-            self._dict[key] = packages_types_volume[count]
+            self._dict[key] = package_type_amounts[count]
 
     @property
     def dict(self) -> dict:
@@ -27,10 +27,10 @@ class PackageTypesVolumeMap:
     def get_package_types(self) -> [PackageType]:
         return list(self._dict.keys())
 
-    def get_package_type_volume(self, package_type: PackageType) -> int:
+    def get_package_type_amount(self, package_type: PackageType) -> int:
         return self._dict[package_type]
 
-    def get_package_types_volumes(self) -> [int]:
+    def get_package_type_amounts(self) -> [int]:
         return list(self._dict.values())
 
     def __str__(self):
@@ -40,7 +40,7 @@ class PackageTypesVolumeMap:
 
 class DroneConfiguration:
 
-    def __init__(self, platform_type: PlatformType, package_types_map: PackageTypesVolumeMap):
+    def __init__(self, platform_type: PlatformType, package_types_map: PackageTypeAmounts):
         self._platform_type = platform_type
         self._package_types_map = package_types_map
 
@@ -49,25 +49,25 @@ class DroneConfiguration:
         return self._platform_type
 
     @property
-    def package_type_map(self) -> PackageTypesVolumeMap:
+    def package_type_map(self) -> PackageTypeAmounts:
         return self._package_types_map
 
-    def get_package_type_volume(self, package_type: PackageType) -> int:
-        return self._package_types_map.get_package_type_volume(package_type)
+    def get_package_type_amount(self, package_type: PackageType) -> int:
+        return self._package_types_map.get_package_type_amount(package_type)
 
     def get_platform_type(self) -> PlatformType:
         return self._platform_type
 
 
 class Configurations(Enum):
-    LARGE_X2 = PackageTypesVolumeMap([0, 0, 0, 2])
-    MEDIUM_X4 = PackageTypesVolumeMap([0, 0, 4, 0])
-    SMALL_X8 = PackageTypesVolumeMap([0, 8, 0, 0])
-    TINY_X16 = PackageTypesVolumeMap([16, 0, 0, 0])
-    LARGE_X4 = PackageTypesVolumeMap([0, 0, 0, 4])
-    MEDIUM_X8 = PackageTypesVolumeMap([0, 0, 8, 0])
-    SMALL_X16 = PackageTypesVolumeMap([0, 16, 0, 0])
-    TINY_X32 = PackageTypesVolumeMap([32, 0, 0, 0])
+    LARGE_X2 = PackageTypeAmounts([0, 0, 0, 2])
+    MEDIUM_X4 = PackageTypeAmounts([0, 0, 4, 0])
+    SMALL_X8 = PackageTypeAmounts([0, 8, 0, 0])
+    TINY_X16 = PackageTypeAmounts([16, 0, 0, 0])
+    LARGE_X4 = PackageTypeAmounts([0, 0, 0, 4])
+    MEDIUM_X8 = PackageTypeAmounts([0, 0, 8, 0])
+    SMALL_X16 = PackageTypeAmounts([0, 16, 0, 0])
+    TINY_X32 = PackageTypeAmounts([32, 0, 0, 0])
 
 
 class DroneConfigurationOptions:

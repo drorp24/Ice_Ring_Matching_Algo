@@ -117,7 +117,7 @@ class BasicMinimumEnd2EndExperiment():
 
         row_names = ["Dropped Out"] + \
                     ["[" + str(delivery.drone_formation.size.value) + "] * " +
-                     str(delivery.drone_formation.drone_configuration.package_type_map.get_package_types_volumes())
+                     str(delivery.drone_formation.drone_configuration.package_type_map.get_package_type_amounts())
                      for delivery in delivery_board.drone_deliveries]
         board_gantt_drawer = create_gantt_drawer(zero_time=DateTimeExtension.from_dt(fully_connected_graph.zero_time),
                                      hours_period=24,

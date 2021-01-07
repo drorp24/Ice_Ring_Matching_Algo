@@ -2,7 +2,7 @@ from dataclasses import dataclass
 
 from common.entities.base_entities.delivery_request import DeliveryRequest
 from common.entities.base_entities.drone_formation import DroneFormation
-from common.entities.base_entities.drone import PackageTypesVolumeMap
+from common.entities.base_entities.drone import PackageTypeAmounts
 from common.entities.base_entities.drone_loading_dock import DroneLoadingDock
 from common.entities.base_entities.package import PackageType
 from common.entities.base_entities.temporal import DateTimeExtension
@@ -62,7 +62,7 @@ class MatchedDeliveryRequest:
             self.delivery_request.priority) + ', min_time=' + self.delivery_min_time.str_format_time() + \
                ', max_time=' + self.delivery_max_time.str_format_time() + ', delivered=' + str(
             self.delivery_request.delivery_options[
-                self.matched_delivery_option_index].get_package_types_volume_map()) + ')]'
+                self.matched_delivery_option_index].get_package_type_amounts()) + ')]'
 
 
 # TODO change to MatchedDroneDelivery
@@ -91,13 +91,13 @@ class DroneDelivery(EmptyDroneDelivery):
         if len(self._matched_requests) == 0:
             return "\n[DroneDelivery id={id} - origin {origin_capacity} No match found]".format(
                 id=self.id,
-                origin_capacity=self.drone_formation.get_package_type_volumes(), )
+                origin_capacity=self.drone_formation.get_package_type_amounts(), )
 
         return "\n[DroneDelivery id={id} origin {origin_capacity} matched " \
                "{total_amount_per_package_type} total priority={priority} total time in " \
                "minutes={total_time}]\n{start_drone_loading_docks}\n{matched_requests}\n{end_drone_loading_docks}" \
             .format(id=self.id,
-                    origin_capacity=self.drone_formation.get_package_type_volumes(),
+                    origin_capacity=self.drone_formation.get_package_type_amounts(),
                     total_amount_per_package_type=str(self.total_amount_per_package_type),
                     priority=str(self.total_priority), total_time=str(self.total_time_in_minutes),
                     start_drone_loading_docks=str(self.start_drone_loading_docks),
@@ -121,7 +121,7 @@ class DroneDelivery(EmptyDroneDelivery):
         return self._total_time_in_minutes
 
     @property
-    def total_amount_per_package_type(self) -> PackageTypesVolumeMap:
+    def total_amount_per_package_type(self) -> PackageTypeAmounts:
         return self._total_amount_per_package_type
 
     @property
@@ -135,12 +135,12 @@ class DroneDelivery(EmptyDroneDelivery):
             total_amount_per_package_type = [x + y for x, y in zip(total_amount_per_package_type,
                                                                    matched_request.delivery_request.delivery_options[
                                                                        matched_request.matched_delivery_option_index].
-                                                                   get_package_types_volume_map().
-                                                                   get_package_types_volumes())]
+                                                                   get_package_type_amounts().
+                                                                   get_package_type_amounts())]
 
             self._total_priority += matched_request.delivery_request.priority
 
             self._total_time_in_minutes = self._end_drone_loading_docks.delivery_min_time.get_time_delta(
                 self._start_drone_loading_docks.delivery_min_time).in_minutes()
 
-        self._total_amount_per_package_type = PackageTypesVolumeMap(total_amount_per_package_type)
+        self._total_amount_per_package_type = PackageTypeAmounts(total_amount_per_package_type)

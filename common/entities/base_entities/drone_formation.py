@@ -3,7 +3,7 @@ from enum import IntEnum
 from functools import lru_cache
 
 from common.entities.base_entities.drone import DroneConfiguration, PlatformType, Configurations, \
-    DroneConfigurations, PackageTypesVolumeMap
+    DroneConfigurations, PackageTypeAmounts
 from common.entities.base_entities.package import PackageType
 
 
@@ -32,16 +32,16 @@ class DroneFormation:
     def get_package_types(self) -> [PackageType]:
         return self._drone_configuration.package_type_map.get_package_types()
 
-    def get_package_type_volume(self, package_type: PackageType) -> int:
-        return self.size * self._drone_configuration.package_type_map.get_package_type_volume(package_type)
+    def get_package_type_amount(self, package_type: PackageType) -> int:
+        return self.size * self._drone_configuration.package_type_map.get_package_type_amount(package_type)
 
-    def get_package_type_volumes(self) -> PackageTypesVolumeMap:
-        return PackageTypesVolumeMap(
-            list(map(lambda x: x * self._size, self._drone_configuration.package_type_map.get_package_types_volumes())))
+    def get_package_type_amounts(self) -> PackageTypeAmounts:
+        return PackageTypeAmounts(
+            list(map(lambda x: x * self._size, self._drone_configuration.package_type_map.get_package_type_amounts())))
 
     def get_package_type_formation(self) -> PackageType:
-        package_type_volumes = self._drone_configuration.package_type_map.get_package_types_volumes()
-        package_type_indexes = [pt_index for pt_index, pt_exist in enumerate(package_type_volumes) if pt_exist > 0]
+        package_type_amounts = self._drone_configuration.package_type_map.get_package_type_amounts()
+        package_type_indexes = [pt_index for pt_index, pt_exist in enumerate(package_type_amounts) if pt_exist > 0]
         if len(package_type_indexes) != 1:
             raise TypeError(f"The drone formation should has only one package type")
         return self.get_package_types()[package_type_indexes[0]]
