@@ -18,9 +18,6 @@ class DroneFormation:
         self._size = formation_size
         self._drone_configuration = drone_configuration
 
-    def __hash__(self):
-        return hash((self._size, self._drone_configuration))
-
     @property
     def size(self) -> FormationSize:
         return self._size
@@ -40,7 +37,9 @@ class DroneFormation:
 
     def get_package_type_amounts(self) -> PackageTypeAmounts:
         return PackageTypeAmounts(
-            list(map(lambda x: x * self._size, self._drone_configuration.package_type_map.get_package_type_amounts())))
+            map(lambda configuration_amounts:
+                configuration_amounts * self._size,
+                self._drone_configuration.package_type_map.get_package_type_amounts()))
 
     def get_package_type_formation(self) -> PackageType:
         package_type_amounts = self._drone_configuration.package_type_map.get_package_type_amounts()
@@ -54,6 +53,9 @@ class DroneFormation:
     def max_route_times_in_minutes(self) -> int:
         # TODO: Change to real endurance
         return self.get_platform_type().value * 100
+
+    def __hash__(self):
+        return hash((self._size, self._drone_configuration))
 
 
 class AutoName(Enum):

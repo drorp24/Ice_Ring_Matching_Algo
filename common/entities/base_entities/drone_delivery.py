@@ -90,32 +90,6 @@ class DroneDelivery(EmptyDroneDelivery):
         self._start_drone_loading_docks = start_drone_loading_docks
         self._end_drone_loading_docks = end_drone_loading_docks
 
-    def __eq__(self, other):
-        return super().__eq__(
-            other) and self._matched_requests == other.matched_requests and self.start_drone_loading_docks == \
-               other.start_drone_loading_docks and self.end_drone_loading_docks == other.end_drone_loading_docks
-
-    def __str__(self):
-        if len(self._matched_requests) == 0:
-            return "\n[DroneDelivery id={id} - origin {origin_capacity} No match found]".format(
-                id=self.id,
-                origin_capacity=self.drone_formation.get_package_type_amounts(), )
-
-        return "\n[DroneDelivery id={id} origin {origin_capacity} matched " \
-               "{total_amount_per_package_type} total priority={priority} total time in " \
-               "minutes={total_time}]\n{start_drone_loading_docks}\n{matched_requests}\n{end_drone_loading_docks}" \
-            .format(id=self.id,
-                    origin_capacity=self.drone_formation.get_package_type_amounts(),
-                    total_amount_per_package_type=str(self.get_total_amount_per_package_type()),
-                    priority=str(self.get_total_priority()), total_time=str(self.get_total_time_in_minutes()),
-                    start_drone_loading_docks=str(self.start_drone_loading_docks),
-                    matched_requests='\n'.join(map(str, self._matched_requests)),
-                    end_drone_loading_docks=str(self.end_drone_loading_docks))
-
-    def __hash__(self):
-        return hash((tuple(self._matched_requests),
-                     self._start_drone_loading_docks, self._end_drone_loading_docks))
-
     @property
     def matched_requests(self) -> [MatchedDeliveryRequest]:
         return self._matched_requests
@@ -147,3 +121,30 @@ class DroneDelivery(EmptyDroneDelivery):
     @lru_cache()
     def get_total_priority(self) -> int:
         return sum(matched_request.delivery_request.priority for matched_request in self._matched_requests)
+
+    def __eq__(self, other):
+        return super().__eq__(
+            other) and self._matched_requests == other.matched_requests and self.start_drone_loading_docks == \
+               other.start_drone_loading_docks and self.end_drone_loading_docks == other.end_drone_loading_docks
+
+    def __str__(self):
+        if len(self._matched_requests) == 0:
+            return "\n[DroneDelivery id={id} - origin {origin_capacity} No match found]".format(
+                id=self.id,
+                origin_capacity=self.drone_formation.get_package_type_amounts(), )
+
+        return "\n[DroneDelivery id={id} origin {origin_capacity} matched " \
+               "{total_amount_per_package_type} total priority={priority} total time in " \
+               "minutes={total_time}]\n{start_drone_loading_docks}\n{matched_requests}\n{end_drone_loading_docks}" \
+            .format(id=self.id,
+                    origin_capacity=self.drone_formation.get_package_type_amounts(),
+                    total_amount_per_package_type=str(self.get_total_amount_per_package_type()),
+                    priority=str(self.get_total_priority()), total_time=str(self.get_total_time_in_minutes()),
+                    start_drone_loading_docks=str(self.start_drone_loading_docks),
+                    matched_requests='\n'.join(map(str, self._matched_requests)),
+                    end_drone_loading_docks=str(self.end_drone_loading_docks))
+
+    def __hash__(self):
+        return hash((tuple(self._matched_requests),
+                     self._start_drone_loading_docks, self._end_drone_loading_docks))
+
