@@ -38,7 +38,7 @@ class DropEnvelope(Shapeable):
         return self._drop_azimuth
 
     @property
-    def internal_envelope(self) -> Polygon2D:
+    def internal_envelope(self) -> Union[Polygon2D, EmptyGeometry2D]:
         return self._internal_envelope
 
     @property

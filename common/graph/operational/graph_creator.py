@@ -6,7 +6,7 @@ from common.entities.base_entities.drone_loading_dock import DroneLoadingDock
 from common.entities.base_entities.temporal import Temporal
 from common.graph.operational.operational_graph import OperationalGraph, OperationalEdge, OperationalEdgeAttribs, \
     OperationalNode
-from geometry.utils import Localizable
+from geometry.utils import Localizable, Shapeable
 
 
 def add_locally_connected_dr_graph(graph, dr_connection_options: [DeliveryRequest], max_cost_to_connect=math.inf):
@@ -60,3 +60,8 @@ def is_within_cost_range(start: Localizable, target: Localizable,
 
 def calc_cost(start: Localizable, end: Localizable) -> int:
     return ceil(start.calc_location().calc_distance_to_point(end.calc_location()))
+
+
+def calc_cost(start: Shapeable, end: Shapeable) -> int:
+    #  TODO: Add heuristic algorithm for calculating cost between two 2 Shapeable objects
+    return 1
