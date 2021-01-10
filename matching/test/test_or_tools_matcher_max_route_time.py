@@ -94,7 +94,7 @@ class ORToolsMatcherMaxRouteTimeTestCase(TestCase):
             FormationSize.MINI, FormationOptions.LARGE_PACKAGES, PlatformType.platform_2))
         edd2_max_range = empty_drone_delivery_2.drone_formation.get_formation_max_range_in_meters()
         edd2_max_endurance = empty_drone_delivery_2.drone_formation.max_route_times_in_minutes
-        edd2_velocity_per_minute = empty_drone_delivery_1.drone_formation.velocity_meter_per_sec*60.0
+        edd2_velocity_per_minute = empty_drone_delivery_2.drone_formation.velocity_meter_per_sec*60.0
 
         empty_board_1 = EmptyDroneDeliveryBoard([empty_drone_delivery_1])
         empty_board_2 = EmptyDroneDeliveryBoard([empty_drone_delivery_2])

@@ -110,11 +110,11 @@ class MinimumEnd2End:
     def build_from_json(cls, data_loader: DataLoader):
         return MinimumEnd2End(data_loader.get_scenario(), data_loader.get_empty_drone_delivery_board())
 
-    def create_fully_connected_graph_model(self) -> OperationalGraph:
+    def create_fully_connected_graph_model(self, factor: float=1.0) -> OperationalGraph:
         operational_graph = OperationalGraph(self.zero_time.get_internal())
         operational_graph.add_drone_loading_docks(self.loading_dock)
         operational_graph.add_delivery_requests(self.delivery_requests)
-        build_time_overlapping_dependent_connected_graph(operational_graph)
+        build_time_overlapping_dependent_connected_graph(operational_graph, factor)
         return operational_graph
 
     def calc_assignment(self, graph: OperationalGraph, match_config_file: Path) -> DroneDeliveryBoard:

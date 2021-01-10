@@ -67,8 +67,8 @@ def create_single_package_distribution():
 
 def _create_empty_drone_delivery_board(
         formation_size_policy: dict = {FormationSize.MINI: 1, FormationSize.MEDIUM: 0},
-        configurations_policy: dict = {Configurations.LARGE_X2: 0.9,
-                                       Configurations.MEDIUM_X4: 0.1,
+        configurations_policy: dict = {Configurations.LARGE_X2: 1.0,
+                                       Configurations.MEDIUM_X4: 0.0,
                                        Configurations.SMALL_X8: 0,
                                        Configurations.TINY_X16: 0}
         , platform_type: PlatformType = PlatformType.platform_1,
@@ -102,7 +102,7 @@ class BasicMinimumEnd2EndExperiment():
         minimum_end_to_end = MinimumEnd2End(
             scenario=self.scenario_distribution.choose_rand(random=Random(10), amount={DeliveryRequest: 37, DroneLoadingDock: 1})[0],
             empty_drone_delivery_board=empty_drone_delivery_board)
-        fully_connected_graph = minimum_end_to_end.create_fully_connected_graph_model()
+        fully_connected_graph = minimum_end_to_end.create_fully_connected_graph_model(factor=90.0)
 
         delivery_board = minimum_end_to_end.calc_assignment(fully_connected_graph, self.matcher_config)
         print(delivery_board)
