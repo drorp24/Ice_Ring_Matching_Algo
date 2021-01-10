@@ -18,8 +18,8 @@ from common.entities.base_entities.package import PackageType
 from common.entities.base_entities.temporal import DateTimeExtension, TimeDeltaExtension
 from common.tools.empty_drone_delivery_board_generation import build_empty_drone_delivery_board
 from common.tools.fleet_property_sets import *
+from end_to_end.distribution.scenario_distribution import ScenarioDistribution
 from end_to_end.minimum_end_to_end import MinimumEnd2End
-from end_to_end.scenario import ScenarioDistribution
 from geometry.distribution.geo_distribution import NormalPointDistribution, UniformPointInBboxDistribution
 from geometry.geo_factory import create_point_2d
 from visualization.basic.drawer2d import Drawer2DCoordinateSys
@@ -91,8 +91,8 @@ class BasicMinimumEnd2EndExperiment():
             drone_loading_docks_distribution=
             DroneLoadingDockDistribution(drone_loading_station_distributions=
                                          DroneLoadingStationDistribution(drone_station_locations_distribution=
-                                                                         UniformPointInBboxDistribution(35.11,35.11,
-                                                                                                        31.79,31.79
+                                                                         UniformPointInBboxDistribution(35.11, 35.11,
+                                                                                                        31.79, 31.79
                                                                                                         )),
                                          time_window_distributions=create_standad_full_day_test_time()))
         self.matcher_config = Path("end_to_end/tests/jsons/test_matcher_config.json")
@@ -100,7 +100,8 @@ class BasicMinimumEnd2EndExperiment():
     def test_small_scenario(self):
         empty_drone_delivery_board = _create_empty_drone_delivery_board(size=20)
         minimum_end_to_end = MinimumEnd2End(
-            scenario=self.scenario_distribution.choose_rand(random=Random(10), amount={DeliveryRequest: 37, DroneLoadingDock: 1})[0],
+            scenario=self.scenario_distribution.choose_rand(random=Random(10),
+                                                            amount={DeliveryRequest: 37, DroneLoadingDock: 1})[0],
             empty_drone_delivery_board=empty_drone_delivery_board)
         fully_connected_graph = minimum_end_to_end.create_fully_connected_graph_model()
 
@@ -108,7 +109,8 @@ class BasicMinimumEnd2EndExperiment():
         print(delivery_board)
 
         dr_drawer = create_drawer_2d(Drawer2DCoordinateSys.GEOGRAPHIC)
-        operational_drawer2d.add_operational_graph(dr_drawer, fully_connected_graph,draw_internal=True, draw_edges=False)
+        operational_drawer2d.add_operational_graph(dr_drawer, fully_connected_graph, draw_internal=True,
+                                                   draw_edges=False)
         dr_drawer.draw(False)
 
         board_map_drawer = create_drawer_2d(Drawer2DCoordinateSys.GEOGRAPHIC)
@@ -119,11 +121,12 @@ class BasicMinimumEnd2EndExperiment():
                     ["[" + str(delivery.drone_formation.size.value) + "] * " +
                      str(delivery.drone_formation.drone_configuration.package_type_map.get_package_type_amounts())
                      for delivery in delivery_board.drone_deliveries]
-        board_gantt_drawer = create_gantt_drawer(zero_time=DateTimeExtension.from_dt(fully_connected_graph.zero_time),
-                                     hours_period=24,
-                                     row_names=row_names,
-                                     rows_title='Carried Package types: [Formation Size] * ' + str(PackageType.get_all_names())
-                                     )
+        board_gantt_drawer = create_gantt_drawer(zero_time=minimum_end_to_end.zero_time,
+                                                 hours_period=24,
+                                                 row_names=row_names,
+                                                 rows_title='Carried Package types: [Formation Size] * ' + str(
+                                                     PackageType.get_all_names())
+                                                 )
         operational_gantt_drawer.add_delivery_board(board_gantt_drawer, delivery_board, True)
         board_gantt_drawer.draw(True)
 

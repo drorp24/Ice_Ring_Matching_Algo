@@ -4,7 +4,8 @@ from random import Random
 
 from common.entities.base_entities.delivery_request import DeliveryRequest
 from common.entities.base_entities.drone_loading_dock import DroneLoadingDock
-from end_to_end.scenario import ScenarioDistribution, Scenario
+from end_to_end.distribution.scenario_distribution import ScenarioDistribution
+from end_to_end.scenario import  Scenario
 
 
 class BasicScenarioTests(unittest.TestCase):

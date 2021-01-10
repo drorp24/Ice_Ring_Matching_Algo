@@ -37,9 +37,9 @@ class DroneFormation:
 
     def get_package_type_amounts(self) -> PackageTypeAmounts:
         return PackageTypeAmounts(
-            map(lambda configuration_amounts:
-                configuration_amounts * self._size,
-                self._drone_configuration.package_type_map.get_package_type_amounts()))
+            list(map(lambda configuration_amounts:
+                     configuration_amounts * self._size,
+                     self._drone_configuration.package_type_map.get_package_type_amounts())))
 
     def get_package_type_formation(self) -> PackageType:
         package_type_amounts = self._drone_configuration.package_type_map.get_package_type_amounts()
