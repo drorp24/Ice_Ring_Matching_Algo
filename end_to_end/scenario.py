@@ -46,3 +46,8 @@ class Scenario(JsonableBaseEntity):
                                  for dld_dict in dict_input['drone_loading_docks']],
             zero_time=DateTimeExtension.from_dict(dict_input['zero_time']))
 
+    def __eq__(self, other):
+        return self.zero_time == other.zero_time and self.delivery_requests == other.delivery_requests and \
+               self.drone_loading_docks == other.drone_loading_docks
+
+
