@@ -24,7 +24,7 @@ class Matcher(ABC):
         raise NotImplementedError()
 
     def _validate_input(self) -> bool:
-        if self._matcher_input.empty_board.num_of_formations == 0:
+        if self._matcher_input.empty_board.amount_of_formations() == 0:
             raise InvalidMatchInputException(f"Empty Board must has at least one formation")
 
         return True

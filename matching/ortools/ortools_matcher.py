@@ -29,7 +29,7 @@ class ORToolsMatcher(Matcher):
         self._set_constraints()
 
     def _set_manager(self) -> RoutingIndexManager:
-        num_vehicles = self._matcher_input.empty_board.num_of_formations()
+        num_vehicles = self._matcher_input.empty_board.amount_of_formations()
         depot_ids_start = self._graph_exporter.export_basis_nodes_indices(self._matcher_input.graph)
         # TODO depot_ids_end = self._graph_exporter.export_basis_nodes_indices(self._match_input.graph)
 

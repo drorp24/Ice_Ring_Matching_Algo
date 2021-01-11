@@ -15,7 +15,7 @@ class EmptyDroneDeliveryBoard:
     def empty_drone_deliveries(self) -> [EmptyDroneDelivery]:
         return self._empty_drone_deliveries
 
-    def num_of_formations(self) -> int:
+    def amount_of_formations(self) -> int:
         return len(self._empty_drone_deliveries)
 
     def formation_capacities(self, package_type: PackageType) -> [int]:
@@ -59,8 +59,8 @@ class DroneDeliveryBoard:
         return self._dropped_delivery_requests
 
     @lru_cache()
-    def get_total_time_in_minutes(self) -> float:
-        return sum([drone_delivery.get_total_time_in_minutes() for drone_delivery in self._drone_deliveries])
+    def get_total_work_time_in_minutes(self) -> float:
+        return sum([drone_delivery.get_total_work_time_in_minutes() for drone_delivery in self._drone_deliveries])
 
     @lru_cache()
     def get_total_amount_per_package_type(self) -> PackageTypeAmountMap:
