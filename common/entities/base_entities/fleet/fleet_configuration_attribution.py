@@ -42,13 +42,13 @@ class FleetConfigurationAttribution:
         cls.configuration_attribution_parameters.formation_sizes = [
             s.value for s in formation_sizes_amounts.amounts.keys()]
         cls.configuration_attribution_parameters.configurations = list(
-            platform_property_set.package_configuration_policy.package_configurations_policy.keys())
+            platform_property_set.package_configuration_policy._package_configurations_policy.keys())
         cls.configuration_attribution_parameters.configuration_options_size = len(
-            platform_property_set.package_configuration_policy.package_configurations_policy)
+            platform_property_set.package_configuration_policy._package_configurations_policy)
         cls.configuration_attribution_parameters.configurations = list(
-            platform_property_set.package_configuration_policy.package_configurations_policy.keys())
+            platform_property_set.package_configuration_policy._package_configurations_policy.keys())
         cls.configuration_attribution_parameters.configurations_policy = list(
-            platform_property_set.package_configuration_policy.package_configurations_policy.values())
+            platform_property_set.package_configuration_policy._package_configurations_policy.values())
         cls.configuration_attribution_parameters.total_formation_size = int(sum(
             cls.configuration_attribution_parameters.formation_amounts))
         cls.configuration_attribution_parameters.platform_type = platform_property_set.drone_type

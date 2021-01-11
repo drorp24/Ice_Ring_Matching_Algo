@@ -6,7 +6,7 @@ from uuid import UUID
 
 from common.utils.uuid_utils import convert_uuid_to_str
 
-DEFAULT_TEST_FILE_JSON = 'jsons/test_file.json'
+DEFAULT_TEST_FILE_JSON = 'jsons/test_file.jsons'
 
 
 class BaseEntity(object):

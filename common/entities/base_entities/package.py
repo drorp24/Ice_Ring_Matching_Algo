@@ -76,6 +76,9 @@ class PackageType(Enum):
         assert (split_package_type[0] == 'PackageType')
         return PackageType[split_package_type[1]]
 
+    def calc_weight(self):
+        return self.value.weight
+
     def __dict__(self):
         return {'__enum__': str(self)}
 

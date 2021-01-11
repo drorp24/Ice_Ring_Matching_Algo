@@ -1,6 +1,6 @@
 import unittest
 
-from common.entities.base_entities.drone import DroneType, PackageConfigurations
+from common.entities.base_entities.drone import DroneType, PackageConfiguration
 from common.entities.base_entities.drone_delivery_board import EmptyDroneDeliveryBoard
 from common.entities.base_entities.drone_formation import DroneFormationType, DroneFormations, \
     PackageConfigurationOptions, DroneFormation
@@ -83,30 +83,30 @@ class TestFleetConfigurationAttribution(unittest.TestCase):
     @classmethod
     def define_drone_set_properties_1(cls):
         return DroneSetProperties(
-            drone_type=DroneType.drone_type_1,
-            drone_formation_policy=DroneFormationTypePolicy(
+            _drone_type=DroneType.drone_type_1,
+            _drone_formation_policy=DroneFormationTypePolicy(
                 {DroneFormationType.PAIR: 0.5,
                  DroneFormationType.QUAD: 0.5}),
-            package_configuration_policy=PackageConfigurationsPolicy(
-                {PackageConfigurations.LARGE_X2: 0.1,
-                 PackageConfigurations.MEDIUM_X4: 0.4,
-                 PackageConfigurations.SMALL_X8: 0.3,
-                 PackageConfigurations.TINY_X16: 0.2}),
-            drone_amount=30)
+            _package_configuration_policy=PackageConfigurationsPolicy(
+                {PackageConfiguration.LARGE_X2: 0.1,
+                 PackageConfiguration.MEDIUM_X4: 0.4,
+                 PackageConfiguration.SMALL_X8: 0.3,
+                 PackageConfiguration.TINY_X16: 0.2}),
+            _drone_amount=30)
 
     @classmethod
     def define_drone_set_properties_2(cls):
         return DroneSetProperties(
-            drone_type=DroneType.drone_type_2,
-            drone_formation_policy=DroneFormationTypePolicy(
+            _drone_type=DroneType.drone_type_2,
+            _drone_formation_policy=DroneFormationTypePolicy(
                 {DroneFormationType.PAIR: 1.0,
                  DroneFormationType.QUAD: 0.0}),
-            package_configuration_policy=PackageConfigurationsPolicy(
-                {PackageConfigurations.LARGE_X4: 0.0,
-                 PackageConfigurations.MEDIUM_X8: 0.4,
-                 PackageConfigurations.SMALL_X16: 0.6,
-                 PackageConfigurations.TINY_X32: 0.0}),
-            drone_amount=30)
+            _package_configuration_policy=PackageConfigurationsPolicy(
+                {PackageConfiguration.LARGE_X4: 0.0,
+                 PackageConfiguration.MEDIUM_X8: 0.4,
+                 PackageConfiguration.SMALL_X16: 0.6,
+                 PackageConfiguration.TINY_X32: 0.0}),
+            _drone_amount=30)
 
     def _assert_fleet_configuration_is_correct(self, expected_outcome, fleet_configuration):
         for fleet_option, expected_amount in expected_outcome.items():

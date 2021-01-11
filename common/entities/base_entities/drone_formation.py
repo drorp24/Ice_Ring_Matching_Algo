@@ -1,7 +1,7 @@
 from enum import Enum, auto
 from enum import IntEnum
 
-from common.entities.base_entities.drone import DronePackageConfiguration, DroneType, PackageConfigurations, \
+from common.entities.base_entities.drone import DronePackageConfiguration, DroneType, PackageConfiguration, \
     DroneConfigurations
 from common.entities.base_entities.package import PackageType
 
@@ -12,6 +12,18 @@ class DroneFormationType(IntEnum):
 
     def get_amount_of_drones(self):
         return self.value
+
+    @classmethod
+    def dict_to_obj(cls, input_dict):
+        split_name = input_dict['__enum__'].split('.')
+        assert (split_name[0] == 'DroneFormationType')
+        return DroneFormationType[split_name[1]]
+
+    def __dict__(self):
+        return {'__enum__': str(self)}
+
+    def __repr__(self):
+        return 'DroneFormationType: ' + str(self.__dict__())
 
 
 class DroneFormation:
@@ -31,14 +43,8 @@ class DroneFormation:
     def get_platform_type(self) -> DroneType:
         return self._drone_configuration.get_platform_type()
 
-    def get_package_types(self) -> [PackageType]:
-        return self._drone_configuration.package_type_map.get_package_types()
-
     def get_package_type_volume(self, package_type: PackageType) -> int:
         return self._drone_configuration.package_type_map.get_package_type_volume(package_type)
-
-    def get_package_type_volumes(self) -> [int]:
-        return self._drone_configuration.package_type_map.get_package_types_volumes()
 
 
 class AutoName(Enum):
@@ -56,17 +62,17 @@ class PackageConfigurationOptions(AutoName):
 class DroneFormationOptions:
     drone_configurations_map: {PackageConfigurationOptions: [DronePackageConfiguration]} = {
         PackageConfigurationOptions.LARGE_PACKAGES: [
-            DroneConfigurations.get_drone_configuration(DroneType.drone_type_1, PackageConfigurations.LARGE_X2),
-            DroneConfigurations.get_drone_configuration(DroneType.drone_type_2, PackageConfigurations.LARGE_X4)],
+            DroneConfigurations.get_drone_configuration(DroneType.drone_type_1, PackageConfiguration.LARGE_X2),
+            DroneConfigurations.get_drone_configuration(DroneType.drone_type_2, PackageConfiguration.LARGE_X4)],
         PackageConfigurationOptions.MEDIUM_PACKAGES: [
-            DroneConfigurations.get_drone_configuration(DroneType.drone_type_1, PackageConfigurations.MEDIUM_X4),
-            DroneConfigurations.get_drone_configuration(DroneType.drone_type_2, PackageConfigurations.MEDIUM_X8)],
+            DroneConfigurations.get_drone_configuration(DroneType.drone_type_1, PackageConfiguration.MEDIUM_X4),
+            DroneConfigurations.get_drone_configuration(DroneType.drone_type_2, PackageConfiguration.MEDIUM_X8)],
         PackageConfigurationOptions.SMALL_PACKAGES: [
-            DroneConfigurations.get_drone_configuration(DroneType.drone_type_1, PackageConfigurations.SMALL_X8),
-            DroneConfigurations.get_drone_configuration(DroneType.drone_type_2, PackageConfigurations.SMALL_X16)],
+            DroneConfigurations.get_drone_configuration(DroneType.drone_type_1, PackageConfiguration.SMALL_X8),
+            DroneConfigurations.get_drone_configuration(DroneType.drone_type_2, PackageConfiguration.SMALL_X16)],
         PackageConfigurationOptions.TINY_PACKAGES: [
-            DroneConfigurations.get_drone_configuration(DroneType.drone_type_1, PackageConfigurations.TINY_X16),
-            DroneConfigurations.get_drone_configuration(DroneType.drone_type_2, PackageConfigurations.TINY_X32)],
+            DroneConfigurations.get_drone_configuration(DroneType.drone_type_1, PackageConfiguration.TINY_X16),
+            DroneConfigurations.get_drone_configuration(DroneType.drone_type_2, PackageConfiguration.TINY_X32)],
     }
 
     @classmethod
@@ -89,7 +95,7 @@ class DroneFormationOptions:
         return DroneFormation(formation_size, drone_configuration)
 
     @classmethod
-    def get_formation_option(cls, configuration: PackageConfigurations, platform_type: DroneType):
+    def get_formation_option(cls, configuration: PackageConfiguration, platform_type: DroneType):
         drone_configuration = DroneConfigurations.get_drone_configuration(platform_type, configuration)
         for formation_option, drone_configurations in cls.drone_configurations_map.items():
             for drone_conf in drone_configurations:

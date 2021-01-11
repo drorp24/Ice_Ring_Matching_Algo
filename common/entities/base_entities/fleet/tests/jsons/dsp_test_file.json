@@ -1,0 +1,22 @@
+{
+  "__class__": "DroneSetProperties",
+  "drone_amount": 10,
+  "drone_formation_policy": {
+    "__class__": "DroneFormationTypePolicy",
+    "formation_type_policy": {
+      "2": 0.7,
+      "4": 0.3
+    }
+  },
+  "drone_type": {
+    "__enum__": "DroneType.drone_type_1"
+  },
+  "package_configuration_policy": {
+    "__class__": "PackageConfigurationsPolicy",
+    "package_configuration_policy": {
+      "LARGE_X2": 0.2,
+      "MEDIUM_X4": 0.5,
+      "SMALL_X8": 0.3
+    }
+  }
+}
