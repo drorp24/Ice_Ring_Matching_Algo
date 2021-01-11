@@ -3,7 +3,7 @@ from enum import IntEnum
 from functools import lru_cache
 
 from common.entities.base_entities.drone import DroneConfiguration, PlatformType, Configurations, \
-    DroneConfigurations, PackageTypeAmounts
+    DroneConfigurations, PackageTypeAmountMap
 from common.entities.base_entities.package import PackageType
 
 
@@ -26,6 +26,12 @@ class DroneFormation:
     def drone_configuration(self) -> DroneConfiguration:
         return self._drone_configuration
 
+    @property
+    @lru_cache()
+    def max_route_times_in_minutes(self) -> int:
+        # TODO: Change to real endurance
+        return self.get_platform_type().value * 100
+
     def get_platform_type(self) -> PlatformType:
         return self._drone_configuration.get_platform_type()
 
@@ -35,8 +41,8 @@ class DroneFormation:
     def get_package_type_amount(self, package_type: PackageType) -> int:
         return self.size * self._drone_configuration.package_type_map.get_package_type_amount(package_type)
 
-    def get_package_type_amounts(self) -> PackageTypeAmounts:
-        return PackageTypeAmounts(
+    def get_package_type_amount_map(self) -> PackageTypeAmountMap:
+        return PackageTypeAmountMap(
             list(map(lambda configuration_amounts:
                      configuration_amounts * self._size,
                      self._drone_configuration.package_type_map.get_package_type_amounts())))
@@ -47,12 +53,6 @@ class DroneFormation:
         if len(package_type_indexes) != 1:
             raise TypeError(f"The drone formation should has only one package type")
         return self.get_package_types()[package_type_indexes[0]]
-
-    @property
-    @lru_cache()
-    def max_route_times_in_minutes(self) -> int:
-        # TODO: Change to real endurance
-        return self.get_platform_type().value * 100
 
     def __hash__(self):
         return hash((self._size, self._drone_configuration))
