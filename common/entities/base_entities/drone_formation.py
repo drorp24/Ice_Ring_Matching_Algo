@@ -6,7 +6,7 @@ from common.entities.base_entities.drone import DronePackageConfiguration, Drone
 from common.entities.base_entities.package import PackageType
 
 
-class DroneFormationType(IntEnum):
+class DroneFormationType(Enum):
     PAIR = 2
     QUAD = 4
 

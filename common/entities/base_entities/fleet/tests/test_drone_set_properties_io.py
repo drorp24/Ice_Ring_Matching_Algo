@@ -21,18 +21,18 @@ class TestDroneSetProperties(unittest.TestCase):
         dftp_dict = JsonableBaseEntity.json_to_dict(
             'common/entities/base_entities/fleet/tests/jsons/dftp_test_file.json')
         drone_formation_type_policy = DroneFormationTypePolicy.dict_to_obj(dftp_dict)
-        print(drone_formation_type_policy)
+        self.assertEqual(drone_formation_type_policy, self.dftp)
 
     def test_package_configuration_policy_to_json(self):
         self.pcp.to_json('common/entities/base_entities/fleet/tests/jsons/pcp_test_file.json')
         pcp_dict = JsonableBaseEntity.json_to_dict(
             'common/entities/base_entities/fleet/tests/jsons/pcp_test_file.json')
         package_configuration_policy = PackageConfigurationsPolicy.dict_to_obj(pcp_dict)
-        print(package_configuration_policy)
+        self.assertEqual(package_configuration_policy, self.pcp)
 
     def test_drone_set_properties_to_json(self):
         self.dsp.to_json('common/entities/base_entities/fleet/tests/jsons/dsp_test_file.json')
         dsp_dict = JsonableBaseEntity.json_to_dict(
             'common/entities/base_entities/fleet/tests/jsons/dsp_test_file.json')
         drone_set_properties = DroneSetProperties.dict_to_obj(dsp_dict)
-        print(drone_set_properties)
+        self.assertEqual(drone_set_properties, self.dsp)
