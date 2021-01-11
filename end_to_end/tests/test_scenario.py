@@ -11,7 +11,7 @@ from end_to_end.scenario import  Scenario
 class BasicScenarioTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.scenario = ScenarioDistribution().choose_rand(random=Random(), amount={DeliveryRequest: 10, DroneLoadingDock: 1})[0]
+        cls.scenario = ScenarioDistribution().choose_rand(random=Random(), amount={DeliveryRequest: 10, DroneLoadingDock: 1})
 
     def test_scenario_amounts(self):
         self.assertEqual(len(self.scenario.delivery_requests), 10)
@@ -22,6 +22,4 @@ class BasicScenarioTests(unittest.TestCase):
         self.scenario.to_json(test_json_file_name)
         loaded_scenario_dict = Scenario.json_to_dict(test_json_file_name)
         loaded_scenario = self.scenario.dict_to_obj(loaded_scenario_dict)
-        self.assertEqual(self.scenario.zero_time, loaded_scenario.zero_time)
-        self.assertEqual(self.scenario.drone_loading_docks, loaded_scenario.drone_loading_docks)
-        self.assertEqual(self.scenario.delivery_requests, loaded_scenario.delivery_requests)
+        self.assertEqual(self.scenario, loaded_scenario)
