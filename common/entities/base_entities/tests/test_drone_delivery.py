@@ -80,9 +80,6 @@ class BasicDroneDeliveryGenerationTests(unittest.TestCase):
         cls.drone_delivery_board = DroneDeliveryBoard(drone_deliveries=[cls.drone_delivery_1, cls.drone_delivery_2],
                                                       dropped_delivery_requests=[cls.dropped_delivery_request])
 
-    def test_delivery_requests_quantity(self):
-        self.assertGreaterEqual(len(self.delivery_requests), 3)
-
     def test_empty_drone_delivery(self):
         self.assertEqual(self.empty_drone_delivery_1.drone_formation, DroneFormations.get_drone_formation(
             FormationSize.MINI, FormationOptions.TINY_PACKAGES, PlatformType.platform_1))
