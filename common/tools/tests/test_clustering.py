@@ -3,7 +3,6 @@ import unittest
 import numpy as np
 
 from common.tools.clustering_alg import fit_k_means
-from geometry.geo_factory import create_point_2d
 
 
 class ClusteringTestCase(unittest.TestCase):
@@ -32,11 +31,9 @@ class ClusteringTestCase(unittest.TestCase):
         expected_centers = [(29.93, 29.63),
                             (19.34, 19.94)]
 
-        best_fit_centers = [(round(center.x,2),round(center.y,2)) for center in best_fit.centers]
+        best_fit_centers = [(round(center.x, 2), round(center.y, 2)) for center in best_fit.centers]
 
         self.assertEqual(expected_n_clusters, len(best_fit.centers))
         self.assertEqual(expected_centers, best_fit_centers)
         self.assertEqual(expected_0_labels, best_fit.labels.count(0))
         self.assertEqual(expected_1_labels, best_fit.labels.count(1))
-
-        best_fit.plot(all_data)

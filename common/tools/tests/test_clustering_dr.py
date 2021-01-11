@@ -31,11 +31,12 @@ class ClusteringDeliveryRequestsTestCase(unittest.TestCase):
                                                                            sigma_x_range=Range(0, 15),
                                                                            sigma_y_range=Range(0, 15)))
 
-        cls.ds = DeliveryRequestDatasetStructure(num_of_delivery_requests=cls.num_of_drs,
-                                                 num_of_delivery_options_per_delivery_request=cls.num_of_do_per_dr,
-                                                 num_of_customer_deliveries_per_delivery_option=cls.num_of_cd_per_do,
-                                                 num_of_package_delivery_plan_per_customer_delivery=cls.num_of_pdp_per_cd,
-                                                 delivery_request_distribution=dr_distribution)
+        cls.ds = DeliveryRequestDatasetStructure(
+            num_of_delivery_requests=cls.num_of_drs,
+            num_of_delivery_options_per_delivery_request=cls.num_of_do_per_dr,
+            num_of_customer_deliveries_per_delivery_option=cls.num_of_cd_per_do,
+            num_of_package_delivery_plan_per_customer_delivery=cls.num_of_pdp_per_cd,
+            delivery_request_distribution=dr_distribution)
 
         cls.random = Random()
         cls.random.seed(0)
@@ -54,5 +55,3 @@ class ClusteringDeliveryRequestsTestCase(unittest.TestCase):
         self.assertEqual(expected_n_clusters, len(best_fit.centers))
         self.assertEqual(expected_0_labels, best_fit.labels.count(0))
         self.assertEqual(expected_1_labels, best_fit.labels.count(1))
-
-        best_fit.plot(all_data)
