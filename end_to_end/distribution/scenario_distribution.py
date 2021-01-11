@@ -35,9 +35,9 @@ class ScenarioDistribution(HierarchialDistribution):
         sc_amount = extract_amount_in_range(internal_amount.pop(Scenario), random)
         dld_amount = extract_amount_in_range(internal_amount.pop(DroneLoadingDock), random)
         zero_time = self.zero_time_distribution.choose_rand(random=random, amount=1)
-        return [Scenario(self.delivery_requests_distribution.choose_rand(random=random, amount=internal_amount),
+        return Scenario(self.delivery_requests_distribution.choose_rand(random=random, amount=internal_amount),
                          self.drone_loading_docks_distribution.choose_rand(random=random, amount=dld_amount),
-                         zero_time[0]) for _ in range(sc_amount)]
+                         zero_time[0])
 
     @classmethod
     def distribution_class(cls) -> type:

@@ -6,6 +6,7 @@ from common.entities.base_entities.drone import PackageTypeAmounts
 from common.entities.base_entities.drone_delivery import DroneDelivery, EmptyDroneDelivery
 from common.entities.base_entities.package import PackageType
 
+
 class EmptyDroneDeliveryBoard:
     def __init__(self, empty_drone_deliveries: [EmptyDroneDelivery]):
         self._empty_drone_deliveries = empty_drone_deliveries
@@ -89,4 +90,3 @@ class DroneDeliveryBoard:
     @lru_cache()
     def get_total_priority(self) -> int:
         return sum(drone_delivery.get_total_priority() for drone_delivery in self._drone_deliveries)
-
