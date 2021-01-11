@@ -168,9 +168,5 @@ class BasicPackageGeneration(unittest.TestCase):
                          PackageType.SMALL.name: 0.33,
                          PackageType.MEDIUM.name: 0.0,
                          PackageType.LARGE.name: 0.0}
-
-        for package in PackageType.get_all_names():
-            assert_samples_approx_expected(self, package, expected_prob, sample_count)
-
-    def print_example_package(self):
-        pprint(PackageType.TINY)
+        for package in PackageType:
+            assert_samples_approx_expected(self, package.name, expected_prob, sample_count)
