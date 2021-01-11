@@ -31,7 +31,7 @@ class BasicMinimumEnd2End(unittest.TestCase):
                                      config=self.matcher_config)
 
         delivery_board = calc_assignment(matcher_input=matcher_input)
-        self.assertEqual(len(delivery_board.dropped_delivery_requests), 4)
+        self.assertEqual(len(delivery_board.unmatched_delivery_requests), 4)
         self.assertEqual(delivery_board.get_total_amount_per_package_type().get_package_type_amount(PackageType.TINY), 1)
         self.assertEqual(delivery_board.get_total_amount_per_package_type().get_package_type_amount(PackageType.MEDIUM), 1)
         self.assertEqual(delivery_board.get_total_amount_per_package_type().get_package_type_amount(PackageType.LARGE), 4)

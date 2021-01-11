@@ -62,7 +62,7 @@ class ORToolsMatcherMaxRouteTimeTestCase(TestCase):
                                                  max_route_time=MAX_OPERATION_TIME,
                                                  count_time_from_zero=False),
                 priority_constraints=PriorityConstraints(True)),
-            dropped_penalty=1000))
+            unmatched_penalty=1000))
 
         self.graph = self._create_graph(self.delivery_requests, self.loading_dock)
 
@@ -109,7 +109,7 @@ class ORToolsMatcherMaxRouteTimeTestCase(TestCase):
                                                  max_route_time=MAX_OPERATION_TIME,
                                                  count_time_from_zero=False),
                 priority_constraints=PriorityConstraints(True)),
-            dropped_penalty=1000))
+            unmatched_penalty=1000))
 
         self.graph = self._create_graph(self.delivery_requests, self.loading_dock)
 

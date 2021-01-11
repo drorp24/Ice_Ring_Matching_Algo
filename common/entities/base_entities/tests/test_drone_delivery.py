@@ -6,9 +6,8 @@ from common.entities.base_entities.delivery_request import DeliveryRequest
 from common.entities.base_entities.drone import PlatformType
 from common.entities.base_entities.drone_delivery import DroneDelivery, EmptyDroneDelivery, MatchedDroneLoadingDock, \
     MatchedDeliveryRequest
-from common.entities.base_entities.drone_delivery_board import EmptyDroneDeliveryBoard, DroneDeliveryBoard, DroppedDeliveryRequest
+from common.entities.base_entities.drone_delivery_board import EmptyDroneDeliveryBoard, DroneDeliveryBoard, UnmatchedDeliveryRequest
 from common.entities.base_entities.drone_formation import DroneFormations, FormationSize, FormationOptions
-from common.entities.base_entities.drone_loading_dock import DroneLoadingDock
 from common.entities.base_entities.entity_distribution.delivery_request_distribution import DeliveryRequestDistribution
 from common.entities.base_entities.entity_distribution.drone_loading_dock_distribution import \
     DroneLoadingDockDistribution
@@ -53,7 +52,7 @@ class BasicDroneDeliveryGenerationTests(unittest.TestCase):
             delivery_max_time=DateTimeExtension(
                 dt_date=date(2020, 1, 23), dt_time=time(12, 30, 0)))
 
-        cls.dropped_delivery_request = DroppedDeliveryRequest(graph_index=4, delivery_request=cls.delivery_requests[2])
+        cls.unmatched_delivery_request = UnmatchedDeliveryRequest(graph_index=4, delivery_request=cls.delivery_requests[2])
 
         drone_loading_dock_distribution = DroneLoadingDockDistribution()
         docks = drone_loading_dock_distribution.choose_rand(Random(100), amount=1)
@@ -78,7 +77,7 @@ class BasicDroneDeliveryGenerationTests(unittest.TestCase):
             [cls.empty_drone_delivery_1, cls.empty_drone_delivery_2])
 
         cls.drone_delivery_board = DroneDeliveryBoard(drone_deliveries=[cls.drone_delivery_1, cls.drone_delivery_2],
-                                                      dropped_delivery_requests=[cls.dropped_delivery_request])
+                                                      unmatched_delivery_requests=[cls.unmatched_delivery_request])
 
     def test_delivery_requests_quantity(self):
         self.assertGreaterEqual(len(self.delivery_requests), 3)
@@ -158,5 +157,5 @@ class BasicDroneDeliveryGenerationTests(unittest.TestCase):
     def test_2_drone_delivery_boards_are_equal(self):
         actual_drone_delivery_board = DroneDeliveryBoard(
             drone_deliveries=[self.drone_delivery_1, self.drone_delivery_2],
-            dropped_delivery_requests=[self.dropped_delivery_request])
+            unmatched_delivery_requests=[self.unmatched_delivery_request])
         self.assertEqual(self.drone_delivery_board, actual_drone_delivery_board)

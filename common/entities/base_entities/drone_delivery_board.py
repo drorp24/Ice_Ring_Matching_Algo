@@ -30,7 +30,7 @@ class EmptyDroneDeliveryBoard:
 
 
 @dataclass
-class DroppedDeliveryRequest:
+class UnmatchedDeliveryRequest:
     graph_index: int
     delivery_request: DeliveryRequest
 
@@ -38,7 +38,7 @@ class DroppedDeliveryRequest:
         return self.graph_index == other.graph_index and self.delivery_request == other.delivery_request
 
     def __str__(self):
-        return '[DroppedDeliveryRequest(graph_index=' + str(self.graph_index) + ', priority=' + str(
+        return '[UnmatchedDeliveryRequest(graph_index=' + str(self.graph_index) + ', priority=' + str(
             self.delivery_request.priority) + ")]"
 
     def __hash__(self):
@@ -46,17 +46,17 @@ class DroppedDeliveryRequest:
 
 
 class DroneDeliveryBoard:
-    def __init__(self, drone_deliveries: [DroneDelivery], dropped_delivery_requests: [DroppedDeliveryRequest]):
+    def __init__(self, drone_deliveries: [DroneDelivery], unmatched_delivery_requests: [UnmatchedDeliveryRequest]):
         self._drone_deliveries = drone_deliveries
-        self._dropped_delivery_requests = dropped_delivery_requests
+        self._unmatched_delivery_requests = unmatched_delivery_requests
 
     @property
     def drone_deliveries(self) -> [DroneDelivery]:
         return self._drone_deliveries
 
     @property
-    def dropped_delivery_requests(self) -> [DroppedDeliveryRequest]:
-        return self._dropped_delivery_requests
+    def unmatched_delivery_requests(self) -> [UnmatchedDeliveryRequest]:
+        return self._unmatched_delivery_requests
 
     @lru_cache()
     def get_total_time_in_minutes(self) -> float:
@@ -79,16 +79,16 @@ class DroneDeliveryBoard:
 
     def __eq__(self, other):
         return self._drone_deliveries == other.drone_deliveries \
-               and self._dropped_delivery_requests == other._dropped_delivery_requests
+               and self._unmatched_delivery_requests == other._unmatched_delivery_requests
 
     def __str__(self):
         drone_deliveries_str = '\n'.join(map(str, self._drone_deliveries))
 
-        dropped_delivery_requests_str = '\n'.join(map(str, self.dropped_delivery_requests)) if len(
-            self._dropped_delivery_requests) > 0 else "\n[No dropped delivery requests]"
+        unmatched_delivery_requests_str = '\n'.join(map(str, self.unmatched_delivery_requests)) if len(
+            self._unmatched_delivery_requests) > 0 else "\n[No unmatched delivery requests]"
 
-        return "\n[DroneDeliveryBoard]\n{drone_deliveries_str}\n{dropped_delivery_request_str}".format(
-            drone_deliveries_str=drone_deliveries_str, dropped_delivery_request_str=dropped_delivery_requests_str)
+        return "\n[DroneDeliveryBoard]\n{drone_deliveries_str}\n{unmatched_delivery_request_str}".format(
+            drone_deliveries_str=drone_deliveries_str, unmatched_delivery_request_str=unmatched_delivery_requests_str)
 
     def __hash__(self):
-        return hash((tuple(self._drone_deliveries), tuple(self._dropped_delivery_requests)))
+        return hash((tuple(self._drone_deliveries), tuple(self._unmatched_delivery_requests)))

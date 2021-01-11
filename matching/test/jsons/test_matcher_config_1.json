@@ -36,7 +36,7 @@
         "count_priority_from_zero": true
       }
     },
-    "dropped_penalty": 5
+    "unmatched_penalty": 5
  }
 
 

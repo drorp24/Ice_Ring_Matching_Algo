@@ -11,7 +11,7 @@ from common.entities.base_entities.delivery_request import DeliveryRequest
 from common.entities.base_entities.drone import PlatformType
 from common.entities.base_entities.drone_delivery import EmptyDroneDelivery, DroneDelivery, MatchedDeliveryRequest, \
     MatchedDroneLoadingDock
-from common.entities.base_entities.drone_delivery_board import DroppedDeliveryRequest, DroneDeliveryBoard, \
+from common.entities.base_entities.drone_delivery_board import UnmatchedDeliveryRequest, DroneDeliveryBoard, \
     EmptyDroneDeliveryBoard
 from common.entities.base_entities.drone_formation import DroneFormations, FormationOptions, FormationSize
 from common.entities.base_entities.drone_loading_dock import DroneLoadingDock
@@ -46,11 +46,11 @@ class ORToolsMatcherDifferentPriorityTestCase(TestCase):
                                                                   empty_board=self.empty_board,
                                                                   loading_dock=self.loading_dock)
 
-        dropped_delivery_request = DroppedDeliveryRequest(graph_index=2, delivery_request=self.delivery_requests[1])
+        unmatched_delivery_request = UnmatchedDeliveryRequest(graph_index=2, delivery_request=self.delivery_requests[1])
 
         expected_matched_board = DroneDeliveryBoard(
             drone_deliveries=[expected_drone_deliveries[0]],
-            dropped_delivery_requests=[dropped_delivery_request])
+            unmatched_delivery_requests=[unmatched_delivery_request])
 
         self.assertEqual(expected_matched_board, actual_delivery_board)
 

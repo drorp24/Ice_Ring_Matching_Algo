@@ -4,7 +4,7 @@ from common.entities.base_entities.customer_delivery import CustomerDelivery
 from common.entities.base_entities.delivery_option import DeliveryOption
 from common.entities.base_entities.delivery_request import DeliveryRequest
 from common.entities.base_entities.drone_delivery import DroneDelivery
-from common.entities.base_entities.drone_delivery_board import DroneDeliveryBoard, DroppedDeliveryRequest
+from common.entities.base_entities.drone_delivery_board import DroneDeliveryBoard, UnmatchedDeliveryRequest
 from common.entities.base_entities.drone_loading_dock import DroneLoadingDock
 from common.entities.base_entities.package_delivery_plan import PackageDeliveryPlan
 from common.graph.operational.operational_graph import OperationalGraph, OperationalEdge
@@ -114,9 +114,9 @@ class _MatchedDeliveryLabelsHandler:
         return delivery_color
 
 
-def add_dropped_delivery_requests(drawer: Drawer2D, dropped_requests: [DroppedDeliveryRequest]):
-    for dropped in dropped_requests:
-        add_delivery_request(drawer, dropped.delivery_request, draw_internal=False, color=Color.Red)
+def add_unmatched_delivery_requests(drawer: Drawer2D, unmatched_requests: [UnmatchedDeliveryRequest]):
+    for unmatched in unmatched_requests:
+        add_delivery_request(drawer, unmatched.delivery_request, draw_internal=False, color=Color.Red)
 
 
 def add_drone_deliveries(drawer: Drawer2D, drone_deliveries: [DroneDelivery]):
@@ -129,7 +129,7 @@ def add_drone_deliveries(drawer: Drawer2D, drone_deliveries: [DroneDelivery]):
     drawer.add_legend(labels_handler.matched_delivery_labels, labels_handler.selected_delivery_colors)
 
 
-def add_delivery_board(drawer: Drawer2D, board: DroneDeliveryBoard, draw_dropped=True):
-    if draw_dropped:
-        add_dropped_delivery_requests(drawer, board.dropped_delivery_requests)
+def add_delivery_board(drawer: Drawer2D, board: DroneDeliveryBoard, draw_unmatched=True):
+    if draw_unmatched:
+        add_unmatched_delivery_requests(drawer, board.unmatched_delivery_requests)
     add_drone_deliveries(drawer, board.drone_deliveries)

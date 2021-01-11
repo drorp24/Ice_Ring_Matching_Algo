@@ -8,11 +8,11 @@ MAX_OPERATION_TIME = 365 * 24 * 60  # minutes in year
 
 
 class ORToolsMatcherConstraints:
-    def __init__(self, graph_exporter: OrtoolsGraphExporter, manager: RoutingIndexManager, routing: RoutingModel,
+    def __init__(self, index_manager: RoutingIndexManager, routing_model: RoutingModel,
                  matcher_input: MatcherInput):
-        self._graph_exporter = graph_exporter
-        self._manager = manager
-        self._routing = routing
+        self._graph_exporter = OrtoolsGraphExporter()
+        self._index_manager = index_manager
+        self._routing_model = routing_model
         self._matcher_input = matcher_input
         self._travel_times_matrix = self._graph_exporter.export_travel_times(self._matcher_input.graph)
         self._time_windows = self._graph_exporter.export_time_windows(self._matcher_input.graph,
@@ -25,8 +25,8 @@ class ORToolsMatcherConstraints:
         demand_slack = 0
         for package_type in self._matcher_input.empty_board.package_types():
             callback = getattr(self, "_demand_callback_" + str.lower(package_type.name))
-            demand_callback_index = self._routing.RegisterPositiveUnaryTransitCallback(callback)
-            self._routing.AddDimensionWithVehicleCapacity(
+            demand_callback_index = self._routing_model.RegisterPositiveUnaryTransitCallback(callback)
+            self._routing_model.AddDimensionWithVehicleCapacity(
                 demand_callback_index,
                 demand_slack,
                 self._matcher_input.empty_board.formation_capacities(package_type),
@@ -34,35 +34,35 @@ class ORToolsMatcherConstraints:
                 demand_dimension_name_prefix + str.lower(package_type.name))
 
     def _demand_callback_tiny(self, from_index):
-        from_node = self._manager.IndexToNode(from_index)
+        from_node = self._index_manager.IndexToNode(from_index)
         return self._graph_exporter.export_package_type_demands(self._matcher_input.graph, PackageType.TINY)[
             from_node]
 
     def _demand_callback_small(self, from_index):
-        from_node = self._manager.IndexToNode(from_index)
+        from_node = self._index_manager.IndexToNode(from_index)
         return self._graph_exporter.export_package_type_demands(self._matcher_input.graph, PackageType.SMALL)[
             from_node]
 
     def _demand_callback_medium(self, from_index):
-        from_node = self._manager.IndexToNode(from_index)
+        from_node = self._index_manager.IndexToNode(from_index)
         return self._graph_exporter.export_package_type_demands(self._matcher_input.graph, PackageType.MEDIUM)[
             from_node]
 
     def _demand_callback_large(self, from_index):
-        from_node = self._manager.IndexToNode(from_index)
+        from_node = self._index_manager.IndexToNode(from_index)
         return self._graph_exporter.export_package_type_demands(self._matcher_input.graph, PackageType.LARGE)[
             from_node]
 
     def add_time(self):
-        transit_callback_index = self._routing.RegisterTransitCallback(self._time_callback)
+        transit_callback_index = self._routing_model.RegisterTransitCallback(self._time_callback)
         time_dimension_name = 'Time'
-        self._routing.AddDimension(
+        self._routing_model.AddDimension(
             transit_callback_index,
             self._matcher_input.config.constraints.time.max_waiting_time,
             MAX_OPERATION_TIME,
             self._matcher_input.config.constraints.time.count_time_from_zero,
             time_dimension_name)
-        time_dimension = self._routing.GetDimensionOrDie(time_dimension_name)
+        time_dimension = self._routing_model.GetDimensionOrDie(time_dimension_name)
         self._add_time_window_constraints_for_each_delivery_except_depot(time_dimension, self._time_windows)
         self._add_time_window_constraints_for_each_vehicle_start_node(time_dimension, self._time_windows)
         self._instantiate_route_start_and_end_times_to_produce_feasible_times(time_dimension)
@@ -70,15 +70,15 @@ class ORToolsMatcherConstraints:
 
     def _instantiate_route_start_and_end_times_to_produce_feasible_times(self, time_dimension):
         for i in range(len(self._matcher_input.empty_board.empty_drone_deliveries)):
-            self._routing.AddVariableMinimizedByFinalizer(
-                time_dimension.CumulVar(self._routing.Start(i)))
-            self._routing.AddVariableMinimizedByFinalizer(
-                time_dimension.CumulVar(self._routing.End(i)))
+            self._routing_model.AddVariableMinimizedByFinalizer(
+                time_dimension.CumulVar(self._routing_model.Start(i)))
+            self._routing_model.AddVariableMinimizedByFinalizer(
+                time_dimension.CumulVar(self._routing_model.End(i)))
 
     def _add_time_window_constraints_for_each_vehicle_start_node(self, time_dimension, time_windows):
         for i, drone_delivery in enumerate(self._matcher_input.empty_board.empty_drone_deliveries):
-            start_index = self._routing.Start(i)
-            graph_index = self._manager.IndexToNode(start_index)
+            start_index = self._routing_model.Start(i)
+            graph_index = self._index_manager.IndexToNode(start_index)
             time_dimension.CumulVar(start_index).SetRange(time_windows[graph_index][0],
                                                           time_windows[graph_index][1])
 
@@ -91,15 +91,15 @@ class ORToolsMatcherConstraints:
         for graph_index, time_window in enumerate(time_windows):
             if graph_index in self._basis_nodes_indices:
                 continue
-            index = self._manager.NodeToIndex(graph_index)
+            index = self._index_manager.NodeToIndex(graph_index)
             time_dimension.CumulVar(index).SetRange(time_window[0], time_window[1])
 
     def _time_callback(self, from_index, to_index):
-        from_node = self._manager.IndexToNode(from_index)
-        to_node = self._manager.IndexToNode(to_index)
+        from_node = self._index_manager.IndexToNode(from_index)
+        to_node = self._index_manager.IndexToNode(to_index)
         return self._travel_times_matrix[from_node][to_node]
 
-    def add_dropped_penalty(self):
+    def add_unmatched_penalty(self):
         for node in range(1, len(self._matcher_input.graph.nodes)):
-            self._routing.AddDisjunction([self._manager.NodeToIndex(node)],
-                                         self._matcher_input.config.dropped_penalty)
+            self._routing_model.AddDisjunction([self._index_manager.NodeToIndex(node)],
+                                               self._matcher_input.config.unmatched_penalty)
