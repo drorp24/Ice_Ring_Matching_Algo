@@ -47,12 +47,15 @@ class DroneFormation:
                      configuration_amounts * self._size,
                      self._drone_configuration.package_type_map.get_package_type_amounts())))
 
-    def get_package_type_formation(self) -> PackageType:
-        package_type_amounts = self._drone_configuration.package_type_map.get_package_type_amounts()
-        package_type_indexes = [pt_index for pt_index, pt_exist in enumerate(package_type_amounts) if pt_exist > 0]
-        if len(package_type_indexes) != 1:
-            raise TypeError(f"The drone formation should has only one package type")
-        return self.get_package_types()[package_type_indexes[0]]
+    def get_package_type(self) -> PackageType:
+        formation_package_type = None
+        package_type_amount_map = self._drone_configuration.package_type_map
+        for package_type in PackageType:
+            if package_type_amount_map.get_package_type_amount(package_type) > 0:
+                if formation_package_type is not None:
+                    raise TypeError(f"Drone formation supports only one package type")
+                formation_package_type = package_type
+        return formation_package_type
 
     def __hash__(self):
         return hash((self._size, self._drone_configuration))

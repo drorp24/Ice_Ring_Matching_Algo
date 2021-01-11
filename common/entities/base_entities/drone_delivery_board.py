@@ -23,7 +23,7 @@ class EmptyDroneDeliveryBoard:
                 self._empty_drone_deliveries]
 
     def package_types(self) -> [PackageType]:
-        return set([edd.drone_formation.get_package_type_formation() for edd in self._empty_drone_deliveries])
+        return set([edd.drone_formation.get_package_type() for edd in self._empty_drone_deliveries])
 
     def max_route_times_in_minutes(self) -> [int]:
         return [edd.drone_formation.max_route_times_in_minutes() for edd in self._empty_drone_deliveries]
