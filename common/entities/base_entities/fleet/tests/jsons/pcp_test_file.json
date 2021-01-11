@@ -1,8 +1,1 @@
-{
-  "__class__": "PackageConfigurationsPolicy",
-  "package_configuration_policy": {
-    "LARGE_X2": 0.2,
-    "MEDIUM_X4": 0.5,
-    "SMALL_X8": 0.3
-  }
-}
+{"__class__": "PackageConfigurationsPolicy", "package_configuration_policy": {"LARGE_X2": 0.2, "MEDIUM_X4": 0.5, "SMALL_X8": 0.3}}

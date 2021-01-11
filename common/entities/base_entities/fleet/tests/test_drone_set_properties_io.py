@@ -14,10 +14,7 @@ class TestDroneSetProperties(unittest.TestCase):
         cls.dftp = DroneFormationTypePolicy({DroneFormationType.QUAD: 0.3, DroneFormationType.PAIR: 0.7})
         cls.pcp = PackageConfigurationsPolicy({PackageConfiguration.SMALL_X8: 0.3, PackageConfiguration.LARGE_X2: 0.2,
                                                PackageConfiguration.MEDIUM_X4: 0.5})
-        cls.dsp = DroneSetProperties(_drone_type=DroneType.drone_type_1,
-                                     _drone_formation_policy=cls.dftp,
-                                     _package_configuration_policy=cls.pcp,
-                                     _drone_amount=10)
+        cls.dsp = DroneSetProperties(DroneType.drone_type_1, cls.dftp, cls.pcp, 10)
 
     def test_drone_formation_to_json(self):
         self.dftp.to_json('common/entities/base_entities/fleet/tests/jsons/dftp_test_file.json')

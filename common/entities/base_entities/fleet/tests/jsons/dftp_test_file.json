@@ -1,7 +1,1 @@
-{
-  "__class__": "DroneFormationTypePolicy",
-  "formation_type_policy": {
-    "2": 0.7,
-    "4": 0.3
-  }
-}
+{"__class__": "DroneFormationTypePolicy", "formation_type_policy": {"2": 0.7, "4": 0.3}}
