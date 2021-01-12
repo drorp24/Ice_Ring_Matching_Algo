@@ -6,7 +6,7 @@ from ortools.constraint_solver.pywrapcp import RoutingIndexManager, RoutingModel
 
 from common.entities.base_entities.drone_delivery import DroneDelivery, MatchedDroneLoadingDock, MatchedDeliveryRequest
 from common.entities.base_entities.drone_delivery_board import DroneDeliveryBoard, UnmatchedDeliveryRequest
-from common.entities.base_entities.temporal import DateTimeExtension, TimeDeltaExtension , TimeWindowExtension
+from common.entities.base_entities.temporal import TimeDeltaExtension, TimeWindowExtension
 from common.graph.operational.export_ortools_graph import OrtoolsGraphExporter
 from matching.matcher import Matcher
 from matching.matcher_input import MatcherInput
@@ -33,7 +33,7 @@ class ORToolsMatcher(Matcher):
         return self._create_drone_delivery_board(solution)
 
     def _set_index_manager(self) -> RoutingIndexManager:
-        num_vehicles = self._matcher_input.empty_board.num_of_formations()
+        num_vehicles = self._matcher_input.empty_board.amount_of_formations()
         depot_ids_start = self._graph_exporter.export_basis_nodes_indices(self._matcher_input.graph)
         # TODO depot_ids_end = self._graph_exporter.export_basis_nodes_indices(self._match_input.graph)
 
@@ -117,8 +117,7 @@ class ORToolsMatcher(Matcher):
                 self.matcher_input.graph,
                 graph_index),
             matched_delivery_option_index=0,
-            delivery_min_time=(self._get_min_time(index, solution)), delivery_max_time=(
-                self._get_max_time(index, solution)))
+            delivery_time_window=self._get_delivery_time_window(index, solution))
 
     def _create_start_drone_loading_dock(self, edd_index: int, solution: Assignment) -> MatchedDroneLoadingDock:
         start_index = self._routing_model.Start(edd_index)
@@ -136,17 +135,14 @@ class ORToolsMatcher(Matcher):
             graph_index=graph_index,
             drone_loading_dock=self._graph_exporter.get_drone_loading_dock(
                 self.matcher_input.graph, graph_index),
-            delivery_min_time=(self._get_min_time(index, solution)),
-            delivery_max_time=(self._get_max_time(index, solution)))
+            delivery_time_window=self._get_delivery_time_window(index, solution))
 
-    def _get_min_time(self, index: int, solution: Assignment) -> DateTimeExtension:
+    def _get_delivery_time_window(self, index: int, solution: Assignment) -> TimeWindowExtension:
         time_dimension = self._routing_model.GetDimensionOrDie('Time')
         time_var = time_dimension.CumulVar(index)
-        return self._matcher_input.config.zero_time.add_time_delta(
-            TimeDeltaExtension(timedelta(minutes=solution.Min(time_var))))
 
-    def _get_max_time(self, index: int, solution: Assignment) -> DateTimeExtension:
-        time_dimension = self._routing_model.GetDimensionOrDie('Time')
-        time_var = time_dimension.CumulVar(index)
-        return self._matcher_input.config.zero_time.add_time_delta(
-            TimeDeltaExtension(timedelta(minutes=solution.Max(time_var))))
+        return TimeWindowExtension(
+            since=(self._matcher_input.config.zero_time.add_time_delta(
+                TimeDeltaExtension(timedelta(minutes=solution.Min(time_var))))),
+            until=(self._matcher_input.config.zero_time.add_time_delta(
+                TimeDeltaExtension(timedelta(minutes=solution.Max(time_var))))))
