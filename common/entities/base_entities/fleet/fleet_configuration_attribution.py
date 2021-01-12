@@ -23,7 +23,7 @@ class ConfigurationAttributionParameters:
 
     configurations: []
     configuration_options_size: int
-    configurations_policy: [float]
+    configurations_probabilities: [float]
 
 
 @dataclass
@@ -44,13 +44,12 @@ class FleetConfigurationAttribution:
         cls.attribution_config.formation_types = formation_type_amounts.get_formation_types()
         cls.attribution_config.formation_sizes = formation_type_amounts.get_drone_amounts()
         cls.attribution_config.formation_amounts = formation_type_amounts.get_formation_amounts()
+        cls.attribution_config.total_formation_size = formation_type_amounts.get_total_formation_amount()
 
-        cls.attribution_config.total_formation_size = int(sum(cls.attribution_config.formation_amounts))
-
-        cls.attribution_config.configuration_options_size = len(drone_set_properties.package_configuration_policy.policy)
-        cls.attribution_config.configurations = list(drone_set_properties.package_configuration_policy.policy.keys())
-        cls.attribution_config.configurations_policy = list(drone_set_properties.package_configuration_policy.policy.values())
-        print('!')
+        policy = drone_set_properties.package_configuration_policy
+        cls.attribution_config.configuration_options_size = policy.get_amount()
+        cls.attribution_config.configurations = policy.get_configurations()
+        cls.attribution_config.configurations_probabilities = policy.get_probabilities()
 
     @staticmethod
     def _calc_formation_amounts_intervals(formation_amounts):
@@ -93,7 +92,7 @@ class FleetConfigurationAttribution:
 
     @classmethod
     def _calc_configuration_policy_bounds(cls) -> [float]:
-        weights = cls.attribution_config.configurations_policy
+        weights = cls.attribution_config.configurations_probabilities
         fleet_size = cls.attribution_config.fleet_size
         bounds = [weight * fleet_size for weight in weights]
         return bounds

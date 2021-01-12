@@ -28,8 +28,11 @@ class FormationTypeAmounts:
     def get_drone_amounts(self) -> [int]:
         return [s.value for s in self.amounts.keys()]
 
-    def get_formation_amounts(self):
+    def get_formation_amounts(self) -> [int]:
         return list(self.amounts.values())
+
+    def get_total_formation_amount(self) -> int:
+        return int(sum(self.get_formation_amounts()))
 
 
 class FleetPartition(object):

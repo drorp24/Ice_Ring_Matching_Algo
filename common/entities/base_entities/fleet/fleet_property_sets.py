@@ -32,6 +32,15 @@ class PackageConfigurationsPolicy(JsonableBaseEntity):
     def policy(self):
         return self._package_configurations_policy
 
+    def get_configurations(self) -> [PackageConfiguration]:
+        return list(self.policy.keys())
+
+    def get_probabilities(self):
+        return list(self.policy.values())
+
+    def get_amount(self):
+        return len(self.get_configurations())
+
     @classmethod
     def dict_to_obj(cls, dict_input):
         return PackageConfigurationsPolicy(
