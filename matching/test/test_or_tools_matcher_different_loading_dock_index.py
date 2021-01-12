@@ -55,7 +55,7 @@ class ORToolsMatcherDifferentLoadingDockIndexTestCase(TestCase):
 
         expected_matched_board = DroneDeliveryBoard(
             drone_deliveries=[expected_drone_deliveries[0], expected_drone_deliveries[1]],
-            dropped_delivery_requests=[])
+            unmatched_delivery_requests=[])
 
         self.assertEqual(expected_matched_board, actual_delivery_board)
 
@@ -73,7 +73,7 @@ class ORToolsMatcherDifferentLoadingDockIndexTestCase(TestCase):
 
         expected_matched_board = DroneDeliveryBoard(
             drone_deliveries=[expected_drone_deliveries[0], expected_drone_deliveries[1]],
-            dropped_delivery_requests=[])
+            unmatched_delivery_requests=[])
 
         self.assertEqual(expected_matched_board, actual_delivery_board)
 
@@ -91,7 +91,7 @@ class ORToolsMatcherDifferentLoadingDockIndexTestCase(TestCase):
 
         expected_matched_board = DroneDeliveryBoard(
             drone_deliveries=[expected_drone_deliveries[0], expected_drone_deliveries[1]],
-            dropped_delivery_requests=[])
+            unmatched_delivery_requests=[])
 
         self.assertEqual(expected_matched_board, actual_delivery_board)
 
@@ -195,7 +195,7 @@ class ORToolsMatcherDifferentLoadingDockIndexTestCase(TestCase):
                                                  max_route_time=300,
                                                  count_time_from_zero=False),
                 priority_constraints=PriorityConstraints(True)),
-            dropped_penalty=10)
+            unmatched_penalty=10)
 
         return MatcherConfig(match_config_properties=match_config_properties)
 

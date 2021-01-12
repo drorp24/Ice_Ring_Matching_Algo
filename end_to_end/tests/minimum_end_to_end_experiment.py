@@ -116,10 +116,10 @@ class BasicMinimumEnd2EndExperiment():
         dr_drawer.draw(False)
 
         board_map_drawer = create_drawer_2d(Drawer2DCoordinateSys.GEOGRAPHIC)
-        operational_drawer2d.add_delivery_board(board_map_drawer, delivery_board, draw_dropped=True)
+        operational_drawer2d.add_delivery_board(board_map_drawer, delivery_board, draw_unmatched=True)
         board_map_drawer.draw(False)
 
-        row_names = ["Dropped Out"] + \
+        row_names = ["Unmatched Out"] + \
                     ["[" + str(delivery.drone_formation.size.value) + "] * " +
                      str(delivery.drone_formation.drone_configuration.package_type_map.get_package_type_amounts())
                      for delivery in delivery_board.drone_deliveries]

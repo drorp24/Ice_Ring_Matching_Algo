@@ -143,7 +143,7 @@ class MatcherConfigProperties:
     first_solution_strategy: str
     solver: MatcherSolver
     match_constraints: MatcherConstraints
-    dropped_penalty: int
+    unmatched_penalty: int
 
 
 class MatcherConfig(JsonableBaseEntity):
@@ -159,7 +159,7 @@ class MatcherConfig(JsonableBaseEntity):
             first_solution_strategy=dict_input["first_solution_strategy"],
             solver=MatcherSolver.dict_to_obj(dict_input["solver"]),
             match_constraints=MatcherConstraints.dict_to_obj(dict_input["constraints"]),
-            dropped_penalty=dict_input["dropped_penalty"])
+            unmatched_penalty=dict_input["unmatched_penalty"])
 
         return MatcherConfig(match_config_properties)
 
@@ -176,8 +176,8 @@ class MatcherConfig(JsonableBaseEntity):
         return self._match_config_properties.solver
 
     @property
-    def dropped_penalty(self) -> int:
-        return self._match_config_properties.dropped_penalty
+    def unmatched_penalty(self) -> int:
+        return self._match_config_properties.unmatched_penalty
 
     @property
     def constraints(self) -> MatcherConstraints:
@@ -187,5 +187,5 @@ class MatcherConfig(JsonableBaseEntity):
         return (self.zero_time == other.zero_time) and \
                (self.first_solution_strategy == other.first_solution_strategy) and \
                (self.solver == other.solver) and \
-               (self.dropped_penalty == other.dropped_penalty) and \
+               (self.unmatched_penalty == other.unmatched_penalty) and \
                (self.constraints == other.constraints)

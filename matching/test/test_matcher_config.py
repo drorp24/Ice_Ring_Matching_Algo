@@ -22,7 +22,7 @@ class MatchConfigTestCase(TestCase):
                                                  max_route_time=300,
                                                  count_time_from_zero=False),
                 priority_constraints=PriorityConstraints(True)),
-            dropped_penalty=5)
+            unmatched_penalty=5)
 
         cls.config_obj = MatcherConfig(match_config_properties=cls.match_config_properties)
 

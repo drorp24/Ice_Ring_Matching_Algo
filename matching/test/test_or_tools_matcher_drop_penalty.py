@@ -8,7 +8,7 @@ from common.entities.base_entities.delivery_request import DeliveryRequest
 from common.entities.base_entities.drone import PlatformType
 from common.entities.base_entities.drone_delivery import DroneDelivery, MatchedDroneLoadingDock, EmptyDroneDelivery
 from common.entities.base_entities.drone_delivery_board import DroneDeliveryBoard, EmptyDroneDeliveryBoard, \
-    DroppedDeliveryRequest
+    UnmatchedDeliveryRequest
 from common.entities.base_entities.drone_formation import DroneFormations, FormationOptions, FormationSize
 from common.entities.base_entities.drone_loading_dock import DroneLoadingDock
 from common.entities.base_entities.drone_loading_station import DroneLoadingStation
@@ -64,10 +64,10 @@ class ORToolsMatcherDropPenaltyTestCase(TestCase):
                                                since=ZERO_TIME,
                                                until=ZERO_TIME)))
 
-        dropped_delivery_request = self._create_dropped(self.delivery_requests)
+        unmatched_delivery_request = self._create_unmatched(self.delivery_requests)
 
         expected_matched_board = DroneDeliveryBoard(drone_deliveries=[drone_delivery],
-                                                    dropped_delivery_requests=dropped_delivery_request)
+                                                    unmatched_delivery_requests=unmatched_delivery_request)
         self.assertEqual(expected_matched_board, actual_delivery_board)
 
     @staticmethod
@@ -129,12 +129,12 @@ class ORToolsMatcherDropPenaltyTestCase(TestCase):
                                                  max_route_time=300,
                                                  count_time_from_zero=False),
                 priority_constraints=PriorityConstraints(True)),
-            dropped_penalty=0)
+            unmatched_penalty=0)
 
         return MatcherConfig(match_config_properties=match_config_properties)
 
     @staticmethod
-    def _create_dropped(delivery_requests: List[DeliveryRequest]):
-        return [DroppedDeliveryRequest(graph_index=1, delivery_request=delivery_requests[0]),
-                DroppedDeliveryRequest(graph_index=2, delivery_request=delivery_requests[1]),
-                DroppedDeliveryRequest(graph_index=3, delivery_request=delivery_requests[2])]
+    def _create_unmatched(delivery_requests: List[DeliveryRequest]):
+        return [UnmatchedDeliveryRequest(graph_index=1, delivery_request=delivery_requests[0]),
+                UnmatchedDeliveryRequest(graph_index=2, delivery_request=delivery_requests[1]),
+                UnmatchedDeliveryRequest(graph_index=3, delivery_request=delivery_requests[2])]

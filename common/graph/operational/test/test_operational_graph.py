@@ -50,6 +50,7 @@ class BasicDeliveryRequestGraphTestCases(unittest.TestCase):
         with self.assertRaises(NonTemporalNodeException) as context:
             OperationalNode(DeliveryOptionDistribution().choose_rand(Random(42))[0])
 
+    @unittest.skipIf(os.environ.get('NO_SLOW_TESTS', False), 'slow tests')
     def test_local_graph_generation_should_be_fully_connected(self):
         region_dataset = self.dr_dataset_local_region_1_morning
         graph = OperationalGraph()
@@ -76,6 +77,7 @@ class BasicDeliveryRequestGraphTestCases(unittest.TestCase):
         self.assertEqual(len(region_dataset), num_nodes)
         self.assertEqual(2 * (num_nodes / 2 * (num_nodes / 2 - 1)), len(graph.edges))
 
+    @unittest.skipIf(os.environ.get('NO_SLOW_TESTS', False), 'slow tests')
     def test_add_full_connection_between_loading_docks_and_delivery_requests(self):
         regional_dr_dataset = self.dr_dataset_local_region_2_afternoon
         graph = OperationalGraph()
