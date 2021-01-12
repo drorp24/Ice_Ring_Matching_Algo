@@ -1,4 +1,5 @@
 import unittest
+import uuid
 from datetime import date, time
 from random import Random
 
@@ -11,58 +12,65 @@ from common.entities.base_entities.drone_formation import DroneFormations, Forma
 from common.entities.base_entities.entity_distribution.delivery_request_distribution import DeliveryRequestDistribution
 from common.entities.base_entities.entity_distribution.drone_loading_dock_distribution import \
     DroneLoadingDockDistribution
-from common.entities.base_entities.temporal import DateTimeExtension
+from common.entities.base_entities.entity_id import EntityID
+from common.entities.base_entities.temporal import DateTimeExtension, TimeWindowExtension
 
 
 class BasicDroneDeliveryGenerationTests(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.delivery_requests = DeliveryRequestDistribution().choose_rand(random=Random(42), amount={DeliveryRequest: 3})
-
-        cls.empty_drone_delivery_1 = EmptyDroneDelivery("edd_1", DroneFormations.get_drone_formation(
+        cls.delivery_requests = DeliveryRequestDistribution().choose_rand(random=Random(42),
+                                                                          amount={DeliveryRequest: 3})
+        cls.entity_id_1 = EntityID(uuid.uuid4())
+        cls.entity_id_2 = EntityID(uuid.uuid4())
+        cls.empty_drone_delivery_1 = EmptyDroneDelivery(cls.entity_id_1, DroneFormations.get_drone_formation(
             FormationSize.MINI, FormationOptions.TINY_PACKAGES, PlatformType.platform_1))
-        cls.empty_drone_delivery_2 = EmptyDroneDelivery("edd_2", DroneFormations.get_drone_formation(
+        cls.empty_drone_delivery_2 = EmptyDroneDelivery(cls.entity_id_2, DroneFormations.get_drone_formation(
             FormationSize.MEDIUM, FormationOptions.TINY_PACKAGES, PlatformType.platform_1))
 
         cls.matched_delivery_request_1 = MatchedDeliveryRequest(
             graph_index=1,
             delivery_request=cls.delivery_requests[0],
             matched_delivery_option_index=0,
-            delivery_min_time=DateTimeExtension(
-                dt_date=date(2020, 1, 23), dt_time=time(11, 30, 0)),
-            delivery_max_time=DateTimeExtension(
-                dt_date=date(2020, 1, 23), dt_time=time(11, 30, 0)))
+            delivery_time_window=TimeWindowExtension(
+                since=DateTimeExtension(
+                    dt_date=date(2020, 1, 23), dt_time=time(11, 30, 0)),
+                until=DateTimeExtension(
+                    dt_date=date(2020, 1, 23), dt_time=time(11, 30, 0))))
 
         cls.matched_delivery_request_2 = MatchedDeliveryRequest(
             graph_index=2,
             delivery_request=cls.delivery_requests[1],
             matched_delivery_option_index=0,
-            delivery_min_time=DateTimeExtension(
-                dt_date=date(2020, 1, 23), dt_time=time(11, 30, 0)),
-            delivery_max_time=DateTimeExtension(
-                dt_date=date(2020, 1, 23), dt_time=time(11, 30, 0)))
+            delivery_time_window=TimeWindowExtension(
+                since=DateTimeExtension(
+                    dt_date=date(2020, 1, 23), dt_time=time(11, 30, 0)),
+                until=DateTimeExtension(
+                    dt_date=date(2020, 1, 23), dt_time=time(11, 30, 0))))
 
         cls.matched_delivery_request_3 = MatchedDeliveryRequest(
             graph_index=3,
             delivery_request=cls.delivery_requests[2],
             matched_delivery_option_index=0,
-            delivery_min_time=DateTimeExtension(
-                dt_date=date(2020, 1, 23), dt_time=time(12, 30, 0)),
-            delivery_max_time=DateTimeExtension(
-                dt_date=date(2020, 1, 23), dt_time=time(12, 30, 0)))
+            delivery_time_window=TimeWindowExtension(
+                since=DateTimeExtension(
+                    dt_date=date(2020, 1, 23), dt_time=time(12, 30, 0)),
+                until=DateTimeExtension(
+                    dt_date=date(2020, 1, 23), dt_time=time(12, 30, 0))))
 
         cls.unmatched_delivery_request = UnmatchedDeliveryRequest(graph_index=4, delivery_request=cls.delivery_requests[2])
 
         drone_loading_dock_distribution = DroneLoadingDockDistribution()
         docks = drone_loading_dock_distribution.choose_rand(Random(100), amount=1)
         cls.matched_drone_loading_dock = MatchedDroneLoadingDock(graph_index=0, drone_loading_dock=docks[0],
-                                                                 delivery_min_time=DateTimeExtension(
-                                                                     dt_date=date(2020, 1, 23),
-                                                                     dt_time=time(0, 0, 0)),
-                                                                 delivery_max_time=DateTimeExtension(
-                                                                     dt_date=date(2020, 1, 23),
-                                                                     dt_time=time(23, 59, 59)))
+                                                                 delivery_time_window=TimeWindowExtension(
+                                                                     since=DateTimeExtension(
+                                                                         dt_date=date(2020, 1, 23),
+                                                                         dt_time=time(0, 0, 0)),
+                                                                     until=DateTimeExtension(
+                                                                         dt_date=date(2020, 1, 23),
+                                                                         dt_time=time(23, 59, 59))))
 
         cls.drone_delivery_1 = DroneDelivery(cls.empty_drone_delivery_1.id,
                                              cls.empty_drone_delivery_1.drone_formation,
@@ -91,18 +99,18 @@ class BasicDroneDeliveryGenerationTests(unittest.TestCase):
 
         expected_datetime_1 = DateTimeExtension(dt_date=date(2020, 1, 23), dt_time=time(11, 30, 0))
 
-        self.assertEqual(self.drone_delivery_1.matched_requests[0].delivery_min_time, expected_datetime_1)
-        self.assertEqual(self.drone_delivery_1.matched_requests[0].delivery_max_time, expected_datetime_1)
-        self.assertEqual(self.drone_delivery_1.matched_requests[1].delivery_min_time, expected_datetime_1)
-        self.assertEqual(self.drone_delivery_1.matched_requests[1].delivery_max_time, expected_datetime_1)
+        self.assertEqual(self.drone_delivery_1.matched_requests[0].delivery_time_window.since, expected_datetime_1)
+        self.assertEqual(self.drone_delivery_1.matched_requests[0].delivery_time_window.until, expected_datetime_1)
+        self.assertEqual(self.drone_delivery_1.matched_requests[1].delivery_time_window.since, expected_datetime_1)
+        self.assertEqual(self.drone_delivery_1.matched_requests[1].delivery_time_window.until, expected_datetime_1)
         self.assertEqual(len(self.drone_delivery_1.matched_requests), 2)
 
         self.assertEqual(self.drone_delivery_2.drone_formation, DroneFormations.get_drone_formation(
             FormationSize.MEDIUM, FormationOptions.TINY_PACKAGES, PlatformType.platform_1))
 
         expected_datetime_2 = DateTimeExtension(dt_date=date(2020, 1, 23), dt_time=time(12, 30, 0))
-        self.assertEqual(self.drone_delivery_2.matched_requests[0].delivery_min_time, expected_datetime_2)
-        self.assertEqual(self.drone_delivery_2.matched_requests[0].delivery_max_time, expected_datetime_2)
+        self.assertEqual(self.drone_delivery_2.matched_requests[0].delivery_time_window.since, expected_datetime_2)
+        self.assertEqual(self.drone_delivery_2.matched_requests[0].delivery_time_window.until, expected_datetime_2)
         self.assertEqual(len(self.drone_delivery_2.matched_requests), 1)
 
     def test_empty_drone_delivery_board(self):
@@ -129,17 +137,18 @@ class BasicDroneDeliveryGenerationTests(unittest.TestCase):
             graph_index=1,
             delivery_request=self.delivery_requests[0],
             matched_delivery_option_index=0,
-            delivery_min_time=DateTimeExtension(
-                dt_date=date(2020, 1, 23),
-                dt_time=time(11, 30, 0)),
-            delivery_max_time=DateTimeExtension(
-                dt_date=date(2020, 1, 23),
-                dt_time=time(11, 30, 0)))
+            delivery_time_window=TimeWindowExtension(
+                since=DateTimeExtension(
+                    dt_date=date(2020, 1, 23),
+                    dt_time=time(11, 30, 0)),
+                until=DateTimeExtension(
+                    dt_date=date(2020, 1, 23),
+                    dt_time=time(11, 30, 0))))
 
         self.assertEqual(self.matched_delivery_request_1, actual_matched_delivery_request)
 
     def test_2_empty_drone_deliveries_are_equal(self):
-        actual_empty_drone_delivery = EmptyDroneDelivery("edd_1", DroneFormations.get_drone_formation(
+        actual_empty_drone_delivery = EmptyDroneDelivery(self.entity_id_1, DroneFormations.get_drone_formation(
             FormationSize.MINI, FormationOptions.TINY_PACKAGES, PlatformType.platform_1))
         self.assertEqual(self.empty_drone_delivery_1, actual_empty_drone_delivery)
 

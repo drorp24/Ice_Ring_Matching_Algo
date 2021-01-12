@@ -1,3 +1,4 @@
+import uuid
 from datetime import timedelta, date, time
 from random import Random
 from typing import List
@@ -15,6 +16,7 @@ from common.entities.base_entities.entity_distribution.delivery_requestion_datas
     build_delivery_request_distribution
 from common.entities.base_entities.entity_distribution.package_distribution import ExactPackageDistribution
 from common.entities.base_entities.entity_distribution.temporal_distribution import ExactTimeWindowDistribution
+from common.entities.base_entities.entity_id import EntityID
 from common.entities.base_entities.package import PackageType
 from common.entities.base_entities.temporal import TimeWindowExtension, DateTimeExtension, TimeDeltaExtension
 from common.graph.operational.graph_creator import build_fully_connected_graph
@@ -91,10 +93,10 @@ class ORToolsMatcherFleetWithMultiplePackageTYpe(TestCase):
 
     @staticmethod
     def _create_empty_board() -> EmptyDroneDeliveryBoard:
-        empty_drone_delivery_1 = EmptyDroneDelivery("edd_1", DroneFormations.get_drone_formation(
+        empty_drone_delivery_1 = EmptyDroneDelivery(EntityID(uuid.uuid4()), DroneFormations.get_drone_formation(
             FormationSize.MINI, FormationOptions.MEDIUM_PACKAGES, PlatformType.platform_1))
 
-        empty_drone_delivery_2 = EmptyDroneDelivery("edd_2", DroneFormations.get_drone_formation(
+        empty_drone_delivery_2 = EmptyDroneDelivery(EntityID(uuid.uuid4()), DroneFormations.get_drone_formation(
             FormationSize.MINI, FormationOptions.SMALL_PACKAGES, PlatformType.platform_1))
 
         return EmptyDroneDeliveryBoard([empty_drone_delivery_1, empty_drone_delivery_2])
@@ -124,25 +126,28 @@ class ORToolsMatcherFleetWithMultiplePackageTYpe(TestCase):
                                              graph_index=2,
                                              delivery_request=delivery_requests[1],
                                              matched_delivery_option_index=0,
-                                             delivery_min_time=ZERO_TIME.add_time_delta(
-                                                 TimeDeltaExtension(timedelta(minutes=60))),
-                                             delivery_max_time=ZERO_TIME.add_time_delta(
-                                                 TimeDeltaExtension(timedelta(minutes=60))))
+                                             delivery_time_window=TimeWindowExtension(
+                                                 since=ZERO_TIME.add_time_delta(
+                                                     TimeDeltaExtension(timedelta(minutes=60))),
+                                                 until=ZERO_TIME.add_time_delta(
+                                                     TimeDeltaExtension(timedelta(minutes=60)))))
                                          ],
                                          start_drone_loading_docks=MatchedDroneLoadingDock(
                                              graph_index=0,
                                              drone_loading_dock=loading_dock,
-                                             delivery_min_time=loading_dock.time_window.since.add_time_delta(
-                                                 TimeDeltaExtension(timedelta(minutes=40))),
-                                             delivery_max_time=loading_dock.time_window.since.add_time_delta(
-                                                 TimeDeltaExtension(timedelta(minutes=40)))),
+                                             delivery_time_window=TimeWindowExtension(
+                                                 since=loading_dock.time_window.since.add_time_delta(
+                                                     TimeDeltaExtension(timedelta(minutes=40))),
+                                                 until=loading_dock.time_window.since.add_time_delta(
+                                                     TimeDeltaExtension(timedelta(minutes=40))))),
                                          end_drone_loading_docks=MatchedDroneLoadingDock(
                                              graph_index=0,
                                              drone_loading_dock=loading_dock,
-                                             delivery_min_time=loading_dock.time_window.since.add_time_delta(
-                                                 TimeDeltaExtension(timedelta(minutes=70))),
-                                             delivery_max_time=loading_dock.time_window.since.add_time_delta(
-                                                 TimeDeltaExtension(timedelta(minutes=70)))))
+                                             delivery_time_window=TimeWindowExtension(
+                                                 since=loading_dock.time_window.since.add_time_delta(
+                                                     TimeDeltaExtension(timedelta(minutes=70))),
+                                                 until=loading_dock.time_window.since.add_time_delta(
+                                                     TimeDeltaExtension(timedelta(minutes=70))))))
 
         drone_delivery_2 = DroneDelivery(id_=empty_board.empty_drone_deliveries[1].id,
                                          drone_formation=empty_board.empty_drone_deliveries[1].drone_formation,
@@ -150,23 +155,26 @@ class ORToolsMatcherFleetWithMultiplePackageTYpe(TestCase):
                                              graph_index=1,
                                              delivery_request=delivery_requests[0],
                                              matched_delivery_option_index=0,
-                                             delivery_min_time=ZERO_TIME.add_time_delta(
-                                                 TimeDeltaExtension(timedelta(minutes=5))),
-                                             delivery_max_time=ZERO_TIME.add_time_delta(
-                                                 TimeDeltaExtension(timedelta(minutes=5))))
+                                             delivery_time_window=TimeWindowExtension(
+                                                 since=ZERO_TIME.add_time_delta(
+                                                     TimeDeltaExtension(timedelta(minutes=5))),
+                                                 until=ZERO_TIME.add_time_delta(
+                                                     TimeDeltaExtension(timedelta(minutes=5)))))
                                          ],
                                          start_drone_loading_docks=MatchedDroneLoadingDock(
                                              graph_index=0,
                                              drone_loading_dock=loading_dock,
-                                             delivery_min_time=loading_dock.time_window.since,
-                                             delivery_max_time=loading_dock.time_window.since),
+                                             delivery_time_window=TimeWindowExtension(
+                                                 since=loading_dock.time_window.since,
+                                                 until=loading_dock.time_window.since)),
                                          end_drone_loading_docks=MatchedDroneLoadingDock(
                                              graph_index=0,
                                              drone_loading_dock=loading_dock,
-                                             delivery_min_time=loading_dock.time_window.since.add_time_delta(
-                                                 TimeDeltaExtension(timedelta(minutes=10))),
-                                             delivery_max_time=loading_dock.time_window.since.add_time_delta(
-                                                 TimeDeltaExtension(timedelta(minutes=10))))
+                                             delivery_time_window=TimeWindowExtension(
+                                                 since=loading_dock.time_window.since.add_time_delta(
+                                                     TimeDeltaExtension(timedelta(minutes=10))),
+                                                 until=loading_dock.time_window.since.add_time_delta(
+                                                     TimeDeltaExtension(timedelta(minutes=10)))))
                                          )
 
         return [drone_delivery_1, drone_delivery_2]

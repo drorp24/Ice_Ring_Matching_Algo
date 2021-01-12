@@ -11,6 +11,7 @@ from common.entities.base_entities.delivery_option import DeliveryOption
 from common.entities.base_entities.delivery_request import DeliveryRequest
 from common.entities.base_entities.entity_distribution.delivery_requestion_dataset_builder import \
     build_delivery_request_distribution
+from common.entities.base_entities.entity_id import EntityID
 from common.entities.generator.delivery_request_generator import DeliveryRequestDatasetGenerator, DeliveryRequestDatasetStructure
 from common.entities.base_entities.package import PackageType
 from common.entities.base_entities.package_delivery_plan import PackageDeliveryPlan
@@ -96,7 +97,7 @@ def _create_dr_distribution():
 
 
 def create_no_zero_dist_dr_data_set() -> List[DeliveryRequest]:
-    pdp_1 = PackageDeliveryPlan(id=UUID(int=42),
+    pdp_1 = PackageDeliveryPlan(id=EntityID(UUID(int=42)),
                                 drop_point=create_point_2d(10, 20),
                                 azimuth=Angle(135, AngleUnit.DEGREE),
                                 pitch=Angle(90, AngleUnit.DEGREE),
@@ -109,7 +110,7 @@ def create_no_zero_dist_dr_data_set() -> List[DeliveryRequest]:
                                DateTimeExtension(dt_date=date(2021, 1, 1), dt_time=time(6, 0, 0))),
                            priority=1)
 
-    pdp_2 = PackageDeliveryPlan(id=UUID(int=44),
+    pdp_2 = PackageDeliveryPlan(id=EntityID(UUID(int=44)),
                                 drop_point=create_point_2d(30, 40),
                                 azimuth=Angle(45, AngleUnit.DEGREE),
                                 pitch=Angle(45, AngleUnit.DEGREE),
@@ -124,7 +125,7 @@ def create_no_zero_dist_dr_data_set() -> List[DeliveryRequest]:
 
 
 def create_inf_dist_dr_data_set() -> List[DeliveryRequest]:
-    pdp_1 = PackageDeliveryPlan(id=UUID(int=42),
+    pdp_1 = PackageDeliveryPlan(id=EntityID(UUID(int=42)),
                                 drop_point=create_point_2d(10, 20),
                                 azimuth=Angle(270, AngleUnit.DEGREE),
                                 pitch=Angle(270, AngleUnit.DEGREE),
@@ -137,7 +138,7 @@ def create_inf_dist_dr_data_set() -> List[DeliveryRequest]:
                                DateTimeExtension(dt_date=date(2021, 1, 1), dt_time=time(6, 0, 0))),
                            priority=1)
 
-    pdp_2 = PackageDeliveryPlan(id=UUID(int=44),
+    pdp_2 = PackageDeliveryPlan(id=EntityID(UUID(int=44)),
                                 drop_point=create_point_2d(30, 40),
                                 azimuth=Angle(45, AngleUnit.DEGREE),
                                 pitch=Angle(45, AngleUnit.DEGREE),

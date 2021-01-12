@@ -1,5 +1,6 @@
 from common.entities.base_entities.drone_delivery import EmptyDroneDelivery
 from common.entities.base_entities.drone_delivery_board import EmptyDroneDeliveryBoard
+from common.entities.base_entities.entity_id import EntityID
 from common.tools.fleet_property_sets import PlatformPropertySet
 from common.tools.fleet_partition import FormationSizesAmounts, FleetPartition
 from common.tools.fleet_configuration_attribution import DroneFormationsPerTypeAmounts, FleetConfigurationAttribution
@@ -24,7 +25,7 @@ def calc_drone_deliveries(platform_properties: PlatformPropertySet) -> [EmptyDro
     drone_formations_per_type_amounts = _calc_drone_formation_amounts(formation_sizes_amounts, platform_properties)
     for drone_formation, amount in drone_formations_per_type_amounts.amounts.items():
         for i in range(amount):
-            empty_deliveries.append(EmptyDroneDelivery(str(uuid.uuid4()), drone_formation))
+            empty_deliveries.append(EmptyDroneDelivery(EntityID(uuid.uuid4()), drone_formation))
     return empty_deliveries
 
 
