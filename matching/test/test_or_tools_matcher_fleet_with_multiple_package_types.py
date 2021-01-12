@@ -95,10 +95,8 @@ class ORToolsMatcherFleetWithMultiplePackageTYpe(TestCase):
     def _create_empty_board() -> EmptyDroneDeliveryBoard:
         empty_drone_delivery_1 = EmptyDroneDelivery(EntityID(uuid.uuid4()), DroneFormations.get_drone_formation(
             FormationSize.MINI, FormationOptions.MEDIUM_PACKAGES, PlatformType.platform_1))
-
         empty_drone_delivery_2 = EmptyDroneDelivery(EntityID(uuid.uuid4()), DroneFormations.get_drone_formation(
             FormationSize.MINI, FormationOptions.SMALL_PACKAGES, PlatformType.platform_1))
-
         return EmptyDroneDeliveryBoard([empty_drone_delivery_1, empty_drone_delivery_2])
 
     @staticmethod
@@ -114,7 +112,6 @@ class ORToolsMatcherFleetWithMultiplePackageTYpe(TestCase):
                                                  count_time_from_zero=False),
                 priority_constraints=PriorityConstraints(True)),
             unmatched_penalty=1000)
-
         return MatcherConfig(match_config_properties=match_config_properties)
 
     @staticmethod
@@ -148,7 +145,6 @@ class ORToolsMatcherFleetWithMultiplePackageTYpe(TestCase):
                                                      TimeDeltaExtension(timedelta(minutes=70))),
                                                  until=loading_dock.time_window.since.add_time_delta(
                                                      TimeDeltaExtension(timedelta(minutes=70))))))
-
         drone_delivery_2 = DroneDelivery(id_=empty_board.empty_drone_deliveries[1].id,
                                          drone_formation=empty_board.empty_drone_deliveries[1].drone_formation,
                                          matched_requests=[MatchedDeliveryRequest(
@@ -176,5 +172,4 @@ class ORToolsMatcherFleetWithMultiplePackageTYpe(TestCase):
                                                  until=loading_dock.time_window.since.add_time_delta(
                                                      TimeDeltaExtension(timedelta(minutes=10)))))
                                          )
-
         return [drone_delivery_1, drone_delivery_2]
