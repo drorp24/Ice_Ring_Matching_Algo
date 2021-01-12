@@ -14,13 +14,22 @@ class FleetPartitionParameters:
     formation_type_probabilities: [float]
     fleet_drone_amount: int
 
-    def amount_of_options(self) -> int:
+    def get_amount_of_options(self) -> int:
         return len(self.formation_drone_amount_options)
 
 
 @dataclass
 class FormationTypeAmounts:
     amounts: {DroneFormationType, int}
+
+    def get_formation_types(self) -> [DroneFormationType]:
+        return list(self.amounts.keys())
+
+    def get_drone_amounts(self) -> [int]:
+        return [s.value for s in self.amounts.keys()]
+
+    def get_formation_amounts(self):
+        return list(self.amounts.values())
 
 
 class FleetPartition(object):
@@ -29,7 +38,7 @@ class FleetPartition(object):
     @classmethod
     def extract_parameters(cls, drone_set_properties: DroneSetProperties):
         cls.fleet_partition_parameters.fleet_drone_amount = drone_set_properties.drone_amount
-        formation_type_policy = drone_set_properties.drone_formation_policy.formation_type_policy
+        formation_type_policy = drone_set_properties.drone_formation_policy.policy
         cls.fleet_partition_parameters.formation_drone_amount_options = FleetPartition \
             .get_amount_of_drones_per_type_in_policy(formation_type_policy)
         cls.fleet_partition_parameters.formation_type_probabilities = FleetPartition \
@@ -45,7 +54,7 @@ class FleetPartition(object):
 
     @classmethod
     def _calc_number_variables(cls) -> int:
-        return cls.fleet_partition_parameters.amount_of_options()
+        return cls.fleet_partition_parameters.get_amount_of_options()
 
     @classmethod
     def _export_formation_amounts(cls, variables) -> FormationTypeAmounts:

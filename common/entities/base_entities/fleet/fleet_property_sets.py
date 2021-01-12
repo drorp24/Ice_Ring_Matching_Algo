@@ -10,17 +10,17 @@ class DroneFormationTypePolicy(JsonableBaseEntity):
     _formation_type_policy: {DroneFormationType, float}
 
     @property
-    def formation_type_policy(self):
+    def policy(self):
         return self._formation_type_policy
 
     @classmethod
     def dict_to_obj(cls, dict_input):
         return DroneFormationTypePolicy(
-            {DroneFormationType[ftp[0]]: ftp[1] for ftp in dict_input['formation_type_policy'].items()})
+            {DroneFormationType[ftp[0]]: ftp[1] for ftp in dict_input['policy'].items()})
 
     def __dict__(self):
         return {'__class__': self.__class__.__name__,
-                'formation_type_policy': {pcp[0].name: pcp[1] for pcp in
+                'policy': {pcp[0].name: pcp[1] for pcp in
                                           self._formation_type_policy.items()}}
 
 
@@ -29,17 +29,17 @@ class PackageConfigurationsPolicy(JsonableBaseEntity):
     _package_configurations_policy: {PackageConfiguration, float}
 
     @property
-    def package_configuration_policy(self):
+    def policy(self):
         return self._package_configurations_policy
 
     @classmethod
     def dict_to_obj(cls, dict_input):
         return PackageConfigurationsPolicy(
-            {PackageConfiguration[pcp[0]]: pcp[1] for pcp in dict_input['package_configuration_policy'].items()})
+            {PackageConfiguration[pcp[0]]: pcp[1] for pcp in dict_input['policy'].items()})
 
     def __dict__(self):
         return {'__class__': self.__class__.__name__,
-                'package_configuration_policy': {pcp[0].name: pcp[1] for pcp in
+                'policy': {pcp[0].name: pcp[1] for pcp in
                                                  self._package_configurations_policy.items()}}
 
 
