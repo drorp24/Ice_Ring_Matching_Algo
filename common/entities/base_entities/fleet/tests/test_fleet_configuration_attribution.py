@@ -3,7 +3,7 @@ import unittest
 from common.entities.base_entities.drone import DroneType, PackageConfiguration
 from common.entities.base_entities.drone_delivery_board import EmptyDroneDeliveryBoard
 from common.entities.base_entities.drone_formation import DroneFormationType, DroneFormations, \
-    PackageConfigurationOptions, DroneFormation
+    PackageConfigurationOption, DroneFormation
 from common.entities.base_entities.fleet.empty_drone_delivery_board_generation import generate_empty_delivery_board
 from common.entities.base_entities.fleet.fleet_configuration_attribution import FleetConfigurationAttribution
 from common.entities.base_entities.fleet.fleet_partition import FleetPartition
@@ -27,14 +27,14 @@ class TestFleetConfigurationAttribution(unittest.TestCase):
         fleet_configuration = FleetConfigurationAttribution.solve()
 
         expected_outcome = {
-            (DroneType.drone_type_1, DroneFormationType.PAIR, PackageConfigurationOptions.LARGE_PACKAGES): 1,
-            (DroneType.drone_type_1, DroneFormationType.QUAD, PackageConfigurationOptions.LARGE_PACKAGES): 0,
-            (DroneType.drone_type_1, DroneFormationType.PAIR, PackageConfigurationOptions.MEDIUM_PACKAGES): 4,
-            (DroneType.drone_type_1, DroneFormationType.QUAD, PackageConfigurationOptions.MEDIUM_PACKAGES): 1,
-            (DroneType.drone_type_1, DroneFormationType.PAIR, PackageConfigurationOptions.SMALL_PACKAGES): 0,
-            (DroneType.drone_type_1, DroneFormationType.QUAD, PackageConfigurationOptions.SMALL_PACKAGES): 2,
-            (DroneType.drone_type_1, DroneFormationType.PAIR, PackageConfigurationOptions.TINY_PACKAGES): 0,
-            (DroneType.drone_type_1, DroneFormationType.QUAD, PackageConfigurationOptions.TINY_PACKAGES): 1
+            (DroneType.drone_type_1, DroneFormationType.PAIR, PackageConfigurationOption.LARGE_PACKAGES): 1,
+            (DroneType.drone_type_1, DroneFormationType.QUAD, PackageConfigurationOption.LARGE_PACKAGES): 0,
+            (DroneType.drone_type_1, DroneFormationType.PAIR, PackageConfigurationOption.MEDIUM_PACKAGES): 4,
+            (DroneType.drone_type_1, DroneFormationType.QUAD, PackageConfigurationOption.MEDIUM_PACKAGES): 1,
+            (DroneType.drone_type_1, DroneFormationType.PAIR, PackageConfigurationOption.SMALL_PACKAGES): 0,
+            (DroneType.drone_type_1, DroneFormationType.QUAD, PackageConfigurationOption.SMALL_PACKAGES): 2,
+            (DroneType.drone_type_1, DroneFormationType.PAIR, PackageConfigurationOption.TINY_PACKAGES): 0,
+            (DroneType.drone_type_1, DroneFormationType.QUAD, PackageConfigurationOption.TINY_PACKAGES): 1
         }
 
         self._assert_fleet_configuration_is_correct(expected_outcome, fleet_configuration)
@@ -47,14 +47,14 @@ class TestFleetConfigurationAttribution(unittest.TestCase):
         fleet_configuration = FleetConfigurationAttribution.solve()
 
         expected_outcome = {
-            (DroneType.drone_type_2, DroneFormationType.PAIR, PackageConfigurationOptions.LARGE_PACKAGES): 0,
-            (DroneType.drone_type_2, DroneFormationType.QUAD, PackageConfigurationOptions.LARGE_PACKAGES): 0,
-            (DroneType.drone_type_2, DroneFormationType.PAIR, PackageConfigurationOptions.MEDIUM_PACKAGES): 6,
-            (DroneType.drone_type_2, DroneFormationType.QUAD, PackageConfigurationOptions.MEDIUM_PACKAGES): 0,
-            (DroneType.drone_type_2, DroneFormationType.PAIR, PackageConfigurationOptions.SMALL_PACKAGES): 9,
-            (DroneType.drone_type_2, DroneFormationType.QUAD, PackageConfigurationOptions.SMALL_PACKAGES): 0,
-            (DroneType.drone_type_2, DroneFormationType.PAIR, PackageConfigurationOptions.TINY_PACKAGES): 0,
-            (DroneType.drone_type_2, DroneFormationType.QUAD, PackageConfigurationOptions.TINY_PACKAGES): 0
+            (DroneType.drone_type_2, DroneFormationType.PAIR, PackageConfigurationOption.LARGE_PACKAGES): 0,
+            (DroneType.drone_type_2, DroneFormationType.QUAD, PackageConfigurationOption.LARGE_PACKAGES): 0,
+            (DroneType.drone_type_2, DroneFormationType.PAIR, PackageConfigurationOption.MEDIUM_PACKAGES): 6,
+            (DroneType.drone_type_2, DroneFormationType.QUAD, PackageConfigurationOption.MEDIUM_PACKAGES): 0,
+            (DroneType.drone_type_2, DroneFormationType.PAIR, PackageConfigurationOption.SMALL_PACKAGES): 9,
+            (DroneType.drone_type_2, DroneFormationType.QUAD, PackageConfigurationOption.SMALL_PACKAGES): 0,
+            (DroneType.drone_type_2, DroneFormationType.PAIR, PackageConfigurationOption.TINY_PACKAGES): 0,
+            (DroneType.drone_type_2, DroneFormationType.QUAD, PackageConfigurationOption.TINY_PACKAGES): 0
         }
 
         self._assert_fleet_configuration_is_correct(expected_outcome, fleet_configuration)

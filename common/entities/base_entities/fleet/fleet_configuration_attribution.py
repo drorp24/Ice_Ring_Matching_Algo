@@ -131,7 +131,7 @@ class FleetConfigurationAttribution:
         for interval in formation_amounts_intervals:
             if index in interval:
                 formation_size_idx = formation_amounts_intervals.index(interval)
-                return cls.configuration_attribution_parameters.formation_sizes[formation_size_idx]
+                return cls.configuration_attribution_parameters.formation_size_type[formation_size_idx]
 
     @classmethod
     def _export_drone_formation_amounts(cls, variables) -> DroneFormationsPerTypeAmounts:
