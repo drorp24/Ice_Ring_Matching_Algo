@@ -215,18 +215,20 @@ class ORToolsMatcherDifferentLoadingDockIndexTestCase(TestCase):
                                                  graph_index=1,
                                                  delivery_request=delivery_requests[0],
                                                  matched_delivery_option_index=0,
-                                                 delivery_min_time=DateTimeExtension.from_dt(
-                                                     datetime(2020, 1, 23, 11, 35, 00)),
-                                                 delivery_max_time=DateTimeExtension.from_dt(
-                                                     datetime(2020, 1, 23, 11, 50, 00))),
+                                                 delivery_time_window=TimeWindowExtension(
+                                                     since=DateTimeExtension.from_dt(
+                                                         datetime(2020, 1, 23, 11, 35, 00)),
+                                                     until=DateTimeExtension.from_dt(
+                                                         datetime(2020, 1, 23, 11, 50, 00)))),
                                              MatchedDeliveryRequest(
                                                  graph_index=2,
                                                  delivery_request=delivery_requests[1],
                                                  matched_delivery_option_index=0,
-                                                 delivery_min_time=DateTimeExtension.from_dt(
-                                                     datetime(2020, 1, 23, 12, 00, 00)),
-                                                 delivery_max_time=DateTimeExtension.from_dt(
-                                                     datetime(2020, 1, 23, 12, 00, 00)))
+                                                 delivery_time_window=TimeWindowExtension(
+                                                     since=DateTimeExtension.from_dt(
+                                                         datetime(2020, 1, 23, 12, 00, 00)),
+                                                     until=DateTimeExtension.from_dt(
+                                                         datetime(2020, 1, 23, 12, 00, 00))))
                                          ],
                                          start_drone_loading_docks=MatchedDroneLoadingDock(
                                              graph_index=0,
@@ -252,10 +254,11 @@ class ORToolsMatcherDifferentLoadingDockIndexTestCase(TestCase):
                                                  graph_index=3,
                                                  delivery_request=delivery_requests[2],
                                                  matched_delivery_option_index=0,
-                                                 delivery_min_time=DateTimeExtension.from_dt(
-                                                     datetime(2020, 1, 23, 13, 30, 00)),
-                                                 delivery_max_time=DateTimeExtension.from_dt(
-                                                     datetime(2020, 1, 23, 13, 30, 00)))
+                                                 delivery_time_window=TimeWindowExtension(
+                                                     since=DateTimeExtension.from_dt(
+                                                         datetime(2020, 1, 23, 13, 30, 00)),
+                                                     until=DateTimeExtension.from_dt(
+                                                         datetime(2020, 1, 23, 13, 30, 00))))
                                          ],
                                          start_drone_loading_docks=MatchedDroneLoadingDock(
                                              graph_index=0,
@@ -286,18 +289,20 @@ class ORToolsMatcherDifferentLoadingDockIndexTestCase(TestCase):
                                                  graph_index=0,
                                                  delivery_request=delivery_requests[0],
                                                  matched_delivery_option_index=0,
-                                                 delivery_min_time=DateTimeExtension.from_dt(
-                                                     datetime(2020, 1, 23, 11, 35, 00)),
-                                                 delivery_max_time=DateTimeExtension.from_dt(
-                                                     datetime(2020, 1, 23, 11, 50, 00))),
+                                                 delivery_time_window=TimeWindowExtension(
+                                                     since=DateTimeExtension.from_dt(
+                                                         datetime(2020, 1, 23, 11, 35, 00)),
+                                                     until=DateTimeExtension.from_dt(
+                                                         datetime(2020, 1, 23, 11, 50, 00)))),
                                              MatchedDeliveryRequest(
                                                  graph_index=1,
                                                  delivery_request=delivery_requests[1],
                                                  matched_delivery_option_index=0,
-                                                 delivery_min_time=DateTimeExtension.from_dt(
-                                                     datetime(2020, 1, 23, 12, 00, 00)),
-                                                 delivery_max_time=DateTimeExtension.from_dt(
-                                                     datetime(2020, 1, 23, 12, 00, 00)))
+                                                 delivery_time_window=TimeWindowExtension(
+                                                     since=DateTimeExtension.from_dt(
+                                                         datetime(2020, 1, 23, 12, 00, 00)),
+                                                     until=DateTimeExtension.from_dt(
+                                                         datetime(2020, 1, 23, 12, 00, 00))))
                                          ],
                                          start_drone_loading_docks=MatchedDroneLoadingDock(
                                              graph_index=3,
@@ -323,10 +328,11 @@ class ORToolsMatcherDifferentLoadingDockIndexTestCase(TestCase):
                                                  graph_index=2,
                                                  delivery_request=delivery_requests[2],
                                                  matched_delivery_option_index=0,
-                                                 delivery_min_time=DateTimeExtension.from_dt(
-                                                     datetime(2020, 1, 23, 13, 30, 00)),
-                                                 delivery_max_time=DateTimeExtension.from_dt(
-                                                     datetime(2020, 1, 23, 13, 30, 00)))
+                                                 delivery_time_window=TimeWindowExtension(
+                                                     since=DateTimeExtension.from_dt(
+                                                         datetime(2020, 1, 23, 13, 30, 00)),
+                                                     until=DateTimeExtension.from_dt(
+                                                         datetime(2020, 1, 23, 13, 30, 00))))
                                          ],
                                          start_drone_loading_docks=MatchedDroneLoadingDock(
                                              graph_index=3,
@@ -357,18 +363,20 @@ class ORToolsMatcherDifferentLoadingDockIndexTestCase(TestCase):
                                                  graph_index=0,
                                                  delivery_request=delivery_requests[0],
                                                  matched_delivery_option_index=0,
-                                                 delivery_min_time=DateTimeExtension.from_dt(
-                                                     datetime(2020, 1, 23, 11, 35, 00)),
-                                                 delivery_max_time=DateTimeExtension.from_dt(
-                                                     datetime(2020, 1, 23, 11, 50, 00))),
+                                                 delivery_time_window=TimeWindowExtension(
+                                                     since=DateTimeExtension.from_dt(
+                                                         datetime(2020, 1, 23, 11, 35, 00)),
+                                                     until=DateTimeExtension.from_dt(
+                                                         datetime(2020, 1, 23, 11, 50, 00)))),
                                              MatchedDeliveryRequest(
                                                  graph_index=2,
                                                  delivery_request=delivery_requests[1],
                                                  matched_delivery_option_index=0,
-                                                 delivery_min_time=DateTimeExtension.from_dt(
-                                                     datetime(2020, 1, 23, 12, 00, 00)),
-                                                 delivery_max_time=DateTimeExtension.from_dt(
-                                                     datetime(2020, 1, 23, 12, 00, 00)))
+                                                 delivery_time_window=TimeWindowExtension(
+                                                     since=DateTimeExtension.from_dt(
+                                                         datetime(2020, 1, 23, 12, 00, 00)),
+                                                     until=DateTimeExtension.from_dt(
+                                                         datetime(2020, 1, 23, 12, 00, 00))))
                                          ],
                                          start_drone_loading_docks=MatchedDroneLoadingDock(
                                              graph_index=1,
@@ -394,10 +402,11 @@ class ORToolsMatcherDifferentLoadingDockIndexTestCase(TestCase):
                                                  graph_index=3,
                                                  delivery_request=delivery_requests[2],
                                                  matched_delivery_option_index=0,
-                                                 delivery_min_time=DateTimeExtension.from_dt(
-                                                     datetime(2020, 1, 23, 13, 30, 00)),
-                                                 delivery_max_time=DateTimeExtension.from_dt(
-                                                     datetime(2020, 1, 23, 13, 30, 00)))
+                                                 delivery_time_window=TimeWindowExtension(
+                                                     since=DateTimeExtension.from_dt(
+                                                         datetime(2020, 1, 23, 13, 30, 00)),
+                                                     until=DateTimeExtension.from_dt(
+                                                         datetime(2020, 1, 23, 13, 30, 00))))
                                          ],
                                          start_drone_loading_docks=MatchedDroneLoadingDock(
                                              graph_index=1,

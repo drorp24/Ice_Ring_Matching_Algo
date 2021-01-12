@@ -34,28 +34,31 @@ class BasicDroneDeliveryGenerationTests(unittest.TestCase):
             graph_index=1,
             delivery_request=cls.delivery_requests[0],
             matched_delivery_option_index=0,
-            delivery_min_time=DateTimeExtension(
-                dt_date=date(2020, 1, 23), dt_time=time(11, 30, 0)),
-            delivery_max_time=DateTimeExtension(
-                dt_date=date(2020, 1, 23), dt_time=time(11, 30, 0)))
+            delivery_time_window=TimeWindowExtension(
+                since=DateTimeExtension(
+                    dt_date=date(2020, 1, 23), dt_time=time(11, 30, 0)),
+                until=DateTimeExtension(
+                    dt_date=date(2020, 1, 23), dt_time=time(11, 30, 0))))
 
         cls.matched_delivery_request_2 = MatchedDeliveryRequest(
             graph_index=2,
             delivery_request=cls.delivery_requests[1],
             matched_delivery_option_index=0,
-            delivery_min_time=DateTimeExtension(
-                dt_date=date(2020, 1, 23), dt_time=time(11, 30, 0)),
-            delivery_max_time=DateTimeExtension(
-                dt_date=date(2020, 1, 23), dt_time=time(11, 30, 0)))
+            delivery_time_window=TimeWindowExtension(
+                since=DateTimeExtension(
+                    dt_date=date(2020, 1, 23), dt_time=time(11, 30, 0)),
+                until=DateTimeExtension(
+                    dt_date=date(2020, 1, 23), dt_time=time(11, 30, 0))))
 
         cls.matched_delivery_request_3 = MatchedDeliveryRequest(
             graph_index=3,
             delivery_request=cls.delivery_requests[2],
             matched_delivery_option_index=0,
-            delivery_min_time=DateTimeExtension(
-                dt_date=date(2020, 1, 23), dt_time=time(12, 30, 0)),
-            delivery_max_time=DateTimeExtension(
-                dt_date=date(2020, 1, 23), dt_time=time(12, 30, 0)))
+            delivery_time_window=TimeWindowExtension(
+                since=DateTimeExtension(
+                    dt_date=date(2020, 1, 23), dt_time=time(12, 30, 0)),
+                until=DateTimeExtension(
+                    dt_date=date(2020, 1, 23), dt_time=time(12, 30, 0))))
 
         cls.dropped_delivery_request = DroppedDeliveryRequest(graph_index=4, delivery_request=cls.delivery_requests[2])
 
@@ -97,18 +100,18 @@ class BasicDroneDeliveryGenerationTests(unittest.TestCase):
 
         expected_datetime_1 = DateTimeExtension(dt_date=date(2020, 1, 23), dt_time=time(11, 30, 0))
 
-        self.assertEqual(self.drone_delivery_1.matched_requests[0].delivery_min_time, expected_datetime_1)
-        self.assertEqual(self.drone_delivery_1.matched_requests[0].delivery_max_time, expected_datetime_1)
-        self.assertEqual(self.drone_delivery_1.matched_requests[1].delivery_min_time, expected_datetime_1)
-        self.assertEqual(self.drone_delivery_1.matched_requests[1].delivery_max_time, expected_datetime_1)
+        self.assertEqual(self.drone_delivery_1.matched_requests[0].delivery_time_window.since, expected_datetime_1)
+        self.assertEqual(self.drone_delivery_1.matched_requests[0].delivery_time_window.until, expected_datetime_1)
+        self.assertEqual(self.drone_delivery_1.matched_requests[1].delivery_time_window.since, expected_datetime_1)
+        self.assertEqual(self.drone_delivery_1.matched_requests[1].delivery_time_window.until, expected_datetime_1)
         self.assertEqual(len(self.drone_delivery_1.matched_requests), 2)
 
         self.assertEqual(self.drone_delivery_2.drone_formation, DroneFormations.get_drone_formation(
             FormationSize.MEDIUM, FormationOptions.TINY_PACKAGES, PlatformType.platform_1))
 
         expected_datetime_2 = DateTimeExtension(dt_date=date(2020, 1, 23), dt_time=time(12, 30, 0))
-        self.assertEqual(self.drone_delivery_2.matched_requests[0].delivery_min_time, expected_datetime_2)
-        self.assertEqual(self.drone_delivery_2.matched_requests[0].delivery_max_time, expected_datetime_2)
+        self.assertEqual(self.drone_delivery_2.matched_requests[0].delivery_time_window.since, expected_datetime_2)
+        self.assertEqual(self.drone_delivery_2.matched_requests[0].delivery_time_window.until, expected_datetime_2)
         self.assertEqual(len(self.drone_delivery_2.matched_requests), 1)
 
     def test_empty_drone_delivery_board(self):
@@ -135,12 +138,13 @@ class BasicDroneDeliveryGenerationTests(unittest.TestCase):
             graph_index=1,
             delivery_request=self.delivery_requests[0],
             matched_delivery_option_index=0,
-            delivery_min_time=DateTimeExtension(
-                dt_date=date(2020, 1, 23),
-                dt_time=time(11, 30, 0)),
-            delivery_max_time=DateTimeExtension(
-                dt_date=date(2020, 1, 23),
-                dt_time=time(11, 30, 0)))
+            delivery_time_window=TimeWindowExtension(
+                since=DateTimeExtension(
+                    dt_date=date(2020, 1, 23),
+                    dt_time=time(11, 30, 0)),
+                until=DateTimeExtension(
+                    dt_date=date(2020, 1, 23),
+                    dt_time=time(11, 30, 0))))
 
         self.assertEqual(self.matched_delivery_request_1, actual_matched_delivery_request)
 

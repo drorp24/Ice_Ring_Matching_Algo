@@ -130,18 +130,20 @@ class ORToolsMatcherDifferentTWTestCase(TestCase):
                                                  graph_index=1,
                                                  delivery_request=delivery_requests[0],
                                                  matched_delivery_option_index=0,
-                                                 delivery_min_time=ZERO_TIME.add_time_delta(
-                                                     TimeDeltaExtension(timedelta(minutes=5))),
-                                                 delivery_max_time=ZERO_TIME.add_time_delta(
-                                                     TimeDeltaExtension(timedelta(minutes=20)))),
+                                                 delivery_time_window=TimeWindowExtension(
+                                                     since=ZERO_TIME.add_time_delta(
+                                                         TimeDeltaExtension(timedelta(minutes=5))),
+                                                     until=ZERO_TIME.add_time_delta(
+                                                         TimeDeltaExtension(timedelta(minutes=20))))),
                                              MatchedDeliveryRequest(
                                                  graph_index=2,
                                                  delivery_request=delivery_requests[1],
                                                  matched_delivery_option_index=0,
-                                                 delivery_min_time=ZERO_TIME.add_time_delta(
-                                                     TimeDeltaExtension(timedelta(minutes=30))),
-                                                 delivery_max_time=ZERO_TIME.add_time_delta(
-                                                     TimeDeltaExtension(timedelta(minutes=30))))
+                                                 delivery_time_window=TimeWindowExtension(
+                                                     since=ZERO_TIME.add_time_delta(
+                                                         TimeDeltaExtension(timedelta(minutes=30))),
+                                                     until=ZERO_TIME.add_time_delta(
+                                                         TimeDeltaExtension(timedelta(minutes=30)))))
                                          ],
                                          start_drone_loading_docks=MatchedDroneLoadingDock(
                                              graph_index=0,
@@ -165,10 +167,11 @@ class ORToolsMatcherDifferentTWTestCase(TestCase):
                                                  graph_index=3,
                                                  delivery_request=delivery_requests[2],
                                                  matched_delivery_option_index=0,
-                                                 delivery_min_time=ZERO_TIME.add_time_delta(
-                                                     TimeDeltaExtension(timedelta(hours=2))),
-                                                 delivery_max_time=ZERO_TIME.add_time_delta(
-                                                     TimeDeltaExtension(timedelta(hours=2))))
+                                                 delivery_time_window=TimeWindowExtension(
+                                                     since=ZERO_TIME.add_time_delta(
+                                                         TimeDeltaExtension(timedelta(hours=2))),
+                                                     until=ZERO_TIME.add_time_delta(
+                                                         TimeDeltaExtension(timedelta(hours=2)))))
                                          ],
                                          start_drone_loading_docks=MatchedDroneLoadingDock(
                                              graph_index=0,

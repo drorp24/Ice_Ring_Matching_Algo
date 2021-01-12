@@ -57,25 +57,24 @@ class MatchedDeliveryRequest:
     graph_index: int
     delivery_request: DeliveryRequest
     matched_delivery_option_index: int
-    delivery_min_time: DateTimeExtension
-    delivery_max_time: DateTimeExtension
+    delivery_time_window: TimeWindowExtension
 
     def __eq__(self, other):
         return self.graph_index == other.graph_index and self.delivery_request == other.delivery_request \
                and self.matched_delivery_option_index == other.matched_delivery_option_index \
-               and self.delivery_min_time == other.delivery_min_time \
-               and self.delivery_max_time == other.delivery_max_time
+               and self.delivery_time_window.since == other.delivery_time_window.since \
+               and self.delivery_time_window.until == other.delivery_time_window.until
 
     def __str__(self):
         return '[MatchedDeliveryRequest(graph_index=' + str(self.graph_index) + ', priority=' + str(
-            self.delivery_request.priority) + ', min_time=' + self.delivery_min_time.str_format_time() + \
-               ', max_time=' + self.delivery_max_time.str_format_time() + ', delivered=' + str(
+            self.delivery_request.priority) + ', min_time=' + self.delivery_time_window.since.str_format_time() + \
+               ', max_time=' + self.delivery_time_window.until.str_format_time() + ', delivered=' + str(
             self.delivery_request.delivery_options[
                 self.matched_delivery_option_index].get_package_type_amount_map()) + ')]'
 
     def __hash__(self):
         return hash((self.graph_index, self.delivery_request, self.matched_delivery_option_index,
-                     self.delivery_min_time, self.delivery_max_time))
+                     self.delivery_time_window.since, self.delivery_time_window.until))
 
 
 # TODO change to MatchedDroneDelivery

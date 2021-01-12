@@ -36,7 +36,7 @@ def add_delivery_board(drawer: GanttDrawer, board: DroneDeliveryBoard, draw_drop
                 row=delivery_row,
                 time_window=request.delivery_request.time_window,
                 name=str(request.graph_index),
-                time_mark=request.delivery_min_time,
+                time_mark=request.delivery_time_window.since,
                 side_text=str(request.delivery_request.priority),
                 color=MATCHED_REQUEST_BAR_COLORS[request.graph_index % len(MATCHED_REQUEST_BAR_COLORS)])
     if draw_dropped:

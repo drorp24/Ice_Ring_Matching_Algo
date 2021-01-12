@@ -125,8 +125,7 @@ class ORToolsMatcher(Matcher):
                 self.matcher_input.graph,
                 graph_index),
             matched_delivery_option_index=0,
-            delivery_min_time=(self._get_min_time(index, solution)), delivery_max_time=(
-                self._get_max_time(index, solution)))
+            delivery_time_window=self._get_delivery_time_window(index, solution))
 
     def _create_drone_loading_dock(self, graph_index: int, index: int,
                                    solution: Assignment) -> MatchedDroneLoadingDock:
@@ -134,18 +133,15 @@ class ORToolsMatcher(Matcher):
             graph_index=graph_index,
             drone_loading_dock=self._graph_exporter.get_drone_loading_dock(
                 self.matcher_input.graph, graph_index),
-            delivery_time_window=TimeWindowExtension(
-                since=(self._get_min_time(index, solution)),
-                until=(self._get_max_time(index, solution))))
+            delivery_time_window=self._get_delivery_time_window(index, solution))
 
-    def _get_min_time(self, index: int, solution: Assignment) -> DateTimeExtension:
+    def _get_delivery_time_window(self, index: int, solution: Assignment) -> TimeWindowExtension:
         time_dimension = self._routing.GetDimensionOrDie('Time')
         time_var = time_dimension.CumulVar(index)
-        return self._matcher_input.config.zero_time.add_time_delta(
-            TimeDeltaExtension(timedelta(minutes=solution.Min(time_var))))
 
-    def _get_max_time(self, index: int, solution: Assignment) -> DateTimeExtension:
-        time_dimension = self._routing.GetDimensionOrDie('Time')
-        time_var = time_dimension.CumulVar(index)
-        return self._matcher_input.config.zero_time.add_time_delta(
-            TimeDeltaExtension(timedelta(minutes=solution.Max(time_var))))
+        return TimeWindowExtension(
+            since=(self._matcher_input.config.zero_time.add_time_delta(
+                TimeDeltaExtension(timedelta(minutes=solution.Min(time_var))))),
+            until=(self._matcher_input.config.zero_time.add_time_delta(
+                TimeDeltaExtension(timedelta(minutes=solution.Max(time_var))))))
+
