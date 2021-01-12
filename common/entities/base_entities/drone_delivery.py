@@ -7,7 +7,7 @@ from common.entities.base_entities.drone_formation import DroneFormation
 from common.entities.base_entities.drone_loading_dock import DroneLoadingDock
 from common.entities.base_entities.entity_id import EntityID
 from common.entities.base_entities.package import PackageType
-from common.entities.base_entities.temporal import DateTimeExtension
+from common.entities.base_entities.temporal import DateTimeExtension, TimeWindowExtension
 
 
 class EmptyDroneDelivery:
@@ -34,23 +34,22 @@ class EmptyDroneDelivery:
 class MatchedDroneLoadingDock:
     graph_index: int
     drone_loading_dock: DroneLoadingDock
-    delivery_min_time: DateTimeExtension
-    delivery_max_time: DateTimeExtension
+    delivery_time_window: TimeWindowExtension
 
     def __eq__(self, other):
         return self.graph_index == other.graph_index and self.drone_loading_dock == \
-               other.drone_loading_dock and self.delivery_min_time == \
-               other.delivery_min_time \
-               and self.delivery_max_time == other.delivery_max_time
+               other.drone_loading_dock and self.delivery_time_window.since == \
+               other.delivery_time_window.since \
+               and self.delivery_time_window.until == other.delivery_time_window.until
 
     def __str__(self):
         return '[MatchedDroneLoadingDock(graph_index=' + str(
-            self.graph_index) + ', min_time=' + self.delivery_min_time.str_format_time() + \
-               ', max_time=' + self.delivery_max_time.str_format_time() + ')]'
+            self.graph_index) + ', min_time=' + self.delivery_time_window.since.str_format_time() + \
+               ', max_time=' + self.delivery_time_window.until.str_format_time() + ')]'
 
     def __hash__(self):
         return hash((self.graph_index, self.drone_loading_dock,
-                     self.delivery_min_time, self.delivery_max_time))
+                     self.delivery_time_window.since, self.delivery_time_window.until))
 
 
 @dataclass
@@ -104,8 +103,8 @@ class DroneDelivery(EmptyDroneDelivery):
 
     @lru_cache()
     def get_total_work_time_in_minutes(self) -> float:
-        return self._end_drone_loading_docks.delivery_min_time.get_time_delta(
-            self._start_drone_loading_docks.delivery_min_time).in_minutes()
+        return self._end_drone_loading_docks.delivery_time_window.since.get_time_delta(
+            self._start_drone_loading_docks.delivery_time_window.since).in_minutes()
 
     @lru_cache()
     def get_total_package_type_amount_map(self) -> PackageTypeAmountMap:

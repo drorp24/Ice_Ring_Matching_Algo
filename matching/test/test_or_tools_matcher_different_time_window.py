@@ -144,15 +144,17 @@ class ORToolsMatcherDifferentTWTestCase(TestCase):
                                          start_drone_loading_docks=MatchedDroneLoadingDock(
                                              graph_index=0,
                                              drone_loading_dock=loading_dock,
-                                             delivery_min_time=loading_dock.time_window.since,
-                                             delivery_max_time=loading_dock.time_window.since),
+                                             delivery_time_window=TimeWindowExtension(
+                                                 since=loading_dock.time_window.since,
+                                                 until=loading_dock.time_window.since)),
                                          end_drone_loading_docks=MatchedDroneLoadingDock(
                                              graph_index=0,
                                              drone_loading_dock=loading_dock,
-                                             delivery_min_time=loading_dock.time_window.since.add_time_delta(
-                                                 TimeDeltaExtension(timedelta(minutes=40))),
-                                             delivery_max_time=loading_dock.time_window.since.add_time_delta(
-                                                 TimeDeltaExtension(timedelta(minutes=40)))))
+                                             delivery_time_window=TimeWindowExtension(
+                                                 since=loading_dock.time_window.since.add_time_delta(
+                                                     TimeDeltaExtension(timedelta(minutes=40))),
+                                                 until=loading_dock.time_window.since.add_time_delta(
+                                                     TimeDeltaExtension(timedelta(minutes=40))))))
 
         drone_delivery_2 = DroneDelivery(id_=empty_board.empty_drone_deliveries[1].id,
                                          drone_formation=empty_board.empty_drone_deliveries[1].drone_formation,
@@ -169,15 +171,17 @@ class ORToolsMatcherDifferentTWTestCase(TestCase):
                                          start_drone_loading_docks=MatchedDroneLoadingDock(
                                              graph_index=0,
                                              drone_loading_dock=loading_dock,
-                                             delivery_min_time=loading_dock.time_window.since,
-                                             delivery_max_time=loading_dock.time_window.since),
+                                             delivery_time_window=TimeWindowExtension(
+                                                 since=loading_dock.time_window.since,
+                                                 until=loading_dock.time_window.since)),
                                          end_drone_loading_docks=MatchedDroneLoadingDock(
                                              graph_index=0,
                                              drone_loading_dock=loading_dock,
-                                             delivery_min_time=loading_dock.time_window.since.add_time_delta(
-                                                 TimeDeltaExtension(timedelta(hours=2, minutes=15))),
-                                             delivery_max_time=loading_dock.time_window.since.add_time_delta(
-                                                 TimeDeltaExtension(timedelta(hours=2, minutes=15))))
+                                             delivery_time_window=TimeWindowExtension(
+                                                 since=loading_dock.time_window.since.add_time_delta(
+                                                     TimeDeltaExtension(timedelta(hours=2, minutes=15))),
+                                                 until=loading_dock.time_window.since.add_time_delta(
+                                                     TimeDeltaExtension(timedelta(hours=2, minutes=15)))))
                                          )
 
         return [drone_delivery_1, drone_delivery_2]

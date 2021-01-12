@@ -6,20 +6,21 @@ from common.entities.base_entities.delivery_request import DeliveryRequest
 from common.entities.base_entities.drone import PlatformType
 from common.entities.base_entities.drone_delivery import DroneDelivery, EmptyDroneDelivery, MatchedDroneLoadingDock, \
     MatchedDeliveryRequest
-from common.entities.base_entities.drone_delivery_board import EmptyDroneDeliveryBoard, DroneDeliveryBoard, DroppedDeliveryRequest
+from common.entities.base_entities.drone_delivery_board import EmptyDroneDeliveryBoard, DroneDeliveryBoard, \
+    DroppedDeliveryRequest
 from common.entities.base_entities.drone_formation import DroneFormations, FormationSize, FormationOptions
-from common.entities.base_entities.drone_loading_dock import DroneLoadingDock
 from common.entities.base_entities.entity_distribution.delivery_request_distribution import DeliveryRequestDistribution
 from common.entities.base_entities.entity_distribution.drone_loading_dock_distribution import \
     DroneLoadingDockDistribution
-from common.entities.base_entities.temporal import DateTimeExtension
+from common.entities.base_entities.temporal import DateTimeExtension, TimeWindowExtension
 
 
 class BasicDroneDeliveryGenerationTests(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.delivery_requests = DeliveryRequestDistribution().choose_rand(random=Random(42), amount={DeliveryRequest: 3})
+        cls.delivery_requests = DeliveryRequestDistribution().choose_rand(random=Random(42),
+                                                                          amount={DeliveryRequest: 3})
 
         cls.empty_drone_delivery_1 = EmptyDroneDelivery("edd_1", DroneFormations.get_drone_formation(
             FormationSize.MINI, FormationOptions.TINY_PACKAGES, PlatformType.platform_1))
@@ -58,12 +59,13 @@ class BasicDroneDeliveryGenerationTests(unittest.TestCase):
         drone_loading_dock_distribution = DroneLoadingDockDistribution()
         docks = drone_loading_dock_distribution.choose_rand(Random(100), amount=1)
         cls.matched_drone_loading_dock = MatchedDroneLoadingDock(graph_index=0, drone_loading_dock=docks[0],
-                                                                 delivery_min_time=DateTimeExtension(
-                                                                     dt_date=date(2020, 1, 23),
-                                                                     dt_time=time(0, 0, 0)),
-                                                                 delivery_max_time=DateTimeExtension(
-                                                                     dt_date=date(2020, 1, 23),
-                                                                     dt_time=time(23, 59, 59)))
+                                                                 delivery_time_window=TimeWindowExtension(
+                                                                     since=DateTimeExtension(
+                                                                         dt_date=date(2020, 1, 23),
+                                                                         dt_time=time(0, 0, 0)),
+                                                                     until=DateTimeExtension(
+                                                                         dt_date=date(2020, 1, 23),
+                                                                         dt_time=time(23, 59, 59))))
 
         cls.drone_delivery_1 = DroneDelivery(cls.empty_drone_delivery_1.id,
                                              cls.empty_drone_delivery_1.drone_formation,

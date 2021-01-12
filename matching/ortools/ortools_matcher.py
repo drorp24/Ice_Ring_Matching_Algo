@@ -6,7 +6,7 @@ from ortools.constraint_solver.pywrapcp import RoutingIndexManager, RoutingModel
 
 from common.entities.base_entities.drone_delivery import DroneDelivery, MatchedDroneLoadingDock, MatchedDeliveryRequest
 from common.entities.base_entities.drone_delivery_board import DroneDeliveryBoard, DroppedDeliveryRequest
-from common.entities.base_entities.temporal import DateTimeExtension, TimeDeltaExtension
+from common.entities.base_entities.temporal import DateTimeExtension, TimeDeltaExtension, TimeWindowExtension
 from common.graph.operational.export_ortools_graph import OrtoolsGraphExporter
 from matching.matcher import Matcher
 from matching.matcher_input import MatcherInput
@@ -134,8 +134,9 @@ class ORToolsMatcher(Matcher):
             graph_index=graph_index,
             drone_loading_dock=self._graph_exporter.get_drone_loading_dock(
                 self.matcher_input.graph, graph_index),
-            delivery_min_time=(self._get_min_time(index, solution)),
-            delivery_max_time=(self._get_max_time(index, solution)))
+            delivery_time_window=TimeWindowExtension(
+                since=(self._get_min_time(index, solution)),
+                until=(self._get_max_time(index, solution))))
 
     def _get_min_time(self, index: int, solution: Assignment) -> DateTimeExtension:
         time_dimension = self._routing.GetDimensionOrDie('Time')

@@ -28,8 +28,8 @@ def add_delivery_board(drawer: GanttDrawer, board: DroneDeliveryBoard, draw_drop
             continue
         drawer.add_row_area(
             row=delivery_row,
-            time_window=TimeWindowExtension(delivery.start_drone_loading_docks.delivery_min_time,
-                                            delivery.end_drone_loading_docks.delivery_min_time),
+            time_window=TimeWindowExtension(delivery.start_drone_loading_docks.delivery_time_window.since,
+                                            delivery.end_drone_loading_docks.delivery_time_window.since),
             edgecolor=OPERATING_TIME_WINDOW_COLOR)
         for request in delivery.matched_requests:
             drawer.add_bar(
