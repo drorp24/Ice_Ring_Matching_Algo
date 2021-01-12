@@ -23,21 +23,27 @@ def add_locally_connected_dr_graph(graph, dr_connection_options: [DeliveryReques
     graph.add_operational_edges(edges)
 
 
+def _create_directed_from_edges(origin_node: OperationalNode, destinations: List[OperationalNode]) -> \
+        List[OperationalEdge]:
+    edges = list(map(lambda y:
+                     OperationalEdge(origin_node, y,
+                                     OperationalEdgeAttribs(
+                                         calc_cost(origin_node.internal_node, y.internal_node))),
+                     destinations)) + \
+            list(map(lambda y: OperationalEdge(y, origin_node,
+                                               OperationalEdgeAttribs(
+                                                   calc_cost(origin_node.internal_node, y.internal_node))),
+                     destinations))
+    return edges
+
+
 def build_time_overlapping_dependent_connected_graph(graph: OperationalGraph):
     nodes = list(graph.nodes)
     for i, origin_node in enumerate(nodes):
         destinations = list(filter(lambda x: x != origin_node and has_overlapping_time_window(origin_node.internal_node,
                                                                                               x.internal_node),
                                    nodes[i:]))
-        edges = list(map(lambda y:
-                         OperationalEdge(origin_node, y,
-                                         OperationalEdgeAttribs(
-                                             calc_cost(origin_node.internal_node, y.internal_node))),
-                         destinations)) + \
-                list(map(lambda y: OperationalEdge(y, origin_node,
-                                                   OperationalEdgeAttribs(
-                                                       calc_cost(origin_node.internal_node, y.internal_node))),
-                         destinations))
+        edges = _create_directed_from_edges(origin_node, destinations)
         graph.add_operational_edges(edges)
 
 
@@ -46,15 +52,7 @@ def build_fully_connected_graph(graph: OperationalGraph):
     for i, origin_node in enumerate(nodes):
         destinations = list(filter(lambda x: x != origin_node,
                                    nodes[i:]))
-        edges = list(map(lambda y:
-                         OperationalEdge(origin_node, y,
-                                         OperationalEdgeAttribs(
-                                             calc_cost(origin_node.internal_node, y.internal_node))),
-                         destinations)) + \
-                list(map(lambda y: OperationalEdge(y, origin_node,
-                                                   OperationalEdgeAttribs(
-                                                       calc_cost(origin_node.internal_node, y.internal_node))),
-                         destinations))
+        edges = _create_directed_from_edges(origin_node, destinations)
         graph.add_operational_edges(edges)
 
 
