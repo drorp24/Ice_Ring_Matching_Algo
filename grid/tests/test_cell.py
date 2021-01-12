@@ -1,6 +1,7 @@
 import unittest
 from uuid import UUID
 
+from common.entities.base_entities.entity_id import EntityID
 from common.entities.base_entities.package import PackageType
 from common.entities.base_entities.package_delivery_plan import PackageDeliveryPlan
 from common.math.angle import Angle, AngleUnit
@@ -15,13 +16,13 @@ class BasicCellTestCase(unittest.TestCase):
     def setUpClass(cls):
         cls.cell_1 = GridCell(location=GridLocation(10, 15))
 
-        cls.pdp_1 = PackageDeliveryPlan(id=UUID(int=42),
+        cls.pdp_1 = PackageDeliveryPlan(id=EntityID(UUID(int=42)),
                                         drop_point=create_point_2d(1, 2),
                                         azimuth=Angle(30, AngleUnit.DEGREE),
                                         pitch=Angle(80, AngleUnit.DEGREE),
                                         package_type=PackageType.TINY)
 
-        cls.pdp_2 = PackageDeliveryPlan(id=UUID(int=43),
+        cls.pdp_2 = PackageDeliveryPlan(id=EntityID(UUID(int=43)),
                                         drop_point=create_point_2d(1, 3),
                                         azimuth=Angle(40, AngleUnit.DEGREE),
                                         pitch=Angle(90, AngleUnit.DEGREE),
@@ -38,13 +39,13 @@ class BasicCellTestCase(unittest.TestCase):
     def test_envelope_cell(self):
         expected_grid_location = GridLocation(10, 15)
         expected_angle = Angle(45, AngleUnit.DEGREE)
-        expected_pdp_1 = PackageDeliveryPlan(id=UUID(int=42),
+        expected_pdp_1 = PackageDeliveryPlan(id=EntityID(UUID(int=42)),
                                              drop_point=create_point_2d(1, 2),
                                              azimuth=Angle(30, AngleUnit.DEGREE),
                                              pitch=Angle(80, AngleUnit.DEGREE),
                                              package_type=PackageType.TINY)
 
-        expected_pdp_2 = PackageDeliveryPlan(id=UUID(int=43),
+        expected_pdp_2 = PackageDeliveryPlan(id=EntityID(UUID(int=43)),
                                              drop_point=create_point_2d(1, 3),
                                              azimuth=Angle(40, AngleUnit.DEGREE),
                                              pitch=Angle(90, AngleUnit.DEGREE),

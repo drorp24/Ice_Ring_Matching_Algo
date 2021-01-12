@@ -60,7 +60,7 @@ class ORToolsMatcherDifferentPriorityTestCase(TestCase):
     def _create_delivery_requests() -> List[DeliveryRequest]:
         delivery_request_1 = DeliveryRequest(
             delivery_options=[DeliveryOption([CustomerDelivery([
-                PackageDeliveryPlan(UUID(int=1),
+                PackageDeliveryPlan(EntityID(UUID(int=1)),
                                     create_point_2d(0, 5),
                                     Angle(45, AngleUnit.DEGREE),
                                     Angle(45, AngleUnit.DEGREE),
@@ -72,7 +72,7 @@ class ORToolsMatcherDifferentPriorityTestCase(TestCase):
 
         delivery_request_2 = DeliveryRequest(
             delivery_options=[DeliveryOption([CustomerDelivery([
-                PackageDeliveryPlan(UUID(int=2),
+                PackageDeliveryPlan(EntityID(UUID(int=2)),
                                     create_point_2d(0, 10),
                                     Angle(45, AngleUnit.DEGREE),
                                     Angle(45, AngleUnit.DEGREE),
@@ -84,7 +84,7 @@ class ORToolsMatcherDifferentPriorityTestCase(TestCase):
 
         delivery_request_3 = DeliveryRequest(
             delivery_options=[DeliveryOption([CustomerDelivery([
-                PackageDeliveryPlan(UUID(int=3),
+                PackageDeliveryPlan(EntityID(UUID(int=3)),
                                     create_point_2d(0, 15),
                                     Angle(45, AngleUnit.DEGREE),
                                     Angle(45, AngleUnit.DEGREE),
