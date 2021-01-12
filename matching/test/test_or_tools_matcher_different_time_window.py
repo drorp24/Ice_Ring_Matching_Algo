@@ -1,3 +1,4 @@
+import uuid
 from datetime import timedelta, date, time
 from random import Random
 from typing import List
@@ -15,6 +16,7 @@ from common.entities.base_entities.entity_distribution.delivery_requestion_datas
     build_delivery_request_distribution
 from common.entities.base_entities.entity_distribution.package_distribution import PackageDistribution
 from common.entities.base_entities.entity_distribution.temporal_distribution import ExactTimeWindowDistribution
+from common.entities.base_entities.entity_id import EntityID
 from common.entities.base_entities.package import PackageType
 from common.entities.base_entities.temporal import DateTimeExtension, TimeWindowExtension, TimeDeltaExtension
 from common.graph.operational.graph_creator import build_fully_connected_graph
@@ -94,10 +96,10 @@ class ORToolsMatcherDifferentTWTestCase(TestCase):
 
     @staticmethod
     def _create_empty_board() -> EmptyDroneDeliveryBoard:
-        empty_drone_delivery_1 = EmptyDroneDelivery("edd_1", DroneFormations.get_drone_formation(
+        empty_drone_delivery_1 = EmptyDroneDelivery(EntityID(uuid.uuid4()), DroneFormations.get_drone_formation(
             FormationSize.MINI, FormationOptions.LARGE_PACKAGES, PlatformType.platform_1))
 
-        empty_drone_delivery_2 = EmptyDroneDelivery("edd_2", DroneFormations.get_drone_formation(
+        empty_drone_delivery_2 = EmptyDroneDelivery(EntityID(uuid.uuid4()), DroneFormations.get_drone_formation(
             FormationSize.MINI, FormationOptions.LARGE_PACKAGES, PlatformType.platform_1))
 
         return EmptyDroneDeliveryBoard([empty_drone_delivery_1, empty_drone_delivery_2])

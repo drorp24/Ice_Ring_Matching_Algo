@@ -1,3 +1,4 @@
+import uuid
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import List
@@ -16,6 +17,7 @@ from common.entities.base_entities.drone_delivery_board import DroppedDeliveryRe
 from common.entities.base_entities.drone_formation import DroneFormations, FormationOptions, FormationSize
 from common.entities.base_entities.drone_loading_dock import DroneLoadingDock
 from common.entities.base_entities.drone_loading_station import DroneLoadingStation
+from common.entities.base_entities.entity_id import EntityID
 from common.entities.base_entities.package import PackageType
 from common.entities.base_entities.package_delivery_plan import PackageDeliveryPlan
 from common.entities.base_entities.temporal import TimeWindowExtension, DateTimeExtension, TimeDeltaExtension
@@ -113,7 +115,7 @@ class ORToolsMatcherDifferentPriorityTestCase(TestCase):
 
     @staticmethod
     def _create_empty_board() -> EmptyDroneDeliveryBoard:
-        empty_drone_delivery_1 = EmptyDroneDelivery("edd_1", DroneFormations.get_drone_formation(
+        empty_drone_delivery_1 = EmptyDroneDelivery(EntityID(uuid.uuid4()), DroneFormations.get_drone_formation(
             FormationSize.MINI, FormationOptions.LARGE_PACKAGES, PlatformType.platform_1))
 
         return EmptyDroneDeliveryBoard([empty_drone_delivery_1])

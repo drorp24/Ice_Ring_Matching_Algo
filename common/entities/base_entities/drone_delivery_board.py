@@ -78,8 +78,8 @@ class DroneDeliveryBoard:
         return sum(drone_delivery.get_total_priority() for drone_delivery in self._drone_deliveries)
 
     def __eq__(self, other):
-        return self._drone_deliveries == other.drone_deliveries \
-               and self._dropped_delivery_requests == other._dropped_delivery_requests
+        return self.drone_deliveries == other.drone_deliveries \
+               and self.dropped_delivery_requests == other.dropped_delivery_requests
 
     def __str__(self):
         drone_deliveries_str = '\n'.join(map(str, self._drone_deliveries))

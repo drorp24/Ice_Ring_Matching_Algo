@@ -1,4 +1,5 @@
 import unittest
+import uuid
 from datetime import date, time
 from random import Random
 
@@ -12,6 +13,7 @@ from common.entities.base_entities.drone_formation import DroneFormations, Forma
 from common.entities.base_entities.entity_distribution.delivery_request_distribution import DeliveryRequestDistribution
 from common.entities.base_entities.entity_distribution.drone_loading_dock_distribution import \
     DroneLoadingDockDistribution
+from common.entities.base_entities.entity_id import EntityID
 from common.entities.base_entities.temporal import DateTimeExtension, TimeWindowExtension
 
 
@@ -21,10 +23,11 @@ class BasicDroneDeliveryGenerationTests(unittest.TestCase):
     def setUpClass(cls):
         cls.delivery_requests = DeliveryRequestDistribution().choose_rand(random=Random(42),
                                                                           amount={DeliveryRequest: 3})
-
-        cls.empty_drone_delivery_1 = EmptyDroneDelivery("edd_1", DroneFormations.get_drone_formation(
+        cls.entity_id_1 = EntityID(uuid.uuid4())
+        cls.entity_id_2 = EntityID(uuid.uuid4())
+        cls.empty_drone_delivery_1 = EmptyDroneDelivery(cls.entity_id_1, DroneFormations.get_drone_formation(
             FormationSize.MINI, FormationOptions.TINY_PACKAGES, PlatformType.platform_1))
-        cls.empty_drone_delivery_2 = EmptyDroneDelivery("edd_2", DroneFormations.get_drone_formation(
+        cls.empty_drone_delivery_2 = EmptyDroneDelivery(cls.entity_id_2, DroneFormations.get_drone_formation(
             FormationSize.MEDIUM, FormationOptions.TINY_PACKAGES, PlatformType.platform_1))
 
         cls.matched_delivery_request_1 = MatchedDeliveryRequest(
@@ -142,7 +145,7 @@ class BasicDroneDeliveryGenerationTests(unittest.TestCase):
         self.assertEqual(self.matched_delivery_request_1, actual_matched_delivery_request)
 
     def test_2_empty_drone_deliveries_are_equal(self):
-        actual_empty_drone_delivery = EmptyDroneDelivery("edd_1", DroneFormations.get_drone_formation(
+        actual_empty_drone_delivery = EmptyDroneDelivery(self.entity_id_1, DroneFormations.get_drone_formation(
             FormationSize.MINI, FormationOptions.TINY_PACKAGES, PlatformType.platform_1))
         self.assertEqual(self.empty_drone_delivery_1, actual_empty_drone_delivery)
 
