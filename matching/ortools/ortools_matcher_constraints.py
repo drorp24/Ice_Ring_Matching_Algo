@@ -24,7 +24,7 @@ class ORToolsMatcherConstraints:
         demand_dimension_name_prefix = 'capacity_'
         demand_slack = 0
         for package_type in self._matcher_input.empty_board.package_types():
-            callback = getattr(self, "_get_" + str.lower(package_type.name) + "_demand_callback" )
+            callback = getattr(self, "_get_" + str.lower(package_type.name) + "_demand_callback")
             demand_callback_index = self._routing_model.RegisterPositiveUnaryTransitCallback(callback)
             self._routing_model.AddDimensionWithVehicleCapacity(
                 demand_callback_index,
@@ -33,25 +33,21 @@ class ORToolsMatcherConstraints:
                 self._matcher_input.config.constraints.capacity.count_capacity_from_zero,
                 demand_dimension_name_prefix + str.lower(package_type.name))
 
-    def _get_tiny_demand_callback(self, from_index):
-        from_node = self._index_manager.IndexToNode(from_index)
-        return self._graph_exporter.export_package_type_demands(self._matcher_input.graph, PackageType.TINY)[
-            from_node]
+    def _get_tiny_demand_callback(self, from_index) -> int:
+        return self._get_package_amount_by_type(from_index, PackageType.TINY)
 
-    def _get_small_demand_callback(self, from_index):
-        from_node = self._index_manager.IndexToNode(from_index)
-        return self._graph_exporter.export_package_type_demands(self._matcher_input.graph, PackageType.SMALL)[
-            from_node]
+    def _get_small_demand_callback(self, from_index) -> int:
+        return self._get_package_amount_by_type(from_index, PackageType.SMALL)
 
-    def _get_medium_demand_callback(self, from_index):
-        from_node = self._index_manager.IndexToNode(from_index)
-        return self._graph_exporter.export_package_type_demands(self._matcher_input.graph, PackageType.MEDIUM)[
-            from_node]
+    def _get_medium_demand_callback(self, from_index) -> int:
+        return self._get_package_amount_by_type(from_index, PackageType.MEDIUM)
 
-    def _get_large_demand_callback(self, from_index):
+    def _get_large_demand_callback(self, from_index) -> int:
+        return self._get_package_amount_by_type(from_index, PackageType.LARGE)
+
+    def _get_package_amount_by_type(self, from_index, package_type) -> int:
         from_node = self._index_manager.IndexToNode(from_index)
-        return self._graph_exporter.export_package_type_demands(self._matcher_input.graph, PackageType.LARGE)[
-            from_node]
+        return self._graph_exporter.export_package_type_demands(self._matcher_input.graph, package_type)[from_node]
 
     def add_time(self):
         transit_callback_index = self._routing_model.RegisterTransitCallback(self._get_travel_time_callback)
