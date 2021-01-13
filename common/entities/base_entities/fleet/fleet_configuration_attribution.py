@@ -83,6 +83,13 @@ class FleetConfigurationAttribution:
         configuration_options_size = cls.attribution_config.configuration_options_size
         formation_amounts = cls.attribution_config.formation_amounts
         formation_sizes = cls.attribution_config.formation_sizes
+        return FleetConfigurationAttribution._calc_constraints_coefficients(configuration_options_size,
+                                                                            formation_amounts,
+                                                                            formation_sizes,
+                                                                            num_vars)
+
+    @staticmethod
+    def _calc_constraints_coefficients(configuration_options_size, formation_amounts, formation_sizes, num_vars):
         constraints_coefficients = np.zeros((configuration_options_size, num_vars))
         for i in range(configuration_options_size):
             for j in range(len(formation_amounts) - 1):
