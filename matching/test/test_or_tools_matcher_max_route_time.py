@@ -34,7 +34,6 @@ ZERO_TIME = DateTimeExtension.from_dt(datetime(2020, 1, 23, 11, 30, 00))
 class ORToolsMatcherMaxRouteTimeTestCase(TestCase):
     @classmethod
     def setUpClass(cls):
-        pass
         cls.loading_dock = cls._create_loading_dock()
 
     def test_when_wait_time_longer_than_max_route_time(self):
