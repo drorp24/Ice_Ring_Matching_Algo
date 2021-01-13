@@ -73,7 +73,7 @@ class ORToolsMatcherDifferentLoadingDockIndexTestCase(TestCase):
 
         self.assertEqual(expected_matched_board, actual_delivery_board)
 
-    def test_matcher_dock_middle(self):
+    def test_matcher_create_dock_middle(self):
         graph_dock_middle = self._create_graph_dock_middle(self.delivery_requests, self.loading_dock)
         match_input = self._create_match_input(graph_dock_middle, self.empty_board, self.match_config)
         matcher = ORToolsMatcher(match_input)
