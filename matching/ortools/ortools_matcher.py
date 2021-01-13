@@ -12,7 +12,7 @@ from common.entities.base_entities.temporal import TimeDeltaExtension, TimeWindo
 from common.graph.operational.export_ortools_graph import OrtoolsGraphExporter
 from matching.matcher import Matcher
 from matching.matcher_input import MatcherInput
-from matching.ortools.ortools_matcher_constraints import ORToolsMatcherConstraints
+from matching.ortools.ortools_matcher_constraints import ORToolsMatcherConstraints ,OrToolsDimensionDescription
 from matching.ortools.ortools_matcher_objective import ORToolsMatcherObjective
 
 
@@ -153,7 +153,7 @@ class ORToolsMatcher(Matcher):
             delivery_time_window=self._get_delivery_time_window(index, solution))
 
     def _get_delivery_time_window(self, index: int, solution: Assignment) -> TimeWindowExtension:
-        time_dimension = self._routing_model.GetDimensionOrDie('Time')
+        time_dimension = self._routing_model.GetDimensionOrDie(OrToolsDimensionDescription.time.value)
         time_var = time_dimension.CumulVar(index)
 
         return TimeWindowExtension(

@@ -1,3 +1,5 @@
+from enum import Enum
+
 from ortools.constraint_solver.pywrapcp import RoutingIndexManager, RoutingModel
 
 from common.entities.base_entities.package import PackageType
@@ -5,6 +7,11 @@ from common.graph.operational.export_ortools_graph import OrtoolsGraphExporter
 from matching.matcher import MatcherInput
 
 MAX_OPERATION_TIME = 365 * 24 * 60  # minutes in year
+
+
+class OrToolsDimensionDescription(Enum):
+    capacity = "capacity"
+    time = "time"
 
 
 class ORToolsMatcherConstraints:
@@ -21,10 +28,10 @@ class ORToolsMatcherConstraints:
         self._basis_nodes_indices = self._graph_exporter.export_basis_nodes_indices(self._matcher_input.graph)
 
     def add_demand(self):
-        demand_dimension_name_prefix = 'capacity_'
+        demand_dimension_name_prefix = OrToolsDimensionDescription.capacity.value + "_"
         demand_slack = 0
         for package_type in self._matcher_input.empty_board.package_types():
-            callback = getattr(self, "_get_" + str.lower(package_type.name) + "_demand_callback" )
+            callback = getattr(self, "_get_" + str.lower(package_type.name) + "_demand_callback")
             demand_callback_index = self._routing_model.RegisterPositiveUnaryTransitCallback(callback)
             self._routing_model.AddDimensionWithVehicleCapacity(
                 demand_callback_index,
@@ -55,14 +62,13 @@ class ORToolsMatcherConstraints:
 
     def add_time(self):
         transit_callback_index = self._routing_model.RegisterTransitCallback(self._get_travel_time_callback)
-        time_dimension_name = 'Time'
         self._routing_model.AddDimension(
             transit_callback_index,
             self._matcher_input.config.constraints.time.max_waiting_time,
             MAX_OPERATION_TIME,
             self._matcher_input.config.constraints.time.count_time_from_zero,
-            time_dimension_name)
-        time_dimension = self._routing_model.GetDimensionOrDie(time_dimension_name)
+            OrToolsDimensionDescription.time.value)
+        time_dimension = self._routing_model.GetDimensionOrDie(OrToolsDimensionDescription.time.value)
         self._add_time_window_constraints_for_each_delivery_except_depot(time_dimension, self._time_windows)
         self._add_time_window_constraints_for_each_vehicle_start_node(time_dimension, self._time_windows)
         self._instantiate_route_start_and_end_times_to_produce_feasible_times(time_dimension)
