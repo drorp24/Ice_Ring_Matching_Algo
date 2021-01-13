@@ -3,6 +3,8 @@ from typing import List
 
 from ortools.constraint_solver import pywrapcp
 from ortools.constraint_solver.pywrapcp import RoutingIndexManager, RoutingModel, Assignment
+from ortools.constraint_solver.routing_enums_pb2 import FirstSolutionStrategy, LocalSearchMetaheuristic
+from ortools.constraint_solver.routing_parameters_pb2 import RoutingSearchParameters
 
 from common.entities.base_entities.drone_delivery import DroneDelivery, MatchedDroneLoadingDock, MatchedDeliveryRequest
 from common.entities.base_entities.drone_delivery_board import DroneDeliveryBoard, UnmatchedDeliveryRequest
@@ -12,7 +14,6 @@ from matching.matcher import Matcher
 from matching.matcher_input import MatcherInput
 from matching.ortools.ortools_matcher_constraints import ORToolsMatcherConstraints
 from matching.ortools.ortools_matcher_objective import ORToolsMatcherObjective
-from matching.ortools.ortools_matcher_search_params import ORToolsMatcherSearchParams
 
 
 class ORToolsMatcher(Matcher):
@@ -23,7 +24,7 @@ class ORToolsMatcher(Matcher):
         self._graph_exporter = OrtoolsGraphExporter()
         self._index_manager = self._set_index_manager()
         self._routing_model = self._set_routing_model()
-        self._search_parameters = ORToolsMatcherSearchParams(self.matcher_input).params
+        self._search_parameters = self._set_search_params()
 
         self._set_objective()
         self._set_constraints()
@@ -49,6 +50,20 @@ class ORToolsMatcher(Matcher):
 
     def _set_objective(self):
         ORToolsMatcherObjective(self._index_manager, self._routing_model, self.matcher_input).add_priority()
+
+    def _set_search_params(self) -> RoutingSearchParameters:
+
+        self._search_parameters = pywrapcp.DefaultRoutingSearchParameters()
+
+        self._search_parameters.first_solution_strategy = FirstSolutionStrategy.DESCRIPTOR.enum_values_by_name.get(
+            str.upper(self.matcher_input.config.first_solution_strategy.partition(':')[2])).number
+
+        self._search_parameters.local_search_metaheuristic = LocalSearchMetaheuristic.DESCRIPTOR.enum_values_by_name.get(
+            self.matcher_input.config.solver.name).number
+
+        self._search_parameters.time_limit.seconds = self.matcher_input.config.solver.timeout_sec
+
+        return self._search_parameters
 
     def _set_constraints(self):
         matcher_constraints = ORToolsMatcherConstraints(self._index_manager, self._routing_model, self.matcher_input)
