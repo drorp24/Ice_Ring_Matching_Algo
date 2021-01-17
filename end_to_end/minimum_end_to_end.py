@@ -1,7 +1,7 @@
 from common.entities.base_entities.drone_delivery_board import DroneDeliveryBoard
 from common.graph.operational.graph_creator import *
 from end_to_end.scenario import Scenario
-from matching.matcher_factory import build_matcher
+from matching.matcher_factory import create_matcher
 from matching.matcher_input import MatcherInput
 
 
@@ -14,5 +14,5 @@ def create_fully_connected_graph_model(scenario: Scenario) -> OperationalGraph:
 
 
 def calc_assignment(matcher_input: MatcherInput) -> DroneDeliveryBoard:
-    matcher = build_matcher(matcher_input)
+    matcher = create_matcher(matcher_input)
     return matcher.match()

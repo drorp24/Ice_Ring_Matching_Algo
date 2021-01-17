@@ -5,7 +5,7 @@ from common.tools.empty_drone_delivery_board_generation import generate_empty_de
 from common.tools.fleet_reader import FleetReader
 from end_to_end.minimum_end_to_end import create_fully_connected_graph_model, calc_assignment
 from end_to_end.scenario import Scenario
-from matching.matcher_config import MatcherConfig, MatcherConfigProperties
+from matching.matcher_config import MatcherConfig
 from matching.matcher_input import MatcherInput
 
 

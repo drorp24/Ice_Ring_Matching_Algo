@@ -23,11 +23,12 @@ from common.graph.operational.graph_creator import build_fully_connected_graph
 from common.graph.operational.operational_graph import OperationalGraph
 from geometry.distribution.geo_distribution import ExactPointLocationDistribution
 from geometry.geo_factory import create_point_2d
-from matching.matcher_config import MatcherConfig, MatcherConfigProperties, MatcherSolver, \
-    MatcherConstraints, \
-    CapacityConstraints, TimeConstraints, PriorityConstraints
+from matching.constraint_config import ConstraintsConfig, TimeConstraints, PriorityConstraints, CapacityConstraints
+from matching.matcher_config import MatcherConfig
 from matching.matcher_input import MatcherInput
 from matching.ortools.ortools_matcher import ORToolsMatcher
+from matching.ortools.ortools_solver_config import ORToolsSolverConfig
+from matching.solver_config import SolverVendor
 
 ZERO_TIME = DateTimeExtension(dt_date=date(2020, 1, 23), dt_time=time(11, 30, 0))
 
@@ -158,18 +159,17 @@ class ORToolsMatcherDifferentLoadingDockIndexTestCase(TestCase):
 
     @staticmethod
     def _create_match_config() -> MatcherConfig:
-        match_config_properties = MatcherConfigProperties(
+        return MatcherConfig(
             zero_time=ZERO_TIME,
-            first_solution_strategy="or_tools:path_cheapest_arc",
-            solver=MatcherSolver(full_name="or_tools:automatic", timeout_sec=30),
-            match_constraints=MatcherConstraints(
+            solver=ORToolsSolverConfig(SolverVendor.OR_TOOLS, first_solution_strategy="path_cheapest_arc",
+                                 local_search_strategy="automatic", timeout_sec=30),
+            constraints=ConstraintsConfig(
                 capacity_constraints=CapacityConstraints(count_capacity_from_zero=True),
                 time_constraints=TimeConstraints(max_waiting_time=300,
                                                  max_route_time=300,
                                                  count_time_from_zero=False),
                 priority_constraints=PriorityConstraints(True)),
             unmatched_penalty=100)
-        return MatcherConfig(match_config_properties=match_config_properties)
 
     @staticmethod
     def _create_match_input(graph: OperationalGraph, empty_board: EmptyDroneDeliveryBoard,
