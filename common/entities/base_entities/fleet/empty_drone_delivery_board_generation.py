@@ -7,9 +7,8 @@ from common.entities.base_entities.fleet.fleet_partition import FormationTypeAmo
 from common.entities.base_entities.fleet.fleet_property_sets import DroneSetProperties
 
 
-def _calc_formation_amounts(platform_properties: DroneSetProperties) -> FormationTypeAmounts:
-    FleetPartition.extract_parameters(platform_properties)
-    return FleetPartition.solve()
+def _calc_formation_amounts(platform_property_set: DroneSetProperties) -> FormationTypeAmounts:
+    return FleetPartition(platform_property_set).solve()
 
 
 def _calc_drone_formation_amounts(formation_sizes_amounts: FormationTypeAmounts,

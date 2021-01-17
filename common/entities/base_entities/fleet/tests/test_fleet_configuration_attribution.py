@@ -21,8 +21,7 @@ class TestFleetConfigurationAttribution(unittest.TestCase):
 
     def test_fleet_configuration_with_none_zero_policy(self):
         drone_set_properties = self.drone_set_properties_1
-        FleetPartition.extract_parameters(drone_set_properties)
-        fleet_formation_amounts = FleetPartition.solve()
+        fleet_formation_amounts = FleetPartition(drone_set_properties).solve()
         FleetConfigurationAttribution.extract_parameters(fleet_formation_amounts, drone_set_properties)
         fleet_configuration = FleetConfigurationAttribution.solve()
 
@@ -41,8 +40,7 @@ class TestFleetConfigurationAttribution(unittest.TestCase):
 
     def test_fleet_configuration_with_zero_policy(self):
         platform_property_set = self.drone_set_properties_2
-        FleetPartition.extract_parameters(platform_property_set)
-        formation_sizes_amounts = FleetPartition.solve()
+        formation_sizes_amounts = FleetPartition(platform_property_set).solve()
         FleetConfigurationAttribution.extract_parameters(formation_sizes_amounts, platform_property_set)
         fleet_configuration = FleetConfigurationAttribution.solve()
 
@@ -61,15 +59,13 @@ class TestFleetConfigurationAttribution(unittest.TestCase):
 
     def test_none_zero_formation_policy(self):
         platform_property_set = self.drone_set_properties_1
-        FleetPartition.extract_parameters(platform_property_set)
-        formation_sizes_amounts = FleetPartition.solve()
+        formation_sizes_amounts = FleetPartition(platform_property_set).solve()
         self.assertEqual(formation_sizes_amounts.amounts[DroneFormationType.PAIR], 5)
         self.assertEqual(formation_sizes_amounts.amounts[DroneFormationType.QUAD], 5)
 
     def test_with_zero_formation_policy(self):
         platform_property_set = self.drone_set_properties_2
-        FleetPartition.extract_parameters(platform_property_set)
-        formation_sizes_amounts = FleetPartition.solve()
+        formation_sizes_amounts = FleetPartition(platform_property_set).solve()
         self.assertEqual(formation_sizes_amounts.amounts[DroneFormationType.PAIR], 15)
         self.assertEqual(formation_sizes_amounts.amounts[DroneFormationType.QUAD], 0)
 
