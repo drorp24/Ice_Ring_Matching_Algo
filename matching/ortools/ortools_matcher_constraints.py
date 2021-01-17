@@ -36,7 +36,7 @@ class ORToolsMatcherConstraints:
             self._routing_model.AddDimensionWithVehicleCapacity(
                 demand_callback_index,
                 demand_slack,
-                self._matcher_input.empty_board.formation_capacities(package_type),
+                self._matcher_input.empty_board.get_package_type_amount_per_drone_delivery(package_type),
                 self._matcher_input.config.constraints.capacity.count_capacity_from_zero,
                 demand_dimension_name_prefix + str.lower(package_type.name))
 
