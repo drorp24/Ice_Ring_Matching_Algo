@@ -25,9 +25,14 @@ class OrtoolsGraphExporter(GraphExporter):
         return priorities
 
     def export_travel_times(self, graph: OperationalGraph) -> np.ndarray:
-        # We want max time to represent nonedge but it is float and the cost is int and the conversion cause it to
-        # be negetive so we devide it by half
-        return graph.to_numpy_array(nonedge=sys.maxsize / 2)
+        arr = graph.to_numpy_array(nonedge=sys.maxsize, dtype=np.int64)
+        arr = self._validate_nonedge_is_maxsize(arr)
+        return arr
+
+    @staticmethod
+    def _validate_nonedge_is_maxsize(arr: np.ndarray):
+        arr = np.where(arr == np.iinfo(np.int64).min, sys.maxsize, arr)
+        return arr
 
     def export_basis_nodes_indices(self, graph: OperationalGraph) -> List[int]:
         nodes = graph.nodes

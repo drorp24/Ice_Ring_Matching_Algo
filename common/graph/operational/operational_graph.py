@@ -111,8 +111,8 @@ class OperationalGraph:
         extracted_subgraph = self._extract_internal_subgraph_of_nodes(nodes_within_polygon)
         return OperationalGraph._create_from_extracted_subgraph(extracted_subgraph)
 
-    def to_numpy_array(self, nonedge: float = 0.0) -> np.ndarray:
-        travel_times = to_numpy_array(self.internal_graph, weight="cost", nonedge=nonedge, dtype=np.int64)
+    def to_numpy_array(self, nonedge: float, dtype) -> np.ndarray:
+        travel_times = to_numpy_array(self.internal_graph, weight="cost", nonedge=nonedge, dtype=dtype)
         if nonedge != 0:
             self._zero_nodes_travel_time_to_themselves(travel_times)
         return travel_times

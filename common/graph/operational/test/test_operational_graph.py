@@ -62,7 +62,6 @@ class BasicDeliveryRequestGraphTestCases(unittest.TestCase):
         self.assertEqual(len(region_dataset), num_nodes)
         self.assertEqual((num_nodes * (num_nodes - 1)), len(graph.edges))
 
-    @unittest.skipIf(os.environ.get('NO_SLOW_TESTS', False), 'slow tests')
     def test_graph_to_numpy_array(self):
         delivery_requests = DeliveryRequestDistribution().choose_rand(random=Random(100), amount={DeliveryRequest: 2})
         docks = DroneLoadingDockDistribution().choose_rand(random=Random(100), amount=1)
@@ -85,7 +84,7 @@ class BasicDeliveryRequestGraphTestCases(unittest.TestCase):
         expected_numpy_array = np.array([[0, cost_dock_to_dr_1, cost_dock_to_dr_2],
                                          [cost_dock_to_dr_1, 0, nonedge],
                                          [cost_dock_to_dr_2, nonedge, 0]])
-        actual_numpy_array = graph.to_numpy_array(nonedge=nonedge)
+        actual_numpy_array = graph.to_numpy_array(nonedge=nonedge, dtype=int)
         assert_array_equal(expected_numpy_array, actual_numpy_array)
 
     @unittest.skipIf(os.environ.get('NO_SLOW_TESTS', False), 'slow tests')
