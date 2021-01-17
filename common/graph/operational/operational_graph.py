@@ -1,13 +1,13 @@
 from __future__ import annotations
 
+import numpy as np
 from dataclasses import dataclass
 from typing import List, Union
-from networkx import DiGraph, subgraph
+from networkx import DiGraph, subgraph, to_numpy_array
 
 from common.entities.base_entities.delivery_request import DeliveryRequest
 from common.entities.base_entities.drone_loading_dock import DroneLoadingDock
 from common.entities.base_entities.temporal import TimeWindowExtension, Temporal
-from datetime import datetime
 from geometry.geo2d import Polygon2D
 from geometry.utils import Localizable
 
@@ -110,6 +110,16 @@ class OperationalGraph:
         nodes_within_polygon = [node for node in self.nodes if node.internal_node.calc_location() in boundary]
         extracted_subgraph = self._extract_internal_subgraph_of_nodes(nodes_within_polygon)
         return OperationalGraph._create_from_extracted_subgraph(extracted_subgraph)
+
+    def to_numpy_array(self, nonedge: float = 0.0) -> np.ndarray:
+        travel_times = to_numpy_array(self.internal_graph, weight="cost", nonedge=nonedge, dtype=np.int64)
+        if nonedge != 0:
+            self._zero_nodes_travel_time_to_themselves(travel_times)
+        return travel_times
+
+    def _zero_nodes_travel_time_to_themselves(self, travel_times: np.ndarray) -> None:
+        for i in range(len(self.internal_graph.nodes)):
+            travel_times[i, i] = 0
 
     def _extract_internal_subgraph_of_nodes(self, nodes_in_subgraph: [OperationalNode]) -> DiGraph:
         return DiGraph(self.internal_graph.subgraph(nodes_in_subgraph))

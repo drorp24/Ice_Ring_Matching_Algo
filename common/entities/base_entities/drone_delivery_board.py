@@ -84,11 +84,15 @@ class DroneDeliveryBoard:
     def __str__(self):
         drone_deliveries_str = '\n'.join(map(str, self._drone_deliveries))
 
-        unmatched_delivery_requests_str = '\n'.join(map(str, self.unmatched_delivery_requests)) if len(
-            self._unmatched_delivery_requests) > 0 else "\n[No unmatched delivery requests]"
+        unmatched_delivery_requests_str = ''.join(map(str, self.unmatched_delivery_requests)) if len(
+            self._unmatched_delivery_requests) > 0 else "[No unmatched delivery requests]"
 
-        return "\n[DroneDeliveryBoard]\n{drone_deliveries_str}\n{unmatched_delivery_request_str}".format(
-            drone_deliveries_str=drone_deliveries_str, unmatched_delivery_request_str=unmatched_delivery_requests_str)
+        return f"\n[DroneDeliveryBoard]\n" \
+               f"Total amount per package type: {self.get_total_amount_per_package_type()}\n" \
+               f"Total work time in minutes: {self.get_total_work_time_in_minutes()}\n" \
+               f"Total priority: {self.get_total_priority()}\n" \
+               f"{drone_deliveries_str}\n" \
+               f"{unmatched_delivery_requests_str}"
 
     def __hash__(self):
         return hash((tuple(self._drone_deliveries), tuple(self._unmatched_delivery_requests)))
