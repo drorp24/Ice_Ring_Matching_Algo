@@ -53,7 +53,8 @@ def _create_delivery_request_distribution():
 
     delivery_request_distribution = build_delivery_request_distribution(
         package_type_distribution=package_distribution,
-        relative_dr_location_distribution=NormalPointDistribution(create_point_2d(35.11, 32.0), 0.03, 0.05),
+        #relative_dr_location_distribution=NormalPointDistribution(create_point_2d(35.11, 32.0), 0.03, 0.05),
+        relative_dr_location_distribution=NormalPointDistribution(create_point_2d(35.45, 33.4), 0.06, 0.06),
         priority_distribution=PriorityDistribution(list(range(1, 10))),
         time_window_distribution=time_window_distribution)
     return delivery_request_distribution
@@ -90,9 +91,13 @@ class BasicMinimumEnd2EndExperiment():
             delivery_requests_distribution=_create_delivery_request_distribution(),
             drone_loading_docks_distribution=
             DroneLoadingDockDistribution(drone_loading_station_distributions=
+                                         # DroneLoadingStationDistribution(drone_station_locations_distribution=
+                                         #                                 UniformPointInBboxDistribution(35.11,35.11,
+                                         #                                                                31.79,31.79
+                                         #                                                                )),
                                          DroneLoadingStationDistribution(drone_station_locations_distribution=
-                                                                         UniformPointInBboxDistribution(35.11,35.11,
-                                                                                                        31.79,31.79
+                                                                         UniformPointInBboxDistribution(35.19336, 35.19336,
+                                                                                                        32.6675, 32.6675
                                                                                                         )),
                                          time_window_distributions=create_standad_full_day_test_time()))
         self.matcher_config = Path("end_to_end/tests/jsons/test_matcher_config.json")
@@ -102,7 +107,7 @@ class BasicMinimumEnd2EndExperiment():
         minimum_end_to_end = MinimumEnd2End(
             scenario=self.scenario_distribution.choose_rand(random=Random(10), amount={DeliveryRequest: 37, DroneLoadingDock: 1})[0],
             empty_drone_delivery_board=empty_drone_delivery_board)
-        fully_connected_graph = minimum_end_to_end.create_fully_connected_graph_model(factor=90.0)
+        fully_connected_graph = minimum_end_to_end.create_fully_connected_graph_model(factor=25.0)#(factor=90.0)
 
         delivery_board = minimum_end_to_end.calc_assignment(fully_connected_graph, self.matcher_config)
         print(delivery_board)

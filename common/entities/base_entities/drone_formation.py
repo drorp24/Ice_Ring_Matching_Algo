@@ -50,7 +50,7 @@ class DroneFormation:
     @lru_cache()
     def max_route_times_in_minutes(self) -> int:
         # TODO: Change to real endurance
-        return 60 # self.get_platform_type().value * 15
+        return 45 # self.get_platform_type().value * 15
 
     @property
     @lru_cache()
