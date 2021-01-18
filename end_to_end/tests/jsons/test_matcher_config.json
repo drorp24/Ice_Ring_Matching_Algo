@@ -1,0 +1,43 @@
+{
+    "__class__": "MatcherConfig",
+  "zero_time": {
+    "__class__": "DateTimeExtension",
+    "date": {
+      "day": 1,
+      "month": 1,
+      "year": 2021
+    },
+    "time": {
+      "hour": 0,
+      "minute": 0,
+      "second": 0
+    }
+  },
+   "solver" : {
+      "__class__": "ORToolsSolverConfig",
+      "vendor": {"__enum__": "SolverVendor.OR_TOOLS"},
+      "first_solution_strategy": "path_cheapest_arc",
+      "local_search_strategy": "automatic",
+      "timeout_sec": 60
+    },
+    "constraints": {
+      "__class__": "ConstraintsConfig",
+      "capacity": {
+        "__class__": "CapacityConstraints",
+        "count_capacity_from_zero": true
+      },
+      "time": {
+        "__class__": "TimeConstraints",
+        "max_waiting_time": 0,
+        "max_route_time": 30000000000,
+        "count_time_from_zero": false
+      },
+      "priority": {
+        "__class__": "PriorityConstraints",
+        "count_priority_from_zero": true
+      }
+    },
+    "unmatched_penalty": 1000
+ }
+
+

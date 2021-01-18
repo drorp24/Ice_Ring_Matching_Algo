@@ -19,3 +19,22 @@ class PackageDistribution(ChoiceDistribution):
     @classmethod
     def distribution_class(cls) -> type:
         return PackageType
+
+
+class ExactPackageDistribution(PackageDistribution):
+    def __init__(self, package_types: List[PackageType]):
+        self._package_types = package_types
+        self._amount_count = 0
+
+    def choose_rand(self, random: Random, amount=1) -> List[PackageType]:
+        if self._amount_count + amount > len(self._package_types):
+            raise RuntimeError(
+                f"Used {self._amount_count} randomized choices which is \
+                more than the initially given {len(self._package_types)} ")
+        choices = self._package_types[self._amount_count: self._amount_count + amount]
+        self._amount_count += amount
+        return choices
+
+    @classmethod
+    def distribution_class(cls) -> type:
+        return PackageType
