@@ -170,13 +170,13 @@ class OperationalGraph(JsonableBaseEntity):
         return OperationalGraph._create_from_extracted_subgraph(extracted_subgraph)
 
     def to_numpy_array(self, nonedge: float, dtype) -> np.ndarray:
-        travel_times = to_numpy_array(self.internal_graph, weight="cost", nonedge=nonedge, dtype=dtype)
+        travel_times = to_numpy_array(self._internal_graph, weight="cost", nonedge=nonedge, dtype=dtype)
         if nonedge != 0:
             self._zero_nodes_travel_time_to_themselves(travel_times)
         return travel_times
 
     def _zero_nodes_travel_time_to_themselves(self, travel_times: np.ndarray) -> None:
-        for i in range(len(self.internal_graph.nodes)):
+        for i in range(len(self._internal_graph.nodes)):
             travel_times[i, i] = 0
 
     def _extract_internal_subgraph_of_nodes(self, nodes_in_subgraph: [OperationalNode]) -> DiGraph:
