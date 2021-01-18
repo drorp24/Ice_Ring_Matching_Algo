@@ -9,8 +9,16 @@ class PlatformType(JsonableBaseEntity, Enum):
     platform_2 = 6
 
     @classmethod
-    def dict_to_obj(cls, dict_input):
-        return PlatformType[dict_input['name']]
+    def dict_to_obj(cls, input_dict):
+        split_name = input_dict['__enum__'].split('.')
+        assert (split_name[0] == 'PlatformType')
+        return PlatformType[split_name[1]]
+
+    def __dict__(self):
+        return {'__enum__': str(self)}
+
+    def __repr__(self):
+        return 'PlatformType: ' + str(self.__dict__())
 
 
 class PackageTypeAmountMap:

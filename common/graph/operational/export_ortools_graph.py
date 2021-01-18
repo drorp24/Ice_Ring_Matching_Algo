@@ -14,14 +14,14 @@ class OrtoolsGraphExporter(GraphExporter):
 
     def export_time_windows(self, graph: OperationalGraph, zero_time: DateTimeExtension) -> List[Tuple[int, int]]:
         nodes = graph.nodes
-        time_windows = [tuple(map(int, node.time_window.get_relative_time_in_min(zero_time)))
+        time_windows = [tuple(map(int, node.get_time_window().get_relative_time_in_min(zero_time)))
                         for node in nodes]
         return time_windows
 
     @lru_cache()
     def export_priorities(self, graph: OperationalGraph) -> List[int]:
         nodes = list(graph.nodes)
-        priorities = [node.priority for node in nodes]
+        priorities = [node.get_priority() for node in nodes]
         return priorities
 
     def export_travel_times(self, graph: OperationalGraph) -> np.ndarray:

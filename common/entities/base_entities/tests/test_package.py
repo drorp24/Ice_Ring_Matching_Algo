@@ -170,9 +170,8 @@ class BasicPackageGeneration(unittest.TestCase):
                          PackageType.SMALL.name: 0.33,
                          PackageType.MEDIUM.name: 0.0,
                          PackageType.LARGE.name: 0.0}
-
-        for package in PackageType.get_all_names():
-            assert_samples_approx_expected(self, package, expected_prob, sample_count)
+        for package in PackageType:
+            assert_samples_approx_expected(self, package.name, expected_prob, sample_count)
 
     def test_exact_package_distribution(self):
         expected_pt_1 = PackageType.TINY
@@ -186,6 +185,3 @@ class BasicPackageGeneration(unittest.TestCase):
         self.assertEqual([expected_pt_1], actual_pt_1)
         self.assertEqual([expected_pt_2, expected_pt_3], actual_pt_2_3)
         self.assertRaises(RuntimeError, exact_pt_dist.choose_rand, (Random(42), 1))
-
-    def print_example_package(self):
-        pprint(PackageType.TINY)
