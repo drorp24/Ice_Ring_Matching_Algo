@@ -33,7 +33,7 @@ class BasicCustomerDeliveryDistribTests(unittest.TestCase):
                                                  amount=cls.amount)
 
     def test_random_local_sample_is_within_range(self):
-        max_dist = 10 * 2 / sqrt(2)
+        max_dist = 100 * sqrt(2)
         within_valid_range = [cd.calc_location().calc_distance_to_point(self.base_point) < max_dist for cd in
                               self.cd_samples]
         self.assertTrue(all(within_valid_range))

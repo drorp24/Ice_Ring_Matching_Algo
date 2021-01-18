@@ -1,7 +1,8 @@
 import unittest
 from random import Random
 
-from geometry.distribution.geo_distribution import UniformPointInBboxDistribution, MultiPointInBboxDistribution
+from geometry.distribution.geo_distribution import UniformPointInBboxDistribution, MultiPointInBboxDistribution, \
+    ExactPointLocationDistribution
 from geometry.geo_factory import create_polygon_2d, create_point_2d
 
 
@@ -39,3 +40,16 @@ class BasicPointTestCase(unittest.TestCase):
 
         self.assertEqual(num_in_bbox_1 / len(points), 0.8)
         self.assertEqual(num_in_bbox_2 / len(points), 0.2)
+
+    def test_sampling_exact_point_locations(self):
+        expected_point_1 = create_point_2d(0, 0)
+        expected_point_2 = create_point_2d(0, 20)
+        expected_point_3 = create_point_2d(0, 40)
+        exact_pd = ExactPointLocationDistribution([expected_point_1,
+                                                   expected_point_2,
+                                                   expected_point_3])
+        actual_point_1 = exact_pd.choose_rand(Random(42), 1)
+        actual_points_2_3 = exact_pd.choose_rand(Random(42), 2)
+        self.assertEqual([expected_point_1], actual_point_1)
+        self.assertEqual([expected_point_2, expected_point_3], actual_points_2_3)
+        self.assertRaises(RuntimeError, exact_pd.choose_rand, (Random(42), 1))

@@ -20,6 +20,22 @@ class PointLocationDistribution(Distribution):
         return Point2D
 
 
+class ExactPointLocationDistribution(PointLocationDistribution):
+
+    def __init__(self, points: List[Point2D]):
+        self._points = points
+        self._amount_count = 0
+
+    def choose_rand(self, random: Random, amount: int = 1) -> List[Point2D]:
+        if self._amount_count  + amount > len(self._points):
+            raise RuntimeError(
+                f"Used {self._amount_count} randomized choices which is \
+                more than the initially given {len(self._points)} ")
+        choices = self._points[self._amount_count: self._amount_count + amount]
+        self._amount_count += amount
+        return choices
+
+
 class UniformPointInBboxDistribution(PointLocationDistribution):
 
     def __init__(self, min_x: float, max_x: float, min_y: float, max_y: float):

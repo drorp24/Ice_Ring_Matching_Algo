@@ -1,9 +1,9 @@
 from __future__ import annotations
 
+import numpy as np
 from dataclasses import dataclass
 from typing import List, Union
-
-from networkx import DiGraph, subgraph
+from networkx import DiGraph, subgraph, to_numpy_array
 
 from common.entities.base_entities.base_entity import JsonableBaseEntity
 from common.entities.base_entities.delivery_request import DeliveryRequest
@@ -168,6 +168,16 @@ class OperationalGraph(JsonableBaseEntity):
         nodes_within_polygon = [node for node in self.nodes if node.internal_node.calc_location() in boundary]
         extracted_subgraph = self._extract_internal_subgraph_of_nodes(nodes_within_polygon)
         return OperationalGraph._create_from_extracted_subgraph(extracted_subgraph)
+
+    def to_numpy_array(self, nonedge: float, dtype) -> np.ndarray:
+        travel_times = to_numpy_array(self._internal_graph, weight="cost", nonedge=nonedge, dtype=dtype)
+        if nonedge != 0:
+            self._zero_nodes_travel_time_to_themselves(travel_times)
+        return travel_times
+
+    def _zero_nodes_travel_time_to_themselves(self, travel_times: np.ndarray) -> None:
+        for i in range(len(self._internal_graph.nodes)):
+            travel_times[i, i] = 0
 
     def _extract_internal_subgraph_of_nodes(self, nodes_in_subgraph: [OperationalNode]) -> DiGraph:
         return DiGraph(self._internal_graph.subgraph(nodes_in_subgraph))

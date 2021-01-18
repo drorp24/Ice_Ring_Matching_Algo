@@ -19,6 +19,11 @@ SECOND = 'second'
 SINCE = 'since'
 UNTIL = 'until'
 
+SEC_IN_MIN = 60
+MIN_IN_HOUR = 60
+
+DATETIME_DEFAULT_FORMAT = "%d/%m/%Y %H:%M:%S"
+
 
 class Temporal(ABC):
 
@@ -56,6 +61,10 @@ class TimeWindowExtension(JsonableBaseEntity):
 
     def overlaps(self, other: TimeWindowExtension) -> bool:
         return self.get_internal().overlaps(other.get_internal())
+        # return int(self._internal.since.timestamp()), int(self._internal.until.timestamp())
+
+    def get_relative_time_in_min(self, zero_time: DateTimeExtension) -> (float, float):
+        return self.since.get_time_delta(zero_time).in_minutes(), self.until.get_time_delta(zero_time).in_minutes()
 
     def __eq__(self, other: TimeWindowExtension):
         return self.get_internal().since == other.get_internal().since and \
@@ -98,12 +107,15 @@ class DateTimeExtension(BaseEntity):
         return val
 
     def __hash__(self):
-        return hash(self.get_internal)
+        return self.get_internal().__hash__()
 
     def to_dict(self) -> Dict:
         date_dict = DateTimeExtension.extract_date_dict_from_datetime(self.get_internal())
         time_dict = DateTimeExtension.extract_time_dict_from_datetime(self.get_internal())
         return {**date_dict, **time_dict}
+
+    def str_format_time(self, fmt: str = DATETIME_DEFAULT_FORMAT) -> str:
+        return self._date_time.strftime(fmt)
 
     @staticmethod
     def from_dict(date_time_dict: Dict) -> DateTimeExtension:
@@ -134,6 +146,9 @@ class DateTimeExtension(BaseEntity):
     def add_time_delta(self, time_delta: TimeDeltaExtension) -> DateTimeExtension:
         return DateTimeExtension.from_dt(self.get_internal() + time_delta.get_internal())
 
+    def get_time_delta(self, from_time: DateTimeExtension) -> TimeDeltaExtension:
+        return TimeDeltaExtension(self.get_internal() - from_time.get_internal())
+
     def __eq__(self, other: DateTimeExtension):
         return self.get_internal() == other.get_internal()
 
@@ -157,6 +172,9 @@ class TimeDeltaExtension(BaseEntity):
 
     def __hash__(self):
         return hash(self.get_internal())
+
+    def in_minutes(self) -> float:
+        return self.get_internal().total_seconds() / SEC_IN_MIN
 
 
 class NoViableTimesGivenDistribution(Exception):

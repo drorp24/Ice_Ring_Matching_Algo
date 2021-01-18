@@ -1,0 +1,972 @@
+{
+  "__class__": "Scenario",
+  "delivery_requests": [
+    {
+      "__class__": "DeliveryRequest",
+      "delivery_options": [
+        {
+          "__class__": "DeliveryOption",
+          "customer_deliveries": [
+            {
+              "__class__": "CustomerDelivery",
+              "package_delivery_plans": [
+                {
+                  "__class__": "PackageDeliveryPlan",
+                  "azimuth": {
+                    "__class__": "Angle",
+                    "degrees": 223.92998225938584,
+                    "radians": 3.9083154843587735
+                  },
+                  "drop_point": {
+                    "__class__": "_ShapelyPoint2D",
+                    "x": 31.423594393642162,
+                    "y": 110.60794139871453
+                  },
+                  "id": {"__class__": "EntityID", "uuid": "3dafe91f88bf6cf7e6b2cffd9b35dda5"},
+                  "package_type": {
+                    "__enum__": "PackageType.LARGE"
+                  },
+                  "pitch": {
+                    "__class__": "Angle",
+                    "degrees": 55.63460838811983,
+                    "radians": 0.9710070944303464
+                  }
+                }
+              ]
+            }
+          ],
+          "package_delivery_plans": [
+            {
+              "__class__": "PackageDeliveryPlan",
+              "azimuth": {
+                "__class__": "Angle",
+                "degrees": 223.92998225938584,
+                "radians": 3.9083154843587735
+              },
+              "drop_point": {
+                "__class__": "_ShapelyPoint2D",
+                "x": 31.423594393642162,
+                "y": 110.60794139871453
+              },
+              "id": {"__class__": "EntityID", "uuid": "3dafe91f88bf6cf7e6b2cffd9b35dda5"},
+              "package_type": {
+                "__enum__": "PackageType.LARGE"
+              },
+              "pitch": {
+                "__class__": "Angle",
+                "degrees": 55.63460838811983,
+                "radians": 0.9710070944303464
+              }
+            }
+          ]
+        }
+      ],
+      "priority": 97,
+      "time_window": {
+        "__class__": "TimeWindowExtension",
+        "since": {
+          "__class__": "DateTimeExtension",
+          "date": {
+            "day": 1,
+            "month": 1,
+            "year": 2021
+          },
+          "time": {
+            "hour": 23,
+            "minute": 59,
+            "second": 0
+          }
+        },
+        "until": {
+          "__class__": "DateTimeExtension",
+          "date": {
+            "day": 2,
+            "month": 1,
+            "year": 2021
+          },
+          "time": {
+            "hour": 2,
+            "minute": 59,
+            "second": 0
+          }
+        }
+      }
+    },
+    {
+      "__class__": "DeliveryRequest",
+      "delivery_options": [
+        {
+          "__class__": "DeliveryOption",
+          "customer_deliveries": [
+            {
+              "__class__": "CustomerDelivery",
+              "package_delivery_plans": [
+                {
+                  "__class__": "PackageDeliveryPlan",
+                  "azimuth": {
+                    "__class__": "Angle",
+                    "degrees": 323.8191523714896,
+                    "radians": 5.651710389899698
+                  },
+                  "drop_point": {
+                    "__class__": "_ShapelyPoint2D",
+                    "x": 22.954115503576457,
+                    "y": 106.42080225910564
+                  },
+                  "id": {"__class__": "EntityID", "uuid": "b0a2bb10a97b2093dc70d34153fcec66"},
+                  "package_type": {
+                    "__enum__": "PackageType.MEDIUM"
+                  },
+                  "pitch": {
+                    "__class__": "Angle",
+                    "degrees": 34.73718740421856,
+                    "radians": 0.6062782930859163
+                  }
+                }
+              ]
+            }
+          ],
+          "package_delivery_plans": [
+            {
+              "__class__": "PackageDeliveryPlan",
+              "azimuth": {
+                "__class__": "Angle",
+                "degrees": 323.8191523714896,
+                "radians": 5.651710389899698
+              },
+              "drop_point": {
+                "__class__": "_ShapelyPoint2D",
+                "x": 22.954115503576457,
+                "y": 106.42080225910564
+              },
+              "id": {"__class__": "EntityID", "uuid": "b0a2bb10a97b2093dc70d34153fcec66"},
+              "package_type": {
+                "__enum__": "PackageType.MEDIUM"
+              },
+              "pitch": {
+                "__class__": "Angle",
+                "degrees": 34.73718740421856,
+                "radians": 0.6062782930859163
+              }
+            }
+          ]
+        }
+      ],
+      "priority": 43,
+      "time_window": {
+        "__class__": "TimeWindowExtension",
+        "since": {
+          "__class__": "DateTimeExtension",
+          "date": {
+            "day": 1,
+            "month": 1,
+            "year": 2021
+          },
+          "time": {
+            "hour": 23,
+            "minute": 59,
+            "second": 0
+          }
+        },
+        "until": {
+          "__class__": "DateTimeExtension",
+          "date": {
+            "day": 2,
+            "month": 1,
+            "year": 2021
+          },
+          "time": {
+            "hour": 2,
+            "minute": 59,
+            "second": 0
+          }
+        }
+      }
+    },
+    {
+      "__class__": "DeliveryRequest",
+      "delivery_options": [
+        {
+          "__class__": "DeliveryOption",
+          "customer_deliveries": [
+            {
+              "__class__": "CustomerDelivery",
+              "package_delivery_plans": [
+                {
+                  "__class__": "PackageDeliveryPlan",
+                  "azimuth": {
+                    "__class__": "Angle",
+                    "degrees": 115.67245337774165,
+                    "radians": 2.0188651653012277
+                  },
+                  "drop_point": {
+                    "__class__": "_ShapelyPoint2D",
+                    "x": 7.400376380870033,
+                    "y": 185.10702206850272
+                  },
+                  "id": {"__class__": "EntityID", "uuid": "8aeca731d7860113d28ee1c2358d6f6e"},
+                  "package_type": {
+                    "__enum__": "PackageType.SMALL"
+                  },
+                  "pitch": {
+                    "__class__": "Angle",
+                    "degrees": 77.7213532432354,
+                    "radians": 1.3564935132000309
+                  }
+                }
+              ]
+            }
+          ],
+          "package_delivery_plans": [
+            {
+              "__class__": "PackageDeliveryPlan",
+              "azimuth": {
+                "__class__": "Angle",
+                "degrees": 115.67245337774165,
+                "radians": 2.0188651653012277
+              },
+              "drop_point": {
+                "__class__": "_ShapelyPoint2D",
+                "x": 7.400376380870033,
+                "y": 185.10702206850272
+              },
+              "id": {"__class__": "EntityID", "uuid": "8aeca731d7860113d28ee1c2358d6f6e"},
+              "package_type": {
+                "__enum__": "PackageType.SMALL"
+              },
+              "pitch": {
+                "__class__": "Angle",
+                "degrees": 77.7213532432354,
+                "radians": 1.3564935132000309
+              }
+            }
+          ]
+        }
+      ],
+      "priority": 94,
+      "time_window": {
+        "__class__": "TimeWindowExtension",
+        "since": {
+          "__class__": "DateTimeExtension",
+          "date": {
+            "day": 1,
+            "month": 1,
+            "year": 2021
+          },
+          "time": {
+            "hour": 6,
+            "minute": 0,
+            "second": 0
+          }
+        },
+        "until": {
+          "__class__": "DateTimeExtension",
+          "date": {
+            "day": 1,
+            "month": 1,
+            "year": 2021
+          },
+          "time": {
+            "hour": 6,
+            "minute": 30,
+            "second": 0
+          }
+        }
+      }
+    },
+    {
+      "__class__": "DeliveryRequest",
+      "delivery_options": [
+        {
+          "__class__": "DeliveryOption",
+          "customer_deliveries": [
+            {
+              "__class__": "CustomerDelivery",
+              "package_delivery_plans": [
+                {
+                  "__class__": "PackageDeliveryPlan",
+                  "azimuth": {
+                    "__class__": "Angle",
+                    "degrees": 347.0080561702389,
+                    "radians": 6.056433111116093
+                  },
+                  "drop_point": {
+                    "__class__": "_ShapelyPoint2D",
+                    "x": 68.87173192988996,
+                    "y": 171.15326508519368
+                  },
+                  "id": {"__class__": "EntityID", "uuid": "53e6a9e6b437a18bce78dbe49c3a6cde"},
+                  "package_type": {
+                    "__enum__": "PackageType.LARGE"
+                  },
+                  "pitch": {
+                    "__class__": "Angle",
+                    "degrees": 69.96482891759194,
+                    "radians": 1.2211166252065198
+                  }
+                }
+              ]
+            }
+          ],
+          "package_delivery_plans": [
+            {
+              "__class__": "PackageDeliveryPlan",
+              "azimuth": {
+                "__class__": "Angle",
+                "degrees": 347.0080561702389,
+                "radians": 6.056433111116093
+              },
+              "drop_point": {
+                "__class__": "_ShapelyPoint2D",
+                "x": 68.87173192988996,
+                "y": 171.15326508519368
+              },
+              "id": {"__class__": "EntityID", "uuid": "53e6a9e6b437a18bce78dbe49c3a6cde"},
+              "package_type": {
+                "__enum__": "PackageType.LARGE"
+              },
+              "pitch": {
+                "__class__": "Angle",
+                "degrees": 69.96482891759194,
+                "radians": 1.2211166252065198
+              }
+            }
+          ]
+        }
+      ],
+      "priority": 97,
+      "time_window": {
+        "__class__": "TimeWindowExtension",
+        "since": {
+          "__class__": "DateTimeExtension",
+          "date": {
+            "day": 1,
+            "month": 1,
+            "year": 2021
+          },
+          "time": {
+            "hour": 23,
+            "minute": 59,
+            "second": 0
+          }
+        },
+        "until": {
+          "__class__": "DateTimeExtension",
+          "date": {
+            "day": 2,
+            "month": 1,
+            "year": 2021
+          },
+          "time": {
+            "hour": 0,
+            "minute": 29,
+            "second": 0
+          }
+        }
+      }
+    },
+    {
+      "__class__": "DeliveryRequest",
+      "delivery_options": [
+        {
+          "__class__": "DeliveryOption",
+          "customer_deliveries": [
+            {
+              "__class__": "CustomerDelivery",
+              "package_delivery_plans": [
+                {
+                  "__class__": "PackageDeliveryPlan",
+                  "azimuth": {
+                    "__class__": "Angle",
+                    "degrees": 130.40814183906195,
+                    "radians": 2.2760514464994044
+                  },
+                  "drop_point": {
+                    "__class__": "_ShapelyPoint2D",
+                    "x": 94.49699941655801,
+                    "y": 182.8401389865619
+                  },
+                  "id": {"__class__": "EntityID", "uuid": "580fa1a8db332968a5f13907db46c4ee"},
+                  "package_type": {
+                    "__enum__": "PackageType.TINY"
+                  },
+                  "pitch": {
+                    "__class__": "Angle",
+                    "degrees": 55.035042352919504,
+                    "radians": 0.9605426930329725
+                  }
+                }
+              ]
+            }
+          ],
+          "package_delivery_plans": [
+            {
+              "__class__": "PackageDeliveryPlan",
+              "azimuth": {
+                "__class__": "Angle",
+                "degrees": 130.40814183906195,
+                "radians": 2.2760514464994044
+              },
+              "drop_point": {
+                "__class__": "_ShapelyPoint2D",
+                "x": 94.49699941655801,
+                "y": 182.8401389865619
+              },
+              "id": {"__class__": "EntityID", "uuid": "580fa1a8db332968a5f13907db46c4ee"},
+              "package_type": {
+                "__enum__": "PackageType.TINY"
+              },
+              "pitch": {
+                "__class__": "Angle",
+                "degrees": 55.035042352919504,
+                "radians": 0.9605426930329725
+              }
+            }
+          ]
+        }
+      ],
+      "priority": 88,
+      "time_window": {
+        "__class__": "TimeWindowExtension",
+        "since": {
+          "__class__": "DateTimeExtension",
+          "date": {
+            "day": 1,
+            "month": 1,
+            "year": 2021
+          },
+          "time": {
+            "hour": 23,
+            "minute": 59,
+            "second": 0
+          }
+        },
+        "until": {
+          "__class__": "DateTimeExtension",
+          "date": {
+            "day": 2,
+            "month": 1,
+            "year": 2021
+          },
+          "time": {
+            "hour": 2,
+            "minute": 59,
+            "second": 0
+          }
+        }
+      }
+    },
+    {
+      "__class__": "DeliveryRequest",
+      "delivery_options": [
+        {
+          "__class__": "DeliveryOption",
+          "customer_deliveries": [
+            {
+              "__class__": "CustomerDelivery",
+              "package_delivery_plans": [
+                {
+                  "__class__": "PackageDeliveryPlan",
+                  "azimuth": {
+                    "__class__": "Angle",
+                    "degrees": 294.14786183421506,
+                    "radians": 5.1338486767084195
+                  },
+                  "drop_point": {
+                    "__class__": "_ShapelyPoint2D",
+                    "x": 13.683374599365372,
+                    "y": 193.9490276108808
+                  },
+                  "id": {"__class__": "EntityID", "uuid": "a4814f5bd3fe19341a36993b9d2cff74"},
+                  "package_type": {
+                    "__enum__": "PackageType.LARGE"
+                  },
+                  "pitch": {
+                    "__class__": "Angle",
+                    "degrees": 42.44057382369243,
+                    "radians": 0.7407277496591523
+                  }
+                }
+              ]
+            }
+          ],
+          "package_delivery_plans": [
+            {
+              "__class__": "PackageDeliveryPlan",
+              "azimuth": {
+                "__class__": "Angle",
+                "degrees": 294.14786183421506,
+                "radians": 5.1338486767084195
+              },
+              "drop_point": {
+                "__class__": "_ShapelyPoint2D",
+                "x": 13.683374599365372,
+                "y": 193.9490276108808
+              },
+              "id": {"__class__": "EntityID", "uuid": "a4814f5bd3fe19341a36993b9d2cff74"},
+              "package_type": {
+                "__enum__": "PackageType.LARGE"
+              },
+              "pitch": {
+                "__class__": "Angle",
+                "degrees": 42.44057382369243,
+                "radians": 0.7407277496591523
+              }
+            }
+          ]
+        }
+      ],
+      "priority": 91,
+      "time_window": {
+        "__class__": "TimeWindowExtension",
+        "since": {
+          "__class__": "DateTimeExtension",
+          "date": {
+            "day": 1,
+            "month": 1,
+            "year": 2021
+          },
+          "time": {
+            "hour": 23,
+            "minute": 59,
+            "second": 0
+          }
+        },
+        "until": {
+          "__class__": "DateTimeExtension",
+          "date": {
+            "day": 2,
+            "month": 1,
+            "year": 2021
+          },
+          "time": {
+            "hour": 2,
+            "minute": 59,
+            "second": 0
+          }
+        }
+      }
+    },
+    {
+      "__class__": "DeliveryRequest",
+      "delivery_options": [
+        {
+          "__class__": "DeliveryOption",
+          "customer_deliveries": [
+            {
+              "__class__": "CustomerDelivery",
+              "package_delivery_plans": [
+                {
+                  "__class__": "PackageDeliveryPlan",
+                  "azimuth": {
+                    "__class__": "Angle",
+                    "degrees": 329.16466921724054,
+                    "radians": 5.745007259078873
+                  },
+                  "drop_point": {
+                    "__class__": "_ShapelyPoint2D",
+                    "x": 25.725799817192918,
+                    "y": 101.40722196764996
+                  },
+                  "id": {"__class__": "EntityID", "uuid": "fd938ee78ea1d1ec488cfcaa31809429"},
+                  "package_type": {
+                    "__enum__": "PackageType.LARGE"
+                  },
+                  "pitch": {
+                    "__class__": "Angle",
+                    "degrees": 67.41964093954829,
+                    "radians": 1.176694714907481
+                  }
+                }
+              ]
+            }
+          ],
+          "package_delivery_plans": [
+            {
+              "__class__": "PackageDeliveryPlan",
+              "azimuth": {
+                "__class__": "Angle",
+                "degrees": 329.16466921724054,
+                "radians": 5.745007259078873
+              },
+              "drop_point": {
+                "__class__": "_ShapelyPoint2D",
+                "x": 25.725799817192918,
+                "y": 101.40722196764996
+              },
+              "id": {"__class__": "EntityID", "uuid": "fd938ee78ea1d1ec488cfcaa31809429"},
+              "package_type": {
+                "__enum__": "PackageType.LARGE"
+              },
+              "pitch": {
+                "__class__": "Angle",
+                "degrees": 67.41964093954829,
+                "radians": 1.176694714907481
+              }
+            }
+          ]
+        }
+      ],
+      "priority": 61,
+      "time_window": {
+        "__class__": "TimeWindowExtension",
+        "since": {
+          "__class__": "DateTimeExtension",
+          "date": {
+            "day": 1,
+            "month": 1,
+            "year": 2021
+          },
+          "time": {
+            "hour": 6,
+            "minute": 0,
+            "second": 0
+          }
+        },
+        "until": {
+          "__class__": "DateTimeExtension",
+          "date": {
+            "day": 1,
+            "month": 1,
+            "year": 2021
+          },
+          "time": {
+            "hour": 9,
+            "minute": 0,
+            "second": 0
+          }
+        }
+      }
+    },
+    {
+      "__class__": "DeliveryRequest",
+      "delivery_options": [
+        {
+          "__class__": "DeliveryOption",
+          "customer_deliveries": [
+            {
+              "__class__": "CustomerDelivery",
+              "package_delivery_plans": [
+                {
+                  "__class__": "PackageDeliveryPlan",
+                  "azimuth": {
+                    "__class__": "Angle",
+                    "degrees": 208.81648130917506,
+                    "radians": 3.644535131274304
+                  },
+                  "drop_point": {
+                    "__class__": "_ShapelyPoint2D",
+                    "x": 40.29834271607928,
+                    "y": 171.79063071199425
+                  },
+                  "id": {"__class__": "EntityID", "uuid": "d19b434020e88402727bd32395820147"},
+                  "package_type": {
+                    "__enum__": "PackageType.LARGE"
+                  },
+                  "pitch": {
+                    "__class__": "Angle",
+                    "degrees": 77.4832170031259,
+                    "radians": 1.3523372517418004
+                  }
+                }
+              ]
+            }
+          ],
+          "package_delivery_plans": [
+            {
+              "__class__": "PackageDeliveryPlan",
+              "azimuth": {
+                "__class__": "Angle",
+                "degrees": 208.81648130917506,
+                "radians": 3.644535131274304
+              },
+              "drop_point": {
+                "__class__": "_ShapelyPoint2D",
+                "x": 40.29834271607928,
+                "y": 171.79063071199425
+              },
+              "id": {"__class__": "EntityID", "uuid": "d19b434020e88402727bd32395820147"},
+              "package_type": {
+                "__enum__": "PackageType.LARGE"
+              },
+              "pitch": {
+                "__class__": "Angle",
+                "degrees": 77.4832170031259,
+                "radians": 1.3523372517418004
+              }
+            }
+          ]
+        }
+      ],
+      "priority": 82,
+      "time_window": {
+        "__class__": "TimeWindowExtension",
+        "since": {
+          "__class__": "DateTimeExtension",
+          "date": {
+            "day": 1,
+            "month": 1,
+            "year": 2021
+          },
+          "time": {
+            "hour": 6,
+            "minute": 0,
+            "second": 0
+          }
+        },
+        "until": {
+          "__class__": "DateTimeExtension",
+          "date": {
+            "day": 1,
+            "month": 1,
+            "year": 2021
+          },
+          "time": {
+            "hour": 6,
+            "minute": 30,
+            "second": 0
+          }
+        }
+      }
+    },
+    {
+      "__class__": "DeliveryRequest",
+      "delivery_options": [
+        {
+          "__class__": "DeliveryOption",
+          "customer_deliveries": [
+            {
+              "__class__": "CustomerDelivery",
+              "package_delivery_plans": [
+                {
+                  "__class__": "PackageDeliveryPlan",
+                  "azimuth": {
+                    "__class__": "Angle",
+                    "degrees": 302.2983960205422,
+                    "radians": 5.276102334056185
+                  },
+                  "drop_point": {
+                    "__class__": "_ShapelyPoint2D",
+                    "x": 47.61026795375846,
+                    "y": 184.60944250908818
+                  },
+                  "id": {"__class__": "EntityID", "uuid": "8010b7af8df0e2793a2ea41bf6ba81eb"},
+                  "package_type": {
+                    "__enum__": "PackageType.MEDIUM"
+                  },
+                  "pitch": {
+                    "__class__": "Angle",
+                    "degrees": 47.2764616467681,
+                    "radians": 0.8251299144289237
+                  }
+                }
+              ]
+            }
+          ],
+          "package_delivery_plans": [
+            {
+              "__class__": "PackageDeliveryPlan",
+              "azimuth": {
+                "__class__": "Angle",
+                "degrees": 302.2983960205422,
+                "radians": 5.276102334056185
+              },
+              "drop_point": {
+                "__class__": "_ShapelyPoint2D",
+                "x": 47.61026795375846,
+                "y": 184.60944250908818
+              },
+              "id": {"__class__": "EntityID", "uuid": "8010b7af8df0e2793a2ea41bf6ba81eb"},
+              "package_type": {
+                "__enum__": "PackageType.MEDIUM"
+              },
+              "pitch": {
+                "__class__": "Angle",
+                "degrees": 47.2764616467681,
+                "radians": 0.8251299144289237
+              }
+            }
+          ]
+        }
+      ],
+      "priority": 10,
+      "time_window": {
+        "__class__": "TimeWindowExtension",
+        "since": {
+          "__class__": "DateTimeExtension",
+          "date": {
+            "day": 1,
+            "month": 1,
+            "year": 2021
+          },
+          "time": {
+            "hour": 6,
+            "minute": 0,
+            "second": 0
+          }
+        },
+        "until": {
+          "__class__": "DateTimeExtension",
+          "date": {
+            "day": 1,
+            "month": 1,
+            "year": 2021
+          },
+          "time": {
+            "hour": 6,
+            "minute": 30,
+            "second": 0
+          }
+        }
+      }
+    },
+    {
+      "__class__": "DeliveryRequest",
+      "delivery_options": [
+        {
+          "__class__": "DeliveryOption",
+          "customer_deliveries": [
+            {
+              "__class__": "CustomerDelivery",
+              "package_delivery_plans": [
+                {
+                  "__class__": "PackageDeliveryPlan",
+                  "azimuth": {
+                    "__class__": "Angle",
+                    "degrees": 156.25412937770682,
+                    "radians": 2.727149027478182
+                  },
+                  "drop_point": {
+                    "__class__": "_ShapelyPoint2D",
+                    "x": 1.0787848978618175,
+                    "y": 131.32009519652811
+                  },
+                  "id": {"__class__": "EntityID", "uuid": "0295154c8557afe1499068c87041be39"},
+                  "package_type": {
+                    "__enum__": "PackageType.LARGE"
+                  },
+                  "pitch": {
+                    "__class__": "Angle",
+                    "degrees": 59.1816018141285,
+                    "radians": 1.0329138082607916
+                  }
+                }
+              ]
+            }
+          ],
+          "package_delivery_plans": [
+            {
+              "__class__": "PackageDeliveryPlan",
+              "azimuth": {
+                "__class__": "Angle",
+                "degrees": 156.25412937770682,
+                "radians": 2.727149027478182
+              },
+              "drop_point": {
+                "__class__": "_ShapelyPoint2D",
+                "x": 1.0787848978618175,
+                "y": 131.32009519652811
+              },
+              "id": {"__class__": "EntityID", "uuid": "0295154c8557afe1499068c87041be39"},
+              "package_type": {
+                "__enum__": "PackageType.LARGE"
+              },
+              "pitch": {
+                "__class__": "Angle",
+                "degrees": 59.1816018141285,
+                "radians": 1.0329138082607916
+              }
+            }
+          ]
+        }
+      ],
+      "priority": 31,
+      "time_window": {
+        "__class__": "TimeWindowExtension",
+        "since": {
+          "__class__": "DateTimeExtension",
+          "date": {
+            "day": 1,
+            "month": 1,
+            "year": 2021
+          },
+          "time": {
+            "hour": 6,
+            "minute": 0,
+            "second": 0
+          }
+        },
+        "until": {
+          "__class__": "DateTimeExtension",
+          "date": {
+            "day": 1,
+            "month": 1,
+            "year": 2021
+          },
+          "time": {
+            "hour": 6,
+            "minute": 30,
+            "second": 0
+          }
+        }
+      }
+    }
+  ],
+  "drone_loading_docks": [
+    {
+      "__class__": "DroneLoadingDock",
+      "drone_loading_station": {
+        "__class__": "DroneLoadingStation",
+        "location": {
+          "__class__": "_ShapelyPoint2D",
+          "x": 94.65514585085286,
+          "y": 47.933356530527135
+        }
+      },
+      "platform_type": {"__enum__": "PlatformType.platform_2"},
+      "priority": 0,
+      "time_window": {
+        "__class__": "TimeWindowExtension",
+        "since": {
+          "__class__": "DateTimeExtension",
+          "date": {
+            "day": 1,
+            "month": 1,
+            "year": 2021
+          },
+          "time": {
+            "hour": 6,
+            "minute": 0,
+            "second": 0
+          }
+        },
+        "until": {
+          "__class__": "DateTimeExtension",
+          "date": {
+            "day": 2,
+            "month": 1,
+            "year": 2021
+          },
+          "time": {
+            "hour": 2,
+            "minute": 59,
+            "second": 0
+          }
+        }
+      }
+    }
+  ],
+  "zero_time": {
+    "__class__": "DateTimeExtension",
+    "date": {
+      "day": 1,
+      "month": 1,
+      "year": 2021
+    },
+    "time": {
+      "hour": 6,
+      "minute": 0,
+      "second": 0
+    }
+  }
+}
