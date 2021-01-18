@@ -1,6 +1,8 @@
 from enum import Enum
+from typing import Tuple, List
 
-from ortools.constraint_solver.pywrapcp import RoutingIndexManager, RoutingModel
+import numpy as np
+from ortools.constraint_solver.pywrapcp import RoutingIndexManager, RoutingModel, RoutingDimension
 
 from common.entities.base_entities.package import PackageType
 from common.graph.operational.export_ortools_graph import OrtoolsGraphExporter
@@ -40,19 +42,19 @@ class ORToolsMatcherConstraints:
                 self._matcher_input.config.constraints.capacity.count_capacity_from_zero,
                 demand_dimension_name_prefix + str.lower(package_type.name))
 
-    def _get_tiny_demand_callback(self, from_index) -> int:
+    def _get_tiny_demand_callback(self, from_index: np.int64) -> int:
         return self._get_package_amount_by_type(from_index, PackageType.TINY)
 
-    def _get_small_demand_callback(self, from_index) -> int:
+    def _get_small_demand_callback(self, from_index: np.int64) -> int:
         return self._get_package_amount_by_type(from_index, PackageType.SMALL)
 
-    def _get_medium_demand_callback(self, from_index) -> int:
+    def _get_medium_demand_callback(self, from_index: np.int64) -> int:
         return self._get_package_amount_by_type(from_index, PackageType.MEDIUM)
 
-    def _get_large_demand_callback(self, from_index) -> int:
+    def _get_large_demand_callback(self, from_index: np.int64) -> int:
         return self._get_package_amount_by_type(from_index, PackageType.LARGE)
 
-    def _get_package_amount_by_type(self, from_index, package_type) -> int:
+    def _get_package_amount_by_type(self, from_index: np.int64, package_type: PackageType) -> int:
         from_node = self._index_manager.IndexToNode(from_index)
         return self._graph_exporter.export_package_type_demands(self._matcher_input.graph, package_type)[from_node]
 
@@ -70,33 +72,35 @@ class ORToolsMatcherConstraints:
         self._instantiate_route_start_and_end_times_to_produce_feasible_times(time_dimension)
         self._set_max_route_time_for_each_vehicle(time_dimension)
 
-    def _instantiate_route_start_and_end_times_to_produce_feasible_times(self, time_dimension):
+    def _instantiate_route_start_and_end_times_to_produce_feasible_times(self, time_dimension: RoutingDimension):
         for i in range(len(self._matcher_input.empty_board.empty_drone_deliveries)):
             self._routing_model.AddVariableMinimizedByFinalizer(
                 time_dimension.CumulVar(self._routing_model.Start(i)))
             self._routing_model.AddVariableMinimizedByFinalizer(
                 time_dimension.CumulVar(self._routing_model.End(i)))
 
-    def _add_time_window_constraints_for_each_vehicle_start_node(self, time_dimension, time_windows):
+    def _add_time_window_constraints_for_each_vehicle_start_node(self, time_dimension: RoutingDimension,
+                                                                 time_windows: List[Tuple[int, int]]):
         for i, drone_delivery in enumerate(self._matcher_input.empty_board.empty_drone_deliveries):
             start_index = self._routing_model.Start(i)
             graph_index = self._index_manager.IndexToNode(start_index)
             time_dimension.CumulVar(start_index).SetRange(time_windows[graph_index][0],
                                                           time_windows[graph_index][1])
 
-    def _set_max_route_time_for_each_vehicle(self, time_dimension):
+    def _set_max_route_time_for_each_vehicle(self, time_dimension: RoutingDimension):
         for i, drone_delivery in enumerate(self._matcher_input.empty_board.empty_drone_deliveries):
             max_route_times_in_minutes = drone_delivery.drone_formation.max_route_times_in_minutes
             time_dimension.SetSpanUpperBoundForVehicle(max_route_times_in_minutes, i)
 
-    def _add_time_window_constraints_for_each_delivery_except_depot(self, time_dimension, time_windows):
+    def _add_time_window_constraints_for_each_delivery_except_depot(self, time_dimension: RoutingDimension,
+                                                                    time_windows: List[Tuple[int, int]]):
         for graph_index, time_window in enumerate(time_windows):
             if graph_index in self._basis_nodes_indices:
                 continue
             index = self._index_manager.NodeToIndex(graph_index)
             time_dimension.CumulVar(index).SetRange(time_window[0], time_window[1])
 
-    def _get_travel_time_callback(self, from_index, to_index):
+    def _get_travel_time_callback(self, from_index: np.int64, to_index: np.int64) -> np.ndarray:
         from_node = self._index_manager.IndexToNode(from_index)
         to_node = self._index_manager.IndexToNode(to_index)
         return self._travel_times_matrix[from_node][to_node]
