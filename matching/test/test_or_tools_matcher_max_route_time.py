@@ -22,11 +22,13 @@ from common.graph.operational.graph_creator import build_fully_connected_graph
 from common.graph.operational.operational_graph import OperationalGraph
 from geometry.distribution.geo_distribution import ExactPointLocationDistribution
 from geometry.geo_factory import create_point_2d
-from matching.matcher_config import MatcherConfig, MatcherConfigProperties, MatcherSolver, MatcherConstraints, \
-    CapacityConstraints, TimeConstraints, PriorityConstraints
+from matching.constraint_config import ConstraintsConfig, CapacityConstraints, TimeConstraints, PriorityConstraints
+from matching.matcher_config import MatcherConfig
 from matching.matcher_input import MatcherInput
 from matching.ortools.ortools_matcher import ORToolsMatcher
 from matching.ortools.ortools_matcher_constraints import MAX_OPERATION_TIME
+from matching.ortools.ortools_solver_config import ORToolsSolverConfig
+from matching.solver_config import SolverVendor
 
 ZERO_TIME = DateTimeExtension.from_dt(datetime(2020, 1, 23, 11, 30, 00))
 
@@ -35,8 +37,60 @@ class ORToolsMatcherMaxRouteTimeTestCase(TestCase):
     @classmethod
     def setUpClass(cls):
         cls.loading_dock = cls._create_loading_dock()
+        cls.empty_drone_delivery_1 = cls._create_limited_route_time_empty_drone_delivery()
+        cls.empty_drone_delivery_2 = cls._create_sufficient_route_time_empty_drone_delivery()
+        cls.empty_board_1 = EmptyDroneDeliveryBoard([cls.empty_drone_delivery_1])
+        cls.empty_board_2 = EmptyDroneDeliveryBoard([cls.empty_drone_delivery_2])
 
     def test_when_wait_time_longer_than_max_route_time(self):
+        delivery_requests = self._create_2_delivery_requests_with_big_time_window_difference()
+        match_config = self._create_match_config_with_big_waiting_time()
+        graph = self._create_graph(delivery_requests, self.loading_dock)
+        match_input_1 = MatcherInput(graph, self.empty_board_1, match_config)
+        match_input_2 = MatcherInput(graph, self.empty_board_2, match_config)
+        matcher_1 = ORToolsMatcher(match_input_1)
+        matcher_2 = ORToolsMatcher(match_input_2)
+        delivery_board_1 = matcher_1.match()
+        delivery_board_2 = matcher_2.match()
+
+        self.assertEqual(1, len(delivery_board_1.drone_deliveries[0].matched_requests))
+        self.assertEqual(2, len(delivery_board_2.drone_deliveries[0].matched_requests))
+
+    def test_when_travel_time_is_greater_than_max_route_time(self):
+        delivery_requests = self._create_2_delivery_requests_with_big_travel_time_difference()
+        match_config = self._create_match_config_with_zero_waiting_time()
+        graph = self._create_graph(delivery_requests, self.loading_dock)
+        match_input_1 = MatcherInput(graph, self.empty_board_1, match_config)
+        match_input_2 = MatcherInput(graph, self.empty_board_2, match_config)
+        matcher_1 = ORToolsMatcher(match_input_1)
+        matcher_2 = ORToolsMatcher(match_input_2)
+        delivery_board_1 = matcher_1.match()
+        delivery_board_2 = matcher_2.match()
+
+        self.assertEqual(1, len(delivery_board_1.drone_deliveries[0].matched_requests))
+        self.assertEqual(2, len(delivery_board_2.drone_deliveries[0].matched_requests))
+
+    @staticmethod
+    def _create_limited_route_time_empty_drone_delivery():
+        return EmptyDroneDelivery(EntityID(uuid.uuid4()), DroneFormations.get_drone_formation(
+            FormationSize.MINI, FormationOptions.LARGE_PACKAGES, PlatformType.platform_1))
+
+    @staticmethod
+    def _create_match_config_with_big_waiting_time():
+        return MatcherConfig(
+            zero_time=ZERO_TIME,
+            solver=ORToolsSolverConfig(SolverVendor.OR_TOOLS, first_solution_strategy="path_cheapest_arc",
+                                       local_search_strategy="automatic", timeout_sec=30),
+            constraints=ConstraintsConfig(
+                capacity_constraints=CapacityConstraints(count_capacity_from_zero=True),
+                time_constraints=TimeConstraints(max_waiting_time=500,
+                                                 max_route_time=MAX_OPERATION_TIME,
+                                                 count_time_from_zero=False),
+                priority_constraints=PriorityConstraints(True)),
+            unmatched_penalty=1000)
+
+    @staticmethod
+    def _create_2_delivery_requests_with_big_time_window_difference():
         dist = build_delivery_request_distribution(
             relative_pdp_location_distribution=ExactPointLocationDistribution([
                 create_point_2d(0, 5),
@@ -51,39 +105,24 @@ class ORToolsMatcherMaxRouteTimeTestCase(TestCase):
                     until=ZERO_TIME.add_time_delta(TimeDeltaExtension(timedelta(minutes=500)))),
             ]),
             package_type_distribution=PackageDistribution({PackageType.LARGE.name: 1}))
-        self.delivery_requests = dist.choose_rand(Random(42), amount={DeliveryRequest: 2})
+        return dist.choose_rand(Random(42), amount={DeliveryRequest: 2})
 
-        match_config = MatcherConfig(MatcherConfigProperties(
+    @staticmethod
+    def _create_match_config_with_zero_waiting_time():
+        return MatcherConfig(
             zero_time=ZERO_TIME,
-            first_solution_strategy="or_tools:path_cheapest_arc",
-            solver=MatcherSolver(full_name="or_tools:automatic", timeout_sec=30),
-            match_constraints=MatcherConstraints(
+            solver=ORToolsSolverConfig(SolverVendor.OR_TOOLS, first_solution_strategy="path_cheapest_arc",
+                                       local_search_strategy="automatic", timeout_sec=30),
+            constraints=ConstraintsConfig(
                 capacity_constraints=CapacityConstraints(count_capacity_from_zero=True),
-                time_constraints=TimeConstraints(max_waiting_time=500,
+                time_constraints=TimeConstraints(max_waiting_time=0,
                                                  max_route_time=MAX_OPERATION_TIME,
                                                  count_time_from_zero=False),
                 priority_constraints=PriorityConstraints(True)),
-            unmatched_penalty=1000))
+            unmatched_penalty=1000)
 
-        self.graph = self._create_graph(self.delivery_requests, self.loading_dock)
-
-        empty_drone_delivery_1 = EmptyDroneDelivery(EntityID(uuid.uuid4()), DroneFormations.get_drone_formation(
-            FormationSize.MINI, FormationOptions.LARGE_PACKAGES, PlatformType.platform_1))
-        empty_drone_delivery_2 = EmptyDroneDelivery(EntityID(uuid.uuid4()), DroneFormations.get_drone_formation(
-            FormationSize.MINI, FormationOptions.LARGE_PACKAGES, PlatformType.platform_2))
-
-        empty_board_1 = EmptyDroneDeliveryBoard([empty_drone_delivery_1])
-        empty_board_2 = EmptyDroneDeliveryBoard([empty_drone_delivery_2])
-        match_input_1 = MatcherInput(self.graph, empty_board_1, match_config)
-        match_input_2 = MatcherInput(self.graph, empty_board_2, match_config)
-        matcher_1 = ORToolsMatcher(match_input_1)
-        matcher_2 = ORToolsMatcher(match_input_2)
-        delivery_board_1 = matcher_1.match()
-        delivery_board_2 = matcher_2.match()
-        self.assertEqual(1, len(delivery_board_1.drone_deliveries[0].matched_requests))
-        self.assertEqual(2, len(delivery_board_2.drone_deliveries[0].matched_requests))
-
-    def test_when_travel_time_is_greater_than_max_route_time(self):
+    @staticmethod
+    def _create_2_delivery_requests_with_big_travel_time_difference():
         dist = build_delivery_request_distribution(
             relative_pdp_location_distribution=ExactPointLocationDistribution([
                 create_point_2d(0, 5),
@@ -98,37 +137,12 @@ class ORToolsMatcherMaxRouteTimeTestCase(TestCase):
                     until=ZERO_TIME.add_time_delta(TimeDeltaExtension(timedelta(minutes=400)))),
             ]),
             package_type_distribution=PackageDistribution({PackageType.LARGE.name: 1}))
-        self.delivery_requests = dist.choose_rand(Random(42), amount={DeliveryRequest: 2})
+        return dist.choose_rand(Random(42), amount={DeliveryRequest: 2})
 
-        match_config = MatcherConfig(MatcherConfigProperties(
-            zero_time=ZERO_TIME,
-            first_solution_strategy="or_tools:path_cheapest_arc",
-            solver=MatcherSolver(full_name="or_tools:automatic", timeout_sec=30),
-            match_constraints=MatcherConstraints(
-                capacity_constraints=CapacityConstraints(count_capacity_from_zero=True),
-                time_constraints=TimeConstraints(max_waiting_time=0,
-                                                 max_route_time=MAX_OPERATION_TIME,
-                                                 count_time_from_zero=False),
-                priority_constraints=PriorityConstraints(True)),
-            unmatched_penalty=1000))
-
-        self.graph = self._create_graph(self.delivery_requests, self.loading_dock)
-
-        empty_drone_delivery_1 = EmptyDroneDelivery(EntityID(uuid.uuid4()), DroneFormations.get_drone_formation(
-            FormationSize.MINI, FormationOptions.LARGE_PACKAGES, PlatformType.platform_1))
-        empty_drone_delivery_2 = EmptyDroneDelivery(EntityID(uuid.uuid4()), DroneFormations.get_drone_formation(
+    @staticmethod
+    def _create_sufficient_route_time_empty_drone_delivery():
+        return EmptyDroneDelivery(EntityID(uuid.uuid4()), DroneFormations.get_drone_formation(
             FormationSize.MINI, FormationOptions.LARGE_PACKAGES, PlatformType.platform_2))
-
-        empty_board_1 = EmptyDroneDeliveryBoard([empty_drone_delivery_1])
-        empty_board_2 = EmptyDroneDeliveryBoard([empty_drone_delivery_2])
-        match_input_1 = MatcherInput(self.graph, empty_board_1, match_config)
-        match_input_2 = MatcherInput(self.graph, empty_board_2, match_config)
-        matcher_1 = ORToolsMatcher(match_input_1)
-        matcher_2 = ORToolsMatcher(match_input_2)
-        delivery_board_1 = matcher_1.match()
-        delivery_board_2 = matcher_2.match()
-        self.assertEqual(1, len(delivery_board_1.drone_deliveries[0].matched_requests))
-        self.assertEqual(2, len(delivery_board_2.drone_deliveries[0].matched_requests))
 
     @staticmethod
     def _create_loading_dock() -> DroneLoadingDock:

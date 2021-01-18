@@ -7,7 +7,7 @@ from common.entities.base_entities.drone_formation import DroneFormation
 from common.entities.base_entities.drone_loading_dock import DroneLoadingDock
 from common.entities.base_entities.entity_id import EntityID
 from common.entities.base_entities.package import PackageType
-from common.entities.base_entities.temporal import DateTimeExtension, TimeWindowExtension
+from common.entities.base_entities.temporal import TimeWindowExtension
 
 
 class EmptyDroneDelivery:
@@ -32,7 +32,7 @@ class EmptyDroneDelivery:
 
 @dataclass
 class MatchedDroneLoadingDock:
-    graph_index: int
+    graph_index: int  # TODO: replace to DeliveryRequestUUID
     drone_loading_dock: DroneLoadingDock
     delivery_time_window: TimeWindowExtension
 
@@ -56,7 +56,7 @@ class MatchedDroneLoadingDock:
 class MatchedDeliveryRequest:
     graph_index: int
     delivery_request: DeliveryRequest
-    matched_delivery_option_index: int
+    matched_delivery_option_index: int  # TODO: replace to DeliveryOptionUUID
     delivery_time_window: TimeWindowExtension
 
     def __eq__(self, other):

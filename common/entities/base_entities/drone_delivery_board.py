@@ -18,8 +18,8 @@ class EmptyDroneDeliveryBoard:
     def amount_of_formations(self) -> int:
         return len(self._empty_drone_deliveries)
 
-    def formation_capacities(self, package_type: PackageType) -> [int]:
-        return [delivery.drone_formation.get_package_type_amount(package_type) for delivery in
+    def get_package_type_amount_per_drone_delivery(self, package_type: PackageType) -> [int]:
+        return [drone_delivery.drone_formation.get_package_type_amount(package_type) for drone_delivery in
                 self._empty_drone_deliveries]
 
     def package_types(self) -> [PackageType]:

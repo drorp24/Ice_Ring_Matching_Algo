@@ -3,7 +3,6 @@ from typing import List
 
 from ortools.constraint_solver import pywrapcp
 from ortools.constraint_solver.pywrapcp import RoutingIndexManager, RoutingModel, Assignment
-from ortools.constraint_solver.routing_enums_pb2 import FirstSolutionStrategy, LocalSearchMetaheuristic
 from ortools.constraint_solver.routing_parameters_pb2 import RoutingSearchParameters
 
 from common.entities.base_entities.drone_delivery import DroneDelivery, MatchedDroneLoadingDock, MatchedDeliveryRequest
@@ -12,7 +11,7 @@ from common.entities.base_entities.temporal import TimeDeltaExtension, TimeWindo
 from common.graph.operational.export_ortools_graph import OrtoolsGraphExporter
 from matching.matcher import Matcher
 from matching.matcher_input import MatcherInput
-from matching.ortools.ortools_matcher_constraints import ORToolsMatcherConstraints ,OrToolsDimensionDescription
+from matching.ortools.ortools_matcher_constraints import ORToolsMatcherConstraints, OrToolsDimensionDescription
 from matching.ortools.ortools_matcher_objective import ORToolsMatcherObjective
 
 
@@ -55,11 +54,11 @@ class ORToolsMatcher(Matcher):
 
         self._search_parameters = pywrapcp.DefaultRoutingSearchParameters()
 
-        self._search_parameters.first_solution_strategy = FirstSolutionStrategy.DESCRIPTOR.enum_values_by_name.get(
-            str.upper(self.matcher_input.config.first_solution_strategy.partition(':')[2])).number
+        self._search_parameters.first_solution_strategy = \
+            self.matcher_input.config.solver.get_first_solution_strategy_as_int()
 
-        self._search_parameters.local_search_metaheuristic = LocalSearchMetaheuristic.DESCRIPTOR.enum_values_by_name.get(
-            self.matcher_input.config.solver.name).number
+        self._search_parameters.local_search_metaheuristic = \
+            self.matcher_input.config.solver.get_local_search_strategy_as_int()
 
         self._search_parameters.time_limit.seconds = self.matcher_input.config.solver.timeout_sec
 
