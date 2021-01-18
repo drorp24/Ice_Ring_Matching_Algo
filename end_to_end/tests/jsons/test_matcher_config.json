@@ -13,14 +13,15 @@
       "second": 0
     }
   },
-    "first_solution_strategy": "or_tools:path_cheapest_arc",
-    "solver" : {
-      "__class__": "MatcherSolver",
-      "name": "or_tools:automatic",
+   "solver" : {
+      "__class__": "ORToolsSolverConfig",
+      "vendor": {"__enum__": "SolverVendor.OR_TOOLS"},
+      "first_solution_strategy": "path_cheapest_arc",
+      "local_search_strategy": "automatic",
       "timeout_sec": 60
     },
     "constraints": {
-      "__class__": "MatcherConstraints",
+      "__class__": "ConstraintsConfig",
       "capacity": {
         "__class__": "CapacityConstraints",
         "count_capacity_from_zero": true
