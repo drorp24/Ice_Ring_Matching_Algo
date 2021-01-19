@@ -15,7 +15,7 @@ from services.envelope_services_interface import EnvelopeServicesInterface
 class SlideProperties:
     package_type: PackageType
     drone_azimuth: Angle
-    drop_azimuth: Optional.of(Angle)
+    drop_azimuth: Angle
 
 
 class Slide(Shapeable):
@@ -37,7 +37,7 @@ class Slide(Shapeable):
         return self._drone_azimuth
 
     @property
-    def drop_azimuth(self) -> Optional.of(Angle):
+    def drop_azimuth(self) -> Angle:
         return self._drop_azimuth
 
     @property

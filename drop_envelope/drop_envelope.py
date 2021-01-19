@@ -12,7 +12,7 @@ from geometry.geo2d import Polygon2D, EmptyGeometry2D, Point2D
 @dataclass
 class DropEnvelopeProperties:
     package_type: PackageType
-    drop_azimuth: Optional.of(Angle)
+    drop_azimuth: Angle
     drone_azimuth: Angle
     drop_point: Point2D
 
@@ -35,7 +35,7 @@ class DropEnvelope(Shapeable):
         return self._drone_azimuth
 
     @property
-    def drop_azimuth(self) -> Optional.of(Angle):
+    def drop_azimuth(self) -> Angle:
         return self._drop_azimuth
 
     @property
@@ -56,14 +56,8 @@ class DropEnvelope(Shapeable):
         return self._internal_envelope.calc_area()
 
     def __eq__(self, other):
-        drop_azimuth_equals = False
-        if self.drop_azimuth is None and other.drop_azimuth is None:
-            drop_azimuth_equals = True
-        elif self.drop_azimuth is not None or other.drop_azimuth is not None \
-                and self.drop_azimuth.degrees == other.drop_azimuth.degrees:
-            drop_azimuth_equals = True
         return (self.drop_point == other.drop_point and
-                drop_azimuth_equals and
+                self.drop_azimuth == other.drop_azimuth and
                 self.drone_azimuth == other.drone_azimuth and
                 self.package_type == other.package_type and
                 self.internal_envelope == other.internal_envelope)

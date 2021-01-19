@@ -1,5 +1,7 @@
 import unittest
 
+from optional import Optional
+
 from common.entities.base_entities.package import PackageType
 from common.math.angle import Angle, AngleUnit
 from drop_envelope.azimuth_quantization import get_azimuth_quantization_values
@@ -24,9 +26,9 @@ class BasicSlideServiceTestCase(unittest.TestCase):
         self.assertIsInstance(self.service.get_slide(Angle(value=50, unit=AngleUnit.DEGREE),
                                                      Angle(value=90, unit=AngleUnit.DEGREE),
                                                      PackageType.TINY).internal_envelope, Polygon2D)
-        self.assertIsInstance(self.service.get_slide(Angle(value=50, unit=AngleUnit.DEGREE), None,
+        self.assertIsInstance(self.service.get_slide(Angle(value=50, unit=AngleUnit.DEGREE),
+                                                     Angle(value=50, unit=AngleUnit.DEGREE),
                                                      PackageType.TINY).internal_envelope, Polygon2D)
-        self.assertEqual(self.service.get_slide(Angle(value=50, unit=AngleUnit.DEGREE), None,
+        self.assertEqual(self.service.get_slide(Angle(value=50, unit=AngleUnit.DEGREE),
+                                                Angle(value=50, unit=AngleUnit.DEGREE),
                                                 PackageType.TINY).drone_azimuth.degrees, 36)
-        self.assertEqual(self.service.get_slide(Angle(value=50, unit=AngleUnit.DEGREE), None,
-                                                PackageType.TINY).drop_azimuth.degrees, 36)
