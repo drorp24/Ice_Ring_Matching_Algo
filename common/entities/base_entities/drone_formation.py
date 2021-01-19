@@ -1,8 +1,11 @@
 from enum import Enum, auto
 from enum import IntEnum
+from functools import lru_cache
 
 from common.entities.base_entities.drone import DronePackageConfiguration, DroneType, PackageConfiguration, \
     DroneConfigurations
+from common.entities.base_entities.drone import DroneConfiguration, PlatformType, Configurations, \
+    DroneConfigurations, PackageTypeAmountMap
 from common.entities.base_entities.package import PackageType
 
 
@@ -41,10 +44,41 @@ class DroneFormation:
         return self._drone_configuration
 
     def get_platform_type(self) -> DroneType:
+    @property
+    @lru_cache()
+    def max_route_times_in_minutes(self) -> int:
+        # TODO: Change to real endurance
+        return self.get_platform_type().value * 100
+
+    def get_platform_type(self) -> PlatformType:
         return self._drone_configuration.get_platform_type()
 
     def get_package_type_volume(self, package_type: PackageType) -> int:
         return self._drone_configuration.package_type_map.get_package_type_volume(package_type)
+    def get_package_types(self) -> [PackageType]:
+        return self._drone_configuration.package_type_map.get_package_types()
+
+    def get_package_type_amount(self, package_type: PackageType) -> int:
+        return self.size * self._drone_configuration.package_type_map.get_package_type_amount(package_type)
+
+    def get_package_type_amount_map(self) -> PackageTypeAmountMap:
+        return PackageTypeAmountMap(
+            list(map(lambda configuration_amounts:
+                     configuration_amounts * self._size,
+                     self._drone_configuration.package_type_map.get_package_type_amounts())))
+
+    def get_package_type(self) -> PackageType:
+        formation_package_type = None
+        package_type_amount_map = self._drone_configuration.package_type_map
+        for package_type in PackageType:
+            if package_type_amount_map.get_package_type_amount(package_type) > 0:
+                if formation_package_type is not None:
+                    raise TypeError(f"Drone formation supports only one package type")
+                formation_package_type = package_type
+        return formation_package_type
+
+    def __hash__(self):
+        return hash((self._size, self._drone_configuration))
 
 
 class AutoName(Enum):

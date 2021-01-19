@@ -2,6 +2,7 @@ from enum import Enum
 
 from common.entities.base_entities.base_entity import JsonableBaseEntity
 from common.entities.base_entities.package import PackageType
+from common.entities.base_entities.base_entity import JsonableBaseEntity
 
 
 class DroneType(Enum):
@@ -33,13 +34,26 @@ class _PackageTypesAmountMap(JsonableBaseEntity):
     @classmethod
     def dict_to_obj(cls, dict_input):
         return _PackageTypesAmountMap(dict_input['package_type_to_amounts'])
+    def get_package_types(self) -> [PackageType]:
+        return list(self._dict.keys())
 
     def get_package_type_volume(self, package_type: PackageType) -> int:
         return self._package_type_to_amounts[package_type.name]
 
     def __hash__(self):
         return hash(self._package_type_to_amounts)
+    def get_package_type_amount(self, package_type: PackageType) -> int:
+        return self._dict[package_type]
 
+    def get_package_type_amounts(self) -> [int]:
+        return list(self._dict.values())
+
+    def __str__(self):
+        return '[' + ' '.join(
+            map(lambda item: str(item[0].name) + ':' + str(item[1]), self.dict.items())) + ']'
+
+    def __hash__(self):
+        return hash(tuple(self._dict))
     def __eq__(self, other):
         return self.package_type_to_amounts == other.package_type_to_amounts
 
@@ -53,8 +67,12 @@ class _PackageTypesAmountMap(JsonableBaseEntity):
 class DronePackageConfiguration:
 
     def __init__(self, platform_type: DroneType, package_types_map: _PackageTypesAmountMap):
+    def __init__(self, platform_type: PlatformType, package_types_map: PackageTypeAmountMap):
         self._platform_type = platform_type
         self._package_types_map = package_types_map
+
+    def __hash__(self):
+        return hash((self._platform_type, self._package_types_map))
 
     @property
     def platform_type(self) -> DroneType:
@@ -64,8 +82,8 @@ class DronePackageConfiguration:
     def package_type_map(self) -> _PackageTypesAmountMap:
         return self._package_types_map
 
-    def get_package_type_volume(self, package_type: PackageType) -> int:
-        return self._package_types_map.get_package_type_volume(package_type)
+    def get_package_type_amount(self, package_type: PackageType) -> int:
+        return self._package_types_map.get_package_type_amount(package_type)
 
     def get_platform_type(self) -> DroneType:
         return self._platform_type

@@ -56,6 +56,12 @@ class DroneLoadingDock(JsonableBaseEntity, Localizable, Temporal):
     def __hash__(self):
         return hash((self._drone_loading_station, self._drone_type, self._time_window))
 
+    @classmethod
+    def dict_to_obj(cls, dict_input):
+        return DroneLoadingDock(drone_loading_station=DroneLoadingStation.dict_to_obj(dict_input['drone_loading_station']),
+                                platform_type=PlatformType.dict_to_obj(dict_input['platform_type']),
+                                time_window=TimeWindowExtension.dict_to_obj(dict_input['time_window']))
+
 
 def create_default_time_window_for_drone_loading_dock():
     default_date_time_morning = DateTimeExtension(dt_date=date(2021, 1, 1), dt_time=time(6, 0, 0))

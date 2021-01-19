@@ -35,12 +35,12 @@ class BasicDroneConfigurationTypeGenerationTests(unittest.TestCase):
         self.assertEqual(self.PLATFORM_2_16X2.platform_type, DroneType.drone_type_2)
         self.assertEqual(self.PLATFORM_2_32X1.platform_type, DroneType.drone_type_2)
 
-    def test_package_type_volume(self):
-        self.assertEqual(self.PLATFORM_1_2X8.get_package_type_volume(PackageType.LARGE), 2)
-        self.assertEqual(self.PLATFORM_1_4X4.get_package_type_volume(PackageType.MEDIUM), 4)
-        self.assertEqual(self.PLATFORM_1_8X2.get_package_type_volume(PackageType.SMALL), 8)
-        self.assertEqual(self.PLATFORM_1_16X1.get_package_type_volume(PackageType.TINY), 16)
-        self.assertEqual(self.PLATFORM_2_4X8.get_package_type_volume(PackageType.LARGE), 4)
-        self.assertEqual(self.PLATFORM_2_8X4.get_package_type_volume(PackageType.MEDIUM), 8)
-        self.assertEqual(self.PLATFORM_2_16X2.get_package_type_volume(PackageType.SMALL), 16)
-        self.assertEqual(self.PLATFORM_2_32X1.get_package_type_volume(PackageType.TINY), 32)
+    def test_get_package_type_amount(self):
+        self.assertEqual(self.PLATFORM_1_2X8.get_package_type_amount(PackageType.LARGE), 2)
+        self.assertEqual(self.PLATFORM_1_4X4.get_package_type_amount(PackageType.MEDIUM), 4)
+        self.assertEqual(self.PLATFORM_1_8X2.get_package_type_amount(PackageType.SMALL), 8)
+        self.assertEqual(self.PLATFORM_1_16X1.get_package_type_amount(PackageType.TINY), 16)
+        self.assertEqual(self.PLATFORM_2_4X8.get_package_type_amount(PackageType.LARGE), 4)
+        self.assertEqual(self.PLATFORM_2_8X4.get_package_type_amount(PackageType.MEDIUM), 8)
+        self.assertEqual(self.PLATFORM_2_16X2.get_package_type_amount(PackageType.SMALL), 16)
+        self.assertEqual(self.PLATFORM_2_32X1.get_package_type_amount(PackageType.TINY), 32)
