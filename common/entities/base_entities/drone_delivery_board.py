@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from functools import lru_cache
 
 from common.entities.base_entities.delivery_request import DeliveryRequest
-from common.entities.base_entities.drone import PackageTypeAmountMap
+from common.entities.base_entities.drone import _PackageTypeAmountMap
 from common.entities.base_entities.drone_delivery import DroneDelivery, EmptyDroneDelivery
 from common.entities.base_entities.package import PackageType
 
@@ -63,15 +63,11 @@ class DroneDeliveryBoard:
         return sum([drone_delivery.get_total_work_time_in_minutes() for drone_delivery in self._drone_deliveries])
 
     @lru_cache()
-    def get_total_amount_per_package_type(self) -> PackageTypeAmountMap:
-        amount_per_package_type = [0] * len(PackageType)
+    def get_total_amount_per_package_type(self) -> _PackageTypeAmountMap:
+        amount_per_package_type = _PackageTypeAmountMap({package: 0 for package in PackageType})
         for drone_delivery in self._drone_deliveries:
-            amount_per_package_type = [total_amount + delivery_amount
-                                       for total_amount, delivery_amount
-                                       in zip(amount_per_package_type,
-                                              drone_delivery.get_total_package_type_amount_map().
-                                              get_package_type_amounts())]
-        return PackageTypeAmountMap(amount_per_package_type)
+            amount_per_package_type.add_to_map(drone_delivery.get_total_package_type_amount_map())
+        return amount_per_package_type
 
     @lru_cache()
     def get_total_priority(self) -> int:

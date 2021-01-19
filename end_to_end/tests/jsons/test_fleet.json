@@ -1,9 +1,9 @@
 {
-      "platform_1": {
+      "drone_type_1": {
         "size": 30,
         "formation_policy": {
-          "MINI": 1.0,
-          "MEDIUM": 0.0
+          "PAIR": 1.0,
+          "QUAD": 0.0
         },
         "configuration_policy": {
           "LARGE_X2": 0.6,

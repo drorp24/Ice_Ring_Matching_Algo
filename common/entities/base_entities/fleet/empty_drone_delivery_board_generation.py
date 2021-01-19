@@ -1,16 +1,13 @@
 import uuid
 
+
 from common.entities.base_entities.drone_delivery import EmptyDroneDelivery
 from common.entities.base_entities.drone_delivery_board import EmptyDroneDeliveryBoard
-from common.entities.base_entities.fleet.fleet_configuration_attribution import DroneFormationsPerTypeAmounts, FleetConfigurationAttribution
+from common.entities.base_entities.entity_id import EntityID
+from common.entities.base_entities.fleet.fleet_configuration_attribution import FleetConfigurationAttribution, \
+    DroneFormationsPerTypeAmounts
 from common.entities.base_entities.fleet.fleet_partition import FormationTypeAmounts, FleetPartition
 from common.entities.base_entities.fleet.fleet_property_sets import DroneSetProperties
-from common.entities.base_entities.entity_id import EntityID
-from common.tools.fleet_property_sets import PlatformPropertySet
-from common.tools.fleet_partition import FormationSizesAmounts, FleetPartition
-from common.tools.fleet_configuration_attribution import DroneFormationsPerTypeAmounts, FleetConfigurationAttribution
-from common.tools.fleet_reader import FleetReader
-import uuid
 
 
 def _calc_formation_amounts(platform_property_set: DroneSetProperties) -> FormationTypeAmounts:
@@ -33,12 +30,12 @@ def calc_drone_deliveries(platform_properties: DroneSetProperties) -> [EmptyDron
     return empty_deliveries
 
 
-def generate_empty_delivery_board(platforms_properties: [DroneSetProperties]) -> EmptyDroneDeliveryBoard:
+def generate_empty_delivery_board(drone_set_properties: [DroneSetProperties]) -> EmptyDroneDeliveryBoard:
     total_drone_deliveries = []
-    for platform_property in platforms_properties:
-        total_drone_deliveries += calc_drone_deliveries(platform_property)
+    for drone_properties in drone_set_properties:
+        total_drone_deliveries += calc_drone_deliveries(drone_properties)
     return EmptyDroneDeliveryBoard(total_drone_deliveries)
 
 
-def build_empty_drone_delivery_board(platform_properties: PlatformPropertySet):
-    return EmptyDroneDeliveryBoard(calc_drone_deliveries(platform_properties))
+def build_empty_drone_delivery_board(drone_set_properties: DroneSetProperties):
+    return EmptyDroneDeliveryBoard(calc_drone_deliveries(drone_set_properties))

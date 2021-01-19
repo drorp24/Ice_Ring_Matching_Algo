@@ -25,12 +25,12 @@ class DroneFormationTypePolicy(JsonableBaseEntity):
 
 
 @dataclass
-class PackageConfigurationsPolicy(JsonableBaseEntity):
-    _package_configurations_policy: {PackageConfiguration, float}
+class PackageConfigurationPolicy(JsonableBaseEntity):
+    _package_configuration_policy: {PackageConfiguration, float}
 
     @property
     def policy(self):
-        return self._package_configurations_policy
+        return self._package_configuration_policy
 
     def get_configurations(self) -> [PackageConfiguration]:
         return list(self.policy.keys())
@@ -43,20 +43,20 @@ class PackageConfigurationsPolicy(JsonableBaseEntity):
 
     @classmethod
     def dict_to_obj(cls, dict_input):
-        return PackageConfigurationsPolicy(
+        return PackageConfigurationPolicy(
             {PackageConfiguration[pcp[0]]: pcp[1] for pcp in dict_input['policy'].items()})
 
     def __dict__(self):
         return {'__class__': self.__class__.__name__,
                 'policy': {pcp[0].name: pcp[1] for pcp in
-                                                 self._package_configurations_policy.items()}}
+                           self._package_configuration_policy.items()}}
 
 
 @dataclass
 class DroneSetProperties(JsonableBaseEntity):
     _drone_type: DroneType
     _drone_formation_policy: DroneFormationTypePolicy
-    _package_configuration_policy: PackageConfigurationsPolicy
+    _package_configuration_policy: PackageConfigurationPolicy
     _drone_amount: int
 
     @property
@@ -68,7 +68,7 @@ class DroneSetProperties(JsonableBaseEntity):
         return self._drone_formation_policy
 
     @property
-    def package_configuration_policy(self) -> PackageConfigurationsPolicy:
+    def package_configuration_policy(self) -> PackageConfigurationPolicy:
         return self._package_configuration_policy
 
     @property
@@ -80,7 +80,7 @@ class DroneSetProperties(JsonableBaseEntity):
         return DroneSetProperties(
             _drone_type=DroneType.dict_to_obj(dict_input['drone_type']),
             _drone_formation_policy=DroneFormationTypePolicy.dict_to_obj(dict_input['drone_formation_policy']),
-            _package_configuration_policy=PackageConfigurationsPolicy.dict_to_obj(
+            _package_configuration_policy=PackageConfigurationPolicy.dict_to_obj(
                 dict_input['package_configuration_policy']),
             _drone_amount=dict_input['drone_amount']
         )

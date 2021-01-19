@@ -1,11 +1,8 @@
 from enum import Enum, auto
-from enum import IntEnum
 from functools import lru_cache
 
-from common.entities.base_entities.drone import DronePackageConfiguration, DroneType, PackageConfiguration, \
-    DroneConfigurations
-from common.entities.base_entities.drone import DroneConfiguration, PlatformType, Configurations, \
-    DroneConfigurations, PackageTypeAmountMap
+from common.entities.base_entities.drone import DronePackageConfiguration, PackageConfiguration, _PackageTypeAmountMap
+from common.entities.base_entities.drone import DroneType, DroneConfigurations
 from common.entities.base_entities.package import PackageType
 
 
@@ -31,45 +28,42 @@ class DroneFormationType(Enum):
 
 class DroneFormation:
 
-    def __init__(self, formation_size: DroneFormationType, drone_configuration: DronePackageConfiguration):
-        self._size = formation_size
-        self._drone_configuration = drone_configuration
+    def __init__(self, drone_formation_type: DroneFormationType, package_configuration: DronePackageConfiguration):
+        self._drone_formation_type = drone_formation_type
+        self._package_configuration = package_configuration
 
     @property
-    def size(self) -> DroneFormationType:
-        return self._size
+    def drone_formation_type(self) -> DroneFormationType:
+        return self._drone_formation_type
 
     @property
     def drone_configuration(self) -> DronePackageConfiguration:
-        return self._drone_configuration
+        return self._package_configuration
 
-    def get_platform_type(self) -> DroneType:
     @property
     @lru_cache()
     def max_route_times_in_minutes(self) -> int:
         # TODO: Change to real endurance
-        return self.get_platform_type().value * 100
+        return self.get_drone_type().value * 100
 
-    def get_platform_type(self) -> PlatformType:
-        return self._drone_configuration.get_platform_type()
-
-    def get_package_type_volume(self, package_type: PackageType) -> int:
-        return self._drone_configuration.package_type_map.get_package_type_volume(package_type)
-    def get_package_types(self) -> [PackageType]:
-        return self._drone_configuration.package_type_map.get_package_types()
+    def get_drone_type(self) -> DroneType:
+        return self._package_configuration.get_drone_type()
 
     def get_package_type_amount(self, package_type: PackageType) -> int:
-        return self.size * self._drone_configuration.package_type_map.get_package_type_amount(package_type)
+        return self.drone_formation_type.get_amount_of_drones() * \
+               self._package_configuration.get_package_type_amount(package_type)
 
-    def get_package_type_amount_map(self) -> PackageTypeAmountMap:
-        return PackageTypeAmountMap(
-            list(map(lambda configuration_amounts:
-                     configuration_amounts * self._size,
-                     self._drone_configuration.package_type_map.get_package_type_amounts())))
+    def get_package_type_amount_map(self) -> _PackageTypeAmountMap:
+        amount_per_package_type = _PackageTypeAmountMap({package: 0 for package in PackageType})
+        extracted_package_type_amounts = {
+            package_type.name: package_amount * self.drone_formation_type.get_amount_of_drones() for
+            package_type, package_amount in self._package_configuration.package_type_map.items()}
+        amount_per_package_type.update(extracted_package_type_amounts)
+        return amount_per_package_type
 
     def get_package_type(self) -> PackageType:
         formation_package_type = None
-        package_type_amount_map = self._drone_configuration.package_type_map
+        package_type_amount_map = self._package_configuration.package_type_map
         for package_type in PackageType:
             if package_type_amount_map.get_package_type_amount(package_type) > 0:
                 if formation_package_type is not None:
@@ -78,7 +72,7 @@ class DroneFormation:
         return formation_package_type
 
     def __hash__(self):
-        return hash((self._size, self._drone_configuration))
+        return hash((self._drone_formation_type, self._package_configuration))
 
 
 class AutoName(Enum):
@@ -93,7 +87,7 @@ class PackageConfigurationOption(AutoName):
     TINY_PACKAGES = auto()
 
 
-class DroneFormationOptions:
+class DronePackageConfigurationOption:
     drone_configurations_map: {PackageConfigurationOption: [DronePackageConfiguration]} = {
         PackageConfigurationOption.LARGE_PACKAGES: [
             DroneConfigurations.get_drone_configuration(DroneType.drone_type_1, PackageConfiguration.LARGE_X2),
@@ -119,7 +113,7 @@ class DroneFormationOptions:
                                  platform_type: DroneType) -> DronePackageConfiguration:
         drone_configurations = cls.drone_configurations_map[formation_option]
         for drone_configuration in drone_configurations:
-            if drone_configuration.get_platform_type() == platform_type:
+            if drone_configuration.get_drone_type() == platform_type:
                 return drone_configuration
 
     @classmethod
@@ -143,7 +137,7 @@ class DroneFormations:
             formation_size:
                 {
                     platform_type:
-                        DroneFormationOptions.get_drone_formation(
+                        DronePackageConfigurationOption.get_drone_formation(
                             formation_size,
                             formation_option,
                             platform_type)

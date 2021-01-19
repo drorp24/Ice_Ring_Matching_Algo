@@ -66,12 +66,12 @@ def create_single_package_distribution():
 
 
 def _create_empty_drone_delivery_board(
-        formation_size_policy: dict = {FormationSize.MINI: 1, FormationSize.MEDIUM: 0},
+        formation_size_policy: dict = {DroneFormationType.PAIR: 1, DroneFormationType.QUAD: 0},
         configurations_policy: dict = {Configurations.LARGE_X2: 0.9,
                                        Configurations.MEDIUM_X4: 0.1,
                                        Configurations.SMALL_X8: 0,
                                        Configurations.TINY_X16: 0}
-        , platform_type: PlatformType = PlatformType.platform_1,
+        , platform_type: DroneType = DroneType.drone_type_1,
         size: int = 30):
     formation_size_property_set = PlatformFormationsSizePolicyPropertySet(formation_size_policy)
     configuration_policy_property_set = PlatformConfigurationsPolicyPropertySet(configurations_policy)
@@ -132,7 +132,7 @@ class BasicMinimumEnd2EndExperiment:
         operational_drawer2d.add_delivery_board(board_map_drawer, delivery_board, draw_unmatched=True)
         board_map_drawer.draw(False)
         row_names = ["Unmatched Out"] + \
-                    ["[" + str(delivery.drone_formation.size.value) + "] * " +
+                    ["[" + str(delivery.drone_formation.drone_formation_type.value) + "] * " +
                      str(delivery.drone_formation.drone_configuration.package_type_map.get_package_type_amounts())
                      for delivery in delivery_board.drone_deliveries]
         board_gantt_drawer = create_gantt_drawer(zero_time=scenario.zero_time,

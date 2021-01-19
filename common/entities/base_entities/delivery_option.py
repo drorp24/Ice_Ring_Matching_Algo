@@ -3,7 +3,7 @@ from typing import List
 
 from common.entities.base_entities.base_entity import JsonableBaseEntity
 from common.entities.base_entities.customer_delivery import CustomerDelivery
-from common.entities.base_entities.drone import PackageTypeAmountMap
+from common.entities.base_entities.drone import _PackageTypeAmountMap
 from common.entities.base_entities.package import PackageType
 from common.entities.base_entities.package_delivery_plan import PackageDeliveryPlan
 from geometry.geo2d import Point2D
@@ -33,8 +33,9 @@ class DeliveryOption(JsonableBaseEntity, Localizable):
         demands = list(map(lambda x: x.get_package_type_amount(package_type), customer_deliveries))
         return sum(demands)
 
-    def get_package_type_amount_map(self) -> PackageTypeAmountMap:
-        return PackageTypeAmountMap([self.get_package_type_amount(package_type) for package_type in PackageType])
+    def get_package_type_amount_map(self) -> _PackageTypeAmountMap:
+        return _PackageTypeAmountMap(
+            {package_type.name: self.get_package_type_amount(package_type) for package_type in PackageType})
 
     @classmethod
     def dict_to_obj(cls, dict_input):

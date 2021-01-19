@@ -923,7 +923,7 @@
           "y": 47.933356530527135
         }
       },
-      "platform_type": {"__enum__": "PlatformType.platform_2"},
+      "drone_type": {"__enum__": "DroneType.drone_type_2"},
       "priority": 0,
       "time_window": {
         "__class__": "TimeWindowExtension",

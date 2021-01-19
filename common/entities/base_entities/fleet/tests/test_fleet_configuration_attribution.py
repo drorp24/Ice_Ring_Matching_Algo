@@ -8,7 +8,7 @@ from common.entities.base_entities.fleet.empty_drone_delivery_board_generation i
 from common.entities.base_entities.fleet.fleet_configuration_attribution import FleetConfigurationAttribution
 from common.entities.base_entities.fleet.fleet_partition import FleetPartition
 from common.entities.base_entities.fleet.fleet_property_sets import DroneSetProperties, DroneFormationTypePolicy, \
-    PackageConfigurationsPolicy
+    PackageConfigurationPolicy
 
 
 class TestFleetConfigurationAttribution(unittest.TestCase):
@@ -83,7 +83,7 @@ class TestFleetConfigurationAttribution(unittest.TestCase):
             _drone_formation_policy=DroneFormationTypePolicy(
                 {DroneFormationType.PAIR: 0.5,
                  DroneFormationType.QUAD: 0.5}),
-            _package_configuration_policy=PackageConfigurationsPolicy(
+            _package_configuration_policy=PackageConfigurationPolicy(
                 {PackageConfiguration.LARGE_X2: 0.1,
                  PackageConfiguration.MEDIUM_X4: 0.4,
                  PackageConfiguration.SMALL_X8: 0.3,
@@ -97,7 +97,7 @@ class TestFleetConfigurationAttribution(unittest.TestCase):
             _drone_formation_policy=DroneFormationTypePolicy(
                 {DroneFormationType.PAIR: 1.0,
                  DroneFormationType.QUAD: 0.0}),
-            _package_configuration_policy=PackageConfigurationsPolicy(
+            _package_configuration_policy=PackageConfigurationPolicy(
                 {PackageConfiguration.LARGE_X4: 0.0,
                  PackageConfiguration.MEDIUM_X8: 0.4,
                  PackageConfiguration.SMALL_X16: 0.6,

@@ -1,8 +1,9 @@
+from __future__ import annotations
 from enum import Enum
+from typing import Type
 
 from common.entities.base_entities.base_entity import JsonableBaseEntity
 from common.entities.base_entities.package import PackageType
-from common.entities.base_entities.base_entity import JsonableBaseEntity
 
 
 class DroneType(Enum):
@@ -22,38 +23,42 @@ class DroneType(Enum):
         return 'DroneType: ' + str(self.__dict__())
 
 
-class _PackageTypesAmountMap(JsonableBaseEntity):
+class _PackageTypeAmountMap(JsonableBaseEntity):
 
-    def __init__(self, packages_types_amount: {str: int}):
-        self._package_type_to_amounts = packages_types_amount
+    def __init__(self, package_types_amounts: {str: int}):
+        self._package_type_to_amounts = package_types_amounts
 
     @property
-    def package_type_to_amounts(self):
+    def package_type_to_amounts(self) -> dict:
         return self._package_type_to_amounts
 
     @classmethod
     def dict_to_obj(cls, dict_input):
-        return _PackageTypesAmountMap(dict_input['package_type_to_amounts'])
+        return _PackageTypeAmountMap(dict_input['package_type_to_amounts'])
+
+    def add_to_map(self, other_package_types_amounts: Type[_PackageTypeAmountMap]):
+        other_amounts = other_package_types_amounts.package_type_to_amounts
+        for key, val in other_amounts.items():
+            if key not in self._package_type_to_amounts.keys():
+                self._package_type_to_amounts[key] = 0
+            self._package_type_to_amounts[key] += val
+
     def get_package_types(self) -> [PackageType]:
-        return list(self._dict.keys())
+        return list(self._package_type_to_amounts.keys())
 
-    def get_package_type_volume(self, package_type: PackageType) -> int:
-        return self._package_type_to_amounts[package_type.name]
-
-    def __hash__(self):
-        return hash(self._package_type_to_amounts)
     def get_package_type_amount(self, package_type: PackageType) -> int:
-        return self._dict[package_type]
+        return self.package_type_to_amounts.get(package_type.name, 0)
 
     def get_package_type_amounts(self) -> [int]:
-        return list(self._dict.values())
+        return list(self.package_type_to_amounts.values())
+
+    def __hash__(self):
+        return hash(tuple(sorted(self._package_type_to_amounts.items())))
 
     def __str__(self):
         return '[' + ' '.join(
-            map(lambda item: str(item[0].name) + ':' + str(item[1]), self.dict.items())) + ']'
+            map(lambda item: str(item[0].name) + ':' + str(item[1]), self.package_type_to_amounts.items())) + ']'
 
-    def __hash__(self):
-        return hash(tuple(self._dict))
     def __eq__(self, other):
         return self.package_type_to_amounts == other.package_type_to_amounts
 
@@ -66,8 +71,7 @@ class _PackageTypesAmountMap(JsonableBaseEntity):
 
 class DronePackageConfiguration:
 
-    def __init__(self, platform_type: DroneType, package_types_map: _PackageTypesAmountMap):
-    def __init__(self, platform_type: PlatformType, package_types_map: PackageTypeAmountMap):
+    def __init__(self, platform_type: DroneType, package_types_map: _PackageTypeAmountMap):
         self._platform_type = platform_type
         self._package_types_map = package_types_map
 
@@ -79,25 +83,25 @@ class DronePackageConfiguration:
         return self._platform_type
 
     @property
-    def package_type_map(self) -> _PackageTypesAmountMap:
+    def package_type_map(self) -> _PackageTypeAmountMap:
         return self._package_types_map
 
     def get_package_type_amount(self, package_type: PackageType) -> int:
         return self._package_types_map.get_package_type_amount(package_type)
 
-    def get_platform_type(self) -> DroneType:
+    def get_drone_type(self) -> DroneType:
         return self._platform_type
 
 
 class PackageConfiguration(Enum):
-    LARGE_X2 = _PackageTypesAmountMap({PackageType.LARGE.name: 2})
-    MEDIUM_X4 = _PackageTypesAmountMap({PackageType.MEDIUM.name: 4})
-    SMALL_X8 = _PackageTypesAmountMap({PackageType.SMALL.name: 8})
-    TINY_X16 = _PackageTypesAmountMap({PackageType.TINY.name: 16})
-    LARGE_X4 = _PackageTypesAmountMap({PackageType.LARGE.name: 4})
-    MEDIUM_X8 = _PackageTypesAmountMap({PackageType.MEDIUM.name: 8})
-    SMALL_X16 = _PackageTypesAmountMap({PackageType.SMALL.name: 16})
-    TINY_X32 = _PackageTypesAmountMap({PackageType.TINY.name: 32})
+    LARGE_X2 = _PackageTypeAmountMap({PackageType.LARGE.name: 2})
+    MEDIUM_X4 = _PackageTypeAmountMap({PackageType.MEDIUM.name: 4})
+    SMALL_X8 = _PackageTypeAmountMap({PackageType.SMALL.name: 8})
+    TINY_X16 = _PackageTypeAmountMap({PackageType.TINY.name: 16})
+    LARGE_X4 = _PackageTypeAmountMap({PackageType.LARGE.name: 4})
+    MEDIUM_X8 = _PackageTypeAmountMap({PackageType.MEDIUM.name: 8})
+    SMALL_X16 = _PackageTypeAmountMap({PackageType.SMALL.name: 16})
+    TINY_X32 = _PackageTypeAmountMap({PackageType.TINY.name: 32})
 
     @classmethod
     def dict_to_obj(cls, input_dict):

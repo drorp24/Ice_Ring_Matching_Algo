@@ -24,3 +24,6 @@ ortools~=8.0.8283
 networkx~=2.5
 optional.py~=1.1.0
 flatten-dict~=0.3.0
+
+scikit-learn~=0.24.0
+pathlib2~=2.3.5

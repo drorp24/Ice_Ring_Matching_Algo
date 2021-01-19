@@ -4,7 +4,7 @@ from common.entities.base_entities.drone import DroneType
 from common.entities.distribution.distribution import Distribution, ChoiceDistribution
 
 
-class PlatformTypeDistribution(Distribution):
+class DroneTypeDistribution(Distribution):
 
     def __init__(self, platform_type_options: {DroneType, int} = None):
         if platform_type_options is None:
