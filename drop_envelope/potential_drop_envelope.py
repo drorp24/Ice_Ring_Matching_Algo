@@ -1,6 +1,7 @@
-from typing import List, Union
+from typing import List
+from optional import Optional
 
-from common.math.angle import Angle, NoneAngle
+from common.math.angle import Angle
 from drop_envelope.abstract_envelope_collections import ShapeableCollection
 from drop_envelope.drop_envelope import DropEnvelope
 from drop_envelope.slide_service import _SlidesService, MockSlidesServiceWrapper
@@ -21,7 +22,7 @@ class PotentialDropEnvelopes(ShapeableCollection):
         return self._drop_point
 
     @property
-    def drop_azimuth(self) -> [Angle, NoneAngle]:
+    def drop_azimuth(self) -> Optional.of(Angle):
         return self._drop_azimuth
 
     @property
@@ -37,6 +38,6 @@ class PotentialDropEnvelopes(ShapeableCollection):
     def get_centroid(self) -> Point2D:
         return self.drop_point
 
-    def get_arrival_azimuth(self) -> Union[Angle, NoneAngle]:
+    def get_arrival_azimuth(self) -> Optional.of(Angle):
         return self.drop_azimuth
 

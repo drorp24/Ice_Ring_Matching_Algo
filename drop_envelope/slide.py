@@ -1,9 +1,10 @@
 from abc import ABC
 from dataclasses import dataclass
 from typing import Union
+from optional import Optional
 
 from common.entities.base_entities.package import PackageType
-from common.math.angle import Angle, NoneAngle
+from common.math.angle import Angle
 from geometry.geo2d import Polygon2D, EmptyGeometry2D, Point2D
 from geometry.geo_factory import create_zero_point_2d, create_empty_geometry_2d
 from geometry.utils import Shapeable
@@ -14,7 +15,7 @@ from services.envelope_services_interface import EnvelopeServicesInterface
 class SlideProperties:
     package_type: PackageType
     drone_azimuth: Angle
-    drop_azimuth: Union[Angle, NoneAngle]
+    drop_azimuth: Optional.of(Angle)
 
 
 class Slide(Shapeable):
@@ -36,7 +37,7 @@ class Slide(Shapeable):
         return self._drone_azimuth
 
     @property
-    def drop_azimuth(self) -> Union[Angle, NoneAngle]:
+    def drop_azimuth(self) -> Optional.of(Angle):
         return self._drop_azimuth
 
     @property

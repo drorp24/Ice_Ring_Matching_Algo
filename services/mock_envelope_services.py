@@ -1,7 +1,8 @@
 from typing import Union
+from optional import Optional
 
 from common.entities.base_entities.package import PackageType
-from common.math.angle import Angle, NoneAngle
+from common.math.angle import Angle
 from geometry.geo2d import Polygon2D, Point2D, EmptyGeometry2D
 from geometry.geo_factory import create_polygon_2d_from_ellipse
 from services.envelope_services_interface import EnvelopeServicesInterface
@@ -11,8 +12,8 @@ class MockEnvelopeServices(EnvelopeServicesInterface):
 
     @classmethod
     def _calc_envelope(cls, package_type: PackageType, envelope_center: Point2D, drone_azimuth: Angle,
-                       drop_azimuth: Union[Angle, NoneAngle]) -> Union[Polygon2D, EmptyGeometry2D]:
-        if drop_azimuth.__class__ is NoneAngle:
+                       drop_azimuth: Optional.of(Angle)) -> Union[Polygon2D, EmptyGeometry2D]:
+        if drop_azimuth.__class__ is None:
             drop_azimuth = drone_azimuth
         envelope_width = package_type.value.calc_potential_drop_envelope().calc_delta_between_radii()
         envelope_height = envelope_width * drop_azimuth.to_direction().dot(drone_azimuth.to_direction())

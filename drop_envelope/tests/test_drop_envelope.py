@@ -1,9 +1,8 @@
 import unittest
 
 from common.entities.base_entities.package import PackageType
-from common.math.angle import Angle, AngleUnit, NoneAngle
+from common.math.angle import Angle, AngleUnit
 from drop_envelope.drop_envelope import DropEnvelopeProperties, DropEnvelope
-from drop_envelope.slide_service import MockSlidesServiceWrapper
 from geometry.geo_factory import create_point_2d
 
 
@@ -11,7 +10,7 @@ class BasicDropEnvelopeTestCase(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
         cls.drop_envelope_properties_1 = DropEnvelopeProperties(drone_azimuth=Angle(value=50, unit=AngleUnit.DEGREE),
-                                                                drop_azimuth=NoneAngle(),
+                                                                drop_azimuth=None,
                                                                 package_type=PackageType.LARGE,
                                                                 drop_point=create_point_2d(x=10, y=10))
 

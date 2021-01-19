@@ -1,8 +1,9 @@
 from dataclasses import dataclass
 from typing import Union
+from optional import Optional
 
 from common.entities.base_entities.package import PackageType
-from common.math.angle import Angle, NoneAngle
+from common.math.angle import Angle
 from drop_envelope.slide_service import MockSlidesServiceWrapper
 from geometry.utils import Shapeable
 from geometry.geo2d import Polygon2D, EmptyGeometry2D, Point2D
@@ -11,7 +12,7 @@ from geometry.geo2d import Polygon2D, EmptyGeometry2D, Point2D
 @dataclass
 class DropEnvelopeProperties:
     package_type: PackageType
-    drop_azimuth: Union[Angle, NoneAngle]
+    drop_azimuth: Optional.of(Angle)
     drone_azimuth: Angle
     drop_point: Point2D
 
@@ -34,7 +35,7 @@ class DropEnvelope(Shapeable):
         return self._drone_azimuth
 
     @property
-    def drop_azimuth(self) -> [Angle, NoneAngle]:
+    def drop_azimuth(self) -> Optional.of(Angle):
         return self._drop_azimuth
 
     @property
@@ -55,8 +56,14 @@ class DropEnvelope(Shapeable):
         return self._internal_envelope.calc_area()
 
     def __eq__(self, other):
+        drop_azimuth_equals = False
+        if self.drop_azimuth is None and other.drop_azimuth is None:
+            drop_azimuth_equals = True
+        elif self.drop_azimuth is not None or other.drop_azimuth is not None \
+                and self.drop_azimuth.degrees == other.drop_azimuth.degrees:
+            drop_azimuth_equals = True
         return (self.drop_point == other.drop_point and
-                self.drop_azimuth.degrees == other.drop_azimuth.degrees and
+                drop_azimuth_equals and
                 self.drone_azimuth == other.drone_azimuth and
                 self.package_type == other.package_type and
                 self.internal_envelope == other.internal_envelope)

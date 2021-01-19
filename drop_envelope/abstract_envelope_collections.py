@@ -1,7 +1,8 @@
 from abc import abstractmethod, ABC
-from typing import List, Union
+from typing import List
+from optional import Optional
 
-from common.math.angle import Angle, NoneAngle
+from common.math.angle import Angle
 from geometry.geo2d import Point2D
 from geometry.utils import Shapeable
 
@@ -16,7 +17,7 @@ class ShapeableCollection(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def get_arrival_azimuth(self) -> Union[Angle, NoneAngle]:
+    def get_arrival_azimuth(self) -> Optional.of(Angle):
         raise NotImplementedError
 
 
