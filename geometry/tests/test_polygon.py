@@ -73,6 +73,13 @@ class PolygonOperationsTestCase(unittest.TestCase):
         poly6_p4 = create_point_2d(2, 1)
         cls.poly6 = create_polygon_2d([poly6_p1, poly6_p2, poly6_p3, poly6_p4])
 
+    def test_contains(self):
+        p1 = create_point_2d(2,2)
+        p2 = create_point_2d(11,11)
+
+        self.assertTrue(self.poly1.__contains__(p1))
+        self.assertFalse(self.poly1.__contains__(p2))
+
     def test_intersection(self):
         intersection_result = self.poly1.calc_intersection(self.poly3)
         self.assertEqual(intersection_result, self.poly3)

@@ -1,6 +1,8 @@
 import unittest
 from datetime import date, time
+from random import Random
 
+from common.entities.base_entities.entity_distribution.temporal_distribution import ExactTimeWindowDistribution
 from common.entities.base_entities.temporal import DateTimeExtension, TimeWindowExtension
 
 
@@ -65,3 +67,13 @@ class BasicTemporalTests(unittest.TestCase):
     def test_gt(self):
         self.assertTrue(self.dt1 < self.dt2)
         self.assertFalse(self.dt1 > self.dt2)
+
+    def test_exact_time_window_distribution(self):
+        exact_tw_dist = ExactTimeWindowDistribution([self.tw1,
+                                                     self.tw2,
+                                                     self.tw3])
+        actual_tw_1 = exact_tw_dist.choose_rand(Random(42), 1)
+        actual_tw_2_3 = exact_tw_dist.choose_rand(Random(42), 2)
+        self.assertEqual([self.tw1], actual_tw_1)
+        self.assertEqual([self.tw2, self.tw3], actual_tw_2_3)
+        self.assertRaises(RuntimeError, exact_tw_dist.choose_rand, (Random(42), 1))
