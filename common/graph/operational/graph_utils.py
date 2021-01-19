@@ -4,17 +4,18 @@ from typing import List, Dict
 import numpy as np
 
 from common.entities.base_entities.delivery_request import DeliveryRequest
+from common.entities.base_entities.zone import Zone
 from common.tools.clustering_alg import fit_k_means
 from geometry.geo2d import Polygon2D
 from visualization.basic.pltdrawer2d import create_drawer_2d
 from visualization.operational.operational_drawer2d import add_operational_graph
 
 
-def sort_delivery_requests_by_zone(delivery_requests: [DeliveryRequest], zones: [Polygon2D]) -> {
+def sort_delivery_requests_by_zone(delivery_requests: [DeliveryRequest], zones: [Zone]) -> {
     Polygon2D, List[DeliveryRequest]}:
     return dict(
         filter(itemgetter(1),
-               {zone_index: [dr for dr in delivery_requests if zones[zone_index].__contains__(dr.calc_location())] for
+               {zone_index: [dr for dr in delivery_requests if zones[zone_index].shape.__contains__(dr.calc_location())] for
                 zone_index in range(0, len(zones))}.items()))
 
 

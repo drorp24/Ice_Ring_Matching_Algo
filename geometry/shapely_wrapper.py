@@ -195,6 +195,13 @@ class _ShapelyPolygon2D(_ShapelyGeometry, Polygon2D):
         x_array, y_array = self._shapely_obj.exterior.xy
         return GeometryUtils.convert_xy_separate_arrays_to_points_list(x_array[:-1], y_array[:-1])
 
+    @classmethod
+    def dict_to_obj(cls, dict_input) -> Polygon2D:
+        assert (dict_input['__class__'] == cls.__name__)
+        return _ShapelyPolygon2D(
+            boundary_points=[_ShapelyPoint2D.dict_to_obj(point_dict) for point_dict in
+                             dict_input['boundary_points']])
+
     def calc_area(self) -> float:
         return self._shapely_obj.area
 
