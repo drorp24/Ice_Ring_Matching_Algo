@@ -57,7 +57,7 @@ class _PackageTypeAmountMap(JsonableBaseEntity):
 
     def __str__(self):
         return '[' + ' '.join(
-            map(lambda item: str(item[0].name) + ':' + str(item[1]), self.package_type_to_amounts.items())) + ']'
+            map(lambda item: str(item[0]) + ':' + str(item[1]), self.package_type_to_amounts.items())) + ']'
 
     def __eq__(self, other):
         return self.package_type_to_amounts == other.package_type_to_amounts
