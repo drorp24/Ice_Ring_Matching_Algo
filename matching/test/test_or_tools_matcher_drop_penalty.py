@@ -9,7 +9,8 @@ from common.entities.base_entities.drone import DroneType
 from common.entities.base_entities.drone_delivery import DroneDelivery, MatchedDroneLoadingDock, EmptyDroneDelivery
 from common.entities.base_entities.drone_delivery_board import DroneDeliveryBoard, EmptyDroneDeliveryBoard, \
     UnmatchedDeliveryRequest
-from common.entities.base_entities.drone_formation import DroneFormations, PackageConfigurationOption, FormationSize
+from common.entities.base_entities.drone_formation import DroneFormations, PackageConfigurationOption, \
+    DroneFormationType
 from common.entities.base_entities.drone_loading_dock import DroneLoadingDock
 from common.entities.base_entities.drone_loading_station import DroneLoadingStation
 from common.entities.base_entities.entity_distribution.delivery_requestion_dataset_builder import \
