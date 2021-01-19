@@ -5,6 +5,7 @@ from uuid import UUID
 from common.entities.base_entities.customer_delivery import CustomerDelivery
 from common.entities.base_entities.delivery_option import DeliveryOption
 from common.entities.base_entities.delivery_request import DeliveryRequest
+from common.entities.base_entities.entity_id import EntityID
 from common.entities.base_entities.package import PackageType
 from common.entities.base_entities.package_delivery_plan import PackageDeliveryPlan
 from common.entities.base_entities.temporal import TimeWindowExtension, DateTimeExtension
@@ -39,19 +40,19 @@ class BasicDeliveryRequestEnvelopeCellsTestCase(unittest.TestCase):
                                                          cls.cell_height_resolution,
                                                          cls.cell_ratio_required)
 
-        cls.pdp_1 = PackageDeliveryPlan(id=UUID(int=42),
+        cls.pdp_1 = PackageDeliveryPlan(id=EntityID(UUID(int=42)),
                                         drop_point=create_point_2d(10, 20),
                                         azimuth=Angle(135, AngleUnit.DEGREE),
                                         pitch=Angle(90, AngleUnit.DEGREE),
                                         package_type=PackageType.TINY)
 
-        cls.pdp_2 = PackageDeliveryPlan(id=UUID(int=43),
+        cls.pdp_2 = PackageDeliveryPlan(id=EntityID(UUID(int=43)),
                                         drop_point=create_point_2d(20, 30),
                                         azimuth=Angle(135, AngleUnit.DEGREE),
                                         pitch=Angle(45, AngleUnit.DEGREE),
                                         package_type=PackageType.TINY)
 
-        cls.pdp_3 = PackageDeliveryPlan(id=UUID(int=44),
+        cls.pdp_3 = PackageDeliveryPlan(id=EntityID(UUID(int=44)),
                                         drop_point=create_point_2d(30, 40),
                                         azimuth=Angle(45, AngleUnit.DEGREE),
                                         pitch=Angle(45, AngleUnit.DEGREE),
@@ -114,13 +115,13 @@ class BasicDeliveryRequestEnvelopeCellsDictTestCase(unittest.TestCase):
     def setUpClass(cls):
         cls.cell_1 = GridCell(location=GridLocation(10, 15))
 
-        cls.pdp_1 = PackageDeliveryPlan(id=UUID(int=42),
+        cls.pdp_1 = PackageDeliveryPlan(id=EntityID(UUID(int=42)),
                                         drop_point=create_point_2d(1, 2),
                                         azimuth=Angle(30, AngleUnit.DEGREE),
                                         pitch=Angle(80, AngleUnit.DEGREE),
                                         package_type=PackageType.TINY)
 
-        cls.pdp_2 = PackageDeliveryPlan(id=UUID(int=43),
+        cls.pdp_2 = PackageDeliveryPlan(id=EntityID(UUID(int=43)),
                                         drop_point=create_point_2d(1, 3),
                                         azimuth=Angle(40, AngleUnit.DEGREE),
                                         pitch=Angle(90, AngleUnit.DEGREE),
@@ -144,13 +145,13 @@ class BasicDeliveryRequestEnvelopeCellsDictTestCase(unittest.TestCase):
         ec2_expected_grid_location = GridLocation(20, 15)
         ec2_expected_angle = Angle(90, AngleUnit.DEGREE)
 
-        expected_pdp_1 = PackageDeliveryPlan(id=UUID(int=42),
+        expected_pdp_1 = PackageDeliveryPlan(id=EntityID(UUID(int=42)),
                                              drop_point=create_point_2d(1, 2),
                                              azimuth=Angle(30, AngleUnit.DEGREE),
                                              pitch=Angle(80, AngleUnit.DEGREE),
                                              package_type=PackageType.TINY)
 
-        expected_pdp_2 = PackageDeliveryPlan(id=UUID(int=43),
+        expected_pdp_2 = PackageDeliveryPlan(id=EntityID(UUID(int=43)),
                                              drop_point=create_point_2d(1, 3),
                                              azimuth=Angle(40, AngleUnit.DEGREE),
                                              pitch=Angle(90, AngleUnit.DEGREE),

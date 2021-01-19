@@ -1,0 +1,1 @@
+{"__class__": "MinimumEnd2EndConfig", "fleet_partition_json": "end_to_end/tests/jsons/test_fleet.json", "matcher_config_json": "end_to_end/tests/jsons/test_matcher_config.json", "scenario_json": "end_to_end/tests/jsons/test_scenario.json"}

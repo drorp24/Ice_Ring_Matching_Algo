@@ -26,7 +26,10 @@ class FleetPartition(object):
 
     @classmethod
     def extract_parameters(cls, platform_property_set: PlatformPropertySet):
-        cls.fleet_partition_parameters.fleet_size = platform_property_set.size
+        if platform_property_set.size % 2 == 0:
+            cls.fleet_partition_parameters.fleet_size = platform_property_set.size
+        else:
+            cls.fleet_partition_parameters.fleet_size = platform_property_set.size - 1
         cls.fleet_partition_parameters.formation_size_distribution = list(
             platform_property_set.formation_policy.formation_size_policy.values())
         cls.fleet_partition_parameters.formation_size_num = len(

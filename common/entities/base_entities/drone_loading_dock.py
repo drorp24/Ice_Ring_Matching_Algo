@@ -1,18 +1,16 @@
 from datetime import date, time, timedelta
-from typing import Union, List
 
+from common.entities.base_entities.base_entity import JsonableBaseEntity
 from common.entities.base_entities.drone import PlatformType
 from common.entities.base_entities.drone_loading_station import DroneLoadingStation
 from common.entities.base_entities.entity_distribution.temporal_distribution import TimeDeltaDistribution, \
     DateTimeDistribution, TimeWindowDistribution
 from common.entities.base_entities.temporal import TimeWindowExtension, Temporal, DateTimeExtension, TimeDeltaExtension
-from common.math.angle import Angle, NoneAngle
-from drop_envelope.abstract_envelope_collections import ShapeableCollection
 from geometry.geo2d import Point2D
-from geometry.utils import Localizable, Shapeable
+from geometry.utils import Localizable
 
 
-class DroneLoadingDock(Localizable, Temporal, ShapeableCollection):
+class DroneLoadingDock(JsonableBaseEntity, Localizable, Temporal):
 
     def __init__(self, drone_loading_station: DroneLoadingStation,
                  platform_type: PlatformType,
@@ -40,6 +38,15 @@ class DroneLoadingDock(Localizable, Temporal, ShapeableCollection):
     def calc_location(self) -> Point2D:
         return self.drone_loading_station.location
 
+    @classmethod
+    def dict_to_obj(cls, dict_input):
+        assert (dict_input['__class__'] == cls.__name__)
+        return DroneLoadingDock(
+            drone_loading_station=DroneLoadingStation.dict_to_obj(dict_input['drone_loading_station']),
+            platform_type=PlatformType.dict_to_obj(dict_input['platform_type']),
+            time_window=TimeWindowExtension.dict_to_obj(dict_input['time_window'])
+        )
+
     def __eq__(self, other):
         return self.__class__ == other.__class__ and \
                self.time_window == other.time_window and \
@@ -49,14 +56,11 @@ class DroneLoadingDock(Localizable, Temporal, ShapeableCollection):
     def __hash__(self):
         return hash((self._drone_loading_station, self._platform_type, self._time_window))
 
-    def get_shapeable_collection(self) -> List[Shapeable]:
-        return [self.drone_loading_station]
-
-    def get_centroid(self) -> Point2D:
-        return self.calc_location()
-
-    def get_arrival_azimuth(self) -> Union[Angle, NoneAngle]:
-        return NoneAngle()
+    @classmethod
+    def dict_to_obj(cls, dict_input):
+        return DroneLoadingDock(drone_loading_station=DroneLoadingStation.dict_to_obj(dict_input['drone_loading_station']),
+                                platform_type=PlatformType.dict_to_obj(dict_input['platform_type']),
+                                time_window=TimeWindowExtension.dict_to_obj(dict_input['time_window']))
 
 
 def create_default_time_window_for_drone_loading_dock():

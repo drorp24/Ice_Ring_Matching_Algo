@@ -43,7 +43,7 @@ class DeliveryRequest(JsonableBaseEntity, Localizable, Temporal):
             priority=dict_input['priority']
         )
 
-    def __eq__(self, other):
+    def __eq__(self, other: DeliveryRequest):
         return (self.__class__ == other.__class__) and \
                (self.delivery_options == other.delivery_options) and \
                (self.time_window == other.time_window) and \

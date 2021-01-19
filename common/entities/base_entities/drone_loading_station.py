@@ -1,12 +1,9 @@
-from geometry.geo2d import Point2D, Polygon2D
-from geometry.distribution.geo_distribution import UniformPointInBboxDistribution
-from geometry.geo_factory import create_polygon_2d
-from geometry.utils import Shapeable
-
-DEFAULT_LOADING_STATION_LOCATION_DISTRIB = UniformPointInBboxDistribution(0, 100, 0, 100)
+from common.entities.base_entities.base_entity import JsonableBaseEntity
+from geometry.geo2d import Point2D
+from geometry.geo_factory import convert_dict_to_point_2d
 
 
-class DroneLoadingStation(Shapeable):
+class DroneLoadingStation(JsonableBaseEntity):
 
     def __init__(self, location: Point2D):
         self._location = location
@@ -21,12 +18,7 @@ class DroneLoadingStation(Shapeable):
     def __hash__(self):
         return hash(self._location)
 
-    def calc_location(self) -> Point2D:
-        return self.location
-
-    def get_shape(self) -> Polygon2D:
-        return create_polygon_2d([self.location])
-
-    def calc_area(self) -> float:
-        return 0
-
+    @classmethod
+    def dict_to_obj(cls, dict_input):
+        assert (dict_input['__class__'] == cls.__name__)
+        return DroneLoadingStation(location=convert_dict_to_point_2d(dict_input['location']))
