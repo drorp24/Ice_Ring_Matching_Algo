@@ -21,7 +21,7 @@ class DroneFormationTypePolicy(JsonableBaseEntity):
     def __dict__(self):
         return {'__class__': self.__class__.__name__,
                 'policy': {pcp[0].name: pcp[1] for pcp in
-                                          self._formation_type_policy.items()}}
+                           self._formation_type_policy.items()}}
 
 
 @dataclass
@@ -80,7 +80,7 @@ class DroneSetProperties(JsonableBaseEntity):
         return DroneSetProperties(
             _drone_type=DroneType.dict_to_obj(dict_input['drone_type']),
             _drone_formation_policy=DroneFormationTypePolicy.dict_to_obj(dict_input['drone_formation_policy']),
-            _package_configuration_policy=PackageConfigurationPolicy.dict_to_obj(
-                dict_input['package_configuration_policy']),
+            _package_configuration_policy= \
+                PackageConfigurationPolicy.dict_to_obj(dict_input['package_configuration_policy']),
             _drone_amount=dict_input['drone_amount']
         )

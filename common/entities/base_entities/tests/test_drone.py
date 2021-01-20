@@ -25,15 +25,15 @@ class BasicDroneConfigurationTypeGenerationTests(unittest.TestCase):
         cls.drone_type_2_32X1 = DroneConfigurations.get_drone_configuration(
             DroneType.drone_type_2, PackageConfiguration.TINY_X32)
 
-    def test_platform_type(self):
-        self.assertEqual(self.drone_type_1_2X8.platform_type, DroneType.drone_type_1)
-        self.assertEqual(self.drone_type_1_4X4.platform_type, DroneType.drone_type_1)
-        self.assertEqual(self.drone_type_1_8X2.platform_type, DroneType.drone_type_1)
-        self.assertEqual(self.drone_type_1_16X1.platform_type, DroneType.drone_type_1)
-        self.assertEqual(self.drone_type_2_4X8.platform_type, DroneType.drone_type_2)
-        self.assertEqual(self.drone_type_2_8X4.platform_type, DroneType.drone_type_2)
-        self.assertEqual(self.drone_type_2_16X2.platform_type, DroneType.drone_type_2)
-        self.assertEqual(self.drone_type_2_32X1.platform_type, DroneType.drone_type_2)
+    def test_drone_type(self):
+        self.assertEqual(self.drone_type_1_2X8.drone_type, DroneType.drone_type_1)
+        self.assertEqual(self.drone_type_1_4X4.drone_type, DroneType.drone_type_1)
+        self.assertEqual(self.drone_type_1_8X2.drone_type, DroneType.drone_type_1)
+        self.assertEqual(self.drone_type_1_16X1.drone_type, DroneType.drone_type_1)
+        self.assertEqual(self.drone_type_2_4X8.drone_type, DroneType.drone_type_2)
+        self.assertEqual(self.drone_type_2_8X4.drone_type, DroneType.drone_type_2)
+        self.assertEqual(self.drone_type_2_16X2.drone_type, DroneType.drone_type_2)
+        self.assertEqual(self.drone_type_2_32X1.drone_type, DroneType.drone_type_2)
 
     def test_get_package_type_amount(self):
         self.assertEqual(self.drone_type_1_2X8.get_package_type_amount(PackageType.LARGE), 2)

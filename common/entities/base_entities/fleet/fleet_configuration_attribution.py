@@ -4,7 +4,7 @@ from typing import Any
 import numpy as np
 
 from common.entities.base_entities.drone import DroneType
-from common.entities.base_entities.drone_formation import DroneFormationType, DroneFormation, DronePackageConfigurationOption, \
+from common.entities.base_entities.drone_formation import DroneFormationType, DroneFormation, DroneTypeToPackageConfigurationOption, \
     DroneFormations
 from common.entities.base_entities.fleet.fleet_partition import FormationTypeAmounts
 from common.entities.base_entities.fleet.fleet_property_sets import DroneSetProperties
@@ -147,7 +147,7 @@ class FleetConfigurationAttribution:
         for i in range(len(chosen_formations_indices)):
             formation_size = cls._get_formation_size_type(i)
             configuration = cls.attribution_config.configurations[chosen_formations_indices[i]]
-            formation_option = DronePackageConfigurationOption.get_formation_option(configuration, platform_type)
+            formation_option = DroneTypeToPackageConfigurationOption.get_formation_option(configuration, platform_type)
             drone_formation = DroneFormations.get_drone_formation(formation_size, formation_option, platform_type)
             formation_amounts[drone_formation] += 1
         return DroneFormationsPerTypeAmounts(formation_amounts)

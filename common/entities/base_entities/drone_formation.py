@@ -1,7 +1,7 @@
 from enum import Enum, auto
 from functools import lru_cache
 
-from common.entities.base_entities.drone import DronePackageConfiguration, PackageConfiguration, _PackageTypeAmountMap
+from common.entities.base_entities.drone import DronePackageConfiguration, PackageConfiguration, PackageTypeAmountMap
 from common.entities.base_entities.drone import DroneType, DroneConfigurations
 from common.entities.base_entities.package import PackageType
 
@@ -53,9 +53,9 @@ class DroneFormation:
         return self.drone_formation_type.get_amount_of_drones() * \
                self._package_configuration.get_package_type_amount(package_type)
 
-    def get_package_type_amount_map(self) -> _PackageTypeAmountMap:
-        amount_per_package_type = _PackageTypeAmountMap({package: 0 for package in PackageType})
-        extracted_package_type_amounts = _PackageTypeAmountMap({
+    def get_package_type_amount_map(self) -> PackageTypeAmountMap:
+        amount_per_package_type = PackageTypeAmountMap({package: 0 for package in PackageType})
+        extracted_package_type_amounts = PackageTypeAmountMap({
             package_type_name : package_amount * self.drone_formation_type.get_amount_of_drones() for
             package_type_name, package_amount in self._package_configuration.package_type_map.package_type_to_amounts.items()})
         amount_per_package_type.add_to_map(extracted_package_type_amounts)
@@ -87,7 +87,7 @@ class PackageConfigurationOption(AutoName):
     TINY_PACKAGES = auto()
 
 
-class DronePackageConfigurationOption:
+class DroneTypeToPackageConfigurationOption:
     drone_configurations_map: {PackageConfigurationOption: [DronePackageConfiguration]} = {
         PackageConfigurationOption.LARGE_PACKAGES: [
             DroneConfigurations.get_drone_configuration(DroneType.drone_type_1, PackageConfiguration.LARGE_X2),
@@ -137,7 +137,7 @@ class DroneFormations:
             formation_size:
                 {
                     platform_type:
-                        DronePackageConfigurationOption.get_drone_formation(
+                        DroneTypeToPackageConfigurationOption.get_drone_formation(
                             formation_size,
                             formation_option,
                             platform_type)

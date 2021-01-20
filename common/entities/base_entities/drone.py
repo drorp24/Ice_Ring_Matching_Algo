@@ -23,7 +23,7 @@ class DroneType(Enum):
         return 'DroneType: ' + str(self.__dict__())
 
 
-class _PackageTypeAmountMap(JsonableBaseEntity):
+class PackageTypeAmountMap(JsonableBaseEntity):
 
     def __init__(self, package_types_amounts: {str: int}):
         self._package_type_to_amounts = package_types_amounts
@@ -34,9 +34,9 @@ class _PackageTypeAmountMap(JsonableBaseEntity):
 
     @classmethod
     def dict_to_obj(cls, dict_input):
-        return _PackageTypeAmountMap(dict_input['package_type_to_amounts'])
+        return PackageTypeAmountMap(dict_input['package_type_to_amounts'])
 
-    def add_to_map(self, other_package_types_amounts: Type[_PackageTypeAmountMap]):
+    def add_to_map(self, other_package_types_amounts: Type[PackageTypeAmountMap]):
         other_amounts = other_package_types_amounts.package_type_to_amounts
         for key, val in other_amounts.items():
             if key not in self._package_type_to_amounts.keys():
@@ -71,37 +71,37 @@ class _PackageTypeAmountMap(JsonableBaseEntity):
 
 class DronePackageConfiguration:
 
-    def __init__(self, platform_type: DroneType, package_types_map: _PackageTypeAmountMap):
-        self._platform_type = platform_type
+    def __init__(self, drone_type: DroneType, package_types_map: PackageTypeAmountMap):
+        self._drone_type = drone_type
         self._package_types_map = package_types_map
 
     def __hash__(self):
-        return hash((self._platform_type, self._package_types_map))
+        return hash((self._drone_type, self._package_types_map))
 
     @property
-    def platform_type(self) -> DroneType:
-        return self._platform_type
+    def drone_type(self) -> DroneType:
+        return self._drone_type
 
     @property
-    def package_type_map(self) -> _PackageTypeAmountMap:
+    def package_type_map(self) -> PackageTypeAmountMap:
         return self._package_types_map
 
     def get_package_type_amount(self, package_type: PackageType) -> int:
         return self._package_types_map.get_package_type_amount(package_type)
 
     def get_drone_type(self) -> DroneType:
-        return self._platform_type
+        return self._drone_type
 
 
 class PackageConfiguration(Enum):
-    LARGE_X2 = _PackageTypeAmountMap({PackageType.LARGE.name: 2})
-    MEDIUM_X4 = _PackageTypeAmountMap({PackageType.MEDIUM.name: 4})
-    SMALL_X8 = _PackageTypeAmountMap({PackageType.SMALL.name: 8})
-    TINY_X16 = _PackageTypeAmountMap({PackageType.TINY.name: 16})
-    LARGE_X4 = _PackageTypeAmountMap({PackageType.LARGE.name: 4})
-    MEDIUM_X8 = _PackageTypeAmountMap({PackageType.MEDIUM.name: 8})
-    SMALL_X16 = _PackageTypeAmountMap({PackageType.SMALL.name: 16})
-    TINY_X32 = _PackageTypeAmountMap({PackageType.TINY.name: 32})
+    LARGE_X2 = PackageTypeAmountMap({PackageType.LARGE.name: 2})
+    MEDIUM_X4 = PackageTypeAmountMap({PackageType.MEDIUM.name: 4})
+    SMALL_X8 = PackageTypeAmountMap({PackageType.SMALL.name: 8})
+    TINY_X16 = PackageTypeAmountMap({PackageType.TINY.name: 16})
+    LARGE_X4 = PackageTypeAmountMap({PackageType.LARGE.name: 4})
+    MEDIUM_X8 = PackageTypeAmountMap({PackageType.MEDIUM.name: 8})
+    SMALL_X16 = PackageTypeAmountMap({PackageType.SMALL.name: 16})
+    TINY_X32 = PackageTypeAmountMap({PackageType.TINY.name: 32})
 
     @classmethod
     def dict_to_obj(cls, input_dict):
@@ -122,11 +122,9 @@ class PackageConfiguration(Enum):
 class DroneTypeToPackageConfigurationOptions:
     drone_configurations_map: {DroneType: [PackageConfiguration]} = \
         {DroneType.drone_type_1: [PackageConfiguration.LARGE_X2, PackageConfiguration.MEDIUM_X4,
-                                  PackageConfiguration.SMALL_X8,
-                                  PackageConfiguration.TINY_X16],
+                                  PackageConfiguration.SMALL_X8, PackageConfiguration.TINY_X16],
          DroneType.drone_type_2: [PackageConfiguration.LARGE_X4, PackageConfiguration.MEDIUM_X8,
-                                  PackageConfiguration.SMALL_X16,
-                                  PackageConfiguration.TINY_X32]}
+                                  PackageConfiguration.SMALL_X16, PackageConfiguration.TINY_X32]}
 
     @classmethod
     def add_configuration_option(cls, configuration_option: {DroneType: [PackageConfiguration]}):

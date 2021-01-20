@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from functools import lru_cache
 
 from common.entities.base_entities.delivery_request import DeliveryRequest
-from common.entities.base_entities.drone import _PackageTypeAmountMap
+from common.entities.base_entities.drone import PackageTypeAmountMap
 from common.entities.base_entities.drone_formation import DroneFormation
 from common.entities.base_entities.drone_loading_dock import DroneLoadingDock
 from common.entities.base_entities.entity_id import EntityID
@@ -106,13 +106,13 @@ class DroneDelivery(EmptyDroneDelivery):
             self._start_drone_loading_docks.delivery_time_window.since).in_minutes()
 
     @lru_cache()
-    def get_total_package_type_amount_map(self) -> _PackageTypeAmountMap:
-        amount_per_package_type = _PackageTypeAmountMap({package.name: 0 for package in PackageType})
+    def get_total_package_type_amount_map(self) -> PackageTypeAmountMap:
+        amount_per_package_type = PackageTypeAmountMap({package.name: 0 for package in PackageType})
         for matched_request in self._matched_requests:
             dr = matched_request.delivery_request
-            do = dr.delivery_options[matched_request.matched_delivery_option_index]
-            ptam = do.get_package_type_amount_map()
-            amount_per_package_type.add_to_map(ptam)
+            delivery_option_of_interest = dr.delivery_options[matched_request.matched_delivery_option_index]
+            delivery_option_package_type_amount = delivery_option_of_interest.get_package_type_amount_map()
+            amount_per_package_type.add_to_map(delivery_option_package_type_amount)
         return amount_per_package_type
 
 
