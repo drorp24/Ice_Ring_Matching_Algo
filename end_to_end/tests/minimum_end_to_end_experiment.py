@@ -1,4 +1,5 @@
-from datetime import time, date, timedelta
+
+from datetime import time, date, timedelta, datetime
 from pathlib import Path
 from random import Random
 
@@ -26,11 +27,6 @@ from visualization.basic.pltdrawer2d import create_drawer_2d
 from visualization.basic.pltgantt_drawer import create_gantt_drawer
 from visualization.operational import operational_drawer2d
 from visualization.operational import operational_gantt_drawer
-
-west_lon = 34.83927
-east_lon = 35.32341
-south_lat = 31.77279
-north_lat = 32.19276
 
 ZERO_TIME = DateTimeExtension(dt_date=date(2021, 1, 1), dt_time=time(0, 0, 0))
 

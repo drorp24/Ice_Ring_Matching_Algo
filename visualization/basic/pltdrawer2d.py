@@ -96,12 +96,12 @@ class PltDrawer2D(Drawer2D):
         elif self._coordinate_sys is Drawer2DCoordinateSys.GEOGRAPHIC:
             self._fig = plt.figure()
             self._ax = plt.axes(projection=ccrs.PlateCarree())
-            # map_background_path = filepath(r"visualization/basic/gush_dan_background.Png")
+            # map_background_path = filePath(r"visualization/basic/gush_dan_background.Png")
             # west_lon = 34.83927
             # east_lon = 35.32341
             # south_lat = 31.77279
             # north_lat = 32.19276
-            map_background_path = filepath(r"visualization/basic/north_map.Png")
+            map_background_path = filePath(r"visualization/basic/north_map.Png")
             west_lon = 34.90777
             east_lon = 35.90753
             south_lat = 32.48928
@@ -110,6 +110,7 @@ class PltDrawer2D(Drawer2D):
                                          east_lon,
                                          south_lat,
                                          north_lat)
+            map_background_img = plt.imread(map_background_path)
             self._ax.imshow(map_background_img, origin='upper', extent=map_background_img_extent,
                             transform=ccrs.PlateCarree())
         else:

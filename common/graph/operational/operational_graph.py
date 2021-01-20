@@ -128,6 +128,12 @@ class OperationalGraph(JsonableBaseEntity):
         internal_edges = self._internal_graph.edges.data(data=True)
         return [OperationalEdge(edge[0], edge[1], OperationalEdgeAttribs(edge[2]['cost'])) for edge in internal_edges]
 
+    def get_max_cost(self) -> int:
+        return max(e.attributes.cost for e in self.edges[:])
+
+    def get_min_cost(self) -> int:
+        return min(e.attributes.cost for e in self.edges[:])
+
     @classmethod
     def dict_to_obj(cls, dict_input):
         assert (dict_input['__class__'] == cls.__name__)
@@ -136,10 +142,10 @@ class OperationalGraph(JsonableBaseEntity):
         og.add_operational_edges([OperationalEdge.dict_to_obj(edge) for edge in dict_input['edges']])
         return og
 
-    def get_max_cost(self) -> int:
+    def get_max_cost(self) -> float:
         return max(e.attributes.cost for e in self.edges[:])
 
-    def get_min_cost(self) -> int:
+    def get_min_cost(self) -> float:
         return min(e.attributes.cost for e in self.edges[:])
 
     def is_empty(self):

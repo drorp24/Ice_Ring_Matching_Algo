@@ -32,6 +32,15 @@ class DroneFormation:
         # TODO: Change to real endurance
         return self.get_platform_type().value * 100
 
+    @property
+    @lru_cache()
+    def velocity_meter_per_sec(self) -> float:
+        # TODO: Change to real velocity
+        return 10.0
+
+    def get_formation_max_range_in_meters(self) -> float:
+        return self.velocity_meter_per_sec * self.max_route_times_in_minutes * 60.0
+
     def get_platform_type(self) -> PlatformType:
         return self._drone_configuration.get_platform_type()
 
