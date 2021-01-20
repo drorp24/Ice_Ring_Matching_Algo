@@ -1,6 +1,7 @@
 import unittest
 
-from common.entities.base_entities.drone import DroneType, PackageConfiguration, DroneConfigurations
+from common.entities.base_entities.drone import DroneType, PackageConfiguration, DroneConfigurations, \
+    PackageTypeAmountMap
 from common.entities.base_entities.package import PackageType
 
 
@@ -44,3 +45,17 @@ class BasicDroneConfigurationTypeGenerationTests(unittest.TestCase):
         self.assertEqual(self.drone_type_2_8X4.get_package_type_amount(PackageType.MEDIUM), 8)
         self.assertEqual(self.drone_type_2_16X2.get_package_type_amount(PackageType.SMALL), 16)
         self.assertEqual(self.drone_type_2_32X1.get_package_type_amount(PackageType.TINY), 32)
+
+    def test_adding_package_type_amounts(self):
+        amounts_1 = PackageTypeAmountMap({PackageType.SMALL.name: 8, PackageType.LARGE.name: 3})
+        amounts_2 = PackageTypeAmountMap({PackageType.SMALL.name: 3, PackageType.LARGE.name: 5})
+        expected_output_amount = PackageTypeAmountMap({PackageType.SMALL.name: 11, PackageType.LARGE.name: 8})
+        amounts_1.add_to_map(amounts_2)
+        self.assertEqual(expected_output_amount, amounts_1)
+
+    def test_adding_package_type_amounts_with_non_overlapping_values(self):
+        amounts_1 = PackageTypeAmountMap({PackageType.SMALL.name: 8, PackageType.LARGE.name: 3})
+        amounts_2 = PackageTypeAmountMap({PackageType.LARGE.name: 5, PackageType.MEDIUM.name: 22})
+        expected_output_amount = PackageTypeAmountMap({PackageType.SMALL.name: 8, PackageType.LARGE.name: 8, PackageType.MEDIUM.name: 22})
+        amounts_1.add_to_map(amounts_2)
+        self.assertEqual(expected_output_amount, amounts_1)
