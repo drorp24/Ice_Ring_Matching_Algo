@@ -100,6 +100,7 @@ class BasicMinimumEnd2EndExperiment:
     def test_small_scenario(self):
         start_time = datetime.now()
         empty_drone_delivery_board = _create_empty_drone_delivery_board(size=20)
+        empty_drone_delivery_board.set_max_route_times_in_minutes([50]*empty_drone_delivery_board.amount_of_formations())
         print("--- _create_empty_drone_delivery_board run time: %s  ---" % (datetime.now() - start_time))
         start_time = datetime.now()
 

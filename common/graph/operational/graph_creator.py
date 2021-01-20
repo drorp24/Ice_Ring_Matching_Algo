@@ -110,4 +110,4 @@ def is_within_cost_range(start: Localizable, target: Localizable,
 
 
 def calc_cost(start: Localizable, end: Localizable, factor: float=1.0) -> float:
-    return ceil(start.calc_location().calc_distance_to_point(end.calc_location()))*factor
+    return (start.calc_location().calc_distance_to_point(end.calc_location()))*factor

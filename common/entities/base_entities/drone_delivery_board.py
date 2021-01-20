@@ -28,6 +28,9 @@ class EmptyDroneDeliveryBoard:
     def max_route_times_in_minutes(self) -> [int]:
         return [edd.drone_formation.max_route_times_in_minutes() for edd in self._empty_drone_deliveries]
 
+    def set_max_route_times_in_minutes(self, max_route_times: [int]):
+        for i, edd in enumerate(self._empty_drone_deliveries):
+            edd.drone_formation.set_max_route_times_in_minutes(max_route_times[i])
 
 @dataclass
 class UnmatchedDeliveryRequest:

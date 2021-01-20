@@ -17,6 +17,8 @@ class DroneFormation:
     def __init__(self, formation_size: FormationSize, drone_configuration: DroneConfiguration):
         self._size = formation_size
         self._drone_configuration = drone_configuration
+        self._max_route_times_in_minutes = 45 # TODO: Change to real endurance
+        self._velocity_meter_per_sec = 10.0  # TODO: Change to real velocity
 
     @property
     def size(self) -> FormationSize:
@@ -29,14 +31,18 @@ class DroneFormation:
     @property
     @lru_cache()
     def max_route_times_in_minutes(self) -> int:
-        # TODO: Change to real endurance
-        return self.get_platform_type().value * 100
+        return self._max_route_times_in_minutes
 
     @property
     @lru_cache()
     def velocity_meter_per_sec(self) -> float:
-        # TODO: Change to real velocity
-        return 10.0
+        return self._velocity_meter_per_sec
+
+    def set_max_route_times_in_minutes(self, max_route_time: int):
+        self._max_route_times_in_minutes = max_route_time
+
+    def set_velocity_meter_per_sec(self, velocity: float):
+        self._velocity_meter_per_sec = velocity
 
     def get_formation_max_range_in_meters(self) -> float:
         return self.velocity_meter_per_sec * self.max_route_times_in_minutes * 60.0
