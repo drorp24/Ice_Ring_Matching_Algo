@@ -12,9 +12,7 @@ class MockEnvelopeServices(EnvelopeServicesInterface):
 
     @classmethod
     def _calc_envelope(cls, package_type: PackageType, envelope_center: Point2D, drone_azimuth: Angle,
-                       drop_azimuth: Optional.of(Angle)) -> Union[Polygon2D, EmptyGeometry2D]:
-        if drop_azimuth.__class__ is None:
-            drop_azimuth = drone_azimuth
+                       drop_azimuth: Angle) -> Union[Polygon2D, EmptyGeometry2D]:
         envelope_width = package_type.value.calc_potential_drop_envelope().calc_delta_between_radii()
         envelope_height = envelope_width * drop_azimuth.to_direction().dot(drone_azimuth.to_direction())
         if drop_azimuth.calc_abs_difference(drone_azimuth).degrees >= 90:
