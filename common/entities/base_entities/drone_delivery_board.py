@@ -1,9 +1,11 @@
 from dataclasses import dataclass
+from functools import lru_cache
 
 from common.entities.base_entities.delivery_request import DeliveryRequest
-from common.entities.base_entities.drone import PackageTypesVolumeMap
+from common.entities.base_entities.drone import PackageTypeAmountMap
 from common.entities.base_entities.drone_delivery import DroneDelivery, EmptyDroneDelivery
 from common.entities.base_entities.package import PackageType
+
 
 class EmptyDroneDeliveryBoard:
     def __init__(self, empty_drone_deliveries: [EmptyDroneDelivery]):
@@ -13,22 +15,22 @@ class EmptyDroneDeliveryBoard:
     def empty_drone_deliveries(self) -> [EmptyDroneDelivery]:
         return self._empty_drone_deliveries
 
-    def num_of_formations(self) -> int:
+    def amount_of_formations(self) -> int:
         return len(self._empty_drone_deliveries)
 
-    def formation_capacities(self, package_type: PackageType) -> [int]:
-        return [delivery.drone_formation.get_package_type_volume(package_type) for delivery in
+    def get_package_type_amount_per_drone_delivery(self, package_type: PackageType) -> [int]:
+        return [drone_delivery.drone_formation.get_package_type_amount(package_type) for drone_delivery in
                 self._empty_drone_deliveries]
 
     def package_types(self) -> [PackageType]:
-        return set([edd.drone_formation.get_package_type_formation() for edd in self._empty_drone_deliveries])
+        return set([edd.drone_formation.get_package_type() for edd in self._empty_drone_deliveries])
 
     def max_route_times_in_minutes(self) -> [int]:
         return [edd.drone_formation.max_route_times_in_minutes() for edd in self._empty_drone_deliveries]
 
 
 @dataclass
-class DroppedDeliveryRequest:
+class UnmatchedDeliveryRequest:
     graph_index: int
     delivery_request: DeliveryRequest
 
@@ -36,63 +38,61 @@ class DroppedDeliveryRequest:
         return self.graph_index == other.graph_index and self.delivery_request == other.delivery_request
 
     def __str__(self):
-        return '[DroppedDeliveryRequest(graph_index=' + str(self.graph_index) + ', priority=' + str(
+        return '[UnmatchedDeliveryRequest(graph_index=' + str(self.graph_index) + ', priority=' + str(
             self.delivery_request.priority) + ")]"
+
+    def __hash__(self):
+        return hash((self.graph_index, self.delivery_request))
 
 
 class DroneDeliveryBoard:
-    def __init__(self, drone_deliveries: [DroneDelivery], dropped_delivery_requests: [DroppedDeliveryRequest]):
+    def __init__(self, drone_deliveries: [DroneDelivery], unmatched_delivery_requests: [UnmatchedDeliveryRequest]):
         self._drone_deliveries = drone_deliveries
-        self._dropped_delivery_requests = dropped_delivery_requests
-
-        self._total_amount_per_package_type = None
-        self._total_priority = 0
-        self._total_time_in_minutes = 0
-
-        self._set_totals()
-
-    def __eq__(self, other):
-        return self._drone_deliveries == other.drone_deliveries \
-               and self._dropped_delivery_requests == other._dropped_delivery_requests
-
-    def __str__(self):
-        drone_deliveries_str = '\n'.join(map(str, self._drone_deliveries))
-
-        dropped_delivery_requests_str = '\n'.join(map(str, self.dropped_delivery_requests)) if len(
-            self._dropped_delivery_requests) > 0 else "\n[No dropped delivery requests]"
-
-        return "\n[DroneDeliveryBoard]\n{drone_deliveries_str}\n{dropped_delivery_request_str}".format(
-            drone_deliveries_str=drone_deliveries_str, dropped_delivery_request_str=dropped_delivery_requests_str)
+        self._unmatched_delivery_requests = unmatched_delivery_requests
 
     @property
     def drone_deliveries(self) -> [DroneDelivery]:
         return self._drone_deliveries
 
     @property
-    def dropped_delivery_requests(self) -> [DroppedDeliveryRequest]:
-        return self._dropped_delivery_requests
+    def unmatched_delivery_requests(self) -> [UnmatchedDeliveryRequest]:
+        return self._unmatched_delivery_requests
 
-    @property
-    def total_time_in_minutes(self) -> float:
-        return self._total_time_in_minutes
+    @lru_cache()
+    def get_total_work_time_in_minutes(self) -> float:
+        return sum([drone_delivery.get_total_work_time_in_minutes() for drone_delivery in self._drone_deliveries])
 
-    @property
-    def total_amount_per_package_type(self) -> PackageTypesVolumeMap:
-        return self._total_amount_per_package_type
-
-    @property
-    def total_priority(self) -> int:
-        return self._total_priority
-
-    def _set_totals(self):
-        total_amount_per_package_type = [0] * len(PackageType)
-
+    @lru_cache()
+    def get_total_amount_per_package_type(self) -> PackageTypeAmountMap:
+        amount_per_package_type = [0] * len(PackageType)
         for drone_delivery in self._drone_deliveries:
-            total_amount_per_package_type = [x + y for x, y in zip(total_amount_per_package_type,
-                                                                   drone_delivery.total_amount_per_package_type.
-                                                                   get_package_types_volumes())]
+            amount_per_package_type = [total_amount + delivery_amount
+                                       for total_amount, delivery_amount
+                                       in zip(amount_per_package_type,
+                                              drone_delivery.get_total_package_type_amount_map().
+                                              get_package_type_amounts())]
+        return PackageTypeAmountMap(amount_per_package_type)
 
-            self._total_priority += drone_delivery.total_priority
-            self._total_time_in_minutes += drone_delivery.total_time_in_minutes
+    @lru_cache()
+    def get_total_priority(self) -> int:
+        return sum(drone_delivery.get_total_priority() for drone_delivery in self._drone_deliveries)
 
-        self._total_amount_per_package_type = PackageTypesVolumeMap(total_amount_per_package_type)
+    def __eq__(self, other):
+        return self.drone_deliveries == other.drone_deliveries \
+               and self.unmatched_delivery_requests == other.unmatched_delivery_requests
+
+    def __str__(self):
+        drone_deliveries_str = '\n'.join(map(str, self._drone_deliveries))
+
+        unmatched_delivery_requests_str = ''.join(map(str, self.unmatched_delivery_requests)) if len(
+            self._unmatched_delivery_requests) > 0 else "[No unmatched delivery requests]"
+
+        return f"\n[DroneDeliveryBoard]\n" \
+               f"Total amount per package type: {self.get_total_amount_per_package_type()}\n" \
+               f"Total work time in minutes: {self.get_total_work_time_in_minutes()}\n" \
+               f"Total priority: {self.get_total_priority()}\n" \
+               f"{drone_deliveries_str}\n" \
+               f"{unmatched_delivery_requests_str}"
+
+    def __hash__(self):
+        return hash((tuple(self._drone_deliveries), tuple(self._unmatched_delivery_requests)))

@@ -2,7 +2,9 @@ from typing import List
 
 import matplotlib.pyplot as plt
 import numpy as np
-from pathlib import Path as filepath
+import cartopy.crs as ccrs
+
+from pathlib import Path as filePath
 from matplotlib.patches import Polygon, Circle, PathPatch, Path, Patch
 
 from geometry.geo2d import Point2D, Polygon2D, LineString2D, LinearRing2D
@@ -20,41 +22,7 @@ def create_drawer_2d(coordinate_sys: Drawer2DCoordinateSys = Drawer2DCoordinateS
 class PltDrawer2D(Drawer2D):
     def __init__(self, coordinate_sys: Drawer2DCoordinateSys = Drawer2DCoordinateSys.CARTESIAN):
         self._coordinate_sys = coordinate_sys
-        if coordinate_sys is Drawer2DCoordinateSys.CARTESIAN:
-            self._fig, self._ax = plt.subplots()
-            plt.title('90\xb0', fontsize=14)
-            plt.xlabel('270\xb0', fontsize=14)
-            plt.ylabel('180\xb0', fontsize=14)
-        elif coordinate_sys is Drawer2DCoordinateSys.GEOGRAPHIC:
-            import cartopy.crs as ccrs
-            self._fig = plt.figure()
-            self._ax = plt.axes(projection=ccrs.PlateCarree())
-            # map_background_path = filepath(r"visualization/basic/gush_dan_background.Png")
-            # west_lon = 34.83927
-            # east_lon = 35.32341
-            # south_lat = 31.77279
-            # north_lat = 32.19276
-            map_background_path = filepath(r"visualization/basic/north_map.Png")
-            west_lon = 34.90777
-            east_lon = 35.90753
-            south_lat = 32.48928
-            north_lat = 33.93233
-            map_background_img = plt.imread(map_background_path)
-            map_background_img_extent = (west_lon,
-                                         east_lon,
-                                         south_lat,
-                                         north_lat)
-            self._ax.imshow(map_background_img, origin='upper', extent=map_background_img_extent,
-                            transform=ccrs.PlateCarree())
-        else:
-            raise NotImplementedError("Non valid Drawer2DCoordinateSys.")
-
-    @staticmethod
-    def _convert_to_numpy_points(point2d_list: List[Point2D]) -> np.ndarray:
-        np_points = np.zeros(shape=(len(point2d_list), 2))
-        for i, point in enumerate(point2d_list):
-            np_points[i] = [point.x, point.y]
-        return np_points
+        self._init_according_to_coordinate_system()
 
     def add_point2d(self, point2d: Point2D, radius=0.05, edgecolor: Color = Color.Blue, facecolor: Color = Color.Blue,
                     facecolor_alpha=1, linewidth=2, label=None) -> None:
@@ -103,15 +71,11 @@ class PltDrawer2D(Drawer2D):
     def add_text(self, text: str, point2d: Point2D, color: Color = Color.Black, fontsize: int = 10) -> None:
         self._ax.text(point2d.x, point2d.y, text, color=color.get_rgb(), fontsize=fontsize)
 
-    def add_legend(self, new_labels: [str] = [], new_label_colors: [Color] = [], fontsize: int = 10) -> None:
-        if len(new_labels) != len(new_label_colors):
-            raise ValueError('new_labels count must match new_label_colors count')
-        if len(new_labels) == 0:
-            plt.legend(bbox_to_anchor=(1.01, 1), loc="upper left", ncol=3)
+    def add_legend(self, new_labels: [str] = None, new_label_colors: [Color] = None, fontsize: int = 10) -> None:
+        if new_labels is not None:
+            self._add_legend_with_new_labels(new_labels, new_label_colors, fontsize)
         else:
-            plt.legend(handles= [
-                Patch(label=new_labels[i], color=new_label_colors[i].get_rgb()) for i, label in enumerate(new_labels)],
-                      loc="upper left", ncol=3, fontsize=fontsize)
+            plt.legend(bbox_to_anchor=(1.01, 1), loc="upper left", ncol=3)
 
     def draw(self, block=True) -> None:
         # self._ax.axis('scaled')
@@ -122,3 +86,47 @@ class PltDrawer2D(Drawer2D):
     def save_plot_to_png(self, file_name: Path) -> None:
         self._ax.axis('scaled')
         plt.savefig(file_name)
+
+    def _init_according_to_coordinate_system(self):
+        if self._coordinate_sys is Drawer2DCoordinateSys.CARTESIAN:
+            self._fig, self._ax = plt.subplots()
+            plt.title('90\xb0', fontsize=14)
+            plt.xlabel('270\xb0', fontsize=14)
+            plt.ylabel('180\xb0', fontsize=14)
+        elif self._coordinate_sys is Drawer2DCoordinateSys.GEOGRAPHIC:
+            self._fig = plt.figure()
+            self._ax = plt.axes(projection=ccrs.PlateCarree())
+            # map_background_path = filepath(r"visualization/basic/gush_dan_background.Png")
+            # west_lon = 34.83927
+            # east_lon = 35.32341
+            # south_lat = 31.77279
+            # north_lat = 32.19276
+            map_background_path = filepath(r"visualization/basic/north_map.Png")
+            west_lon = 34.90777
+            east_lon = 35.90753
+            south_lat = 32.48928
+            north_lat = 33.93233
+            map_background_img_extent = (west_lon,
+                                         east_lon,
+                                         south_lat,
+                                         north_lat)
+            self._ax.imshow(map_background_img, origin='upper', extent=map_background_img_extent,
+                            transform=ccrs.PlateCarree())
+        else:
+            raise NotImplementedError("Non valid Drawer2DCoordinateSys.")
+
+    @staticmethod
+    def _convert_to_numpy_points(point2d_list: List[Point2D]) -> np.ndarray:
+        np_points = np.zeros(shape=(len(point2d_list), 2))
+        for i, point in enumerate(point2d_list):
+            np_points[i] = [point.x, point.y]
+        return np_points
+
+    @staticmethod
+    def _add_legend_with_new_labels(new_labels: [str], new_label_colors: [Color], fontsize: int):
+        if len(new_labels) != len(new_label_colors):
+            raise ValueError('new_labels count must match new_label_colors count')
+        else:
+            plt.legend(handles=[
+                Patch(label=new_labels[i], color=new_label_colors[i].get_rgb()) for i, label in enumerate(new_labels)],
+                      loc="upper left", ncol=3, fontsize=fontsize)

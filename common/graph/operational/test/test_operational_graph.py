@@ -1,13 +1,18 @@
+import os
+import itertools
 import unittest
 from datetime import time, date, timedelta, datetime
 from math import sqrt
 from random import Random
+import numpy as np
+from numpy.testing import assert_array_equal
+from typing import List
 
 from common.entities.base_entities.delivery_request import DeliveryRequest
 from common.entities.base_entities.drone_loading_dock import DroneLoadingDock
 from common.entities.base_entities.entity_distribution.delivery_option_distribution import DeliveryOptionDistribution
-from common.entities.base_entities.entity_distribution.delivery_request_distribution import DeliveryRequestDistribution, \
-    PriorityDistribution
+from common.entities.base_entities.entity_distribution.delivery_request_distribution import \
+    DeliveryRequestDistribution, PriorityDistribution
 from common.entities.base_entities.entity_distribution.delivery_requestion_dataset_builder import \
     build_delivery_request_distribution
 from common.entities.base_entities.entity_distribution.drone_loading_dock_distribution import \
@@ -17,11 +22,14 @@ from common.entities.base_entities.entity_distribution.temporal_distribution imp
 from common.entities.base_entities.temporal import DateTimeExtension, TimeDeltaExtension, TimeWindowExtension
 from common.entities.generator.delivery_request_generator import DeliveryRequestDatasetGenerator, \
     DeliveryRequestDatasetStructure
-from common.graph.operational.graph_creator import add_locally_connected_dr_graph, add_fully_connected_loading_docks
+from common.graph.operational.graph_creator import add_locally_connected_dr_graph, add_fully_connected_loading_docks, \
+    create_grouped_dr_graph
+from common.graph.operational.graph_utils import sort_delivery_requests_by_zone, grouping_delivery_requests
 from common.graph.operational.operational_graph import OperationalEdge, \
     OperationalEdgeAttribs, OperationalNode, NonLocalizableNodeException, NonTemporalNodeException
 from common.graph.operational.operational_graph import OperationalGraph
 from geometry.distribution.geo_distribution import UniformPointInBboxDistribution
+from geometry.geo2d import Polygon2D
 from geometry.geo_factory import create_point_2d, create_polygon_2d
 
 
@@ -29,7 +37,8 @@ class BasicDeliveryRequestGraphTestCases(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.dr_dataset_random = DeliveryRequestDistribution().choose_rand(random=Random(100), amount={DeliveryRequest: 10})
+        cls.dr_dataset_random = DeliveryRequestDistribution().choose_rand(random=Random(100),
+                                                                          amount={DeliveryRequest: 10})
         cls.dld_dataset_random = DroneLoadingDockDistribution().choose_rand(random=Random(100), amount=3)
         cls.dr_dataset_morning = create_morning_dr_dataset()
         cls.dr_dataset_afternoon = create_afternoon_dr_dataset()
@@ -42,40 +51,69 @@ class BasicDeliveryRequestGraphTestCases(unittest.TestCase):
         cls.zero_time = datetime(2020, 1, 23, 12, 30, 00)
 
     def test_localizable_node_exception(self):
-        with self.assertRaises(NonLocalizableNodeException) as context:
+        with self.assertRaises(NonLocalizableNodeException):
             OperationalNode(3)
 
     def test_temporal_node_exception(self):
-        with self.assertRaises(NonTemporalNodeException) as context:
+        with self.assertRaises(NonTemporalNodeException):
             OperationalNode(DeliveryOptionDistribution().choose_rand(Random(42))[0])
 
+    @unittest.skipIf(os.environ.get('NO_SLOW_TESTS', False), 'slow tests')
     def test_local_graph_generation_should_be_fully_connected(self):
         region_dataset = self.dr_dataset_local_region_1_morning
-        graph = OperationalGraph(self.zero_time)
+        graph = OperationalGraph()
         add_locally_connected_dr_graph(graph, region_dataset, max_cost_to_connect=self.radius_surrounding_region_1)
         num_nodes = len(graph.nodes)
         self.assertEqual(len(region_dataset), num_nodes)
         self.assertEqual((num_nodes * (num_nodes - 1)), len(graph.edges))
 
+    def test_graph_to_numpy_array(self):
+        delivery_requests = DeliveryRequestDistribution().choose_rand(random=Random(100), amount={DeliveryRequest: 2})
+        docks = DroneLoadingDockDistribution().choose_rand(random=Random(100), amount=1)
+        cost_dock_to_dr_1 = 2
+        cost_dock_to_dr_2 = 3
+        graph = OperationalGraph()
+        graph.add_drone_loading_docks(docks)
+        graph.add_delivery_requests(delivery_requests)
+        edges = [OperationalEdge(OperationalNode(docks[0]), OperationalNode(delivery_requests[0]),
+                                 OperationalEdgeAttribs(cost=cost_dock_to_dr_1)),
+                 OperationalEdge(OperationalNode(delivery_requests[0]), OperationalNode(docks[0]),
+                                 OperationalEdgeAttribs(cost=cost_dock_to_dr_1)),
+                 OperationalEdge(OperationalNode(docks[0]), OperationalNode(delivery_requests[1]),
+                                 OperationalEdgeAttribs(cost=cost_dock_to_dr_2)),
+                 OperationalEdge(OperationalNode(delivery_requests[1]), OperationalNode(docks[0]),
+                                 OperationalEdgeAttribs(cost=cost_dock_to_dr_2))
+                 ]
+        graph.add_operational_edges(edges)
+        nonedge = 10000
+        expected_numpy_array = np.array([[0, cost_dock_to_dr_1, cost_dock_to_dr_2],
+                                         [cost_dock_to_dr_1, 0, nonedge],
+                                         [cost_dock_to_dr_2, nonedge, 0]])
+        actual_numpy_array = graph.to_numpy_array(nonedge=nonedge, dtype=int)
+        assert_array_equal(expected_numpy_array, actual_numpy_array)
+
+    @unittest.skipIf(os.environ.get('NO_SLOW_TESTS', False), 'slow tests')
     def test_local_graph_generation_two_separate_spatial_cliques(self):
         region_dataset = self.dr_dataset_local_region_1_morning + self.dr_dataset_local_region_2_morning
-        graph = OperationalGraph(self.zero_time)
+        graph = OperationalGraph()
         add_locally_connected_dr_graph(graph, region_dataset, max_cost_to_connect=self.radius_surrounding_region_1)
         num_nodes_in_graph = len(graph.nodes)
         self.assertEqual(len(region_dataset), num_nodes_in_graph)
         self.assertEqual(2 * (num_nodes_in_graph / 2 * (num_nodes_in_graph / 2 - 1)), len(graph.edges))
 
+    @unittest.skipIf(os.environ.get('NO_SLOW_TESTS', False), 'slow tests')
     def test_local_graph_generation_two_separate_temporal_cliques(self):
         region_dataset = self.dr_dataset_local_region_2_afternoon + self.dr_dataset_local_region_2_morning
-        graph = OperationalGraph(self.zero_time)
+        graph = OperationalGraph()
         add_locally_connected_dr_graph(graph, region_dataset, max_cost_to_connect=self.radius_surrounding_region_1)
         num_nodes = len(graph.nodes)
         self.assertEqual(len(region_dataset), num_nodes)
         self.assertEqual(2 * (num_nodes / 2 * (num_nodes / 2 - 1)), len(graph.edges))
 
+    @unittest.skipIf(os.environ.get('NO_SLOW_TESTS', False), 'slow tests')
     def test_add_full_connection_between_loading_docks_and_delivery_requests(self):
         regional_dr_dataset = self.dr_dataset_local_region_2_afternoon
-        graph = OperationalGraph(self.zero_time)
+        graph = OperationalGraph()
         graph.add_delivery_requests(regional_dr_dataset)
         dld_dataset = create_loading_dock_afternoon_distribution()
         add_fully_connected_loading_docks(graph, dld_dataset)
@@ -84,7 +122,7 @@ class BasicDeliveryRequestGraphTestCases(unittest.TestCase):
 
     def test_no_connection_between_dlds_and_drs_due_to_temporal_constraints(self):
         regional_dr_dataset = self.dr_dataset_local_region_1_morning
-        graph = OperationalGraph(self.zero_time)
+        graph = OperationalGraph()
         graph.add_delivery_requests(regional_dr_dataset)
         dld_dataset = create_loading_dock_afternoon_distribution()
         add_fully_connected_loading_docks(graph, dld_dataset)
@@ -92,7 +130,7 @@ class BasicDeliveryRequestGraphTestCases(unittest.TestCase):
         self.assertEqual(0, len(graph.edges))
 
     def test_delivery_request_graph_creation(self):
-        drg = OperationalGraph(self.zero_time)
+        drg = OperationalGraph()
         drg.add_delivery_requests(self.dr_dataset_morning)
         drg.add_delivery_requests(self.dr_dataset_afternoon)
         drg.add_drone_loading_docks(self.dld_dataset_random)
@@ -100,7 +138,7 @@ class BasicDeliveryRequestGraphTestCases(unittest.TestCase):
                          + list(self.dld_dataset_random))
 
     def test_graph_creation_with_edges(self):
-        drg = OperationalGraph(self.zero_time)
+        drg = OperationalGraph()
         drg.add_delivery_requests(self.dr_dataset_morning)
         drg.add_drone_loading_docks(self.dld_dataset_random)
         edges = []
@@ -119,26 +157,26 @@ class BasicDeliveryRequestGraphTestCases(unittest.TestCase):
         self.assertEqual(returned_edges[6].end_node, edges[6].end_node)
 
     def test_drone_loading_dock_set_internal_graph(self):
-        drg1 = OperationalGraph(self.zero_time)
+        drg1 = OperationalGraph()
         drg1.add_drone_loading_docks(self.dld_dataset_random)
-        drg2 = OperationalGraph(self.zero_time)
-        drg2.set_internal_graph(drg1.internal_graph)
+        drg2 = OperationalGraph()
+        drg2.set_internal_graph(drg1.get_internal_graph())
         self.assertFalse(drg1.is_empty())
         self.assertEqual(_get_dr_from_dr_graph(drg1), _get_dr_from_dr_graph(drg2))
 
     def test_delivery_request_set_internal_graph(self):
-        drg1 = OperationalGraph(self.zero_time)
+        drg1 = OperationalGraph()
         drg1.add_delivery_requests(self.dr_dataset_random)
-        drg2 = OperationalGraph(self.zero_time)
-        drg2.set_internal_graph(drg1.internal_graph)
+        drg2 = OperationalGraph()
+        drg2.set_internal_graph(drg1.get_internal_graph())
         self.assertFalse(drg1.is_empty())
         self.assertEqual(_get_dr_from_dr_graph(drg1), _get_dr_from_dr_graph(drg2))
 
     def test_calc_subgraph_in_time_window(self):
-        drg_full_day = OperationalGraph(self.zero_time)
+        drg_full_day = OperationalGraph()
         drg_full_day.add_delivery_requests(self.dr_dataset_morning)
         drg_full_day.add_delivery_requests(self.dr_dataset_afternoon)
-        drg_morning_subgraph_of_full_day = OperationalGraph(self.zero_time)
+        drg_morning_subgraph_of_full_day = OperationalGraph()
         drg_morning_subgraph_of_full_day.add_delivery_requests(self.dr_dataset_morning)
         morning_time_window = TimeWindowExtension(
             since=DateTimeExtension(date(2021, 1, 1), time(6, 0, 0)),
@@ -150,10 +188,10 @@ class BasicDeliveryRequestGraphTestCases(unittest.TestCase):
         self.assertEqual(nodes_in_time_window_subgraph, node_in_time_window_morning_graph)
 
     def test_calc_subgraph_below_priority(self):
-        drg_full_day = OperationalGraph(self.zero_time)
+        drg_full_day = OperationalGraph()
         drg_full_day.add_delivery_requests(self.dr_dataset_top_priority)
         drg_full_day.add_delivery_requests(self.dr_dataset_low_priority)
-        drg_low_priority_subgraph_of_full_day = OperationalGraph(self.zero_time)
+        drg_low_priority_subgraph_of_full_day = OperationalGraph()
         drg_low_priority_subgraph_of_full_day.add_delivery_requests(self.dr_dataset_low_priority)
         max_priority = 10
         calculated_subgraph_below_max_priority = drg_full_day.calc_subgraph_below_priority(max_priority)
@@ -162,9 +200,10 @@ class BasicDeliveryRequestGraphTestCases(unittest.TestCase):
         node_in_low_priority_graph = _get_dr_from_dr_graph(drg_low_priority_subgraph_of_full_day)
         self.assertEqual(nodes_in_low_priority_subgraph, node_in_low_priority_graph)
 
+    @unittest.skipIf(os.environ.get('NO_SLOW_TESTS', False), 'slow tests')
     def test_sub_graph_within_polygon(self):
         region_dataset = self.dr_dataset_local_region_1_morning + self.dr_dataset_local_region_2_morning
-        graph = OperationalGraph(self.zero_time)
+        graph = OperationalGraph()
         add_locally_connected_dr_graph(graph, region_dataset, max_cost_to_connect=self.radius_surrounding_region_1)
         region_1_polygon = create_polygon_2d([create_point_2d(100, 50), create_point_2d(100, 150),
                                               create_point_2d(200, 150), create_point_2d(200, 50)])
@@ -174,6 +213,64 @@ class BasicDeliveryRequestGraphTestCases(unittest.TestCase):
         expected_nodes_in_region_1 = num_nodes_in_all_regions / 2
         self.assertEqual(expected_nodes_in_region_1, num_nodes_in_region_1_subgraph)
         self.assertEqual(expected_nodes_in_region_1 * (expected_nodes_in_region_1 - 1), len(subgraph_in_region_1.edges))
+
+    def test_grouped_graph_generation_one_zone_with_overlap_tw(self):
+
+        region_dataset = self.dr_dataset_local_region_1_morning
+        dld_dataset = create_loading_dock_morning_distribution()
+        deliveries_zones = [create_deliveries_zones()[0]]
+        graph = create_grouped_dr_graph(region_dataset, dld_dataset, deliveries_zones)
+
+        expected_delivery_requests_groups = list(itertools.chain.from_iterable((
+            map(lambda item: list(grouping_delivery_requests(item[1]).values()),
+                sort_delivery_requests_by_zone(region_dataset, deliveries_zones).items()))))
+
+        expected_num_edge_in_graph = 2 * \
+                                     (sum([sum(range(0, len(drs))) for drs in expected_delivery_requests_groups]) + len(
+                                         region_dataset))
+
+        num_nodes_in_graph = len(graph.nodes)
+        self.assertEqual(len(region_dataset) + len(dld_dataset), num_nodes_in_graph)
+        self.assertEqual(expected_num_edge_in_graph, len(graph.edges))
+
+    def test_grouped_graph_generation_one_zone_partial_overlap_tw(self):
+        region_dataset = self.dr_dataset_local_region_2_afternoon + self.dr_dataset_local_region_2_morning
+
+        dld_dataset = [create_loading_dock_morning_distribution()[0], create_loading_dock_afternoon_distribution()[0]]
+        deliveries_zones = [create_deliveries_zones()[1]]
+        graph = create_grouped_dr_graph(region_dataset, dld_dataset, deliveries_zones)
+
+        num_nodes_in_graph = len(graph.nodes)
+        self.assertEqual(len(region_dataset) + len(dld_dataset), num_nodes_in_graph)
+        self.assertEqual(2 * len(region_dataset) + 4, len(graph.edges))
+
+    def test_grouped_graph_generation_two_zones_with_overlap_tw(self):
+
+        region_dataset = self.dr_dataset_local_region_1_morning + self.dr_dataset_local_region_2_morning
+        dld_dataset = create_loading_dock_morning_distribution()
+        deliveries_zones = create_deliveries_zones()
+        graph = create_grouped_dr_graph(region_dataset, dld_dataset, deliveries_zones)
+
+        expected_delivery_requests_groups = list(itertools.chain.from_iterable((
+            map(lambda item: list(grouping_delivery_requests(item[1]).values()),
+                sort_delivery_requests_by_zone(region_dataset, deliveries_zones).items()))))
+
+        expected_num_edge_in_graph = 2 * \
+                                     (sum([sum(range(0, len(drs))) for drs in expected_delivery_requests_groups]) + len(
+                                         region_dataset))
+
+        num_nodes_in_graph = len(graph.nodes)
+        self.assertEqual(len(region_dataset) + len(dld_dataset), num_nodes_in_graph)
+        self.assertEqual(expected_num_edge_in_graph, len(graph.edges))
+
+
+def create_deliveries_zones() -> List[Polygon2D]:
+    return [
+        create_polygon_2d([create_point_2d(100, 50), create_point_2d(100, 150), create_point_2d(200, 150),
+                           create_point_2d(200, 50)]),
+        create_polygon_2d([create_point_2d(1100, 150), create_point_2d(1100, 1150), create_point_2d(1200, 1150),
+                           create_point_2d(1200, 150)]),
+    ]
 
 
 def create_local_data_in_region_1_morning() -> [DeliveryRequest]:
@@ -192,6 +289,10 @@ def create_local_data_in_region_2_morning() -> [DeliveryRequest]:
 
 def create_loading_dock_afternoon_distribution() -> [DroneLoadingDock]:
     return _create_loading_dock_afternoon_distribution().choose_rand(random=Random(42), amount=10)
+
+
+def create_loading_dock_morning_distribution() -> [DroneLoadingDock]:
+    return _create_loading_dock_morning_distribution().choose_rand(random=Random(42))
 
 
 def create_local_data_in_region_2_afternoon() -> [DeliveryRequest]:
@@ -261,7 +362,8 @@ def _create_region_1_morning_dr_distribution() -> DeliveryRequestDistribution:
 
 def _create_region_2_morning_dr_distribution() -> DeliveryRequestDistribution:
     return build_delivery_request_distribution(
-        relative_pdp_location_distribution=UniformPointInBboxDistribution(min_x=1100, max_x=1200, min_y=150, max_y=1150),
+        relative_pdp_location_distribution=UniformPointInBboxDistribution(min_x=1100, max_x=1200, min_y=150,
+                                                                          max_y=1150),
         time_window_distribution=TimeWindowDistribution(
             start_time_distribution=DateTimeDistribution([DateTimeExtension(date(2021, 1, 1), time(6, 0, 0))]),
             time_delta_distribution=TimeDeltaDistribution([TimeDeltaExtension(timedelta(hours=3, minutes=30))])))
@@ -269,7 +371,8 @@ def _create_region_2_morning_dr_distribution() -> DeliveryRequestDistribution:
 
 def _create_region_2_afternoon_dr_distribution() -> DeliveryRequestDistribution:
     return build_delivery_request_distribution(
-        relative_pdp_location_distribution=UniformPointInBboxDistribution(min_x=1100, max_x=1200, min_y=150, max_y=1150),
+        relative_pdp_location_distribution=UniformPointInBboxDistribution(min_x=1100, max_x=1200, min_y=150,
+                                                                          max_y=1150),
         time_window_distribution=TimeWindowDistribution(
             start_time_distribution=DateTimeDistribution([DateTimeExtension(date(2021, 1, 1), time(16, 30, 0))]),
             time_delta_distribution=TimeDeltaDistribution([TimeDeltaExtension(timedelta(hours=1, minutes=30))])))
@@ -280,3 +383,10 @@ def _create_loading_dock_afternoon_distribution() -> DroneLoadingDockDistributio
         time_window_distributions=TimeWindowDistribution(
             start_time_distribution=DateTimeDistribution([DateTimeExtension(date(2021, 1, 1), time(16, 30, 0))]),
             time_delta_distribution=TimeDeltaDistribution([TimeDeltaExtension(timedelta(hours=1, minutes=30))])))
+
+
+def _create_loading_dock_morning_distribution() -> DroneLoadingDockDistribution:
+    return DroneLoadingDockDistribution(
+        time_window_distributions=TimeWindowDistribution(
+            start_time_distribution=DateTimeDistribution([DateTimeExtension(date(2021, 1, 1), time(6, 0, 0))]),
+            time_delta_distribution=TimeDeltaDistribution([TimeDeltaExtension(timedelta(hours=4, minutes=30))])))

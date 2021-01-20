@@ -3,7 +3,7 @@ from enum import IntEnum
 from functools import lru_cache
 
 from common.entities.base_entities.drone import DroneConfiguration, PlatformType, Configurations, \
-    DroneConfigurations, PackageTypesVolumeMap
+    DroneConfigurations, PackageTypeAmountMap
 from common.entities.base_entities.package import PackageType
 
 
@@ -26,40 +26,39 @@ class DroneFormation:
     def drone_configuration(self) -> DroneConfiguration:
         return self._drone_configuration
 
+    @property
+    @lru_cache()
+    def max_route_times_in_minutes(self) -> int:
+        # TODO: Change to real endurance
+        return self.get_platform_type().value * 100
+
     def get_platform_type(self) -> PlatformType:
         return self._drone_configuration.get_platform_type()
 
     def get_package_types(self) -> [PackageType]:
         return self._drone_configuration.package_type_map.get_package_types()
 
-    def get_package_type_volume(self, package_type: PackageType) -> int:
-        return self.size * self._drone_configuration.package_type_map.get_package_type_volume(package_type)
+    def get_package_type_amount(self, package_type: PackageType) -> int:
+        return self.size * self._drone_configuration.package_type_map.get_package_type_amount(package_type)
 
-    def get_package_type_volumes(self) -> PackageTypesVolumeMap:
-        return PackageTypesVolumeMap(
-            list(map(lambda x: x * self._size, self._drone_configuration.package_type_map.get_package_types_volumes())))
+    def get_package_type_amount_map(self) -> PackageTypeAmountMap:
+        return PackageTypeAmountMap(
+            list(map(lambda configuration_amounts:
+                     configuration_amounts * self._size,
+                     self._drone_configuration.package_type_map.get_package_type_amounts())))
 
-    def get_package_type_formation(self) -> PackageType:
-        package_type_volumes = self._drone_configuration.package_type_map.get_package_types_volumes()
-        package_type_indexes = [pt_index for pt_index, pt_exist in enumerate(package_type_volumes) if pt_exist > 0]
-        if len(package_type_indexes) != 1:
-            raise TypeError(f"The drone formation should has only one package type")
-        return self.get_package_types()[package_type_indexes[0]]
+    def get_package_type(self) -> PackageType:
+        formation_package_type = None
+        package_type_amount_map = self._drone_configuration.package_type_map
+        for package_type in PackageType:
+            if package_type_amount_map.get_package_type_amount(package_type) > 0:
+                if formation_package_type is not None:
+                    raise TypeError(f"Drone formation supports only one package type")
+                formation_package_type = package_type
+        return formation_package_type
 
-    @property
-    @lru_cache()
-    def max_route_times_in_minutes(self) -> int:
-        # TODO: Change to real endurance
-        return 45 # self.get_platform_type().value * 15
-
-    @property
-    @lru_cache()
-    def velocity_meter_per_sec(self) -> float:
-        # TODO: Change to real velocity
-        return 10.0
-
-    def get_formation_max_range_in_meters(self) -> float:
-        return self.velocity_meter_per_sec*self.max_route_times_in_minutes*60.0
+    def __hash__(self):
+        return hash((self._size, self._drone_configuration))
 
 
 class AutoName(Enum):

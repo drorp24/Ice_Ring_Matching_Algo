@@ -4,34 +4,32 @@ from unittest import TestCase
 
 from common.entities.base_entities.base_entity import JsonableBaseEntity
 from common.entities.base_entities.temporal import DateTimeExtension
-from matching.matcher_config import MatcherConfigProperties, MatcherSolver, MatcherConstraints, \
-    PriorityConstraints, TimeConstraints, CapacityConstraints, MatcherConfig
+from matching.constraint_config import CapacityConstraints, TimeConstraints, PriorityConstraints
+from matching.matcher_config import ConstraintsConfig, MatcherConfig
+from matching.matcher_factory import SolverVendor
+from matching.ortools.ortools_solver_config import ORToolsSolverConfig
 
 
 class MatchConfigTestCase(TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.match_config_properties = MatcherConfigProperties(
+        cls.config_obj = MatcherConfig(
             zero_time=DateTimeExtension(dt_date=date(2020, 1, 23), dt_time=time(11, 30, 0)),
-            first_solution_strategy="or_tools:path_cheapest_arc",
-            solver=MatcherSolver(full_name="or_tools:automatic", timeout_sec=30),
-            match_constraints=MatcherConstraints(
+            solver=ORToolsSolverConfig(SolverVendor.OR_TOOLS, first_solution_strategy="path_cheapest_arc",
+                                local_search_strategy="automatic", timeout_sec=30),
+            constraints=ConstraintsConfig(
                 capacity_constraints=CapacityConstraints(count_capacity_from_zero=True),
                 time_constraints=TimeConstraints(max_waiting_time=10,
                                                  max_route_time=300,
                                                  count_time_from_zero=False),
                 priority_constraints=PriorityConstraints(True)),
-            dropped_penalty=5)
-
-        cls.config_obj = MatcherConfig(match_config_properties=cls.match_config_properties)
+            unmatched_penalty=5)
 
     def test_match_config_to_dict(self):
         config_dict = self.config_obj.__dict__()
-
         expected_config_obj = MatcherConfig.dict_to_obj(config_dict)
         expected_config_dict = expected_config_obj.__dict__()
-
         self.assertEqual(config_dict, expected_config_dict)
         self.assertEqual(self.config_obj, expected_config_obj)
 

@@ -2,8 +2,6 @@ from datetime import time, date, timedelta
 from pathlib import Path
 from random import Random
 
-from common.entities.base_entities.delivery_request import DeliveryRequest
-from common.entities.base_entities.drone_loading_dock import DroneLoadingDock
 from common.entities.base_entities.entity_distribution.delivery_requestion_dataset_builder import \
     build_delivery_request_distribution
 from common.entities.base_entities.entity_distribution.drone_loading_dock_distribution import \
@@ -18,10 +16,11 @@ from common.entities.base_entities.package import PackageType
 from common.entities.base_entities.temporal import DateTimeExtension, TimeDeltaExtension
 from common.tools.empty_drone_delivery_board_generation import build_empty_drone_delivery_board
 from common.tools.fleet_property_sets import *
-from end_to_end.minimum_end_to_end import MinimumEnd2End
-from end_to_end.scenario import ScenarioDistribution
+from end_to_end.distribution.scenario_distribution import ScenarioDistribution
+from end_to_end.minimum_end_to_end import *
 from geometry.distribution.geo_distribution import NormalPointDistribution, UniformPointInBboxDistribution
 from geometry.geo_factory import create_point_2d
+from matching.matcher_config import MatcherConfig
 from visualization.basic.drawer2d import Drawer2DCoordinateSys
 from visualization.basic.pltdrawer2d import create_drawer_2d
 from visualization.basic.pltgantt_drawer import create_gantt_drawer
@@ -83,7 +82,7 @@ def _create_empty_drone_delivery_board(
     return build_empty_drone_delivery_board(platform_property_set)
 
 
-class BasicMinimumEnd2EndExperiment():
+class BasicMinimumEnd2EndExperiment:
 
     def __init__(self):
         self.scenario_distribution = ScenarioDistribution(
@@ -103,32 +102,48 @@ class BasicMinimumEnd2EndExperiment():
         self.matcher_config = Path("end_to_end/tests/jsons/test_matcher_config.json")
 
     def test_small_scenario(self):
+        start_time = datetime.now()
         empty_drone_delivery_board = _create_empty_drone_delivery_board(size=20)
-        minimum_end_to_end = MinimumEnd2End(
-            scenario=self.scenario_distribution.choose_rand(random=Random(10), amount={DeliveryRequest: 37, DroneLoadingDock: 1})[0],
-            empty_drone_delivery_board=empty_drone_delivery_board)
-        fully_connected_graph = minimum_end_to_end.create_fully_connected_graph_model(factor=25.0)#(factor=90.0)
+        print("--- _create_empty_drone_delivery_board run time: %s  ---" % (datetime.now() - start_time))
+        start_time = datetime.now()
 
-        delivery_board = minimum_end_to_end.calc_assignment(fully_connected_graph, self.matcher_config)
+        scenario = self.scenario_distribution.choose_rand(random=Random(10),
+                                                          amount={DeliveryRequest: 37, DroneLoadingDock: 1})
+        fully_connected_graph = create_fully_connected_graph_model(scenario, factor=25.0)#(factor=90.0))
+        print("--- create_fully_connected_graph_model run time: %s  ---" % (datetime.now() - start_time))
+        start_time = datetime.now()
+
+        match_config = MatcherConfig.dict_to_obj(
+            MatcherConfig.json_to_dict('end_to_end/tests/jsons/test_matcher_config.json'))
+        matcher_input = MatcherInput(graph=fully_connected_graph, empty_board=empty_drone_delivery_board,
+                                     config=match_config)
+
+        delivery_board = calc_assignment(matcher_input=matcher_input)
+        print("--- calc_assignment run time: %s  ---" % (datetime.now() - start_time))
+
         print(delivery_board)
 
+        self._draw_matched_scenario(delivery_board, fully_connected_graph, scenario)
+
+    @staticmethod
+    def _draw_matched_scenario(delivery_board, fully_connected_graph, scenario):
         dr_drawer = create_drawer_2d(Drawer2DCoordinateSys.GEOGRAPHIC)
-        operational_drawer2d.add_operational_graph(dr_drawer, fully_connected_graph,draw_internal=True, draw_edges=False)
+        operational_drawer2d.add_operational_graph(dr_drawer, fully_connected_graph, draw_internal=True,
+                                                   draw_edges=False)
         dr_drawer.draw(False)
-
         board_map_drawer = create_drawer_2d(Drawer2DCoordinateSys.GEOGRAPHIC)
-        operational_drawer2d.add_delivery_board(board_map_drawer, delivery_board, draw_dropped=True)
+        operational_drawer2d.add_delivery_board(board_map_drawer, delivery_board, draw_unmatched=True)
         board_map_drawer.draw(False)
-
-        row_names = ["Dropped Out"] + \
+        row_names = ["Unmatched Out"] + \
                     ["[" + str(delivery.drone_formation.size.value) + "] * " +
-                     str(delivery.drone_formation.drone_configuration.package_type_map.get_package_types_volumes())
+                     str(delivery.drone_formation.drone_configuration.package_type_map.get_package_type_amounts())
                      for delivery in delivery_board.drone_deliveries]
-        board_gantt_drawer = create_gantt_drawer(zero_time=DateTimeExtension.from_dt(fully_connected_graph.zero_time),
-                                     hours_period=24,
-                                     row_names=row_names,
-                                     rows_title='Carried Package types: [Formation Size] * ' + str(PackageType.get_all_names())
-                                     )
+        board_gantt_drawer = create_gantt_drawer(zero_time=scenario.zero_time,
+                                                 hours_period=24,
+                                                 row_names=row_names,
+                                                 rows_title='Carried Package types: [Formation Size] * ' + str(
+                                                     [package_type.name for package_type in PackageType])
+                                                 )
         operational_gantt_drawer.add_delivery_board(board_gantt_drawer, delivery_board, True)
         board_gantt_drawer.draw(True)
 

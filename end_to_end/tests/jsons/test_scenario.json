@@ -923,11 +923,7 @@
           "y": 47.933356530527135
         }
       },
-      "platform_type": {
-        "__class__": "PlatformType",
-        "name": "platform_2",
-        "value": 6
-      },
+      "platform_type": {"__enum__": "PlatformType.platform_2"},
       "priority": 0,
       "time_window": {
         "__class__": "TimeWindowExtension",

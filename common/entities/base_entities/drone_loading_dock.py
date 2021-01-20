@@ -38,6 +38,15 @@ class DroneLoadingDock(JsonableBaseEntity, Localizable, Temporal):
     def calc_location(self) -> Point2D:
         return self.drone_loading_station.location
 
+    @classmethod
+    def dict_to_obj(cls, dict_input):
+        assert (dict_input['__class__'] == cls.__name__)
+        return DroneLoadingDock(
+            drone_loading_station=DroneLoadingStation.dict_to_obj(dict_input['drone_loading_station']),
+            platform_type=PlatformType.dict_to_obj(dict_input['platform_type']),
+            time_window=TimeWindowExtension.dict_to_obj(dict_input['time_window'])
+        )
+
     def __eq__(self, other):
         return self.__class__ == other.__class__ and \
                self.time_window == other.time_window and \

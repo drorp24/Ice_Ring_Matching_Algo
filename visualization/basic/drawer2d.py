@@ -3,6 +3,8 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from enum import Enum, auto
 
+from pathlib2 import Path
+
 from geometry.geo2d import Point2D, Polygon2D, LineString2D, LinearRing2D
 from visualization.basic.color import Color
 
@@ -43,7 +45,11 @@ class Drawer2D(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def add_legend(self, new_labels: [str] = [], new_label_colors: [Color] = [], fontsize: int = 10) -> None:
+    def add_legend(self, new_labels: [str] = None, new_label_colors: [Color] = None, fontsize: int = 10) -> None:
+        raise NotImplementedError
+
+    @abstractmethod
+    def save_plot_to_png(self, file_name: Path) -> None:
         raise NotImplementedError
 
     @abstractmethod

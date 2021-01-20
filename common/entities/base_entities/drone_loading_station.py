@@ -20,4 +20,5 @@ class DroneLoadingStation(JsonableBaseEntity):
 
     @classmethod
     def dict_to_obj(cls, dict_input):
+        assert (dict_input['__class__'] == cls.__name__)
         return DroneLoadingStation(location=convert_dict_to_point_2d(dict_input['location']))

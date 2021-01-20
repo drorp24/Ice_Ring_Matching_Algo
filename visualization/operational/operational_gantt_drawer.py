@@ -16,35 +16,35 @@ def generate_matched_request_bar_colors() -> [Color]:
     return matched_request_bar_colors
 
 
-DROPPED_ROW_NUMBER = 1
+UNMATCHED_ROW_NUMBER = 1
 MATCHED_REQUEST_BAR_COLORS = generate_matched_request_bar_colors()
 OPERATING_TIME_WINDOW_COLOR = Color.Red
 
 
-def add_delivery_board(drawer: GanttDrawer, board: DroneDeliveryBoard, draw_dropped=True):
+def add_delivery_board(drawer: GanttDrawer, board: DroneDeliveryBoard, draw_unmatched=True):
     for i, delivery in enumerate(board.drone_deliveries):
-        delivery_row = i + 1 + DROPPED_ROW_NUMBER
+        delivery_row = i + 1 + UNMATCHED_ROW_NUMBER
         if len(delivery.matched_requests) is 0:
             continue
         drawer.add_row_area(
             row=delivery_row,
-            time_window=TimeWindowExtension(delivery.start_drone_loading_docks.delivery_min_time,
-                                            delivery.end_drone_loading_docks.delivery_min_time),
+            time_window=TimeWindowExtension(delivery.start_drone_loading_docks.delivery_time_window.since,
+                                            delivery.end_drone_loading_docks.delivery_time_window.since),
             edgecolor=OPERATING_TIME_WINDOW_COLOR)
         for request in delivery.matched_requests:
             drawer.add_bar(
                 row=delivery_row,
                 time_window=request.delivery_request.time_window,
                 name=str(request.graph_index),
-                time_mark=request.delivery_min_time,
+                time_mark=request.delivery_time_window.since,
                 side_text=str(request.delivery_request.priority),
                 color=MATCHED_REQUEST_BAR_COLORS[request.graph_index % len(MATCHED_REQUEST_BAR_COLORS)])
-    if draw_dropped:
-        for i, dropped in enumerate(board.dropped_delivery_requests):
+    if draw_unmatched:
+        for i, unmatched in enumerate(board.unmatched_delivery_requests):
             drawer.add_bar(
-                row=DROPPED_ROW_NUMBER,
-                time_window=dropped.delivery_request.time_window,
-                name="dropped" + str(i),
+                row=UNMATCHED_ROW_NUMBER,
+                time_window=unmatched.delivery_request.time_window,
+                name="unmatched" + str(i),
                 time_mark=None,
-                side_text=str(dropped.delivery_request.priority),
+                side_text=str(unmatched.delivery_request.priority),
                 color=Color.Red)

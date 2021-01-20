@@ -107,7 +107,7 @@ class DateTimeExtension(BaseEntity):
         return val
 
     def __hash__(self):
-        return hash(self.get_internal)
+        return self.get_internal().__hash__()
 
     def to_dict(self) -> Dict:
         date_dict = DateTimeExtension.extract_date_dict_from_datetime(self.get_internal())

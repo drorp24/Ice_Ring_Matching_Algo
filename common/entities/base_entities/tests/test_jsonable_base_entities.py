@@ -45,7 +45,6 @@ class BasicJsonableBaseEntitiesTests(unittest.TestCase):
 
     def test_cd_to_json(self):
         cd_json_path = 'common/entities/base_entities/tests/jsons/cd_test_file.json'
-        cd_json_path = 'common/entities/base_entities/tests/jsons/cd_test_file.json'
         self.cd1.to_json(cd_json_path)
         cd_dict = JsonableBaseEntity.json_to_dict(cd_json_path)
         self.assertEqual(self.cd1, CustomerDelivery.dict_to_obj(cd_dict))

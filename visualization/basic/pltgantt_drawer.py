@@ -119,30 +119,3 @@ class PltGanttDrawer(GanttDrawer):
         y = row_height + bar_height_in_row + bar_center
         self._counters[row - 1] = (self._counters[row - 1] + 1) % BARS_IN_ROW
         return y
-
-# zero_time = DateTimeExtension.from_dt(datetime(2020, 1, 23, 0, 00, 00))
-# hours_period = 24
-# row_names = ['row1', 'row2', 'row3', 'row4', 'row5']
-# drawer = create_gantt_drawer(zero_time=zero_time, hours_period=hours_period, row_names=row_names)
-# tw1 = TimeWindowExtension(
-#     since=DateTimeExtension.from_dt(datetime(2020, 1, 23, 13, 30, 00)),
-#     until=DateTimeExtension.from_dt(datetime(2020, 1, 23, 16, 00, 00)))
-# drawer.add_bar(row=1, time_window=tw1, name='x1',
-#                time_mark=DateTimeExtension.from_dt(datetime(2020, 1, 23, 14, 30, 00)), color=Color.Blue)
-# tw2 = TimeWindowExtension(
-#     since=DateTimeExtension.from_dt(datetime(2020, 1, 23, 15, 30, 00)),
-#     until=DateTimeExtension.from_dt(datetime(2020, 1, 23, 18, 00, 00)))
-# drawer.add_bar(row=1, time_window=tw1, name='x2', color=Color.Green)
-# drawer.add_bar(row=1, time_window=tw1, name='x3', color=Color.Yellow)
-# drawer.add_bar(row=1, time_window=tw1, name='x4', color=Color.Purple)
-# drawer.add_bar(row=1, time_window=tw1, name='x5', color=Color.Red)
-# drawer.add_bar(row=2, time_window=tw1, name='x6', color=Color.Aquamarine)
-# drawer.add_bar(row=2, time_window=tw1, name='x7', color=Color.Brown)
-# drawer.add_bar(row=2, time_window=tw2, name='x8',
-#                time_mark=DateTimeExtension.from_dt(datetime(2020, 1, 23, 17, 30, 00)), color=Color.Cyan)
-# drawer.add_bar(row=2, time_window=tw1, name='x9', color=Color.DarkTurquoise)
-# drawer.add_bar(row=3, time_window=tw1, name='x10', color=Color.Grey)
-# drawer.add_bar(row=3, time_window=tw1, name='x11', color=Color.Indigo)
-# drawer.add_bar(row=4, time_window=tw2, name='x12', color=Color.Pink)
-# drawer.add_bar(row=5, time_window=tw2, name='x13', color=Color.Lime)
-# drawer.draw()

@@ -6,6 +6,7 @@ from uuid import UUID
 
 from common.entities.base_entities.entity_distribution.package_distribution import PackageDistribution, \
     ExactPackageDistribution
+from common.entities.base_entities.entity_id import EntityID
 from common.entities.base_entities.package import PackageType
 from common.entities.base_entities.package_delivery_plan import PackageDeliveryPlan
 from common.entities.distribution.test.test_distribution import assert_samples_approx_expected
@@ -24,14 +25,14 @@ class BasicPackageTestCase(unittest.TestCase):
         cls.p3 = PackageType.MEDIUM
         cls.p4 = PackageType.LARGE
         point = create_point_2d(1, 2)
-        cls.id_test_1 = UUID(int=42)
+        cls.id_test_1 = EntityID(UUID(int=42))
         cls.pdp_1 = PackageDeliveryPlan(id=cls.id_test_1,
                                         drop_point=point,
                                         azimuth=Angle(30, AngleUnit.DEGREE),
                                         pitch=Angle(80, AngleUnit.DEGREE),
                                         package_type=PackageType.TINY)
 
-        cls.id_test_2 = UUID(int=43)
+        cls.id_test_2 = EntityID(UUID(int=43))
         cls.pdp_2 = PackageDeliveryPlan(id=cls.id_test_2,
                                         drop_point=point,
                                         azimuth=Angle(40, AngleUnit.DEGREE),
@@ -169,9 +170,8 @@ class BasicPackageGeneration(unittest.TestCase):
                          PackageType.SMALL.name: 0.33,
                          PackageType.MEDIUM.name: 0.0,
                          PackageType.LARGE.name: 0.0}
-
-        for package in PackageType.get_all_names():
-            assert_samples_approx_expected(self, package, expected_prob, sample_count)
+        for package in PackageType:
+            assert_samples_approx_expected(self, package.name, expected_prob, sample_count)
 
     def test_exact_package_distribution(self):
         expected_pt_1 = PackageType.TINY
@@ -185,6 +185,3 @@ class BasicPackageGeneration(unittest.TestCase):
         self.assertEqual([expected_pt_1], actual_pt_1)
         self.assertEqual([expected_pt_2, expected_pt_3], actual_pt_2_3)
         self.assertRaises(RuntimeError, exact_pt_dist.choose_rand, (Random(42), 1))
-
-    def print_example_package(self):
-        pprint(PackageType.TINY)
