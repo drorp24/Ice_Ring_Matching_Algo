@@ -18,8 +18,8 @@ class ConfigurationAttributionParameters:
     drone_type: DroneType
 
     formation_types: [DroneFormationType]
-    formation_sizes: [int]
-    formation_amounts: [int]
+    formation_types_sizes: [int]
+    amount_per_formation_type: [int]
 
     configurations: []
     configuration_options_size: int
@@ -42,8 +42,8 @@ class FleetConfigurationAttribution:
         cls.attribution_config.drone_type = drone_set_properties.drone_type
 
         cls.attribution_config.formation_types = formation_type_amounts.get_formation_types()
-        cls.attribution_config.formation_sizes = formation_type_amounts.get_drone_amounts()
-        cls.attribution_config.formation_amounts = formation_type_amounts.get_formation_amounts()
+        cls.attribution_config.formation_types_sizes = formation_type_amounts.get_drone_amounts()
+        cls.attribution_config.amount_per_formation_type = formation_type_amounts.get_formation_amounts()
         cls.attribution_config.total_formation_size = formation_type_amounts.get_total_formation_amount()
 
         policy = drone_set_properties.package_configuration_policy
@@ -58,7 +58,7 @@ class FleetConfigurationAttribution:
 
     @classmethod
     def _calc_number_variables(cls) -> int:
-        return int(sum(cls.attribution_config.formation_amounts) *
+        return int(sum(cls.attribution_config.amount_per_formation_type) *
                    cls.attribution_config.configuration_options_size)
 
     @classmethod
@@ -81,8 +81,8 @@ class FleetConfigurationAttribution:
     def _calc_configuration_policy_constraints(cls) -> Any:
         num_vars = cls._calc_number_variables()
         configuration_options_size = cls.attribution_config.configuration_options_size
-        formation_amounts = cls.attribution_config.formation_amounts
-        formation_sizes = cls.attribution_config.formation_sizes
+        formation_amounts = cls.attribution_config.amount_per_formation_type
+        formation_sizes = cls.attribution_config.formation_types_sizes
         return FleetConfigurationAttribution._calc_constraints_coefficients(configuration_options_size,
                                                                             formation_amounts,
                                                                             formation_sizes,
@@ -108,8 +108,8 @@ class FleetConfigurationAttribution:
     def _calc_objective_coefficients(cls) -> Any:
         num_vars = cls._calc_number_variables()
         configuration_options_size = cls.attribution_config.configuration_options_size
-        formation_amounts = cls.attribution_config.formation_amounts
-        formation_sizes = cls.attribution_config.formation_sizes
+        formation_amounts = cls.attribution_config.amount_per_formation_type
+        formation_sizes = cls.attribution_config.formation_types_sizes
         constraints_coefficients = np.zeros(num_vars)
         for i in range(len(formation_amounts)):
             constraints_coefficients[int(i * formation_amounts[i] * configuration_options_size):
@@ -129,7 +129,7 @@ class FleetConfigurationAttribution:
 
     @classmethod
     def _get_formation_size_type(cls, index: int) -> DroneFormationType:
-        intervals = cls._calc_formation_amounts_intervals(cls.attribution_config.formation_amounts)
+        intervals = cls._calc_formation_amounts_intervals(cls.attribution_config.amount_per_formation_type)
         for interval in intervals:
             if index in interval:
                 formation_size_idx = intervals.index(interval)

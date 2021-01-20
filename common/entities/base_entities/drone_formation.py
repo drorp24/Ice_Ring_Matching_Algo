@@ -1,3 +1,4 @@
+from __future__ import annotations
 from enum import Enum, auto
 from functools import lru_cache
 
@@ -56,8 +57,9 @@ class DroneFormation:
     def get_package_type_amount_map(self) -> PackageTypeAmountMap:
         amount_per_package_type = PackageTypeAmountMap({package: 0 for package in PackageType})
         extracted_package_type_amounts = PackageTypeAmountMap({
-            package_type_name : package_amount * self.drone_formation_type.get_amount_of_drones() for
-            package_type_name, package_amount in self._package_configuration.package_type_map.package_type_to_amounts.items()})
+            package_type_name: package_amount * self.drone_formation_type.get_amount_of_drones() for
+            package_type_name, package_amount in
+            self._package_configuration.package_type_map.package_type_to_amounts.items()})
         amount_per_package_type.add_to_map(extracted_package_type_amounts)
         return amount_per_package_type
 
@@ -115,12 +117,13 @@ class DroneTypeToPackageConfigurationOption:
         for drone_configuration in drone_configurations:
             if drone_configuration.get_drone_type() == platform_type:
                 return drone_configuration
+        raise NoDronePackageConfigurationFoundException()
 
     @classmethod
-    def get_drone_formation(cls, formation_size: DroneFormationType, formation_option: PackageConfigurationOption,
+    def get_drone_formation(cls, formation_type: DroneFormationType, formation_option: PackageConfigurationOption,
                             platform_type: DroneType) -> DroneFormation:
         drone_configuration = cls._get_drone_configuration(formation_option, platform_type)
-        return DroneFormation(formation_size, drone_configuration)
+        return DroneFormation(formation_type, drone_configuration)
 
     @classmethod
     def get_formation_option(cls, configuration: PackageConfiguration, platform_type: DroneType):
@@ -129,26 +132,19 @@ class DroneTypeToPackageConfigurationOption:
             for drone_conf in drone_configurations:
                 if drone_configuration == drone_conf:
                     return formation_option
+        raise NoFormationOptionFoundException()
 
 
 class DroneFormations:
     drone_formations_map: {PackageConfigurationOption: {DroneFormationType: {DroneType: DroneFormation}}} = {
-        formation_option: {
-            formation_size:
-                {
-                    platform_type:
-                        DroneTypeToPackageConfigurationOption.get_drone_formation(
-                            formation_size,
-                            formation_option,
-                            platform_type)
-                    for
-                    platform_type
-                    in
-                    DroneType}
-            for formation_size
-            in DroneFormationType}
-        for formation_option in
-        PackageConfigurationOption}
+        package_configuration_options: {
+            drone_formation_type: {
+                drone_type:
+                    DroneTypeToPackageConfigurationOption.get_drone_formation(
+                        drone_formation_type, package_configuration_options, drone_type)
+                for drone_type in DroneType}
+            for drone_formation_type in DroneFormationType}
+        for package_configuration_options in PackageConfigurationOption}
 
     @classmethod
     def get_drone_formation(cls, formation_type: DroneFormationType,
@@ -163,3 +159,11 @@ class DroneFormations:
             for formation_size in DroneFormationType:
                 formation_amounts[cls.drone_formations_map[formation_option][formation_size][platform_type]] = 0
         return formation_amounts
+
+
+class NoFormationOptionFoundException(Exception):
+    pass
+
+
+class NoDronePackageConfigurationFoundException(Exception):
+    pass
