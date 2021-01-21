@@ -132,21 +132,21 @@ class DroneTypeToPackageConfigurationOptions:
             cls.drone_configurations_map[key] = configuration_option[key]
 
     @classmethod
-    def get_drone_configuration(cls, platform_type: DroneType,
+    def get_drone_configuration(cls, drone_type: DroneType,
                                 configuration: PackageConfiguration) -> DronePackageConfiguration:
-        index = cls.drone_configurations_map[platform_type].index(configuration)
-        return DronePackageConfiguration(platform_type, cls.drone_configurations_map[platform_type][index].value)
+        index = cls.drone_configurations_map[drone_type].index(configuration)
+        return DronePackageConfiguration(drone_type, cls.drone_configurations_map[drone_type][index].value)
 
 
 class DroneConfigurations:
     drone_configurations_map: {DroneType: {PackageConfiguration: DronePackageConfiguration}} = \
-        {platform_type: {
-            configuration: DroneTypeToPackageConfigurationOptions.get_drone_configuration(platform_type, configuration)
+        {drone_type: {
+            configuration: DroneTypeToPackageConfigurationOptions.get_drone_configuration(drone_type, configuration)
             for configuration in configurations}
-            for platform_type, configurations in
+            for drone_type, configurations in
             DroneTypeToPackageConfigurationOptions.drone_configurations_map.items()}
 
     @classmethod
-    def get_drone_configuration(cls, platform_type: DroneType,
+    def get_drone_configuration(cls, drone_type: DroneType,
                                 configuration: PackageConfiguration) -> DronePackageConfiguration:
-        return cls.drone_configurations_map[platform_type][configuration]
+        return cls.drone_configurations_map[drone_type][configuration]

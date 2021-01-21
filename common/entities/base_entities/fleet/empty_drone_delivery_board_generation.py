@@ -10,20 +10,20 @@ from common.entities.base_entities.fleet.fleet_partition import FormationTypeAmo
 from common.entities.base_entities.fleet.fleet_property_sets import DroneSetProperties
 
 
-def _calc_formation_amounts(platform_property_set: DroneSetProperties) -> FormationTypeAmounts:
-    return FleetPartition(platform_property_set).solve()
+def _calc_formation_amounts(drone_set_properties: DroneSetProperties) -> FormationTypeAmounts:
+    return FleetPartition(drone_set_properties).solve()
 
 
 def _calc_drone_formation_amounts(formation_sizes_amounts: FormationTypeAmounts,
-                                  platform_properties: DroneSetProperties) -> DroneFormationsPerTypeAmounts:
-    FleetConfigurationAttribution.extract_parameters(formation_sizes_amounts, platform_properties)
+                                  drone_set_properties: DroneSetProperties) -> DroneFormationsPerTypeAmounts:
+    FleetConfigurationAttribution.extract_parameters(formation_sizes_amounts, drone_set_properties)
     return FleetConfigurationAttribution.solve()
 
 
-def calc_drone_deliveries(platform_properties: DroneSetProperties) -> [EmptyDroneDelivery]:
+def calc_drone_deliveries(drone_set_properties: DroneSetProperties) -> [EmptyDroneDelivery]:
     empty_deliveries = []
-    formation_type_amounts = _calc_formation_amounts(platform_properties)
-    drone_formations_per_type_amounts = _calc_drone_formation_amounts(formation_type_amounts, platform_properties)
+    formation_type_amounts = _calc_formation_amounts(drone_set_properties)
+    drone_formations_per_type_amounts = _calc_drone_formation_amounts(formation_type_amounts, drone_set_properties)
     for drone_formation, amount in drone_formations_per_type_amounts.amounts.items():
         for i in range(amount):
             empty_deliveries.append(EmptyDroneDelivery(EntityID(uuid.uuid4()), drone_formation))

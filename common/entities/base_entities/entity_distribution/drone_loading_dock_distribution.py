@@ -13,17 +13,17 @@ from geometry.geo2d import Point2D
 from geometry.geo_factory import create_point_2d
 
 DEFAULT_DRONE_LOADING_STATION_DISTRIBUTIONS = DroneLoadingStationDistribution()
-DEFAULT_PLATFORM_TYPE_DISTRIBUTIONS = DroneTypeDistribution()
+DEFAULT_DRONE_TYPE_DISTRIBUTIONS = DroneTypeDistribution()
 DEFAULT_TW_DLD_DISTRIB = create_default_time_window_for_drone_loading_dock()
 
 
 class DroneLoadingDockDistribution(Distribution):
 
     def __init__(self,
-                 platform_type_distribution: DroneTypeDistribution = DEFAULT_PLATFORM_TYPE_DISTRIBUTIONS,
+                 drone_type_distribution: DroneTypeDistribution = DEFAULT_DRONE_TYPE_DISTRIBUTIONS,
                  drone_loading_station_distributions: DroneLoadingStationDistribution = DEFAULT_DRONE_LOADING_STATION_DISTRIBUTIONS,
                  time_window_distributions: TimeWindowDistribution = DEFAULT_TW_DLD_DISTRIB):
-        self._platform_type_distributions = platform_type_distribution
+        self._drone_type_distributions = drone_type_distribution
         self._drone_loading_station_distributions = drone_loading_station_distributions
         self._time_window_distributions = time_window_distributions
 
@@ -36,9 +36,9 @@ class DroneLoadingDockDistribution(Distribution):
                                                                                        base_location=base_location,
                                                                                        amount=amount)
         time_windows = self._time_window_distributions.choose_rand(random=random, amount=amount)
-        platform_types = self._platform_type_distributions.choose_rand(random=random, amount=amount)
+        drone_types = self._drone_type_distributions.choose_rand(random=random, amount=amount)
         return [DroneLoadingDock(dl, pt, tw)
-                for (dl, pt, tw) in zip(drone_loading_stations, platform_types, time_windows)]
+                for (dl, pt, tw) in zip(drone_loading_stations, drone_types, time_windows)]
 
     @classmethod
     def distribution_class(cls) -> type:

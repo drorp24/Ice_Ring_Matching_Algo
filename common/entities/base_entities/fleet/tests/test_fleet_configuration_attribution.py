@@ -39,9 +39,9 @@ class TestFleetConfigurationAttribution(unittest.TestCase):
         self._assert_fleet_configuration_is_correct(expected_outcome, fleet_configuration)
 
     def test_fleet_configuration_with_zero_policy(self):
-        platform_property_set = self.drone_set_properties_2
-        formation_sizes_amounts = FleetPartition(platform_property_set).solve()
-        FleetConfigurationAttribution.extract_parameters(formation_sizes_amounts, platform_property_set)
+        drone_set_properties = self.drone_set_properties_2
+        formation_sizes_amounts = FleetPartition(drone_set_properties).solve()
+        FleetConfigurationAttribution.extract_parameters(formation_sizes_amounts, drone_set_properties)
         fleet_configuration = FleetConfigurationAttribution.solve()
 
         expected_outcome = {
@@ -58,14 +58,14 @@ class TestFleetConfigurationAttribution(unittest.TestCase):
         self._assert_fleet_configuration_is_correct(expected_outcome, fleet_configuration)
 
     def test_none_zero_formation_policy(self):
-        platform_property_set = self.drone_set_properties_1
-        formation_sizes_amounts = FleetPartition(platform_property_set).solve()
+        drone_set_properties = self.drone_set_properties_1
+        formation_sizes_amounts = FleetPartition(drone_set_properties).solve()
         self.assertEqual(formation_sizes_amounts.amounts[DroneFormationType.PAIR], 5)
         self.assertEqual(formation_sizes_amounts.amounts[DroneFormationType.QUAD], 5)
 
     def test_with_zero_formation_policy(self):
-        platform_property_set = self.drone_set_properties_2
-        formation_sizes_amounts = FleetPartition(platform_property_set).solve()
+        drone_set_properties = self.drone_set_properties_2
+        formation_sizes_amounts = FleetPartition(drone_set_properties).solve()
         self.assertEqual(formation_sizes_amounts.amounts[DroneFormationType.PAIR], 15)
         self.assertEqual(formation_sizes_amounts.amounts[DroneFormationType.QUAD], 0)
 

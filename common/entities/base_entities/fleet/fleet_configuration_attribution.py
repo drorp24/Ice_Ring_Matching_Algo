@@ -141,14 +141,14 @@ class FleetConfigurationAttribution:
             cls.attribution_config.drone_type)
         num_vars = cls._calc_number_variables()
         configuration_options_size = cls.attribution_config.configuration_options_size
-        platform_type = cls.attribution_config.drone_type
+        drone_type = cls.attribution_config.drone_type
         variables = [variables[j].solution_value() for j in range(num_vars)]
         chosen_formations_indices = [i % configuration_options_size for i, x in enumerate(variables) if x == 1.0]
         for i in range(len(chosen_formations_indices)):
             formation_size = cls._get_formation_size_type(i)
             configuration = cls.attribution_config.configurations[chosen_formations_indices[i]]
-            formation_option = DroneTypeToPackageConfigurationOption.get_formation_option(configuration, platform_type)
-            drone_formation = DroneFormations.get_drone_formation(formation_size, formation_option, platform_type)
+            formation_option = DroneTypeToPackageConfigurationOption.get_formation_option(configuration, drone_type)
+            drone_formation = DroneFormations.get_drone_formation(formation_size, formation_option, drone_type)
             formation_amounts[drone_formation] += 1
         return DroneFormationsPerTypeAmounts(formation_amounts)
 

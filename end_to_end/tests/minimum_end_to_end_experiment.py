@@ -75,11 +75,11 @@ def _create_empty_drone_delivery_board(
                                                                   PackageConfiguration.TINY_X16: 0}),
         drone_type: DroneType = DroneType.drone_type_1,
         amount: int = 30):
-    platform_property_set = DroneSetProperties(_drone_type=drone_type,
+    drone_set_properties = DroneSetProperties(_drone_type=drone_type,
                                                _package_configuration_policy=package_configurations_policy,
                                                _drone_formation_policy=drone_formation_policy,
                                                _drone_amount=amount)
-    return build_empty_drone_delivery_board(platform_property_set)
+    return build_empty_drone_delivery_board(drone_set_properties)
 
 
 class BasicMinimumEnd2EndExperiment:
