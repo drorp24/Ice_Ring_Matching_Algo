@@ -69,14 +69,14 @@ def _create_empty_drone_delivery_board(
                                        Configurations.SMALL_X8: 0,
                                        Configurations.TINY_X16: 0}
         , platform_type: PlatformType = PlatformType.platform_1,
-        size: int = 30):
+        size: int = 30, max_route_time_entire_board: float = 0):
     formation_size_property_set = PlatformFormationsSizePolicyPropertySet(formation_size_policy)
     configuration_policy_property_set = PlatformConfigurationsPolicyPropertySet(configurations_policy)
     platform_property_set = PlatformPropertySet(platform_type=platform_type,
                                                 configuration_policy=configuration_policy_property_set,
                                                 formation_policy=formation_size_property_set,
                                                 size=size)
-    return build_empty_drone_delivery_board(platform_property_set)
+    return build_empty_drone_delivery_board(platform_property_set, max_route_time_entire_board)
 
 
 class BasicMinimumEnd2EndExperiment:
@@ -113,14 +113,14 @@ class BasicMinimumEnd2EndExperiment:
 
     def test_small_scenario(self):
         start_time = datetime.now()
-        empty_drone_delivery_board = _create_empty_drone_delivery_board(size=20)
-        empty_drone_delivery_board.set_max_route_times_in_minutes([50]*empty_drone_delivery_board.amount_of_formations())
+        empty_drone_delivery_board = _create_empty_drone_delivery_board(size=20, max_route_time_entire_board=50)
+        #empty_drone_delivery_board.set_max_route_times_in_minutes([50]*empty_drone_delivery_board.amount_of_formations())
         print("--- _create_empty_drone_delivery_board run time: %s  ---" % (datetime.now() - start_time))
         start_time = datetime.now()
 
         scenario = self.scenario_distribution.choose_rand(random=Random(10),
                                                           amount={DeliveryRequest: 37, DroneLoadingDock: 1})
-        fully_connected_graph = create_fully_connected_graph_model(scenario, factor=25.0)#(factor=90.0))
+        fully_connected_graph = create_fully_connected_graph_model(scenario, edge_cost_factor=25.0)#(edge_cost_factor=90.0))
         print("--- create_fully_connected_graph_model run time: %s  ---" % (datetime.now() - start_time))
         start_time = datetime.now()
 

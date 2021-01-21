@@ -37,5 +37,5 @@ def generate_empty_delivery_board(fleet_reader: FleetReader) -> EmptyDroneDelive
     return EmptyDroneDeliveryBoard(total_drone_deliveries)
 
 
-def build_empty_drone_delivery_board(platform_properties: PlatformPropertySet):
-    return EmptyDroneDeliveryBoard(calc_drone_deliveries(platform_properties))
+def build_empty_drone_delivery_board(platform_properties: PlatformPropertySet, max_route_time_entire_board: float):
+    return EmptyDroneDeliveryBoard(calc_drone_deliveries(platform_properties), max_route_time_entire_board)

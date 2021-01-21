@@ -29,12 +29,10 @@ class DroneFormation:
         return self._drone_configuration
 
     @property
-    @lru_cache()
     def max_route_times_in_minutes(self) -> int:
         return self._max_route_times_in_minutes
 
     @property
-    @lru_cache()
     def velocity_meter_per_sec(self) -> float:
         return self._velocity_meter_per_sec
 

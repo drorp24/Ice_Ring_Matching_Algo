@@ -71,6 +71,8 @@ class ORToolsMatcherMaxRouteTimeTestCase(TestCase):
         delivery_requests = self._create_2_delivery_requests_with_big_travel_time_difference()
         match_config = self._create_match_config_with_waiting_time(waiting_time=0)
         graph = self._create_graph(delivery_requests, self.loading_dock, 1/self.edd2_velocity_per_minute) # Assuming Velocity of edd1 and edd2 is similar
+        if graph.calc_max_cost() > self.edd2_max_endurance/2.0:
+            print('Check cost calculation')
         match_input_1 = MatcherInput(graph, self.empty_board_1, match_config)
         match_input_2 = MatcherInput(graph, self.empty_board_2, match_config)
         matcher_1 = ORToolsMatcher(match_input_1)

@@ -8,8 +8,11 @@ from common.entities.base_entities.package import PackageType
 
 
 class EmptyDroneDeliveryBoard:
-    def __init__(self, empty_drone_deliveries: [EmptyDroneDelivery]):
+    def __init__(self, empty_drone_deliveries: [EmptyDroneDelivery], max_route_time_entire_board: float):
         self._empty_drone_deliveries = empty_drone_deliveries
+        if max_route_time_entire_board>0: #else default is set per formation
+            for edd in self._empty_drone_deliveries:
+                edd.drone_formation.set_max_route_times_in_minutes(max_route_time_entire_board)
 
     @property
     def empty_drone_deliveries(self) -> [EmptyDroneDelivery]:
@@ -27,10 +30,6 @@ class EmptyDroneDeliveryBoard:
 
     def max_route_times_in_minutes(self) -> [int]:
         return [edd.drone_formation.max_route_times_in_minutes() for edd in self._empty_drone_deliveries]
-
-    def set_max_route_times_in_minutes(self, max_route_times: [int]):
-        for i, edd in enumerate(self._empty_drone_deliveries):
-            edd.drone_formation.set_max_route_times_in_minutes(max_route_times[i])
 
 @dataclass
 class UnmatchedDeliveryRequest:
