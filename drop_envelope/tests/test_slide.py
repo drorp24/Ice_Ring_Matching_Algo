@@ -1,4 +1,3 @@
-import math
 import unittest
 
 from common.entities.base_entities.package import PackageType
