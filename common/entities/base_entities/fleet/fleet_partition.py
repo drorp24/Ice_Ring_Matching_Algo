@@ -106,16 +106,16 @@ class FleetPartition(object):
     def _calc_inequality_constraints_coefficients_given_all_positive_probabilities(self):
         formation_type_probabilities = self.normalize_probabilities(
             self.fleet_partition_parameters.formation_type_probabilities)
-        return self._calc_covariance_matrix(formation_type_probabilities)
+        return self._calc_constraints_matrix(formation_type_probabilities)
 
     def _calc_inequality_constraints_coefficients_given_zero_probabilities(self):
         formation_type_probabilities = self.fleet_partition_parameters.formation_type_probabilities
         non_zero_indices = self._calc_non_zero_indices(formation_type_probabilities)
         if any(non_zero_indices):
             formation_type_probabilities = self.normalize_probabilities(formation_type_probabilities)
-        return self._calc_covariance_matrix(formation_type_probabilities)
+        return self._calc_constraints_matrix(formation_type_probabilities)
 
-    def _calc_covariance_matrix(self, formation_type_probabilities):
+    def _calc_constraints_matrix(self, formation_type_probabilities):
         num_vars = self._calc_number_variables()
         constraints_matrix = np.zeros((1, num_vars))
         for i in range(0, num_vars):
