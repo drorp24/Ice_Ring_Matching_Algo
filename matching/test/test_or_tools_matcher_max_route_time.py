@@ -101,14 +101,14 @@ class ORToolsMatcherMaxRouteTimeTestCase(TestCase):
             unmatched_penalty=1000)
 
     def _create_2_delivery_requests_with_big_time_window_difference(self):
-        dr1_pos = self.edd1_max_range / 10.0
-        dr2_pos = self.edd2_max_range / 10.0
-        edd1_travel_time_to_dr1 = dr1_pos / self.edd1_velocity_per_minute
-        edd2_travel_time_to_dr2 = dr2_pos / self.edd2_velocity_per_minute
+        dr1_range = self.edd1_max_range / 10.0
+        dr2_range = self.edd2_max_range / 10.0
+        edd1_travel_time_to_dr1 = dr1_range / self.edd1_velocity_per_minute
+        edd2_travel_time_to_dr2 = dr2_range / self.edd2_velocity_per_minute
         dist = build_delivery_request_distribution(
             relative_pdp_location_distribution=ExactPointLocationDistribution([
-                create_point_2d(0, dr1_pos),
-                create_point_2d(0, dr2_pos)
+                create_point_2d(0, dr1_range),
+                create_point_2d(0, dr2_range)
             ]),
             time_window_distribution=ExactTimeWindowDistribution([
                 TimeWindowExtension(
@@ -122,12 +122,12 @@ class ORToolsMatcherMaxRouteTimeTestCase(TestCase):
         return dist.choose_rand(Random(42), amount={DeliveryRequest: 2})
 
     def _create_2_delivery_requests_with_big_travel_time_difference(self):
-        dr1_pos = self.edd1_max_range / 10.0
-        dr2_pos = self.edd2_max_range / 2.0
+        dr1_range = self.edd1_max_range / 10.0
+        dr2_range = self.edd2_max_range / 2.0
         dist = build_delivery_request_distribution(
             relative_pdp_location_distribution=ExactPointLocationDistribution([
-                create_point_2d(0, dr1_pos),
-                create_point_2d(0, dr2_pos)
+                create_point_2d(0, dr1_range),
+                create_point_2d(0, dr2_range)
             ]),
             time_window_distribution=ExactTimeWindowDistribution([
                 TimeWindowExtension(
