@@ -10,8 +10,8 @@ from drop_envelope.slide_service import MockSlidesServiceWrapper
 from geometry.geo2d import Point2D
 
 
-def get_drop_envelope(drone_azimuth: Angle, drop_azimuth: Optional.of(Angle), package_type: PackageType,
-                      drop_point: Point2D) -> DropEnvelope:
+def create_drop_envelope(drone_azimuth: Angle, drop_azimuth: Optional.of(Angle), package_type: PackageType,
+                         drop_point: Point2D) -> DropEnvelope:
     if drop_azimuth.is_empty():
         drop_azimuth = Optional.of(drone_azimuth)
     drop_envelope_properties = DropEnvelopeProperties(drop_point=drop_point,
@@ -21,20 +21,20 @@ def get_drop_envelope(drone_azimuth: Angle, drop_azimuth: Optional.of(Angle), pa
     return DropEnvelope(drop_envelope_properties)
 
 
-def get_potential_drop_envelope(drop_azimuth: Optional.of(Angle), package_type: PackageType,
-                                drop_point: Point2D) -> PotentialDropEnvelopes:
+def create_potential_drop_envelope(drop_azimuth: Optional.of(Angle), package_type: PackageType,
+                                   drop_point: Point2D) -> PotentialDropEnvelopes:
     drone_azimuths = get_azimuth_quantization_values(MockSlidesServiceWrapper.drone_azimuth_level_amount)
     if drop_azimuth.is_empty():
-        drop_envelopes = list(map(lambda x: DropEnvelope(DropEnvelopeProperties(
+        drop_envelopes = list(map(lambda drone_azimuth: DropEnvelope(DropEnvelopeProperties(
             package_type=package_type,
-            drop_azimuth=x,
+            drop_azimuth=drone_azimuth,
             drop_point=drop_point,
-            drone_azimuth=x)), drone_azimuths))
+            drone_azimuth=drone_azimuth)), drone_azimuths))
     else:
-        drop_envelopes = list(map(lambda x: DropEnvelope(DropEnvelopeProperties(
+        drop_envelopes = list(map(lambda drone_azimuth: DropEnvelope(DropEnvelopeProperties(
             package_type=package_type,
             drop_azimuth=drop_azimuth.get(),
             drop_point=drop_point,
-            drone_azimuth=x)), drone_azimuths))
+            drone_azimuth=drone_azimuth)), drone_azimuths))
 
     return PotentialDropEnvelopes(drop_envelopes)
