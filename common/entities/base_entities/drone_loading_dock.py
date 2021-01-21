@@ -1,4 +1,5 @@
 from datetime import date, time, timedelta
+from typing import List
 
 from common.entities.base_entities.base_entity import JsonableBaseEntity
 from common.entities.base_entities.drone import PlatformType
@@ -6,11 +7,12 @@ from common.entities.base_entities.drone_loading_station import DroneLoadingStat
 from common.entities.base_entities.entity_distribution.temporal_distribution import TimeDeltaDistribution, \
     DateTimeDistribution, TimeWindowDistribution
 from common.entities.base_entities.temporal import TimeWindowExtension, Temporal, DateTimeExtension, TimeDeltaExtension
+from drop_envelope.envelope_collections import ShapeableCollection
 from geometry.geo2d import Point2D
-from geometry.utils import Localizable
+from geometry.utils import Localizable, Shapeable
 
 
-class DroneLoadingDock(JsonableBaseEntity, Localizable, Temporal):
+class DroneLoadingDock(JsonableBaseEntity, Localizable, Temporal, ShapeableCollection):
 
     def __init__(self, drone_loading_station: DroneLoadingStation,
                  platform_type: PlatformType,
@@ -58,9 +60,16 @@ class DroneLoadingDock(JsonableBaseEntity, Localizable, Temporal):
 
     @classmethod
     def dict_to_obj(cls, dict_input):
-        return DroneLoadingDock(drone_loading_station=DroneLoadingStation.dict_to_obj(dict_input['drone_loading_station']),
-                                platform_type=PlatformType.dict_to_obj(dict_input['platform_type']),
-                                time_window=TimeWindowExtension.dict_to_obj(dict_input['time_window']))
+        return DroneLoadingDock(
+            drone_loading_station=DroneLoadingStation.dict_to_obj(dict_input['drone_loading_station']),
+            platform_type=PlatformType.dict_to_obj(dict_input['platform_type']),
+            time_window=TimeWindowExtension.dict_to_obj(dict_input['time_window']))
+
+    def shapeabls(self) -> List[Shapeable]:
+        return [self.drone_loading_station]
+
+    def centroid(self) -> Point2D:
+        return self.drone_loading_station.calc_location()
 
 
 def create_default_time_window_for_drone_loading_dock():

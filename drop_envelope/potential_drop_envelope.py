@@ -3,11 +3,13 @@ from optional import Optional
 
 from common.math.angle import Angle
 from drop_envelope.drop_envelope import DropEnvelope
+from drop_envelope.envelope_collections import ShapeableCollection
 from drop_envelope.slide_service import _SlidesService, MockSlidesServiceWrapper
 from geometry.geo2d import Point2D
+from geometry.utils import Shapeable
 
 
-class PotentialDropEnvelopes:
+class PotentialDropEnvelopes(ShapeableCollection):
 
     def __init__(self, drop_point: Point2D, drop_azimuth: Optional.of(Angle),
                  drop_envelopes: List[DropEnvelope], slide_service:_SlidesService = MockSlidesServiceWrapper()):
@@ -27,3 +29,10 @@ class PotentialDropEnvelopes:
     @property
     def envelopes(self) -> List[DropEnvelope]:
         return list(self._internal_envelopes.values())
+
+    def shapeabls(self) -> List[Shapeable]:
+        return self.envelopes
+
+    def centroid(self) -> Point2D:
+        return self.drop_point
+

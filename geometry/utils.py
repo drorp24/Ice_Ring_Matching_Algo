@@ -1,7 +1,7 @@
 from abc import abstractmethod, ABC
-from typing import Tuple, List, Iterator
+from typing import Tuple, List, Iterator, Union
 
-from geometry.geo2d import Point2D, Polygon2D
+from geometry.geo2d import Point2D, Polygon2D, EmptyGeometry2D
 
 
 class GeometryUtils:
@@ -34,7 +34,7 @@ class Shapeable(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def get_shape(self) -> Polygon2D:
+    def get_shape(self) -> Union[Polygon2D, EmptyGeometry2D]:
         raise NotImplementedError
 
     @abstractmethod

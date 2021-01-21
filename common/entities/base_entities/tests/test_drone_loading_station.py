@@ -5,6 +5,7 @@ from common.entities.base_entities.drone_loading_station import DroneLoadingStat
 from common.entities.base_entities.entity_distribution.drone_loading_station_distribution import \
     DroneLoadingStationDistribution
 from geometry.distribution.geo_distribution import UniformPointInBboxDistribution
+from geometry.geo_factory import create_empty_geometry_2d
 
 
 class BasicDroneLoadingStationGenerationTests(unittest.TestCase):
@@ -27,4 +28,15 @@ class BasicDroneLoadingStationGenerationTests(unittest.TestCase):
             self.assertLessEqual(station.location.x, 10)
             self.assertGreaterEqual(station.location.y, 5)
             self.assertLessEqual(station.location.y, 10)
+
+    def test_drone_station_shapeable_properties(self):
+        drone_loading_station_distribution = DroneLoadingStationDistribution(
+            UniformPointInBboxDistribution(5, 5, 5, 5))
+        station = drone_loading_station_distribution.choose_rand(random=Random(100), amount=1)[0]
+        self.assertGreaterEqual(station.calc_location().x, 5)
+        self.assertGreaterEqual(station.calc_location().y, 5)
+        polygon = station.get_shape()
+        self.assertEqual(create_empty_geometry_2d(), polygon)
+        self.assertEqual(station.calc_area(), 0)
+
 
