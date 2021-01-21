@@ -5,8 +5,7 @@ import numpy as np
 
 from common.entities.base_entities.drone import DroneType
 from common.entities.base_entities.drone_formation import DroneFormationType, DroneFormation, \
-    DroneTypeToPackageConfigurationOption, \
-    DroneFormations
+    DroneTypeToPackageConfigurationOption, DroneFormations
 from common.entities.base_entities.fleet.fleet_partition import FormationTypeAmounts
 from common.entities.base_entities.fleet.fleet_property_sets import DroneSetProperties
 from common.math.mip_solver import MIPSolver, MIPData, MIPParameters
