@@ -1,7 +1,7 @@
 from abc import abstractmethod, ABC
 from typing import Tuple, List, Iterator
 
-from geometry.geo2d import Point2D
+from geometry.geo2d import Point2D, Polygon2D
 
 
 class GeometryUtils:
@@ -24,4 +24,19 @@ class Localizable(ABC):
 
     @abstractmethod
     def calc_location(self) -> Point2D:
+        raise NotImplementedError
+
+
+class Shapeable(ABC):
+
+    @abstractmethod
+    def calc_location(self) -> Point2D:
+        raise NotImplementedError
+
+    @abstractmethod
+    def get_shape(self) -> Polygon2D:
+        raise NotImplementedError
+
+    @abstractmethod
+    def calc_area(self) -> float:
         raise NotImplementedError
