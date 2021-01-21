@@ -258,6 +258,10 @@ class Polygon2D(Geometry2D, Surface2D):
     def calc_union(self, other_polygon: Polygon2D) -> Union[Polygon2D, MultiPolygon2D]:
         raise NotImplementedError()
 
+    @abstractmethod
+    def shift(self, translation: Point2D):
+        raise NotImplementedError()
+
     def __contains__(self, point: Point2D):
         raise NotImplementedError()
 

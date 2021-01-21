@@ -202,6 +202,11 @@ class _ShapelyPolygon2D(_ShapelyGeometry, Polygon2D):
     def calc_area(self) -> float:
         return self._shapely_obj.area
 
+    def shift(self, translation: Point2D) -> _ShapelyPolygon2D:
+        boundary_points = self.points
+        shifted_boundary_points = list(map(lambda x: x + translation, boundary_points))
+        return _ShapelyPolygon2D(shifted_boundary_points)
+
     def calc_intersection(self, other_polygon: Polygon2D) -> Union[EmptyGeometry2D, Polygon2D, MultiPolygon2D]:
         other_polygon_shapely = _ShapelyUtils.convert_polygon2d_to_shapely(other_polygon)
         if not other_polygon_shapely.is_valid or not self._shapely_obj.is_valid:
