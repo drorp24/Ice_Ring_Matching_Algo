@@ -22,7 +22,7 @@ class BasicPolygonTestCase(unittest.TestCase):
         self.assertEqual(points_result, list((self.p1, self.p2, self.p3, self.p4)))
 
     def test_boundary(self):
-        boundary = self.poly1.boundary
+        boundary = self.poly1.boundary()
         self.assertEqual(boundary, create_linear_ring_2d([self.p1, self.p2, self.p3, self.p4]))
 
     def test_calc_area(self):

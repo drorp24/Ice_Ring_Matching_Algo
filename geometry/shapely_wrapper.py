@@ -12,6 +12,7 @@ from geometry.utils import GeometryUtils
 
 EPSILON_FOR_EQUAL_AREA: float = 0.00001
 
+
 class _ShapelyGeometry(JsonableBaseEntity):
 
     def __init__(self, shapely_obj: BaseGeometry):
@@ -163,30 +164,9 @@ class _ShapelyPolygon2D(_ShapelyGeometry, Polygon2D):
     def __init__(self, boundary_points: List[Point2D]):
         super().__init__(Polygon(GeometryUtils.convert_points_list_to_xy_array(boundary_points)))
 
-    @classmethod
-    def create_from_linear_ring(cls, boundary: LinearRing2D) -> Polygon2D:
-        return _ShapelyPolygon2D(boundary.points)
-
     @property
     def _shapely_obj(self) -> Polygon:
         return super()._shapely_obj
-
-    @property
-    def holes(self) -> List[LinearRing2D]:
-        raise NotImplementedError
-
-    @property
-    def boundary(self) -> LinearRing2D:
-        return _ShapelyLinearRing2D(self.points)
-
-    @property
-    def centroid(self) -> Point2D:
-        return _ShapelyUtils.convert_shapely_to_point_2d(self._shapely_obj.centroid)
-
-    @property
-    def bbox(self) -> Bbox2D:
-        min_x, min_y, max_x, max_y = self._shapely_obj.bounds
-        return _ShapelyBbox2D(min_x, min_y, max_x, max_y)
 
     @property
     def points(self) -> List[Point2D]:
@@ -196,11 +176,28 @@ class _ShapelyPolygon2D(_ShapelyGeometry, Polygon2D):
         return GeometryUtils.convert_xy_separate_arrays_to_points_list(x_array[:-1], y_array[:-1])
 
     @classmethod
+    def create_from_linear_ring(cls, boundary: LinearRing2D) -> Polygon2D:
+        return _ShapelyPolygon2D(boundary.points)
+
+    @classmethod
     def dict_to_obj(cls, dict_input) -> Polygon2D:
         assert (dict_input['__class__'] == cls.__name__)
         return _ShapelyPolygon2D(
             boundary_points=[_ShapelyPoint2D.dict_to_obj(point_dict) for point_dict in
-                             dict_input['boundary_points']])
+                             dict_input['points']])
+
+    def holes(self) -> List[LinearRing2D]:
+        raise NotImplementedError
+
+    def boundary(self) -> LinearRing2D:
+        return _ShapelyLinearRing2D(self.points)
+
+    def centroid(self) -> Point2D:
+        return _ShapelyUtils.convert_shapely_to_point_2d(self._shapely_obj.centroid)
+
+    def bbox(self) -> Bbox2D:
+        min_x, min_y, max_x, max_y = self._shapely_obj.bounds
+        return _ShapelyBbox2D(min_x, min_y, max_x, max_y)
 
     def calc_area(self) -> float:
         return self._shapely_obj.area
