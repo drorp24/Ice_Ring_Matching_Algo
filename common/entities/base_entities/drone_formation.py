@@ -14,11 +14,12 @@ class FormationSize(IntEnum):
 
 class DroneFormation:
 
-    def __init__(self, formation_size: FormationSize, drone_configuration: DroneConfiguration):
+    def __init__(self, formation_size: FormationSize, drone_configuration: DroneConfiguration,
+                 max_route_times_in_minutes: int = 400, velocity_meter_per_sec: float = 10.0):
         self._size = formation_size
         self._drone_configuration = drone_configuration
-        self._max_route_times_in_minutes = 400 # TODO: Change to real endurance
-        self._velocity_meter_per_sec = 10.0  # TODO: Change to real velocity
+        self._max_route_times_in_minutes = max_route_times_in_minutes # TODO: Change to real endurance
+        self._velocity_meter_per_sec = velocity_meter_per_sec  # TODO: Change to real velocity
 
     @property
     def size(self) -> FormationSize:
@@ -38,9 +39,6 @@ class DroneFormation:
 
     def set_max_route_times_in_minutes(self, max_route_time: int):
         self._max_route_times_in_minutes = max_route_time
-
-    def set_velocity_meter_per_sec(self, velocity: float):
-        self._velocity_meter_per_sec = velocity
 
     def get_formation_max_range_in_meters(self) -> float:
         return self.velocity_meter_per_sec * self.max_route_times_in_minutes * 60.0
@@ -117,9 +115,11 @@ class DroneFormationOptions:
 
     @classmethod
     def get_drone_formation(cls, formation_size: FormationSize, formation_option: FormationOptions,
-                            platform_type: PlatformType) -> DroneFormation:
+                            platform_type: PlatformType,
+                            max_route_times_in_minutes: int = 400,
+                            velocity_meter_per_sec: float = 10.0) -> DroneFormation:
         drone_configuration = cls._get_drone_configuration(formation_option, platform_type)
-        return DroneFormation(formation_size, drone_configuration)
+        return DroneFormation(formation_size, drone_configuration, max_route_times_in_minutes, velocity_meter_per_sec)
 
     @classmethod
     def get_formation_option(cls, configuration: Configurations, platform_type: PlatformType):
