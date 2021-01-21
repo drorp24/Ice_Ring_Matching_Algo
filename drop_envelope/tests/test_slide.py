@@ -1,3 +1,4 @@
+import math
 import unittest
 
 from common.entities.base_entities.package import PackageType
@@ -20,7 +21,7 @@ class BasicSlideTestCase(unittest.TestCase):
 
     def test_build_slide(self):
         slide = Slide(self.slide_properties_1, self.envelope_service)
-        self.assertEqual(slide.calc_area(), 120.08638146675789)
+        self.assertEqual(round(slide.calc_area(), 4), 120.0864)
         self.assertEqual(slide.drop_azimuth.degrees, 40)
         self.assertEqual(slide.drone_azimuth.degrees, 50)
         self.assertEqual(slide.package_type, PackageType.LARGE)
@@ -30,4 +31,3 @@ class BasicSlideTestCase(unittest.TestCase):
         shifted_slide_polygon = slide.shift(create_point_2d(x=10.0, y=10.0))
         shifted_polygon = slide.shift(create_point_2d(x=10.0, y=10.0))
         self.assertEqual(shifted_polygon, shifted_slide_polygon)
-
