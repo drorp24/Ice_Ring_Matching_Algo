@@ -1,4 +1,3 @@
-from typing import Union
 from optional import Optional
 
 from common.entities.base_entities.package import PackageType
@@ -37,4 +36,6 @@ def create_potential_drop_envelope(drop_azimuth: Optional.of(Angle), package_typ
             drop_point=drop_point,
             drone_azimuth=drone_azimuth)), drone_azimuths))
 
-    return PotentialDropEnvelopes(drop_envelopes)
+    return PotentialDropEnvelopes(drop_point= drop_point,
+                                  drop_azimuth=drop_azimuth,
+                                  drop_envelopes=drop_envelopes)

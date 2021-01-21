@@ -1,5 +1,4 @@
-from collections import defaultdict
-from typing import List, Dict
+from typing import List
 
 from common.entities.base_entities.package import PackageType
 from common.math.angle import Angle
