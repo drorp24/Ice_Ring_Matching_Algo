@@ -138,11 +138,11 @@ class BasicMinimumEnd2EndExperiment:
 
     @staticmethod
     def _draw_matched_scenario(delivery_board, fully_connected_graph, scenario, mapImage):
-        dr_drawer = create_drawer_2d(mapImage, Drawer2DCoordinateSys.GEOGRAPHIC)
+        dr_drawer = create_drawer_2d(Drawer2DCoordinateSys.GEOGRAPHIC, mapImage)
         operational_drawer2d.add_operational_graph(dr_drawer, fully_connected_graph, draw_internal=True,
                                                    draw_edges=False)
         dr_drawer.draw(False)
-        board_map_drawer = create_drawer_2d(mapImage, Drawer2DCoordinateSys.GEOGRAPHIC)
+        board_map_drawer = create_drawer_2d(Drawer2DCoordinateSys.GEOGRAPHIC, mapImage)
         operational_drawer2d.add_delivery_board(board_map_drawer, delivery_board, draw_unmatched=True)
         board_map_drawer.draw(False)
         row_names = ["Unmatched Out"] + \

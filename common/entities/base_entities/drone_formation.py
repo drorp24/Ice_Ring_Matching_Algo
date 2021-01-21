@@ -17,7 +17,7 @@ class DroneFormation:
     def __init__(self, formation_size: FormationSize, drone_configuration: DroneConfiguration):
         self._size = formation_size
         self._drone_configuration = drone_configuration
-        self._max_route_times_in_minutes = 45 # TODO: Change to real endurance
+        self._max_route_times_in_minutes = 400 # TODO: Change to real endurance
         self._velocity_meter_per_sec = 10.0  # TODO: Change to real velocity
 
     @property

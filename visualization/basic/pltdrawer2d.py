@@ -21,11 +21,11 @@ class MapImage:
         self.south_lat = south_lat
         self.north_lat = north_lat
 
-def create_drawer_2d(mapImage: MapImage, coordinate_sys: Drawer2DCoordinateSys = Drawer2DCoordinateSys.CARTESIAN) -> Drawer2D:
-    return PltDrawer2D(mapImage, coordinate_sys)
+def create_drawer_2d(coordinate_sys: Drawer2DCoordinateSys = Drawer2DCoordinateSys.CARTESIAN, mapImage: MapImage = None) -> Drawer2D:
+    return PltDrawer2D(coordinate_sys, mapImage)
 
 class PltDrawer2D(Drawer2D):
-    def __init__(self, mapImage: MapImage, coordinate_sys: Drawer2DCoordinateSys = Drawer2DCoordinateSys.CARTESIAN):
+    def __init__(self, coordinate_sys: Drawer2DCoordinateSys = Drawer2DCoordinateSys.CARTESIAN, mapImage: MapImage = None):
         self._coordinate_sys = coordinate_sys
         self._init_according_to_coordinate_system(mapImage)
 
@@ -101,19 +101,20 @@ class PltDrawer2D(Drawer2D):
         elif self._coordinate_sys is Drawer2DCoordinateSys.GEOGRAPHIC:
             self._fig = plt.figure()
             self._ax = plt.axes(projection=ccrs.PlateCarree())
-            map_background_path = mapImage.map_background_path
-            west_lon = mapImage.west_lon
-            east_lon = mapImage.east_lon
-            south_lat = mapImage.south_lat
-            north_lat = mapImage.north_lat
+            if mapImage is not None:
+                map_background_path = mapImage.map_background_path
+                west_lon = mapImage.west_lon
+                east_lon = mapImage.east_lon
+                south_lat = mapImage.south_lat
+                north_lat = mapImage.north_lat
 
-            map_background_img_extent = (west_lon,
-                                         east_lon,
-                                         south_lat,
-                                         north_lat)
-            map_background_img = plt.imread(map_background_path)
-            self._ax.imshow(map_background_img, origin='upper', extent=map_background_img_extent,
-                            transform=ccrs.PlateCarree())
+                map_background_img_extent = (west_lon,
+                                             east_lon,
+                                             south_lat,
+                                             north_lat)
+                map_background_img = plt.imread(map_background_path)
+                self._ax.imshow(map_background_img, origin='upper', extent=map_background_img_extent,
+                                transform=ccrs.PlateCarree())
         else:
             raise NotImplementedError("Non valid Drawer2DCoordinateSys.")
 
