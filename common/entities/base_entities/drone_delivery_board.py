@@ -8,9 +8,10 @@ from common.entities.base_entities.package import PackageType
 
 
 class EmptyDroneDeliveryBoard:
-    def __init__(self, empty_drone_deliveries: [EmptyDroneDelivery], max_route_time_entire_board: float=0):
+    def __init__(self, empty_drone_deliveries: [EmptyDroneDelivery], max_route_time_entire_board: float = 0.0):
         self._empty_drone_deliveries = empty_drone_deliveries
-        if max_route_time_entire_board>0: #else default is set per formation
+        # set max_route if input is greater than zero, else default is set per formation
+        if max_route_time_entire_board > 0:
             for edd in self._empty_drone_deliveries:
                 edd.drone_formation.set_max_route_times_in_minutes(max_route_time_entire_board)
 

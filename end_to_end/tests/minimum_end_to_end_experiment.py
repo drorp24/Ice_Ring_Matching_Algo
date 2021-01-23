@@ -40,7 +40,7 @@ def create_standard_full_day_test_time():
 
 
 def _create_delivery_request_distribution(centerPoint: Point2D, sigma_lon: float, sigma_lat: float,
-                                          priority_range: int = 10, dr_timewindow: int = 3):
+                                          lowest_priority: int = 10, dr_timewindow: int = 3):
     package_distribution = create_single_package_distribution()
     zero_time = ZERO_TIME
     time_delta_distrib = TimeDeltaDistribution([TimeDeltaExtension(timedelta(hours=dr_timewindow, minutes=0))])
@@ -51,7 +51,7 @@ def _create_delivery_request_distribution(centerPoint: Point2D, sigma_lon: float
     delivery_request_distribution = build_delivery_request_distribution(
         package_type_distribution=package_distribution,
         relative_dr_location_distribution=NormalPointDistribution(centerPoint, sigma_lon, sigma_lat),
-        priority_distribution=PriorityDistribution(list(range(1, priority_range))),
+        priority_distribution=PriorityDistribution(list(range(1, lowest_priority))),
         time_window_distribution=time_window_distribution)
     return delivery_request_distribution
 
@@ -119,7 +119,7 @@ class BasicMinimumEnd2EndExperiment:
 
         scenario = self.scenario_distribution.choose_rand(random=Random(10),
                                                           amount={DeliveryRequest: 37, DroneLoadingDock: 1})
-        fully_connected_graph = create_fully_connected_graph_model(scenario, edge_cost_factor=25.0)#(edge_cost_factor=90.0))
+        fully_connected_graph = create_fully_connected_graph_model(scenario, edge_cost_factor=25.0)
         print("--- create_fully_connected_graph_model run time: %s  ---" % (datetime.now() - start_time))
         start_time = datetime.now()
 
