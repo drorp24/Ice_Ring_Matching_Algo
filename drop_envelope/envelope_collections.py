@@ -25,3 +25,9 @@ class PotentialEnvelopeCollection:
     @abstractmethod
     def centroid(self) -> Point2D:
         raise NotImplementedError
+
+
+
+def get_distantest_shapeable(external_point: Point2D, potential_envelope: List[ShapeableCollection]) -> Shapeable:
+    #TODO: Not finished yet
+    for i, shapeables in enumerate(potential_envelope):
