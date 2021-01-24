@@ -5,10 +5,11 @@ from typing import List
 from unittest import TestCase
 
 from common.entities.base_entities.delivery_request import DeliveryRequest
-from common.entities.base_entities.drone import PlatformType
+from common.entities.base_entities.drone import DroneType
 from common.entities.base_entities.drone_delivery import EmptyDroneDelivery
 from common.entities.base_entities.drone_delivery_board import EmptyDroneDeliveryBoard
-from common.entities.base_entities.drone_formation import DroneFormations, FormationOptions, FormationSize
+from common.entities.base_entities.drone_formation import DroneFormations, PackageConfigurationOption, \
+    DroneFormationType
 from common.entities.base_entities.drone_loading_dock import DroneLoadingDock
 from common.entities.base_entities.drone_loading_station import DroneLoadingStation
 from common.entities.base_entities.entity_distribution.delivery_requestion_dataset_builder import \
@@ -73,7 +74,7 @@ class ORToolsMatcherMaxRouteTimeTestCase(TestCase):
     @staticmethod
     def _create_limited_route_time_empty_drone_delivery():
         return EmptyDroneDelivery(EntityID(uuid.uuid4()), DroneFormations.get_drone_formation(
-            FormationSize.MINI, FormationOptions.LARGE_PACKAGES, PlatformType.platform_1))
+            DroneFormationType.PAIR, PackageConfigurationOption.LARGE_PACKAGES, DroneType.drone_type_1))
 
     @staticmethod
     def _create_match_config_with_big_waiting_time():
@@ -142,12 +143,12 @@ class ORToolsMatcherMaxRouteTimeTestCase(TestCase):
     @staticmethod
     def _create_sufficient_route_time_empty_drone_delivery():
         return EmptyDroneDelivery(EntityID(uuid.uuid4()), DroneFormations.get_drone_formation(
-            FormationSize.MINI, FormationOptions.LARGE_PACKAGES, PlatformType.platform_2))
+            DroneFormationType.PAIR, PackageConfigurationOption.LARGE_PACKAGES, DroneType.drone_type_2))
 
     @staticmethod
     def _create_loading_dock() -> DroneLoadingDock:
         return DroneLoadingDock(DroneLoadingStation(create_point_2d(0, 0)),
-                                PlatformType.platform_1,
+                                DroneType.drone_type_1,
                                 TimeWindowExtension(
                                     since=ZERO_TIME,
                                     until=ZERO_TIME.add_time_delta(

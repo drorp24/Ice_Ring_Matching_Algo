@@ -64,14 +64,10 @@ class DroneDeliveryBoard:
 
     @lru_cache()
     def get_total_amount_per_package_type(self) -> PackageTypeAmountMap:
-        amount_per_package_type = [0] * len(PackageType)
+        amount_per_package_type = PackageTypeAmountMap({package: 0 for package in PackageType})
         for drone_delivery in self._drone_deliveries:
-            amount_per_package_type = [total_amount + delivery_amount
-                                       for total_amount, delivery_amount
-                                       in zip(amount_per_package_type,
-                                              drone_delivery.get_total_package_type_amount_map().
-                                              get_package_type_amounts())]
-        return PackageTypeAmountMap(amount_per_package_type)
+            amount_per_package_type.add_to_map(drone_delivery.get_total_package_type_amount_map())
+        return amount_per_package_type
 
     @lru_cache()
     def get_total_priority(self) -> int:
