@@ -47,7 +47,7 @@ class PackageTypeAmountMap(JsonableBaseEntity):
         return list(self._package_type_to_amounts.keys())
 
     def get_package_type_amount(self, package_type: PackageType) -> int:
-        return self.package_type_to_amounts.get(package_type.name, 0)
+        return self.package_type_to_amounts.get(package_type, 0)
 
     def get_package_type_amounts(self) -> [int]:
         return list(self.package_type_to_amounts.values())
@@ -94,14 +94,14 @@ class DronePackageConfiguration:
 
 
 class PackageConfiguration(Enum):
-    LARGE_X2 = PackageTypeAmountMap({PackageType.LARGE.name: 2})
-    MEDIUM_X4 = PackageTypeAmountMap({PackageType.MEDIUM.name: 4})
-    SMALL_X8 = PackageTypeAmountMap({PackageType.SMALL.name: 8})
-    TINY_X16 = PackageTypeAmountMap({PackageType.TINY.name: 16})
-    LARGE_X4 = PackageTypeAmountMap({PackageType.LARGE.name: 4})
-    MEDIUM_X8 = PackageTypeAmountMap({PackageType.MEDIUM.name: 8})
-    SMALL_X16 = PackageTypeAmountMap({PackageType.SMALL.name: 16})
-    TINY_X32 = PackageTypeAmountMap({PackageType.TINY.name: 32})
+    LARGE_X2 = PackageTypeAmountMap({PackageType.LARGE: 2})
+    MEDIUM_X4 = PackageTypeAmountMap({PackageType.MEDIUM: 4})
+    SMALL_X8 = PackageTypeAmountMap({PackageType.SMALL: 8})
+    TINY_X16 = PackageTypeAmountMap({PackageType.TINY: 16})
+    LARGE_X4 = PackageTypeAmountMap({PackageType.LARGE: 4})
+    MEDIUM_X8 = PackageTypeAmountMap({PackageType.MEDIUM: 8})
+    SMALL_X16 = PackageTypeAmountMap({PackageType.SMALL: 16})
+    TINY_X32 = PackageTypeAmountMap({PackageType.TINY: 32})
 
     @classmethod
     def dict_to_obj(cls, input_dict):

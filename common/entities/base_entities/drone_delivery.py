@@ -107,7 +107,7 @@ class DroneDelivery(EmptyDroneDelivery):
 
     @lru_cache()
     def get_total_package_type_amount_map(self) -> PackageTypeAmountMap:
-        amount_per_package_type = PackageTypeAmountMap({package.name: 0 for package in PackageType})
+        amount_per_package_type = PackageTypeAmountMap({package: 0 for package in PackageType})
         for matched_request in self._matched_requests:
             dr = matched_request.delivery_request
             delivery_option_of_interest = dr.delivery_options[matched_request.matched_delivery_option_index]

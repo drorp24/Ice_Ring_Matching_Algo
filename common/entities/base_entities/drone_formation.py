@@ -26,6 +26,15 @@ class DroneFormationType(Enum):
     def __repr__(self):
         return 'DroneFormationType: ' + str(self.__dict__())
 
+    def __eq__(self, other: DroneFormationType):
+        return self.name == other.name and self.value == other.value
+
+    def __hash__(self):
+        return hash(tuple((self.name, self.value)))
+
+    def __lt__(self, other):
+        return self.value < other.value
+
 
 class DroneFormation:
 

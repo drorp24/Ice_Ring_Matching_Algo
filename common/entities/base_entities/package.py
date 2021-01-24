@@ -84,3 +84,12 @@ class PackageType(Enum):
 
     def __repr__(self):
         return 'PackageType: ' + str(self.__dict__())
+
+    def __hash__(self):
+        return hash(tuple((self.name, self.value)))
+
+    def __eq__(self, other: PackageType):
+        return self.name == other.name and self.calc_weight() == other.calc_weight()
+
+    def __lt__(self, other: PackageType):
+        return self.name < other.name

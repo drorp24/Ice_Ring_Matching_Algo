@@ -23,6 +23,12 @@ class DroneFormationTypePolicy(JsonableBaseEntity):
                 'policy': {pcp[0].name: pcp[1] for pcp in
                            self._formation_type_policy.items()}}
 
+    def __eq__(self, other):
+        return self.policy == other.policy
+
+    def __hash__(self):
+        return hash(tuple(self.policy))
+
 
 @dataclass
 class PackageConfigurationPolicy(JsonableBaseEntity):
