@@ -7,7 +7,7 @@ from geometry.geo_factory import create_polygon_2d, create_point_2d
 
 
 class ZoneTestCase(TestCase):
-    zone_json_path_str = 'common/entities/base_entities/tests/jsons/zone_test_file.json'
+    zone_json_path_str = 'common/entities/base_entities/tests/zone_test_file.json'
 
     @classmethod
     def setUpClass(cls):

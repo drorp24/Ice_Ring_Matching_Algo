@@ -46,7 +46,7 @@ class DropEnvelope(Shapeable):
         return self._drop_point
 
     def calc_location(self) -> Point2D:
-        return self._internal_envelope.centroid()
+        return self._internal_envelope.calc_centroid()
 
     def get_shape(self) -> Polygon2D:
         return self._internal_envelope
