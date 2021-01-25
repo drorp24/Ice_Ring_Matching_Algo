@@ -12,6 +12,10 @@ from visualization.basic.pltdrawer2d import create_drawer_2d
 
 class DrawGeometriesTestCase(unittest.TestCase):
 
+    base_path = 'visualization/basic/tests/images/'
+    actual_cartesian_image_path = Path('%sactual_cartesian_drawer2d_output.png' % base_path)
+    actual_geographic_image_path = Path('%sactual_geographic_drawer2d_output.png' % base_path)
+
     @classmethod
     def setUpClass(cls):
         cls.p1 = create_point_2d(0.0, 0.0)
@@ -26,11 +30,8 @@ class DrawGeometriesTestCase(unittest.TestCase):
         cls.line_string1 = create_line_string_2d([cls.p3, cls.p6, cls.p7, cls.p8])
         cls.poly1 = create_polygon_2d([cls.p1, cls.p2, cls.p3, cls.p4])
         cls.linear_ring1 = create_linear_ring_2d([cls.p1, cls.p2, cls.p5, cls.p6])
-        base_path = 'visualization/basic/tests/images/'
-        cls.expected_cartesian_image_path = Path('%sexpected_cartesian_drawer2d_output.png' % base_path)
-        cls.actual_cartesian_image_path = Path('%sactual_cartesian_drawer2d_output.png' % base_path)
-        cls.expected_geographic_image_path = Path('%sexpected_geographic_drawer2d_output.png' % base_path)
-        cls.actual_geographic_image_path = Path('%sactual_geographic_drawer2d_output.png' % base_path)
+        cls.expected_cartesian_image_path = Path('%sexpected_cartesian_drawer2d_output.png' % cls.base_path)
+        cls.expected_geographic_image_path = Path('%sexpected_geographic_drawer2d_output.png' % cls.base_path)
 
     @classmethod
     def tearDownClass(cls):

@@ -215,6 +215,7 @@ class BasicDeliveryRequestGraphTestCases(unittest.TestCase):
         self.assertEqual(expected_nodes_in_region_1, num_nodes_in_region_1_subgraph)
         self.assertEqual(expected_nodes_in_region_1 * (expected_nodes_in_region_1 - 1), len(subgraph_in_region_1.edges))
 
+    @unittest.skipIf(os.environ.get('NO_SLOW_TESTS', False), 'slow tests')
     def test_grouped_graph_generation_one_zone_with_overlap_tw(self):
 
         region_dataset = self.dr_dataset_local_region_1_morning
@@ -234,6 +235,7 @@ class BasicDeliveryRequestGraphTestCases(unittest.TestCase):
         self.assertEqual(len(region_dataset) + len(dld_dataset), num_nodes_in_graph)
         self.assertEqual(expected_num_edge_in_graph, len(graph.edges))
 
+    @unittest.skipIf(os.environ.get('NO_SLOW_TESTS', False), 'slow tests')
     def test_grouped_graph_generation_one_zone_partial_overlap_tw(self):
         region_dataset = self.dr_dataset_local_region_2_afternoon + self.dr_dataset_local_region_2_morning
 
@@ -245,6 +247,7 @@ class BasicDeliveryRequestGraphTestCases(unittest.TestCase):
         self.assertEqual(len(region_dataset) + len(dld_dataset), num_nodes_in_graph)
         self.assertEqual(2 * len(region_dataset) + 4, len(graph.edges))
 
+    @unittest.skipIf(os.environ.get('NO_SLOW_TESTS', False), 'slow tests')
     def test_grouped_graph_generation_two_zones_with_overlap_tw(self):
 
         region_dataset = self.dr_dataset_local_region_1_morning + self.dr_dataset_local_region_2_morning
