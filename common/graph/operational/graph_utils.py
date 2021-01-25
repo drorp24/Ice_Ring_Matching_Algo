@@ -15,7 +15,7 @@ def sort_delivery_requests_by_zone(delivery_requests: [DeliveryRequest], zones: 
     Polygon2D, List[DeliveryRequest]}:
     return dict(
         filter(itemgetter(1),
-               {zone_index: [dr for dr in delivery_requests if zones[zone_index].shape.__contains__(dr.calc_location())] for
+               {zone_index: [dr for dr in delivery_requests if zones[zone_index].region.__contains__(dr.calc_location())] for
                 zone_index in range(0, len(zones))}.items()))
 
 

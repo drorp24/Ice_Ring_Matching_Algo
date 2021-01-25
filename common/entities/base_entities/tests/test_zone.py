@@ -15,7 +15,7 @@ class ZoneTestCase(TestCase):
         cls.polygon_2d = create_polygon_2d(
             [create_point_2d(100, 50), create_point_2d(100, 150), create_point_2d(200, 150),
              create_point_2d(200, 50)])
-        cls.zone_obj = Zone(shape=cls.polygon_2d)
+        cls.zone_obj = Zone(region=cls.polygon_2d)
 
     @classmethod
     def tearDownClass(cls):

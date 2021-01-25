@@ -5,17 +5,17 @@ from geometry.shapely_wrapper import _ShapelyPolygon2D
 
 class Zone(JsonableBaseEntity):
 
-    def __init__(self, shape: Polygon2D):
-        self._shape = shape
+    def __init__(self, region: Polygon2D):
+        self._region = region
 
     @property
-    def shape(self) -> Polygon2D:
-        return self._shape
+    def region(self) -> Polygon2D:
+        return self._region
 
     @classmethod
     def dict_to_obj(cls, dict_input):
         assert (dict_input['__class__'] == cls.__name__)
-        return Zone(_ShapelyPolygon2D.dict_to_obj(dict_input["shape"]))
+        return Zone(_ShapelyPolygon2D.dict_to_obj(dict_input["region"]))
 
     def __eq__(self, other):
-        return self.shape == other.shape
+        return self.region == other.region
