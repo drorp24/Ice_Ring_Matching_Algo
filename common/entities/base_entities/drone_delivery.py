@@ -9,11 +9,17 @@ from common.entities.base_entities.entity_id import EntityID
 from common.entities.base_entities.package import PackageType
 from common.entities.base_entities.temporal import TimeWindowExtension
 
+DEFAULT_MAX_ROUTE_TIME_IN_MINUTES = 400
+DEFAULT_VELOCITY_METER_PER_SEC = 10.0
 
 class EmptyDroneDelivery:
-    def __init__(self, id_: EntityID, drone_formation: DroneFormation):
+    def __init__(self, id_: EntityID, drone_formation: DroneFormation,
+                 max_route_time_in_minutes: int = DEFAULT_MAX_ROUTE_TIME_IN_MINUTES,
+                 velocity_meter_per_sec: float = DEFAULT_VELOCITY_METER_PER_SEC):
         self._id = id_
         self._drone_formation = drone_formation
+        self._max_route_times_in_minutes = max_route_time_in_minutes  # TODO: Change to real endurance
+        self._velocity_meter_per_sec = velocity_meter_per_sec  # TODO: Change to real velocity
 
     def __eq__(self, other):
         return self._id == other.id and self._drone_formation == other.drone_formation
@@ -28,6 +34,17 @@ class EmptyDroneDelivery:
     @property
     def drone_formation(self) -> DroneFormation:
         return self._drone_formation
+
+    @property
+    def max_route_time_in_minutes(self) -> int:
+        return self._max_route_times_in_minutes
+
+    @property
+    def velocity_meter_per_sec(self) -> float:
+        return self._velocity_meter_per_sec
+
+    def get_formation_max_range_in_meters(self) -> float:
+        return self.velocity_meter_per_sec * self.max_route_time_in_minutes * 60.0
 
 
 @dataclass

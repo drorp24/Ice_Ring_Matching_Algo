@@ -69,14 +69,14 @@ def _create_empty_drone_delivery_board(
                                        Configurations.SMALL_X8: 0,
                                        Configurations.TINY_X16: 0}
         , platform_type: PlatformType = PlatformType.platform_1,
-        size: int = 30, max_route_time_entire_board: float = 0):
+        size: int = 30, max_route_time_entire_board: int = 400, velocity_entire_board: float = 10.0):
     formation_size_property_set = PlatformFormationsSizePolicyPropertySet(formation_size_policy)
     configuration_policy_property_set = PlatformConfigurationsPolicyPropertySet(configurations_policy)
     platform_property_set = PlatformPropertySet(platform_type=platform_type,
                                                 configuration_policy=configuration_policy_property_set,
                                                 formation_policy=formation_size_property_set,
                                                 size=size)
-    return build_empty_drone_delivery_board(platform_property_set, max_route_time_entire_board)
+    return build_empty_drone_delivery_board(platform_property_set, max_route_time_entire_board, velocity_entire_board)
 
 
 class BasicMinimumEnd2EndExperiment:
@@ -86,7 +86,7 @@ class BasicMinimumEnd2EndExperiment:
         if scene=='north':
             self.scenario_distribution = ScenarioDistribution(
                 zero_time_distribution=DateTimeDistribution([ZERO_TIME]),
-                delivery_requests_distribution=_create_delivery_request_distribution(create_point_2d(35.45, 33.4), 0.06, 0.06, 10, 3),
+                delivery_requests_distribution=_create_delivery_request_distribution(create_point_2d(35.45, 33.4-0.5), 0.05, 0.06, 10, 3),
                 drone_loading_docks_distribution=
                 DroneLoadingDockDistribution(drone_loading_station_distributions=
                                              DroneLoadingStationDistribution(drone_station_locations_distribution=
@@ -113,7 +113,7 @@ class BasicMinimumEnd2EndExperiment:
 
     def test_small_scenario(self):
         start_time = datetime.now()
-        empty_drone_delivery_board = _create_empty_drone_delivery_board(size=20, max_route_time_entire_board=50)
+        empty_drone_delivery_board = _create_empty_drone_delivery_board(size=20, max_route_time_entire_board=45)
         print("--- _create_empty_drone_delivery_board run time: %s  ---" % (datetime.now() - start_time))
         start_time = datetime.now()
 

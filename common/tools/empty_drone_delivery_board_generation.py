@@ -1,4 +1,5 @@
 from common.entities.base_entities.drone_delivery import EmptyDroneDelivery
+from common.entities.base_entities.drone_delivery import DEFAULT_MAX_ROUTE_TIME_IN_MINUTES, DEFAULT_VELOCITY_METER_PER_SEC
 from common.entities.base_entities.drone_delivery_board import EmptyDroneDeliveryBoard
 from common.entities.base_entities.entity_id import EntityID
 from common.tools.fleet_property_sets import PlatformPropertySet
@@ -19,13 +20,16 @@ def _calc_drone_formation_amounts(formation_sizes_amounts: FormationSizesAmounts
     return FleetConfigurationAttribution.solve()
 
 
-def calc_drone_deliveries(platform_properties: PlatformPropertySet) -> [EmptyDroneDelivery]:
+def calc_drone_deliveries(platform_properties: PlatformPropertySet,
+                          max_route_time_entire_board: int = DEFAULT_MAX_ROUTE_TIME_IN_MINUTES,
+                          velocity_entire_board: float = DEFAULT_VELOCITY_METER_PER_SEC) -> [EmptyDroneDelivery]:
     empty_deliveries = []
     formation_sizes_amounts = _calc_formation_amounts(platform_properties)
     drone_formations_per_type_amounts = _calc_drone_formation_amounts(formation_sizes_amounts, platform_properties)
     for drone_formation, amount in drone_formations_per_type_amounts.amounts.items():
         for i in range(amount):
-            empty_deliveries.append(EmptyDroneDelivery(EntityID(uuid.uuid4()), drone_formation))
+            empty_deliveries.append(EmptyDroneDelivery(EntityID(uuid.uuid4()), drone_formation,
+                                                       max_route_time_entire_board, velocity_entire_board))
     return empty_deliveries
 
 
@@ -37,5 +41,7 @@ def generate_empty_delivery_board(fleet_reader: FleetReader) -> EmptyDroneDelive
     return EmptyDroneDeliveryBoard(total_drone_deliveries)
 
 
-def build_empty_drone_delivery_board(platform_properties: PlatformPropertySet, max_route_time_entire_board: float):
-    return EmptyDroneDeliveryBoard(calc_drone_deliveries(platform_properties), max_route_time_entire_board)
+def build_empty_drone_delivery_board(platform_properties: PlatformPropertySet, max_route_time_entire_board: int,
+                                     velocity_entire_board: float):
+    return EmptyDroneDeliveryBoard(calc_drone_deliveries(platform_properties, max_route_time_entire_board,
+                                   velocity_entire_board))

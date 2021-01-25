@@ -8,7 +8,7 @@ from common.entities.base_entities.delivery_request import DeliveryRequest
 from common.entities.base_entities.drone import PlatformType
 from common.entities.base_entities.drone_delivery import EmptyDroneDelivery
 from common.entities.base_entities.drone_delivery_board import EmptyDroneDeliveryBoard
-from common.entities.base_entities.drone_formation import DroneFormations, DroneFormationOptions, FormationOptions, FormationSize
+from common.entities.base_entities.drone_formation import DroneFormations, FormationOptions, FormationSize
 from common.entities.base_entities.drone_loading_dock import DroneLoadingDock
 from common.entities.base_entities.drone_loading_station import DroneLoadingStation
 from common.entities.base_entities.entity_distribution.delivery_requestion_dataset_builder import \
@@ -40,14 +40,14 @@ class ORToolsMatcherMaxRouteTimeTestCase(TestCase):
         cls.loading_dock = cls._create_loading_dock()
         cls.empty_drone_delivery_1 = cls._create_limited_route_time_empty_drone_delivery(max_route_times_in_minutes=20,
                                                                                          velocity_meter_per_sec=10.0)
-        cls.edd1_max_endurance = cls.empty_drone_delivery_1.drone_formation.max_route_times_in_minutes
-        cls.edd1_max_range = cls.empty_drone_delivery_1.drone_formation.get_formation_max_range_in_meters()
-        cls.edd1_velocity_per_minute = cls.empty_drone_delivery_1.drone_formation.velocity_meter_per_sec * 60.0
+        cls.edd1_max_endurance = cls.empty_drone_delivery_1.max_route_time_in_minutes
+        cls.edd1_max_range = cls.empty_drone_delivery_1.get_formation_max_range_in_meters()
+        cls.edd1_velocity_per_minute = cls.empty_drone_delivery_1.velocity_meter_per_sec * 60.0
         cls.empty_drone_delivery_2 = cls._create_sufficient_route_time_empty_drone_delivery(max_route_times_in_minutes=60,
                                                                                          velocity_meter_per_sec=10.0)
-        cls.edd2_max_endurance = cls.empty_drone_delivery_2.drone_formation.max_route_times_in_minutes
-        cls.edd2_max_range = cls.empty_drone_delivery_2.drone_formation.get_formation_max_range_in_meters()
-        cls.edd2_velocity_per_minute = cls.empty_drone_delivery_2.drone_formation.velocity_meter_per_sec * 60.0
+        cls.edd2_max_endurance = cls.empty_drone_delivery_2.max_route_time_in_minutes
+        cls.edd2_max_range = cls.empty_drone_delivery_2.get_formation_max_range_in_meters()
+        cls.edd2_velocity_per_minute = cls.empty_drone_delivery_2.velocity_meter_per_sec * 60.0
         cls.empty_board_1 = EmptyDroneDeliveryBoard([cls.empty_drone_delivery_1])
         cls.empty_board_2 = EmptyDroneDeliveryBoard([cls.empty_drone_delivery_2])
 
@@ -83,9 +83,9 @@ class ORToolsMatcherMaxRouteTimeTestCase(TestCase):
 
     @staticmethod
     def _create_limited_route_time_empty_drone_delivery(max_route_times_in_minutes: int, velocity_meter_per_sec: float):
-        return EmptyDroneDelivery(EntityID(uuid.uuid4()), DroneFormationOptions.get_drone_formation(
-            FormationSize.MINI, FormationOptions.LARGE_PACKAGES, PlatformType.platform_1,
-            max_route_times_in_minutes, velocity_meter_per_sec))
+        return EmptyDroneDelivery(EntityID(uuid.uuid4()), DroneFormations.get_drone_formation(
+            FormationSize.MINI, FormationOptions.LARGE_PACKAGES, PlatformType.platform_1),
+            max_route_times_in_minutes, velocity_meter_per_sec)
 
     @staticmethod
     def _create_match_config_with_waiting_time(waiting_time: int=0):
@@ -143,9 +143,9 @@ class ORToolsMatcherMaxRouteTimeTestCase(TestCase):
 
     @staticmethod
     def _create_sufficient_route_time_empty_drone_delivery(max_route_times_in_minutes: int, velocity_meter_per_sec: float):
-        return EmptyDroneDelivery(EntityID(uuid.uuid4()), DroneFormationOptions.get_drone_formation(
-            FormationSize.MINI, FormationOptions.LARGE_PACKAGES, PlatformType.platform_2,
-            max_route_times_in_minutes, velocity_meter_per_sec))
+        return EmptyDroneDelivery(EntityID(uuid.uuid4()), DroneFormations.get_drone_formation(
+            FormationSize.MINI, FormationOptions.LARGE_PACKAGES, PlatformType.platform_2),
+            max_route_times_in_minutes, velocity_meter_per_sec)
 
     @staticmethod
     def _create_loading_dock() -> DroneLoadingDock:

@@ -14,12 +14,9 @@ class FormationSize(IntEnum):
 
 class DroneFormation:
 
-    def __init__(self, formation_size: FormationSize, drone_configuration: DroneConfiguration,
-                 max_route_times_in_minutes: int = 400, velocity_meter_per_sec: float = 10.0):
+    def __init__(self, formation_size: FormationSize, drone_configuration: DroneConfiguration):
         self._size = formation_size
         self._drone_configuration = drone_configuration
-        self._max_route_times_in_minutes = max_route_times_in_minutes # TODO: Change to real endurance
-        self._velocity_meter_per_sec = velocity_meter_per_sec  # TODO: Change to real velocity
 
     @property
     def size(self) -> FormationSize:
@@ -28,20 +25,6 @@ class DroneFormation:
     @property
     def drone_configuration(self) -> DroneConfiguration:
         return self._drone_configuration
-
-    @property
-    def max_route_times_in_minutes(self) -> int:
-        return self._max_route_times_in_minutes
-
-    @property
-    def velocity_meter_per_sec(self) -> float:
-        return self._velocity_meter_per_sec
-
-    def set_max_route_times_in_minutes(self, max_route_time: int):
-        self._max_route_times_in_minutes = max_route_time
-
-    def get_formation_max_range_in_meters(self) -> float:
-        return self.velocity_meter_per_sec * self.max_route_times_in_minutes * 60.0
 
     def get_platform_type(self) -> PlatformType:
         return self._drone_configuration.get_platform_type()
@@ -115,11 +98,9 @@ class DroneFormationOptions:
 
     @classmethod
     def get_drone_formation(cls, formation_size: FormationSize, formation_option: FormationOptions,
-                            platform_type: PlatformType,
-                            max_route_times_in_minutes: int = 400,
-                            velocity_meter_per_sec: float = 10.0) -> DroneFormation:
+                            platform_type: PlatformType) -> DroneFormation:
         drone_configuration = cls._get_drone_configuration(formation_option, platform_type)
-        return DroneFormation(formation_size, drone_configuration, max_route_times_in_minutes, velocity_meter_per_sec)
+        return DroneFormation(formation_size, drone_configuration)
 
     @classmethod
     def get_formation_option(cls, configuration: Configurations, platform_type: PlatformType):
