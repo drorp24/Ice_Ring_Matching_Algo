@@ -56,8 +56,8 @@ class PackageTypeAmountMap(JsonableBaseEntity):
         return hash(tuple(sorted(self._package_type_to_amounts.items())))
 
     def __str__(self):
-        return '[' + ' '.join(
-            map(lambda item: str(item[0]) + ':' + str(item[1]), self.package_type_to_amounts.items())) + ']'
+        return '[' + ''.join(
+            map(lambda item: str(item[0]).split('.')[1] + ':' + str(item[1]), self.package_type_to_amounts.items())) + ']'
 
     def __eq__(self, other):
         return self.package_type_to_amounts == other.package_type_to_amounts
@@ -66,7 +66,7 @@ class PackageTypeAmountMap(JsonableBaseEntity):
         return sum(list([PackageType[pta[0]].calc_weight() * pta[1] for pta in self._package_type_to_amounts.items()]))
 
     def __lt__(self, other):
-        return self.calc_total_weight < other.calc_total_weight
+        return self.calc_total_weight() < other.calc_total_weight()
 
 
 class DronePackageConfiguration:
@@ -89,9 +89,6 @@ class DronePackageConfiguration:
     def get_package_type_amount(self, package_type: PackageType) -> int:
         return self._package_types_map.get_package_type_amount(package_type)
 
-    def get_drone_type(self) -> DroneType:
-        return self._drone_type
-
 
 class PackageConfiguration(Enum):
     LARGE_X2 = PackageTypeAmountMap({PackageType.LARGE: 2})
@@ -110,7 +107,7 @@ class PackageConfiguration(Enum):
         return DroneType[split_name[1]]
 
     def __dict__(self):
-        return {'__enum__': str(self)}
+        return {'__enum__': str(self.__dict__())}
 
     def __repr__(self):
         return 'PackageConfiguration: ' + str(self.__dict__())

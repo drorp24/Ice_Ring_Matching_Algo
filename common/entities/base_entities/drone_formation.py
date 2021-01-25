@@ -57,7 +57,7 @@ class DroneFormation:
         return self.get_drone_type().value * 100
 
     def get_drone_type(self) -> DroneType:
-        return self._package_configuration.get_drone_type()
+        return self._package_configuration.drone_type
 
     def get_package_type_amount(self, package_type: PackageType) -> int:
         return self.drone_formation_type.get_amount_of_drones() * \
@@ -124,7 +124,7 @@ class DroneTypeToPackageConfigurationOption:
                                  drone_type: DroneType) -> DronePackageConfiguration:
         drone_configurations = cls.drone_configurations_map[formation_option]
         for drone_configuration in drone_configurations:
-            if drone_configuration.get_drone_type() == drone_type:
+            if drone_configuration.drone_type == drone_type:
                 return drone_configuration
         raise NoDronePackageConfigurationFoundException()
 

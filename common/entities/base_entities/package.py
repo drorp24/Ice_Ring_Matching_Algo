@@ -61,7 +61,7 @@ class Package(JsonableBaseEntity):
         return self.__potential_drop_envelope
 
     def __str__(self):
-        return 'package of weight ' + self._weight
+        return 'package of weight ' + str(self._weight)
 
 
 class PackageType(Enum):

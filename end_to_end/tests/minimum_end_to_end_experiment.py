@@ -110,8 +110,7 @@ class BasicMinimumEnd2EndExperiment:
         print("--- create_fully_connected_graph_model run time: %s  ---" % (datetime.now() - start_time))
         start_time = datetime.now()
 
-        match_config_file_path = 'jsons/test_matcher_config.json'
-        # end_to_end/tests/jsons/test_matcher_config.json
+        match_config_file_path = 'end_to_end/tests/jsons/test_matcher_config.json'
         match_config = MatcherConfig.dict_to_obj(MatcherConfig.json_to_dict(match_config_file_path))
         matcher_input = MatcherInput(graph=fully_connected_graph, empty_board=empty_drone_delivery_board,
                                      config=match_config)
@@ -133,13 +132,13 @@ class BasicMinimumEnd2EndExperiment:
         operational_drawer2d.add_delivery_board(board_map_drawer, delivery_board, draw_unmatched=True)
         board_map_drawer.draw(False)
         row_names = ["Unmatched Out"] + \
-                    ["[" + str(delivery.drone_formation.drone_formation_type.value) + "] * " +
-                     str(delivery.drone_formation.drone_configuration.package_type_map.get_package_type_amounts())
+                    ["[" + str(delivery.drone_formation.drone_formation_type.name) + "] * " +
+                     str(delivery.drone_formation.drone_configuration.package_type_map)
                      for delivery in delivery_board.drone_deliveries]
         board_gantt_drawer = create_gantt_drawer(zero_time=scenario.zero_time,
                                                  hours_period=24,
                                                  row_names=row_names,
-                                                 rows_title='Carried Package types: [Formation Size] * ' + str(
+                                                 rows_title='Package Types: ' + str(
                                                      [package_type.name for package_type in PackageType])
                                                  )
         operational_gantt_drawer.add_delivery_board(board_gantt_drawer, delivery_board, True)
