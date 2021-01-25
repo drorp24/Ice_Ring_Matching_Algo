@@ -56,11 +56,12 @@ class ExactTimeWindowDistribution(TimeWindowDistribution):
         self._amount_count = 0
 
     def choose_rand(self, random: Random, amount: int = 1) -> List[TimeWindowExtension]:
-        if self._amount_count + amount > len(self._time_windows):
+        tw = self._time_windows
+        if self._amount_count + amount > len(tw):
             raise RuntimeError(
                 f"Used {self._amount_count} randomized choices which is \
-                more than the initially given {len(self._time_windows)} ")
-        choices = self._time_windows[self._amount_count: self._amount_count + amount]
+                more than the initially given {len(tw)} ")
+        choices = tw[self._amount_count: self._amount_count + amount]
         self._amount_count += amount
         return choices
 

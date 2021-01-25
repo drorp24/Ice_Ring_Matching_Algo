@@ -1,8 +1,9 @@
-
 from datetime import time, date, timedelta, datetime
 from pathlib import Path
 from random import Random
 
+from common.entities.base_entities.drone import PackageConfiguration, DroneType
+from common.entities.base_entities.drone_formation import DroneFormationType
 from common.entities.base_entities.entity_distribution.delivery_requestion_dataset_builder import \
     build_delivery_request_distribution
 from common.entities.base_entities.entity_distribution.drone_loading_dock_distribution import \
@@ -13,10 +14,11 @@ from common.entities.base_entities.entity_distribution.package_distribution impo
 from common.entities.base_entities.entity_distribution.priority_distribution import PriorityDistribution
 from common.entities.base_entities.entity_distribution.temporal_distribution import TimeDeltaDistribution, \
     TimeWindowDistribution, DateTimeDistribution
+from common.entities.base_entities.fleet.empty_drone_delivery_board_generation import build_empty_drone_delivery_board
+from common.entities.base_entities.fleet.fleet_property_sets import DroneFormationTypePolicy, \
+    PackageConfigurationPolicy, DroneSetProperties
 from common.entities.base_entities.package import PackageType
 from common.entities.base_entities.temporal import DateTimeExtension, TimeDeltaExtension
-from common.tools.empty_drone_delivery_board_generation import build_empty_drone_delivery_board
-from common.tools.fleet_property_sets import *
 from end_to_end.distribution.scenario_distribution import ScenarioDistribution
 from end_to_end.minimum_end_to_end import *
 from geometry.distribution.geo_distribution import NormalPointDistribution, UniformPointInBboxDistribution
@@ -66,20 +68,18 @@ def create_single_package_distribution():
 
 
 def _create_empty_drone_delivery_board(
-        formation_size_policy: dict = {FormationSize.MINI: 1, FormationSize.MEDIUM: 0},
-        configurations_policy: dict = {Configurations.LARGE_X2: 0.9,
-                                       Configurations.MEDIUM_X4: 0.1,
-                                       Configurations.SMALL_X8: 0,
-                                       Configurations.TINY_X16: 0}
-        , platform_type: PlatformType = PlatformType.platform_1,
-        size: int = 30):
-    formation_size_property_set = PlatformFormationsSizePolicyPropertySet(formation_size_policy)
-    configuration_policy_property_set = PlatformConfigurationsPolicyPropertySet(configurations_policy)
-    platform_property_set = PlatformPropertySet(platform_type=platform_type,
-                                                configuration_policy=configuration_policy_property_set,
-                                                formation_policy=formation_size_property_set,
-                                                size=size)
-    return build_empty_drone_delivery_board(platform_property_set)
+        drone_formation_policy=DroneFormationTypePolicy({DroneFormationType.PAIR: 1, DroneFormationType.QUAD: 0}),
+        package_configurations_policy=PackageConfigurationPolicy({PackageConfiguration.LARGE_X2: 0.9,
+                                                                  PackageConfiguration.MEDIUM_X4: 0.1,
+                                                                  PackageConfiguration.SMALL_X8: 0,
+                                                                  PackageConfiguration.TINY_X16: 0}),
+        drone_type: DroneType = DroneType.drone_type_1,
+        amount: int = 30):
+    drone_set_properties = DroneSetProperties(_drone_type=drone_type,
+                                               _package_configuration_policy=package_configurations_policy,
+                                               _drone_formation_policy=drone_formation_policy,
+                                               _drone_amount=amount)
+    return build_empty_drone_delivery_board(drone_set_properties)
 
 
 class BasicMinimumEnd2EndExperiment:
@@ -100,7 +100,7 @@ class BasicMinimumEnd2EndExperiment:
 
     def test_small_scenario(self):
         start_time = datetime.now()
-        empty_drone_delivery_board = _create_empty_drone_delivery_board(size=20)
+        empty_drone_delivery_board = _create_empty_drone_delivery_board(amount=20)
         print("--- _create_empty_drone_delivery_board run time: %s  ---" % (datetime.now() - start_time))
         start_time = datetime.now()
 
@@ -110,8 +110,9 @@ class BasicMinimumEnd2EndExperiment:
         print("--- create_fully_connected_graph_model run time: %s  ---" % (datetime.now() - start_time))
         start_time = datetime.now()
 
-        match_config = MatcherConfig.dict_to_obj(
-            MatcherConfig.json_to_dict('end_to_end/tests/jsons/test_matcher_config.json'))
+        match_config_file_path = 'jsons/test_matcher_config.json'
+        # end_to_end/tests/jsons/test_matcher_config.json
+        match_config = MatcherConfig.dict_to_obj(MatcherConfig.json_to_dict(match_config_file_path))
         matcher_input = MatcherInput(graph=fully_connected_graph, empty_board=empty_drone_delivery_board,
                                      config=match_config)
 
@@ -132,7 +133,7 @@ class BasicMinimumEnd2EndExperiment:
         operational_drawer2d.add_delivery_board(board_map_drawer, delivery_board, draw_unmatched=True)
         board_map_drawer.draw(False)
         row_names = ["Unmatched Out"] + \
-                    ["[" + str(delivery.drone_formation.size.value) + "] * " +
+                    ["[" + str(delivery.drone_formation.drone_formation_type.value) + "] * " +
                      str(delivery.drone_formation.drone_configuration.package_type_map.get_package_type_amounts())
                      for delivery in delivery_board.drone_deliveries]
         board_gantt_drawer = create_gantt_drawer(zero_time=scenario.zero_time,

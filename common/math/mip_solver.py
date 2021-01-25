@@ -1,3 +1,5 @@
+from typing import Dict
+
 from ortools.linear_solver import pywraplp
 from dataclasses import dataclass
 from enum import Enum
@@ -58,3 +60,14 @@ class MIPSolver:
     @classmethod
     def solve(cls):
         cls.solver.Solve()
+
+
+def solve_mip(mip_data: MIPData) -> Dict:
+    mip_solver = MIPSolver()
+    variables = mip_solver.set_variables(parameters=mip_data)
+    mip_solver.set_equalities_constraints(parameters=mip_data, variables=variables)
+    mip_solver.set_inequalities_constraints(parameters=mip_data, variables=variables)
+    mip_solver.set_objective_coeffs(parameters=mip_data, variables=variables)
+    mip_solver.set_minimization()
+    mip_solver.solve()
+    return variables

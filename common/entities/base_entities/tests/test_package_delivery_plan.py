@@ -26,5 +26,3 @@ class BasicPackageDeliveryPlanTests(unittest.TestCase):
         samples_from_distribution3 = self.package_delivery_distrib.choose_rand(random=Random(103), amount=100)
         self.assertNotEqual(samples_from_distribution1, samples_from_distribution3)
 
-    def print_example_of_package_delivery(self):
-        pprint(self.package_delivery_distrib.choose_rand(Random(100), 1)[0].__dict__())

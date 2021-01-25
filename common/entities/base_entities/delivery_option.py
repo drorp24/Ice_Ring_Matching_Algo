@@ -34,7 +34,8 @@ class DeliveryOption(JsonableBaseEntity, Localizable):
         return sum(demands)
 
     def get_package_type_amount_map(self) -> PackageTypeAmountMap:
-        return PackageTypeAmountMap([self.get_package_type_amount(package_type) for package_type in PackageType])
+        return PackageTypeAmountMap(
+            {package_type: self.get_package_type_amount(package_type) for package_type in PackageType})
 
     @classmethod
     def dict_to_obj(cls, dict_input):

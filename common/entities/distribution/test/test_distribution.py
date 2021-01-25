@@ -27,7 +27,7 @@ class BasicDistributionTestCase(unittest.TestCase):
         self.assertTrue(all([num in Counter(samples).keys() for num in list(range(0, 10))]))
 
 
-def assert_samples_approx_expected(self, key: Union[str, int], expected_package_prob: dict, sample_count: dict,
+def assert_samples_approx_expected(self, key: Union[object, str, int], expected_package_prob: dict, sample_count: dict,
                                    delta: float = 0.03):
     package_sample_prob = sample_count.get(key, 0) / sum(sample_count.values())
     self.assertAlmostEqual(first=package_sample_prob, second=expected_package_prob.get(key), delta=delta)

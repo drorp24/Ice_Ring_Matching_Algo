@@ -96,7 +96,7 @@ class PltDrawer2D(Drawer2D):
         elif self._coordinate_sys is Drawer2DCoordinateSys.GEOGRAPHIC:
             self._fig = plt.figure()
             self._ax = plt.axes(projection=ccrs.PlateCarree())
-            map_background_path = filePath(r"visualization/basic/gush_dan_background.Png")
+            map_background_path = filePath(r"visualization/basic/gush_dan_background.png") #/Users/gilbaz/Code/Ice_Ring/visualization/basic/gush_dan_background.png
             map_background_img = plt.imread(map_background_path)
             west_lon = 34.83927
             east_lon = 35.32341
