@@ -15,7 +15,7 @@ class GridService:
     @staticmethod
     def get_polygon_centroid_grid_location(polygon: Polygon2D,
                                            cell_width_resolution: float, cell_height_resolution: float) -> GridLocation:
-        return GridService.get_grid_location(polygon.centroid, cell_width_resolution, cell_height_resolution)
+        return GridService.get_grid_location(polygon.centroid(), cell_width_resolution, cell_height_resolution)
 
     @staticmethod
     def scale_to_grid(drop_point_grid_location: GridLocation, envelope_grid_location: Optional.of(GridLocation)) -> \
