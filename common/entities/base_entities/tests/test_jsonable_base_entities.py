@@ -1,4 +1,5 @@
 import unittest
+from pathlib import Path
 from random import Random
 
 from common.entities.base_entities.base_entity import JsonableBaseEntity
@@ -16,12 +17,24 @@ from common.entities.base_entities.package_delivery_plan import PackageDeliveryP
 
 class BasicJsonableBaseEntitiesTests(unittest.TestCase):
 
+    pdp_json_path = Path('common/entities/base_entities/tests/jsons/pdp_test_file.json')
+    cd_json_path = Path('common/entities/base_entities/tests/jsons/cd_test_file.json')
+    do_json_path = Path('common/entities/base_entities/tests/jsons/do_test_file.json')
+    dr_json_path = Path('common/entities/base_entities/tests/jsons/dr_test_file.json')
+
     @classmethod
     def setUpClass(cls):
         cls.pdp1 = PackageDeliveryPlanDistribution().choose_rand(Random(10))[0]
         cls.cd1 = CustomerDeliveryDistribution().choose_rand(Random(42))[0]
         cls.do1 = DeliveryOptionDistribution().choose_rand(Random(42))[0]
         cls.dr1 = DeliveryRequestDistribution().choose_rand(Random(42))[0]
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.pdp_json_path.unlink()
+        cls.cd_json_path.unlink()
+        cls.do_json_path.unlink()
+        cls.dr_json_path.unlink()
 
     def test_pdp_to_dict(self):
         pdp_dict1 = self.pdp1.__dict__()
@@ -31,9 +44,8 @@ class BasicJsonableBaseEntitiesTests(unittest.TestCase):
         self.assertEqual(pdp_dict1, pdp_dict2)
 
     def test_pdp_to_json(self):
-        pdp_json_path = 'common/entities/base_entities/tests/jsons/pdp_test_file.json'
-        self.pdp1.to_json(pdp_json_path)
-        pdp_dict = JsonableBaseEntity.json_to_dict(pdp_json_path)
+        self.pdp1.to_json(self.pdp_json_path)
+        pdp_dict = JsonableBaseEntity.json_to_dict(self.pdp_json_path)
         self.assertEqual(self.pdp1, PackageDeliveryPlan.dict_to_obj(pdp_dict))
 
     def test_cd_to_dict(self):
@@ -44,9 +56,8 @@ class BasicJsonableBaseEntitiesTests(unittest.TestCase):
         self.assertEqual(cd_dict1, cd_dict2)
 
     def test_cd_to_json(self):
-        cd_json_path = 'common/entities/base_entities/tests/jsons/cd_test_file.json'
-        self.cd1.to_json(cd_json_path)
-        cd_dict = JsonableBaseEntity.json_to_dict(cd_json_path)
+        self.cd1.to_json(self.cd_json_path)
+        cd_dict = JsonableBaseEntity.json_to_dict(self.cd_json_path)
         self.assertEqual(self.cd1, CustomerDelivery.dict_to_obj(cd_dict))
 
     def test_do_to_dict(self):
@@ -57,9 +68,8 @@ class BasicJsonableBaseEntitiesTests(unittest.TestCase):
         self.assertEqual(do_dict1, do_dict2)
 
     def test_do_to_json(self):
-        do_json_path = 'common/entities/base_entities/tests/jsons/do_test_file.json'
-        self.do1.to_json(do_json_path)
-        do_dict = JsonableBaseEntity.json_to_dict(do_json_path)
+        self.do1.to_json(self.do_json_path)
+        do_dict = JsonableBaseEntity.json_to_dict(self.do_json_path)
         self.assertEqual(self.do1, DeliveryOption.dict_to_obj(do_dict))
 
     def test_dr_to_dict(self):
@@ -70,7 +80,6 @@ class BasicJsonableBaseEntitiesTests(unittest.TestCase):
         self.assertEqual(dr_dict1, dr_dict2)
 
     def test_dr_to_json(self):
-        dr_json_path = 'common/entities/base_entities/tests/jsons/dr_test_file.json'
-        self.dr1.to_json(dr_json_path)
-        dr_dict = JsonableBaseEntity.json_to_dict(dr_json_path)
+        self.dr1.to_json(self.dr_json_path)
+        dr_dict = JsonableBaseEntity.json_to_dict(self.dr_json_path)
         self.assertEqual(self.dr1, DeliveryRequest.dict_to_obj(dr_dict))
