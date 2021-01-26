@@ -2,11 +2,10 @@ from __future__ import annotations
 
 import json
 from abc import abstractmethod, ABCMeta
+from pathlib import Path
 from uuid import UUID
 import dataclasses
 from common.utils.uuid_utils import convert_uuid_to_str
-
-DEFAULT_TEST_FILE_JSON = 'jsons/test_file.jsons'
 
 
 class BaseEntity(object):
@@ -37,17 +36,17 @@ class BaseEntity(object):
 
 class JsonableBaseEntity(BaseEntity):
 
-    def to_json(self, file_path: str = DEFAULT_TEST_FILE_JSON):
+    def to_json(self, file_path: Path):
         with open(file_path, 'w') as f:
             dict_self = self.__dict__()
             json.dump(dict_self, f, sort_keys=True)
 
-    def from_json(target_class: ABCMeta, file_path: str = DEFAULT_TEST_FILE_JSON):
+    def from_json(target_class: ABCMeta, file_path: Path):
         obj_dict = target_class.json_to_dict(file_path)
         return target_class.dict_to_obj(obj_dict)
 
     @staticmethod
-    def json_to_dict(file_path: str = DEFAULT_TEST_FILE_JSON):
+    def json_to_dict(file_path: Path):
         with open(file_path, 'rb') as f:
             return json.load(f)
 
