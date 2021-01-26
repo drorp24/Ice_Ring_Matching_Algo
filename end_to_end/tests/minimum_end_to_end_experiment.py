@@ -64,7 +64,7 @@ def _create_delivery_request_distribution(centerPoint: Point2D, sigma_lon: float
 
 
 def create_single_package_distribution():
-    package_type_distribution_dict = {PackageType.LARGE.name: 1}
+    package_type_distribution_dict = {PackageType.LARGE: 1}
     package_distribution = PackageDistribution(package_distribution_dict=package_type_distribution_dict)
     return package_distribution
 
@@ -151,14 +151,13 @@ class BasicMinimumEnd2EndExperiment:
         operational_drawer2d.add_delivery_board(board_map_drawer, delivery_board, draw_unmatched=True)
         board_map_drawer.draw(False)
         row_names = ["Unmatched Out"] + \
-                    ["[" + str(delivery.drone_formation.drone_formation_type.value) + "] * " +
-                     str(delivery.drone_formation.drone_configuration.package_type_map.get_package_type_amounts())
+                    ["[" + str(delivery.drone_formation.drone_formation_type.name) + "] * " +
+                     str(delivery.drone_formation.drone_configuration.package_type_map)
                      for delivery in delivery_board.drone_deliveries]
         board_gantt_drawer = create_gantt_drawer(zero_time=supplier_category.zero_time,
                                                  hours_period=24,
                                                  row_names=row_names,
-                                                 rows_title='Carried Package types: [Formation Size] * ' + str(
-                                                     [package_type.name for package_type in PackageType])
+                                                 rows_title='Formation Type x Package Type Amounts'
                                                  )
         operational_gantt_drawer.add_delivery_board(board_gantt_drawer, delivery_board, True)
         board_gantt_drawer.draw(True)

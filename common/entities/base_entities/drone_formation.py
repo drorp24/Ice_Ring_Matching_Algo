@@ -38,9 +38,9 @@ class DroneFormationType(Enum):
 
 class DroneFormation:
 
-    def __init__(self, drone_formation_type: DroneFormationType, package_configuration: DronePackageConfiguration):
+    def __init__(self, drone_formation_type: DroneFormationType, drone_package_configuration: DronePackageConfiguration):
         self._drone_formation_type = drone_formation_type
-        self._package_configuration = package_configuration
+        self._drone_package_configuration = drone_package_configuration
 
     @property
     def drone_formation_type(self) -> DroneFormationType:
@@ -48,27 +48,27 @@ class DroneFormation:
 
     @property
     def drone_configuration(self) -> DronePackageConfiguration:
-        return self._package_configuration
+        return self._drone_package_configuration
 
     def get_drone_type(self) -> DroneType:
-        return self._package_configuration.get_drone_type()
+        return self._drone_package_configuration.drone_type
 
     def get_package_type_amount(self, package_type: PackageType) -> int:
         return self.drone_formation_type.get_amount_of_drones() * \
-               self._package_configuration.get_package_type_amount(package_type)
+               self._drone_package_configuration.get_package_type_amount(package_type)
 
     def get_package_type_amount_map(self) -> PackageTypeAmountMap:
         amount_per_package_type = PackageTypeAmountMap({package: 0 for package in PackageType})
         extracted_package_type_amounts = PackageTypeAmountMap({
             package_type_name: package_amount * self.drone_formation_type.get_amount_of_drones() for
             package_type_name, package_amount in
-            self._package_configuration.package_type_map.package_type_to_amounts.items()})
+            self._drone_package_configuration.package_type_map.package_type_to_amounts.items()})
         amount_per_package_type.add_to_map(extracted_package_type_amounts)
         return amount_per_package_type
 
     def get_package_type(self) -> PackageType:
         formation_package_type = None
-        package_type_amount_map = self._package_configuration.package_type_map
+        package_type_amount_map = self._drone_package_configuration.package_type_map
         for package_type in PackageType:
             if package_type_amount_map.get_package_type_amount(package_type) > 0:
                 if formation_package_type is not None:
@@ -77,7 +77,7 @@ class DroneFormation:
         return formation_package_type
 
     def __hash__(self):
-        return hash((self._drone_formation_type, self._package_configuration))
+        return hash((self._drone_formation_type, self._drone_package_configuration))
 
 
 class AutoName(Enum):
@@ -118,7 +118,7 @@ class DroneTypeToPackageConfigurationOption:
                                  drone_type: DroneType) -> DronePackageConfiguration:
         drone_configurations = cls.drone_configurations_map[formation_option]
         for drone_configuration in drone_configurations:
-            if drone_configuration.get_drone_type() == drone_type:
+            if drone_configuration.drone_type == drone_type:
                 return drone_configuration
         raise NoDronePackageConfigurationFoundException()
 
