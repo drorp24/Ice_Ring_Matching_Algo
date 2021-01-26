@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 from abc import abstractmethod, ABCMeta
 from uuid import UUID
-
+import dataclasses
 from common.utils.uuid_utils import convert_uuid_to_str
 
 DEFAULT_TEST_FILE_JSON = 'jsons/test_file.jsons'
@@ -15,9 +15,12 @@ class BaseEntity(object):
         return str(self.__dict__())
 
     def __dict__(self):
-        d = {member: self.internal_dict(member) for member in dir(self) if
-             not member.startswith('_') and not callable(getattr(self, member))}
-        d.update({'__class__': type(self).__name__})
+        d = {'__class__': type(self).__name__}
+        if dataclasses.is_dataclass(self):
+            d.update({member: self.internal_dict(member) for member in self.__annotations__.keys()})
+        else:
+            d.update({member: self.internal_dict(member) for member in dir(self)
+                      if not member.startswith('_') and not callable(getattr(self, member))})
         return d
 
     def internal_dict(self, member):

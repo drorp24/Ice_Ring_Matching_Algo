@@ -75,10 +75,10 @@ def _create_empty_drone_delivery_board(
                                                                   PackageConfiguration.TINY_X16: 0}),
         drone_type: DroneType = DroneType.drone_type_1,
         amount: int = 30):
-    drone_set_properties = DroneSetProperties(_drone_type=drone_type,
-                                               _package_configuration_policy=package_configurations_policy,
-                                               _drone_formation_policy=drone_formation_policy,
-                                               _drone_amount=amount)
+    drone_set_properties = DroneSetProperties(drone_type=drone_type,
+                                               package_configuration_policy=package_configurations_policy,
+                                               drone_formation_policy=drone_formation_policy,
+                                               drone_amount=amount)
     return build_empty_drone_delivery_board(drone_set_properties)
 
 
@@ -110,7 +110,7 @@ class BasicMinimumEnd2EndExperiment:
         print("--- create_fully_connected_graph_model run time: %s  ---" % (datetime.now() - start_time))
         start_time = datetime.now()
 
-        match_config_file_path = 'jsons/test_matcher_config.json'
+        match_config_file_path = 'end_to_end/tests/jsons/test_matcher_config.json'
         # end_to_end/tests/jsons/test_matcher_config.json
         match_config = MatcherConfig.dict_to_obj(MatcherConfig.json_to_dict(match_config_file_path))
         matcher_input = MatcherInput(graph=fully_connected_graph, empty_board=empty_drone_delivery_board,
@@ -134,7 +134,7 @@ class BasicMinimumEnd2EndExperiment:
         board_map_drawer.draw(False)
         row_names = ["Unmatched Out"] + \
                     ["[" + str(delivery.drone_formation.drone_formation_type.value) + "] * " +
-                     str(delivery.drone_formation.drone_configuration.package_type_map.get_package_type_amounts())
+                     str(delivery.drone_formation.drone_package_configuration.package_type_map.get_package_type_amounts())
                      for delivery in delivery_board.drone_deliveries]
         board_gantt_drawer = create_gantt_drawer(zero_time=scenario.zero_time,
                                                  hours_period=24,

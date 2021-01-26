@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from functools import lru_cache
 
+from common.entities.base_entities.base_entity import JsonableBaseEntity
 from common.entities.base_entities.delivery_request import DeliveryRequest
 from common.entities.base_entities.drone import PackageTypeAmountMap
 from common.entities.base_entities.drone_formation import DroneFormation
@@ -10,7 +11,7 @@ from common.entities.base_entities.package import PackageType
 from common.entities.base_entities.temporal import TimeWindowExtension
 
 
-class EmptyDroneDelivery:
+class EmptyDroneDelivery(JsonableBaseEntity):
     def __init__(self, id_: EntityID, drone_formation: DroneFormation):
         self._id = id_
         self._drone_formation = drone_formation
@@ -29,18 +30,23 @@ class EmptyDroneDelivery:
     def drone_formation(self) -> DroneFormation:
         return self._drone_formation
 
+    @classmethod
+    def dict_to_obj(cls, dict_input):
+        assert (dict_input['__class__'] == cls.__name__)
+        return EmptyDroneDelivery(id_=EntityID.dict_to_obj(dict_input['id']),
+                                  drone_formation=DroneFormation.dict_to_obj(dict_input['drone_formation']))
+
 
 @dataclass
-class MatchedDroneLoadingDock:
+class MatchedDroneLoadingDock(JsonableBaseEntity):
     graph_index: int  # TODO: replace to DeliveryRequestUUID
     drone_loading_dock: DroneLoadingDock
     delivery_time_window: TimeWindowExtension
 
     def __eq__(self, other):
-        return self.graph_index == other.graph_index and self.drone_loading_dock == \
-               other.drone_loading_dock and self.delivery_time_window.since == \
-               other.delivery_time_window.since \
-               and self.delivery_time_window.until == other.delivery_time_window.until
+        return self.graph_index == other.graph_index \
+               and self.drone_loading_dock == other.drone_loading_dock \
+               and self.delivery_time_window == other.delivery_time_window
 
     def __str__(self):
         return '[MatchedDroneLoadingDock(graph_index=' + str(
@@ -51,9 +57,17 @@ class MatchedDroneLoadingDock:
         return hash((self.graph_index, self.drone_loading_dock,
                      self.delivery_time_window.since, self.delivery_time_window.until))
 
+    @classmethod
+    def dict_to_obj(cls, dict_input):
+        assert (dict_input['__class__'] == cls.__name__)
+        return MatchedDroneLoadingDock(
+            graph_index=dict_input['graph_index'],
+            drone_loading_dock=DroneLoadingDock.dict_to_obj(dict_input['drone_loading_dock']),
+            delivery_time_window=TimeWindowExtension.dict_to_obj(dict_input['delivery_time_window']))
+
 
 @dataclass
-class MatchedDeliveryRequest:
+class MatchedDeliveryRequest(JsonableBaseEntity):
     graph_index: int
     delivery_request: DeliveryRequest
     matched_delivery_option_index: int  # TODO: replace to DeliveryOptionUUID
@@ -75,6 +89,15 @@ class MatchedDeliveryRequest:
     def __hash__(self):
         return hash((self.graph_index, self.delivery_request, self.matched_delivery_option_index,
                      self.delivery_time_window.since, self.delivery_time_window.until))
+
+    @classmethod
+    def dict_to_obj(cls, dict_input):
+        assert (dict_input['__class__'] == cls.__name__)
+        return MatchedDeliveryRequest(
+            graph_index=dict_input['graph_index'],
+            delivery_request=DeliveryRequest.dict_to_obj(dict_input['delivery_request']),
+            matched_delivery_option_index=dict_input['matched_delivery_option_index'],
+            delivery_time_window=TimeWindowExtension.dict_to_obj(dict_input['delivery_time_window']))
 
 
 # TODO change to MatchedDroneDelivery
@@ -115,15 +138,6 @@ class DroneDelivery(EmptyDroneDelivery):
             amount_per_package_type.add_to_map(delivery_option_package_type_amount)
         return amount_per_package_type
 
-
-        # for matched_request in self._matched_requests:
-        #     m = matched_request.delivery_request.delivery_options[matched_request.matched_delivery_option_index]\
-        #         .get_package_type_amount_map()
-        #     amount_per_package_type = [total_amount + request_amount
-        #                                for total_amount, request_amount
-        #                                in zip(amount_per_package_type.values(), m)]
-        # return _PackageTypeAmountMap(amount_per_package_type)
-
     @lru_cache()
     def get_total_priority(self) -> int:
         return sum(matched_request.delivery_request.priority for matched_request in self._matched_requests)
@@ -153,3 +167,14 @@ class DroneDelivery(EmptyDroneDelivery):
         return super().__eq__(
             other) and self._matched_requests == other.matched_requests and self.start_drone_loading_docks == \
                other.start_drone_loading_docks and self.end_drone_loading_docks == other.end_drone_loading_docks
+
+    @classmethod
+    def dict_to_obj(cls, dict_input):
+        assert (dict_input['__class__'] == cls.__name__)
+        return DroneDelivery(
+            id_=EntityID.dict_to_obj(dict_input['id']),
+            drone_formation=DroneFormation.dict_to_obj(dict_input['drone_formation']),
+            matched_requests=[MatchedDeliveryRequest.dict_to_obj(matched_request_dict) for matched_request_dict in
+                              dict_input['matched_requests']],
+            start_drone_loading_docks=MatchedDroneLoadingDock.dict_to_obj(dict_input['start_drone_loading_docks']),
+            end_drone_loading_docks=MatchedDroneLoadingDock.dict_to_obj(dict_input['end_drone_loading_docks']))

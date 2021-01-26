@@ -2,6 +2,7 @@ from __future__ import annotations
 from enum import Enum, auto
 from functools import lru_cache
 
+from common.entities.base_entities.base_entity import JsonableBaseEntity
 from common.entities.base_entities.drone import DronePackageConfiguration, PackageConfiguration, PackageTypeAmountMap
 from common.entities.base_entities.drone import DroneType, DroneConfigurations
 from common.entities.base_entities.package import PackageType
@@ -36,45 +37,44 @@ class DroneFormationType(Enum):
         return self.value < other.value
 
 
-class DroneFormation:
+class DroneFormation(JsonableBaseEntity):
 
-    def __init__(self, drone_formation_type: DroneFormationType, package_configuration: DronePackageConfiguration):
+    def __init__(self, drone_formation_type: DroneFormationType, drone_package_configuration: DronePackageConfiguration):
         self._drone_formation_type = drone_formation_type
-        self._package_configuration = package_configuration
+        self._drone_package_configuration = drone_package_configuration
 
     @property
     def drone_formation_type(self) -> DroneFormationType:
         return self._drone_formation_type
 
     @property
-    def drone_configuration(self) -> DronePackageConfiguration:
-        return self._package_configuration
+    def drone_package_configuration(self) -> DronePackageConfiguration:
+        return self._drone_package_configuration
 
-    @property
     @lru_cache()
     def max_route_times_in_minutes(self) -> int:
         # TODO: Change to real endurance
         return self.get_drone_type().value * 100
 
     def get_drone_type(self) -> DroneType:
-        return self._package_configuration.get_drone_type()
+        return self._drone_package_configuration.get_drone_type()
 
     def get_package_type_amount(self, package_type: PackageType) -> int:
         return self.drone_formation_type.get_amount_of_drones() * \
-               self._package_configuration.get_package_type_amount(package_type)
+               self._drone_package_configuration.get_package_type_amount(package_type)
 
     def get_package_type_amount_map(self) -> PackageTypeAmountMap:
         amount_per_package_type = PackageTypeAmountMap({package: 0 for package in PackageType})
         extracted_package_type_amounts = PackageTypeAmountMap({
             package_type_name: package_amount * self.drone_formation_type.get_amount_of_drones() for
             package_type_name, package_amount in
-            self._package_configuration.package_type_map.package_type_to_amounts.items()})
+            self._drone_package_configuration.package_type_map.package_type_to_amounts.items()})
         amount_per_package_type.add_to_map(extracted_package_type_amounts)
         return amount_per_package_type
 
     def get_package_type(self) -> PackageType:
         formation_package_type = None
-        package_type_amount_map = self._package_configuration.package_type_map
+        package_type_amount_map = self._drone_package_configuration.package_type_map
         for package_type in PackageType:
             if package_type_amount_map.get_package_type_amount(package_type) > 0:
                 if formation_package_type is not None:
@@ -83,7 +83,18 @@ class DroneFormation:
         return formation_package_type
 
     def __hash__(self):
-        return hash((self._drone_formation_type, self._package_configuration))
+        return hash((self._drone_formation_type, self._drone_package_configuration))
+
+    def __eq__(self, other):
+        return self.drone_formation_type == other.drone_formation_type \
+               and self.drone_package_configuration == other.drone_package_configuration
+
+    @classmethod
+    def dict_to_obj(cls, dict_input):
+        assert (dict_input['__class__'] == cls.__name__)
+        return DroneFormation(
+            drone_formation_type=DroneFormationType.dict_to_obj(dict_input['drone_formation_type']),
+            drone_package_configuration=DronePackageConfiguration.dict_to_obj(dict_input['drone_package_configuration']))
 
 
 class AutoName(Enum):

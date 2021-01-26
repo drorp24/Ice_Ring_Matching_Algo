@@ -53,24 +53,15 @@ class OperationalNode(JsonableBaseEntity):
 
 @dataclass
 class OperationalEdgeAttribs(JsonableBaseEntity):
-
-    def __init__(self, cost: int):
-        self._cost = cost
-
-    @property
-    def cost(self):
-        return self._cost
+    cost: int
 
     @classmethod
     def dict_to_obj(cls, dict_input):
         assert (dict_input['__class__'] == cls.__name__)
         return OperationalEdgeAttribs(dict_input['cost'])
 
-    def __eq__(self, other: OperationalEdgeAttribs):
-        return self.cost == other.cost
-
     def __hash__(self):
-        return hash(self._cost)
+        return hash(self.cost)
 
 
 class OperationalEdge(JsonableBaseEntity):

@@ -24,13 +24,13 @@ class BasicMinimumEnd2End(unittest.TestCase):
 
     @classmethod
     def _create_simple_drone_set_properties(cls):
-        return DroneSetProperties(_drone_type=DroneType.drone_type_1,
-                                  _drone_formation_policy=DroneFormationTypePolicy(
+        return DroneSetProperties(drone_type=DroneType.drone_type_1,
+                                  drone_formation_policy=DroneFormationTypePolicy(
                                       {DroneFormationType.PAIR: 1.0, DroneFormationType.QUAD: 0.0}),
-                                  _package_configuration_policy=PackageConfigurationPolicy(
+                                  package_configuration_policy=PackageConfigurationPolicy(
                                       {PackageConfiguration.LARGE_X2: 0.6, PackageConfiguration.MEDIUM_X4: 0.2,
                                        PackageConfiguration.SMALL_X8: 0.2, PackageConfiguration.TINY_X16: 0.0}),
-                                  _drone_amount=30)
+                                  drone_amount=30)
 
     def test_create_graph_model(self):
         operational_graph = create_fully_connected_graph_model(self.scenario)

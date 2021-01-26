@@ -1,4 +1,5 @@
 import unittest
+from pathlib import Path
 
 from common.entities.base_entities.drone import DroneType, PackageConfiguration
 from common.entities.base_entities.drone_delivery_board import EmptyDroneDeliveryBoard
@@ -13,11 +14,18 @@ from common.entities.base_entities.fleet.fleet_property_sets import DroneSetProp
 
 class TestFleetConfigurationAttribution(unittest.TestCase):
 
+    empty_drone_delivery_board_json_path = Path('common/entities/base_entities/fleet/tests/empty_drone_test_file.json')
+
     @classmethod
     def setUpClass(cls):
         cls.drone_set_properties_1 = TestFleetConfigurationAttribution.define_drone_set_properties_1()
         cls.drone_set_properties_2 = TestFleetConfigurationAttribution.define_drone_set_properties_2()
-        cls.formation_size_policy = DroneFormationTypePolicy({DroneFormationType.PAIR: 1.0, DroneFormationType.QUAD: 0.0})
+        cls.formation_size_policy = DroneFormationTypePolicy({DroneFormationType.PAIR: 1.0,
+                                                              DroneFormationType.QUAD: 0.0})
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.empty_drone_delivery_board_json_path.unlink()
 
     def test_fleet_configuration_with_none_zero_policy(self):
         drone_set_properties = self.drone_set_properties_1
@@ -76,33 +84,43 @@ class TestFleetConfigurationAttribution(unittest.TestCase):
         self.assertEqual(len(empty_drone_delivery_board.empty_drone_deliveries), 24)
         self.assertIsInstance(empty_drone_delivery_board.empty_drone_deliveries[0].drone_formation, DroneFormation)
 
+    def test_empty_board_to_json_and_back_to_empty_board(self):
+        empty_drone_delivery_board = generate_empty_delivery_board(
+            [self.drone_set_properties_1, self.drone_set_properties_2])
+        empty_drone_delivery_board.to_json(self.empty_drone_delivery_board_json_path)
+
+        empty_drone_delivery_board_from_json = \
+            EmptyDroneDeliveryBoard.from_json(EmptyDroneDeliveryBoard, self.empty_drone_delivery_board_json_path)
+
+        self.assertEqual(empty_drone_delivery_board, empty_drone_delivery_board_from_json)
+
     @classmethod
     def define_drone_set_properties_1(cls):
         return DroneSetProperties(
-            _drone_type=DroneType.drone_type_1,
-            _drone_formation_policy=DroneFormationTypePolicy(
+            drone_type=DroneType.drone_type_1,
+            drone_formation_policy=DroneFormationTypePolicy(
                 {DroneFormationType.PAIR: 0.5,
                  DroneFormationType.QUAD: 0.5}),
-            _package_configuration_policy=PackageConfigurationPolicy(
+            package_configuration_policy=PackageConfigurationPolicy(
                 {PackageConfiguration.LARGE_X2: 0.1,
                  PackageConfiguration.MEDIUM_X4: 0.4,
                  PackageConfiguration.SMALL_X8: 0.3,
                  PackageConfiguration.TINY_X16: 0.2}),
-            _drone_amount=30)
+            drone_amount=30)
 
     @classmethod
     def define_drone_set_properties_2(cls):
         return DroneSetProperties(
-            _drone_type=DroneType.drone_type_2,
-            _drone_formation_policy=DroneFormationTypePolicy(
+            drone_type=DroneType.drone_type_2,
+            drone_formation_policy=DroneFormationTypePolicy(
                 {DroneFormationType.PAIR: 1.0,
                  DroneFormationType.QUAD: 0.0}),
-            _package_configuration_policy=PackageConfigurationPolicy(
+            package_configuration_policy=PackageConfigurationPolicy(
                 {PackageConfiguration.LARGE_X4: 0.0,
                  PackageConfiguration.MEDIUM_X8: 0.4,
                  PackageConfiguration.SMALL_X16: 0.6,
                  PackageConfiguration.TINY_X32: 0.0}),
-            _drone_amount=30)
+            drone_amount=30)
 
     def _assert_fleet_configuration_is_correct(self, expected_outcome, fleet_configuration):
         for fleet_option, expected_amount in expected_outcome.items():
