@@ -38,9 +38,9 @@ class DroneFormationType(Enum):
 
 class DroneFormation:
 
-    def __init__(self, drone_formation_type: DroneFormationType, package_configuration: DronePackageConfiguration):
+    def __init__(self, drone_formation_type: DroneFormationType, drone_package_configuration: DronePackageConfiguration):
         self._drone_formation_type = drone_formation_type
-        self._package_configuration = package_configuration
+        self._package_configuration = drone_package_configuration
 
     @property
     def drone_formation_type(self) -> DroneFormationType:
