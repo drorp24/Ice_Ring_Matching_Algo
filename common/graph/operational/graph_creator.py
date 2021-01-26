@@ -42,36 +42,36 @@ def add_locally_connected_dr_graph(graph, dr_connection_options: [DeliveryReques
     graph.add_operational_edges(edges)
 
 
-def _create_directed_from_edges(origin_node: OperationalNode, destinations: List[OperationalNode]) -> \
+def _create_directed_from_edges(origin_node: OperationalNode, destinations: List[OperationalNode], edge_cost_factor: float=1.0) -> \
         List[OperationalEdge]:
     edges = list(map(lambda y:
                      OperationalEdge(origin_node, y,
                                      OperationalEdgeAttribs(
-                                         calc_cost(origin_node.internal_node, y.internal_node))),
+                                         calc_cost(origin_node.internal_node, y.internal_node, edge_cost_factor))),
                      destinations)) + \
             list(map(lambda y: OperationalEdge(y, origin_node,
                                                OperationalEdgeAttribs(
-                                                   calc_cost(origin_node.internal_node, y.internal_node))),
+                                                   calc_cost(origin_node.internal_node, y.internal_node, edge_cost_factor))),
                      destinations))
     return edges
 
 
-def build_time_overlapping_dependent_connected_graph(graph: OperationalGraph):
+def build_time_overlapping_dependent_connected_graph(graph: OperationalGraph, edge_cost_factor: float=1.0):
     nodes = list(graph.nodes)
     for i, origin_node in enumerate(nodes):
         destinations = list(filter(lambda x: x != origin_node and has_overlapping_time_window(origin_node.internal_node,
                                                                                               x.internal_node),
                                    nodes[i:]))
-        edges = _create_directed_from_edges(origin_node, destinations)
+        edges = _create_directed_from_edges(origin_node, destinations, edge_cost_factor)
         graph.add_operational_edges(edges)
 
 
-def build_fully_connected_graph(graph: OperationalGraph):
+def build_fully_connected_graph(graph: OperationalGraph, edge_cost_factor: float=1.0):
     nodes = list(graph.nodes)
     for i, origin_node in enumerate(nodes):
         destinations = list(filter(lambda x: x != origin_node,
                                    nodes[i:]))
-        edges = _create_directed_from_edges(origin_node, destinations)
+        edges = _create_directed_from_edges(origin_node, destinations, edge_cost_factor)
         graph.add_operational_edges(edges)
 
 
@@ -110,5 +110,5 @@ def is_within_cost_range(start: Localizable, target: Localizable,
     return min_cost < calc_cost(start, target) <= max_cost
 
 
-def calc_cost(start: Localizable, end: Localizable) -> int:
-    return ceil(start.calc_location().calc_distance_to_point(end.calc_location()))
+def calc_cost(start: Localizable, end: Localizable, edge_cost_factor: float=1.0) -> float:
+    return (start.calc_location().calc_distance_to_point(end.calc_location()))*edge_cost_factor
