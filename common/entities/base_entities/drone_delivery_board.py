@@ -28,7 +28,6 @@ class EmptyDroneDeliveryBoard:
     def max_route_times_in_minutes(self) -> [int]:
         return [edd.drone_formation.max_route_times_in_minutes() for edd in self._empty_drone_deliveries]
 
-
 @dataclass
 class UnmatchedDeliveryRequest:
     graph_index: int

@@ -1,5 +1,5 @@
 {
-  "__class__": "Scenario",
+  "__class__": "SupplierCategory",
   "delivery_requests": [
     {
       "__class__": "DeliveryRequest",

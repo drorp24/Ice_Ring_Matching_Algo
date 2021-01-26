@@ -16,11 +16,10 @@ from common.entities.base_entities.package_delivery_plan import PackageDeliveryP
 
 
 class BasicJsonableBaseEntitiesTests(unittest.TestCase):
-
-    pdp_json_path = Path('common/entities/base_entities/tests/jsons/pdp_test_file.json')
-    cd_json_path = Path('common/entities/base_entities/tests/jsons/cd_test_file.json')
-    do_json_path = Path('common/entities/base_entities/tests/jsons/do_test_file.json')
-    dr_json_path = Path('common/entities/base_entities/tests/jsons/dr_test_file.json')
+    pdp_json_path = Path('common/entities/base_entities/tests/pdp_test_file.json')
+    cd_json_path = Path('common/entities/base_entities/tests/cd_test_file.json')
+    do_json_path = Path('common/entities/base_entities/tests/do_test_file.json')
+    dr_json_path = Path('common/entities/base_entities/tests/dr_test_file.json')
 
     @classmethod
     def setUpClass(cls):

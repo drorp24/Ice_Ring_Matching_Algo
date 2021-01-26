@@ -1,12 +1,13 @@
-import os
 import itertools
+import os
 import unittest
 from datetime import time, date, timedelta, datetime
 from math import sqrt
 from random import Random
+from typing import List
+
 import numpy as np
 from numpy.testing import assert_array_equal
-from typing import List
 
 from common.entities.base_entities.delivery_request import DeliveryRequest
 from common.entities.base_entities.drone_loading_dock import DroneLoadingDock
@@ -20,6 +21,7 @@ from common.entities.base_entities.entity_distribution.drone_loading_dock_distri
 from common.entities.base_entities.entity_distribution.temporal_distribution import TimeDeltaDistribution, \
     TimeWindowDistribution, DateTimeDistribution
 from common.entities.base_entities.temporal import DateTimeExtension, TimeDeltaExtension, TimeWindowExtension
+from common.entities.base_entities.zone import Zone
 from common.entities.generator.delivery_request_generator import DeliveryRequestDatasetGenerator, \
     DeliveryRequestDatasetStructure
 from common.graph.operational.graph_creator import add_locally_connected_dr_graph, add_fully_connected_loading_docks, \
@@ -29,7 +31,6 @@ from common.graph.operational.operational_graph import OperationalEdge, \
     OperationalEdgeAttribs, OperationalNode, NonLocalizableNodeException, NonTemporalNodeException
 from common.graph.operational.operational_graph import OperationalGraph
 from geometry.distribution.geo_distribution import UniformPointInBboxDistribution
-from geometry.geo2d import Polygon2D
 from geometry.geo_factory import create_point_2d, create_polygon_2d
 
 
@@ -267,12 +268,12 @@ class BasicDeliveryRequestGraphTestCases(unittest.TestCase):
         self.assertEqual(expected_num_edge_in_graph, len(graph.edges))
 
 
-def create_deliveries_zones() -> List[Polygon2D]:
+def create_deliveries_zones() -> List[Zone]:
     return [
-        create_polygon_2d([create_point_2d(100, 50), create_point_2d(100, 150), create_point_2d(200, 150),
-                           create_point_2d(200, 50)]),
-        create_polygon_2d([create_point_2d(1100, 150), create_point_2d(1100, 1150), create_point_2d(1200, 1150),
-                           create_point_2d(1200, 150)]),
+        Zone(create_polygon_2d([create_point_2d(100, 50), create_point_2d(100, 150), create_point_2d(200, 150),
+                                create_point_2d(200, 50)])),
+        Zone(create_polygon_2d([create_point_2d(1100, 150), create_point_2d(1100, 1150), create_point_2d(1200, 1150),
+                                create_point_2d(1200, 150)])),
     ]
 
 

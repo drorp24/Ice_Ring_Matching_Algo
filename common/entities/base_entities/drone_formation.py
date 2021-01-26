@@ -50,12 +50,6 @@ class DroneFormation:
     def drone_configuration(self) -> DronePackageConfiguration:
         return self._package_configuration
 
-    @property
-    @lru_cache()
-    def max_route_times_in_minutes(self) -> int:
-        # TODO: Change to real endurance
-        return self.get_drone_type().value * 100
-
     def get_drone_type(self) -> DroneType:
         return self._package_configuration.drone_type
 

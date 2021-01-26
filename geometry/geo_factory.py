@@ -31,6 +31,8 @@ def create_zero_point_2d() -> Point2D:
 def convert_dict_to_point_2d(input_dict: dict):
     return _ShapelyPoint2D.dict_to_obj(dict_input=input_dict)
 
+def convert_dict_to_polygon_2d(input_dict: dict):
+    return _ShapelyPolygon2D.dict_to_obj(dict_input=input_dict)
 
 def convert_to_point(vector: Vector2D) -> Point2D:
     return create_point_2d(vector.x, vector.y)
