@@ -62,8 +62,8 @@ class PackageTypeAmountMap(JsonableBaseEntity):
     def __eq__(self, other):
         return self.package_type_to_amounts == other.package_type_to_amounts
 
-    def calc_total_weight(self):
-        return sum(list([PackageType[pta[0]].calc_weight() * pta[1] for pta in self._package_type_to_amounts.items()]))
+    def calc_total_weight(self) -> float:
+        return sum(list([pta[0].calc_weight() * pta[1] for pta in list(self._package_type_to_amounts.items())]))
 
     def __lt__(self, other):
         return self.calc_total_weight() < other.calc_total_weight()
