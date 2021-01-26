@@ -48,7 +48,7 @@ class OperationalNode(JsonableBaseEntity):
         return self.__class__ == other.__class__ and self.internal_node == other.internal_node
 
     def __hash__(self):
-        return hash(self._internal)
+        return hash(tuple([self._internal]))
 
 
 @dataclass

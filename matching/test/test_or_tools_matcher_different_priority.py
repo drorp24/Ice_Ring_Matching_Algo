@@ -5,12 +5,13 @@ from typing import List
 from unittest import TestCase
 
 from common.entities.base_entities.delivery_request import DeliveryRequest
-from common.entities.base_entities.drone import PlatformType
+from common.entities.base_entities.drone import DroneType
 from common.entities.base_entities.drone_delivery import EmptyDroneDelivery, DroneDelivery, MatchedDeliveryRequest, \
     MatchedDroneLoadingDock
 from common.entities.base_entities.drone_delivery_board import UnmatchedDeliveryRequest, DroneDeliveryBoard, \
     EmptyDroneDeliveryBoard
-from common.entities.base_entities.drone_formation import DroneFormations, FormationOptions, FormationSize
+from common.entities.base_entities.drone_formation import DroneFormations, PackageConfigurationOption, \
+    DroneFormationType
 from common.entities.base_entities.drone_loading_dock import DroneLoadingDock
 from common.entities.base_entities.drone_loading_station import DroneLoadingStation
 from common.entities.base_entities.entity_distribution.delivery_requestion_dataset_builder import \
@@ -85,7 +86,7 @@ class ORToolsMatcherDifferentPriorityTestCase(TestCase):
     @staticmethod
     def _create_loading_dock() -> DroneLoadingDock:
         return DroneLoadingDock(DroneLoadingStation(create_point_2d(0, 0)),
-                                PlatformType.platform_1,
+                                DroneType.drone_type_1,
                                 TimeWindowExtension(
                                     since=ZERO_TIME,
                                     until=ZERO_TIME.add_time_delta(
@@ -102,7 +103,7 @@ class ORToolsMatcherDifferentPriorityTestCase(TestCase):
     @staticmethod
     def _create_empty_board() -> EmptyDroneDeliveryBoard:
         empty_drone_delivery_1 = EmptyDroneDelivery(EntityID(uuid.uuid4()), DroneFormations.get_drone_formation(
-            FormationSize.MINI, FormationOptions.LARGE_PACKAGES, PlatformType.platform_1))
+            DroneFormationType.PAIR, PackageConfigurationOption.LARGE_PACKAGES, DroneType.drone_type_1))
         return EmptyDroneDeliveryBoard([empty_drone_delivery_1])
 
     @staticmethod

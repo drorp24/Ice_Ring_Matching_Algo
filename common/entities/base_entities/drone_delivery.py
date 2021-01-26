@@ -124,16 +124,22 @@ class DroneDelivery(EmptyDroneDelivery):
 
     @lru_cache()
     def get_total_package_type_amount_map(self) -> PackageTypeAmountMap:
-        amount_per_package_type = [0] * len(PackageType)
+        amount_per_package_type = PackageTypeAmountMap({package: 0 for package in PackageType})
         for matched_request in self._matched_requests:
-            amount_per_package_type = [total_amount + request_amount
-                                       for total_amount, request_amount
-                                       in zip(amount_per_package_type,
-                                              matched_request.delivery_request.delivery_options[
-                                                  matched_request.matched_delivery_option_index].
-                                              get_package_type_amount_map().
-                                              get_package_type_amounts())]
-        return PackageTypeAmountMap(amount_per_package_type)
+            dr = matched_request.delivery_request
+            delivery_option_of_interest = dr.delivery_options[matched_request.matched_delivery_option_index]
+            delivery_option_package_type_amount = delivery_option_of_interest.get_package_type_amount_map()
+            amount_per_package_type.add_to_map(delivery_option_package_type_amount)
+        return amount_per_package_type
+
+
+        # for matched_request in self._matched_requests:
+        #     m = matched_request.delivery_request.delivery_options[matched_request.matched_delivery_option_index]\
+        #         .get_package_type_amount_map()
+        #     amount_per_package_type = [total_amount + request_amount
+        #                                for total_amount, request_amount
+        #                                in zip(amount_per_package_type.values(), m)]
+        # return _PackageTypeAmountMap(amount_per_package_type)
 
     @lru_cache()
     def get_total_priority(self) -> int:

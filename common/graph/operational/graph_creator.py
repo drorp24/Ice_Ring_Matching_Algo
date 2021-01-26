@@ -7,6 +7,7 @@ from typing import List
 from common.entities.base_entities.delivery_request import DeliveryRequest
 from common.entities.base_entities.drone_loading_dock import DroneLoadingDock
 from common.entities.base_entities.temporal import Temporal
+from common.entities.base_entities.zone import Zone
 from common.graph.operational.graph_utils import sort_delivery_requests_by_zone, grouping_delivery_requests
 from common.graph.operational.operational_graph import OperationalGraph, OperationalEdge, OperationalEdgeAttribs, \
     OperationalNode
@@ -15,7 +16,7 @@ from geometry.utils import Localizable
 
 
 def create_grouped_dr_graph(delivery_requests: [DeliveryRequest], drone_loading_docks: [DroneLoadingDock],
-                            zones: [Polygon2D]) -> OperationalGraph:
+                            zones: [Zone]) -> OperationalGraph:
     delivery_requests_by_zone = sort_delivery_requests_by_zone(delivery_requests, zones)
 
     delivery_requests_groups = list(itertools.chain.from_iterable((
