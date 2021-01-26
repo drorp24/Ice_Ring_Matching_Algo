@@ -62,7 +62,7 @@ def _create_delivery_request_distribution():
 
 
 def create_single_package_distribution():
-    package_type_distribution_dict = {PackageType.LARGE.name: 1}
+    package_type_distribution_dict = {PackageType.LARGE: 1}
     package_distribution = PackageDistribution(package_distribution_dict=package_type_distribution_dict)
     return package_distribution
 
