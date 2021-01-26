@@ -89,8 +89,8 @@ class ORToolsMatcherConstraints:
 
     def _set_max_route_time_for_each_vehicle(self, time_dimension: RoutingDimension):
         for i, drone_delivery in enumerate(self._matcher_input.empty_board.empty_drone_deliveries):
-            max_route_times_in_minutes = drone_delivery.drone_formation.max_route_times_in_minutes()
-            time_dimension.SetSpanUpperBoundForVehicle(max_route_times_in_minutes, i)
+            max_route_time_in_minutes = drone_delivery.max_route_time_in_minutes
+            time_dimension.SetSpanUpperBoundForVehicle(max_route_time_in_minutes, i)
 
     def _add_time_window_constraints_for_each_delivery_except_depot(self, time_dimension: RoutingDimension,
                                                                     time_windows: List[Tuple[int, int]]):

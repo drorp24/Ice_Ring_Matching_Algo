@@ -14,7 +14,7 @@ class PolygonUtils:
     def split_polygon(polygon: Polygon2D, box_resolution: int, required_area: float) -> List[
         Polygon2D]:
 
-        bounds = polygon.bbox
+        bounds = polygon.calc_bbox()
         min_x = convert_lower_value_in_resolution(bounds.min_x, box_resolution)
         min_y = convert_lower_value_in_resolution(bounds.min_y, box_resolution)
         max_x = convert_higher_value_in_resolution(bounds.max_x, box_resolution)

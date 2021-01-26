@@ -127,6 +127,12 @@ class OperationalGraph(JsonableBaseEntity):
         og.add_operational_edges([OperationalEdge.dict_to_obj(edge) for edge in dict_input['edges']])
         return og
 
+    def calc_max_cost(self) -> float:
+        return max(e.attributes.cost for e in self.edges[:])
+
+    def calc_min_cost(self) -> float:
+        return min(e.attributes.cost for e in self.edges[:])
+
     def is_empty(self):
         return self._internal_graph.nodes.__len__() == 0
 

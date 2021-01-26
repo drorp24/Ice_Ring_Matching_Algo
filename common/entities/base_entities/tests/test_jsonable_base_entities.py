@@ -16,7 +16,6 @@ from common.entities.base_entities.package_delivery_plan import PackageDeliveryP
 
 
 class BasicJsonableBaseEntitiesTests(unittest.TestCase):
-
     pdp_json_path = Path('common/entities/base_entities/tests/pdp_test_file.json')
     cd_json_path = Path('common/entities/base_entities/tests/cd_test_file.json')
     do_json_path = Path('common/entities/base_entities/tests/do_test_file.json')

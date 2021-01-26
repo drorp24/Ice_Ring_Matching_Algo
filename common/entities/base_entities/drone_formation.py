@@ -51,11 +51,6 @@ class DroneFormation(JsonableBaseEntity):
     def drone_package_configuration(self) -> DronePackageConfiguration:
         return self._drone_package_configuration
 
-    @lru_cache()
-    def max_route_times_in_minutes(self) -> int:
-        # TODO: Change to real endurance
-        return self.get_drone_type().value * 100
-
     def get_drone_type(self) -> DroneType:
         return self._drone_package_configuration.get_drone_type()
 
@@ -135,7 +130,7 @@ class DroneTypeToPackageConfigurationOption:
                                  drone_type: DroneType) -> DronePackageConfiguration:
         drone_configurations = cls.drone_configurations_map[formation_option]
         for drone_configuration in drone_configurations:
-            if drone_configuration.get_drone_type() == drone_type:
+            if drone_configuration.drone_type == drone_type:
                 return drone_configuration
         raise NoDronePackageConfigurationFoundException()
 

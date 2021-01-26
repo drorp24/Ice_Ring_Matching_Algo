@@ -57,17 +57,17 @@ class PackageTypeAmountMap(JsonableBaseEntity):
         return hash(tuple(sorted(self._package_type_to_amounts.items())))
 
     def __str__(self):
-        return '[' + ' '.join(
-            map(lambda item: str(item[0]) + ':' + str(item[1]), self.package_type_to_amounts.items())) + ']'
+        return '[' + ''.join(
+            map(lambda item: str(item[0]).split('.')[1] + ':' + str(item[1]), self.package_type_to_amounts.items())) + ']'
 
     def __eq__(self, other):
         return self.package_type_to_amounts == other.package_type_to_amounts
 
-    def calc_total_weight(self):
-        return sum(list([PackageType[pta[0]].calc_weight() * pta[1] for pta in self._package_type_to_amounts.items()]))
+    def calc_total_weight(self) -> float:
+        return sum(list([pta[0].calc_weight() * pta[1] for pta in list(self._package_type_to_amounts.items())]))
 
     def __lt__(self, other):
-        return self.calc_total_weight < other.calc_total_weight
+        return self.calc_total_weight() < other.calc_total_weight()
 
     def __dict__(self):
         return {'__class__': self.__class__.__name__,
@@ -127,7 +127,7 @@ class PackageConfiguration(Enum):
         return DroneType[split_name[1]]
 
     def __dict__(self):
-        return {'__enum__': str(self)}
+        return {'__enum__': str(self.__dict__())}
 
     def __repr__(self):
         return 'PackageConfiguration: ' + str(self.__dict__())

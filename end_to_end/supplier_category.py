@@ -18,7 +18,7 @@ from common.entities.base_entities.temporal import DateTimeExtension
 from common.entities.distribution.distribution import Distribution, Range
 
 
-class Scenario(JsonableBaseEntity):
+class SupplierCategory(JsonableBaseEntity):
 
     def __init__(self, delivery_requests: List[DeliveryRequest], drone_loading_docks: List[DroneLoadingDock],
                  zero_time: DateTimeExtension):
@@ -40,7 +40,7 @@ class Scenario(JsonableBaseEntity):
 
     @classmethod
     def dict_to_obj(cls, dict_input):
-        return Scenario(
+        return SupplierCategory(
             delivery_requests=[DeliveryRequest.dict_to_obj(dr_dict) for dr_dict in dict_input['delivery_requests']],
             drone_loading_docks=[DroneLoadingDock.dict_to_obj(dld_dict)
                                  for dld_dict in dict_input['drone_loading_docks']],
