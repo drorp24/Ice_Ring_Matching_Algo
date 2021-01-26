@@ -91,7 +91,7 @@ class BasicMinimumEnd2EndExperiment:
         if scene=='north':
             self.supplier_category_distribution = SupplierCategoryDistribution(
                 zero_time_distribution=DateTimeDistribution([ZERO_TIME]),
-                delivery_requests_distribution=_create_delivery_request_distribution(create_point_2d(35.45, 33.4-0.5), 0.05, 0.06, 10, 3),
+                delivery_requests_distribution=_create_delivery_request_distribution(create_point_2d(35.45, 33.4-0.5*1), 0.05, 0.06, 10, 3),
                 drone_loading_docks_distribution=
                 DroneLoadingDockDistribution(drone_loading_station_distributions=
                                              DroneLoadingStationDistribution(drone_station_locations_distribution=
