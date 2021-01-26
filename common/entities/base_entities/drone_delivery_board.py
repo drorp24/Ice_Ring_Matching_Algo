@@ -46,9 +46,6 @@ class UnmatchedDeliveryRequest(JsonableBaseEntity):
     graph_index: int
     delivery_request: DeliveryRequest
 
-    def __eq__(self, other):
-        return self.graph_index == other.graph_index and self.delivery_request == other.delivery_request
-
     def __str__(self):
         return '[UnmatchedDeliveryRequest(graph_index=' + str(self.graph_index) + ', priority=' + str(
             self.delivery_request.priority) + ")]"

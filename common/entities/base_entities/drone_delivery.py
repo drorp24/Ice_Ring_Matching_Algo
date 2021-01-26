@@ -43,11 +43,6 @@ class MatchedDroneLoadingDock(JsonableBaseEntity):
     drone_loading_dock: DroneLoadingDock
     delivery_time_window: TimeWindowExtension
 
-    def __eq__(self, other):
-        return self.graph_index == other.graph_index \
-               and self.drone_loading_dock == other.drone_loading_dock \
-               and self.delivery_time_window == other.delivery_time_window
-
     def __str__(self):
         return '[MatchedDroneLoadingDock(graph_index=' + str(
             self.graph_index) + ', min_time=' + self.delivery_time_window.since.str_format_time() + \
@@ -72,12 +67,6 @@ class MatchedDeliveryRequest(JsonableBaseEntity):
     delivery_request: DeliveryRequest
     matched_delivery_option_index: int  # TODO: replace to DeliveryOptionUUID
     delivery_time_window: TimeWindowExtension
-
-    def __eq__(self, other):
-        return self.graph_index == other.graph_index and self.delivery_request == other.delivery_request \
-               and self.matched_delivery_option_index == other.matched_delivery_option_index \
-               and self.delivery_time_window.since == other.delivery_time_window.since \
-               and self.delivery_time_window.until == other.delivery_time_window.until
 
     def __str__(self):
         return '[MatchedDeliveryRequest(graph_index=' + str(self.graph_index) + ', priority=' + str(
