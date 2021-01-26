@@ -13,6 +13,7 @@ from common.entities.base_entities.temporal import TimeWindowExtension
 DEFAULT_MAX_ROUTE_TIME_IN_MINUTES = 400
 DEFAULT_VELOCITY_METER_PER_SEC = 10.0
 
+
 class EmptyDroneDelivery(JsonableBaseEntity):
     def __init__(self, id_: EntityID, drone_formation: DroneFormation,
                  max_route_time_in_minutes: int = DEFAULT_MAX_ROUTE_TIME_IN_MINUTES,

@@ -1,6 +1,5 @@
 from __future__ import annotations
 from enum import Enum, auto
-from functools import lru_cache
 
 from common.entities.base_entities.base_entity import JsonableBaseEntity
 from common.entities.base_entities.drone import DronePackageConfiguration, PackageConfiguration, PackageTypeAmountMap
@@ -39,7 +38,8 @@ class DroneFormationType(Enum):
 
 class DroneFormation(JsonableBaseEntity):
 
-    def __init__(self, drone_formation_type: DroneFormationType, drone_package_configuration: DronePackageConfiguration):
+    def __init__(self, drone_formation_type: DroneFormationType,
+                 drone_package_configuration: DronePackageConfiguration):
         self._drone_formation_type = drone_formation_type
         self._drone_package_configuration = drone_package_configuration
 
@@ -89,10 +89,12 @@ class DroneFormation(JsonableBaseEntity):
         assert (dict_input['__class__'] == cls.__name__)
         return DroneFormation(
             drone_formation_type=DroneFormationType.dict_to_obj(dict_input['drone_formation_type']),
-            drone_package_configuration=DronePackageConfiguration.dict_to_obj(dict_input['drone_package_configuration']))
+            drone_package_configuration=DronePackageConfiguration.dict_to_obj(
+                dict_input['drone_package_configuration']))
 
 
 class AutoName(Enum):
+    # noinspection PyMethodParameters
     def _generate_next_value_(name, start, count, last_values):
         return name
 

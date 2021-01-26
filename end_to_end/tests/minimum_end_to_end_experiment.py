@@ -46,7 +46,7 @@ def create_standard_full_day_test_time():
     return TimeWindowDistribution(DateTimeDistribution(default_dt_options), default_time_delta_distrib)
 
 
-def _create_delivery_request_distribution(centerPoint: Point2D, sigma_lon: float, sigma_lat: float,
+def _create_delivery_request_distribution(center_point: Point2D, sigma_lon: float, sigma_lat: float,
                                           lowest_priority: int = 10, dr_timewindow: int = 3):
     package_distribution = create_single_package_distribution()
     zero_time = ZERO_TIME
@@ -57,7 +57,7 @@ def _create_delivery_request_distribution(centerPoint: Point2D, sigma_lon: float
 
     delivery_request_distribution = build_delivery_request_distribution(
         package_type_distribution=package_distribution,
-        relative_dr_location_distribution=NormalPointDistribution(centerPoint, sigma_lon, sigma_lat),
+        relative_dr_location_distribution=NormalPointDistribution(center_point, sigma_lon, sigma_lat),
         priority_distribution=PriorityDistribution(list(range(1, lowest_priority))),
         time_window_distribution=time_window_distribution)
     return delivery_request_distribution
@@ -78,9 +78,9 @@ def _create_empty_drone_delivery_board(
         drone_type: DroneType = DroneType.drone_type_1,
         amount: int = 30, max_route_time_entire_board: int = 400, velocity_entire_board: float = 10.0):
     drone_set_properties = DroneSetProperties(drone_type=drone_type,
-                                               package_configuration_policy=package_configurations_policy,
-                                               drone_formation_policy=drone_formation_policy,
-                                               drone_amount=amount)
+                                              package_configuration_policy=package_configurations_policy,
+                                              drone_formation_policy=drone_formation_policy,
+                                              drone_amount=amount)
     return build_empty_drone_delivery_board(drone_set_properties, max_route_time_entire_board, velocity_entire_board)
 
 
@@ -88,30 +88,33 @@ class BasicMinimumEnd2EndExperiment:
 
     def __init__(self, scene: str):
         self.matcher_config = Path("end_to_end/tests/jsons/test_matcher_config.json")
-        if scene=='north':
+        if scene == 'north':
             self.supplier_category_distribution = SupplierCategoryDistribution(
                 zero_time_distribution=DateTimeDistribution([ZERO_TIME]),
-                delivery_requests_distribution=_create_delivery_request_distribution(create_point_2d(35.45, 33.4-0.5*1), 0.05, 0.06, 10, 3),
-                drone_loading_docks_distribution=
-                DroneLoadingDockDistribution(drone_loading_station_distributions=
-                                             DroneLoadingStationDistribution(drone_station_locations_distribution=
-                                                                             UniformPointInBboxDistribution(35.19336, 35.19336,
-                                                                                                            32.6675, 32.6675
-                                                                                                            )),
-                                             time_window_distributions=create_standard_full_day_test_time()))
+                delivery_requests_distribution=_create_delivery_request_distribution(
+                    create_point_2d(35.45, 33.4 - 0.5 * 1), 0.05, 0.06, 10, 3),
+                drone_loading_docks_distribution=DroneLoadingDockDistribution(
+                    drone_loading_station_distributions=DroneLoadingStationDistribution(
+                        drone_station_locations_distribution=UniformPointInBboxDistribution(35.19336,
+                                                                                            35.19336,
+                                                                                            32.6675,
+                                                                                            32.6675
+                                                                                            )),
+                    time_window_distributions=create_standard_full_day_test_time()))
             self.mapImage = MapImage(map_background_path=Path(r"visualization/basic/north_map.Png"),
                                      west_lon=34.90777, east_lon=35.90753, south_lat=32.48928, north_lat=33.93233)
-        elif scene=='center':
+        elif scene == 'center':
             self.supplier_category_distribution = SupplierCategoryDistribution(
                 zero_time_distribution=DateTimeDistribution([ZERO_TIME]),
-                delivery_requests_distribution=_create_delivery_request_distribution(create_point_2d(35.11, 32.0), 0.03, 0.05, 10, 3),
-                drone_loading_docks_distribution=
-                DroneLoadingDockDistribution(drone_loading_station_distributions=
-                                             DroneLoadingStationDistribution(drone_station_locations_distribution=
-                                                                             UniformPointInBboxDistribution(35.11, 35.11,
-                                                                                                            31.79, 31.79
-                                                                                                            )),
-                                             time_window_distributions=create_standard_full_day_test_time()))
+                delivery_requests_distribution=_create_delivery_request_distribution(create_point_2d(35.11, 32.0), 0.03,
+                                                                                     0.05, 10, 3),
+                drone_loading_docks_distribution=DroneLoadingDockDistribution(
+                    drone_loading_station_distributions=DroneLoadingStationDistribution(
+                        drone_station_locations_distribution=UniformPointInBboxDistribution(35.11,
+                                                                                            35.11,
+                                                                                            31.79, 31.79
+                                                                                            )),
+                    time_window_distributions=create_standard_full_day_test_time()))
             self.matcher_config = Path("end_to_end/tests/jsons/test_matcher_config.json")
             self.mapImage = MapImage(map_background_path=Path(r"visualization/basic/gush_dan_background.Png"),
                                      west_lon=34.83927, east_lon=35.32341, south_lat=31.77279, north_lat=32.19276)
@@ -124,12 +127,13 @@ class BasicMinimumEnd2EndExperiment:
         start_time = datetime.now()
 
         supplier_category = self.supplier_category_distribution.choose_rand(random=Random(10),
-                                                          amount={DeliveryRequest: 37, DroneLoadingDock: 1})
+                                                                            amount={DeliveryRequest: 37,
+                                                                                    DroneLoadingDock: 1})
         fully_connected_graph = create_fully_connected_graph_model(supplier_category, edge_cost_factor=25.0)
         print("--- create_fully_connected_graph_model run time: %s  ---" % (datetime.now() - start_time))
         start_time = datetime.now()
 
-        match_config_file_path = 'end_to_end/tests/jsons/test_matcher_config.json'
+        match_config_file_path = Path('end_to_end/tests/jsons/test_matcher_config.json')
         match_config = MatcherConfig.dict_to_obj(MatcherConfig.json_to_dict(match_config_file_path))
         matcher_input = MatcherInput(graph=fully_connected_graph, empty_board=empty_drone_delivery_board,
                                      config=match_config)
@@ -142,12 +146,12 @@ class BasicMinimumEnd2EndExperiment:
         self._draw_matched_scenario(delivery_board, fully_connected_graph, supplier_category, self.mapImage)
 
     @staticmethod
-    def _draw_matched_scenario(delivery_board, fully_connected_graph, supplier_category, mapImage):
-        dr_drawer = create_drawer_2d(Drawer2DCoordinateSys.GEOGRAPHIC, mapImage)
+    def _draw_matched_scenario(delivery_board, fully_connected_graph, supplier_category, map_image):
+        dr_drawer = create_drawer_2d(Drawer2DCoordinateSys.GEOGRAPHIC, map_image)
         operational_drawer2d.add_operational_graph(dr_drawer, fully_connected_graph, draw_internal=True,
                                                    draw_edges=False)
         dr_drawer.draw(False)
-        board_map_drawer = create_drawer_2d(Drawer2DCoordinateSys.GEOGRAPHIC, mapImage)
+        board_map_drawer = create_drawer_2d(Drawer2DCoordinateSys.GEOGRAPHIC, map_image)
         operational_drawer2d.add_delivery_board(board_map_drawer, delivery_board, draw_unmatched=True)
         board_map_drawer.draw(False)
         row_names = ["Unmatched Out"] + \

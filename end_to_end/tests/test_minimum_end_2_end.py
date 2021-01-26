@@ -1,7 +1,8 @@
 import unittest
+from pathlib import Path
 
 from common.entities.base_entities.drone import DroneType, PackageConfiguration
-from common.entities.base_entities.drone_formation import DroneFormationType, PackageConfigurationOption
+from common.entities.base_entities.drone_formation import DroneFormationType
 from common.entities.base_entities.fleet.empty_drone_delivery_board_generation import generate_empty_delivery_board
 from common.entities.base_entities.fleet.fleet_property_sets import DroneSetProperties, DroneFormationTypePolicy, \
     PackageConfigurationPolicy
@@ -16,11 +17,12 @@ class BasicMinimumEnd2End(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.supplier_category = SupplierCategory.dict_to_obj(SupplierCategory.json_to_dict('end_to_end/tests/jsons/test_supplier_category.json'))
+        cls.supplier_category = SupplierCategory.dict_to_obj(SupplierCategory.json_to_dict(
+            Path('end_to_end/tests/jsons/test_supplier_category.json')))
         cls.empty_drone_delivery_board = \
             generate_empty_delivery_board([BasicMinimumEnd2End._create_simple_drone_set_properties()])
         cls.matcher_config = MatcherConfig.dict_to_obj(
-            MatcherConfig.json_to_dict('end_to_end/tests/jsons/test_matcher_config.json'))
+            MatcherConfig.json_to_dict(Path('end_to_end/tests/jsons/test_matcher_config.json')))
 
     @classmethod
     def _create_simple_drone_set_properties(cls):

@@ -1,6 +1,5 @@
 from __future__ import annotations
 from enum import Enum
-from typing import Type
 
 from common.entities.base_entities.base_entity import JsonableBaseEntity
 from common.entities.base_entities.package import PackageType
@@ -37,7 +36,7 @@ class PackageTypeAmountMap(JsonableBaseEntity):
         return PackageTypeAmountMap({PackageType[package_type_amount[0]]: package_type_amount[1]
                                      for package_type_amount in dict_input['package_type_to_amounts'].items()})
 
-    def add_to_map(self, other_package_types_amounts: Type[PackageTypeAmountMap]):
+    def add_to_map(self, other_package_types_amounts: PackageTypeAmountMap):
         other_amounts = other_package_types_amounts.package_type_to_amounts
         for key, val in other_amounts.items():
             if key not in self._package_type_to_amounts.keys():
@@ -58,7 +57,8 @@ class PackageTypeAmountMap(JsonableBaseEntity):
 
     def __str__(self):
         return '[' + ''.join(
-            map(lambda item: str(item[0]).split('.')[1] + ':' + str(item[1]), self.package_type_to_amounts.items())) + ']'
+            map(lambda item: str(item[0]).split('.')[1] + ':' + str(item[1]),
+                self.package_type_to_amounts.items())) + ']'
 
     def __eq__(self, other):
         return self.package_type_to_amounts == other.package_type_to_amounts
