@@ -1,6 +1,7 @@
 from math import cos, sin
-from typing import List
+from typing import List, Dict
 from common.math.angle import Angle, AngleUnit
+from drop_envelope.envelope_collections import PotentialEnvelopeCollection
 from geometry.geo2d import Point2D, Polygon2D
 from geometry.geo_factory import create_point_2d, create_polygon_2d
 
@@ -46,8 +47,12 @@ class PotentialArrivalEnvelope:
         self._arrival_envelopes = {arrival_envelope.arrival_azimuth: arrival_envelope
                                    for arrival_envelope in arrival_envelopes}
 
+    @classmethod
+    def from_potential_drop_envelope(cls, potential_drop_collection: PotentialEnvelopeCollection):
+        centroid = potential_drop_collection.centroid()
+
     @property
-    def arrival_envelopes(self) -> dict[Angle, ArrivalEnvelope]:
+    def arrival_envelopes(self) -> Dict[Angle, ArrivalEnvelope]:
         return self._arrival_envelopes
 
     def get_arrival_envelope(self, arrival_azimuth: Angle) -> ArrivalEnvelope:
