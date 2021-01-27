@@ -1,5 +1,5 @@
 import unittest
-from datetime import date, time, datetime
+from datetime import date, time, timedelta
 from random import Random
 
 from common.entities.base_entities.delivery_request import DeliveryRequest
@@ -7,7 +7,7 @@ from common.entities.base_entities.entity_distribution.delivery_request_distribu
 from common.entities.base_entities.entity_distribution.drone_loading_dock_distribution import \
     DroneLoadingDockDistribution
 from common.entities.base_entities.package import PackageType
-from common.entities.base_entities.temporal import DateTimeExtension
+from common.entities.base_entities.temporal import DateTimeExtension, TimeDeltaExtension
 from common.graph.operational.operational_graph import OperationalGraph, OperationalEdge, OperationalNode, \
     OperationalEdgeAttribs
 from common.graph.operational.export_ortools_graph import OrtoolsGraphExporter
@@ -33,7 +33,9 @@ class BasicOrtoolsExporterTestCases(unittest.TestCase):
         for dk in cls.dld_dataset_random:
             for dl in cls.dr_dataset_random:
                 edges.append(OperationalEdge(OperationalNode(dk), OperationalNode(dl),
-                                             OperationalEdgeAttribs(Random().choice(range(10)))))
+                                             OperationalEdgeAttribs(Random().choice(range(10)),
+                                                                    TimeDeltaExtension(timedelta(
+                                                                        minutes=Random().choice(range(10)))))))
         return edges
 
     def test_export_time_window(self):
@@ -62,13 +64,21 @@ class BasicOrtoolsExporterTestCases(unittest.TestCase):
         self.assertEqual(priorities[11], self.dld_dataset_random[1].priority)
         self.assertEqual(priorities[12], self.dld_dataset_random[2].priority)
 
+    def test_export_travel_costs(self):
+        travel_costs = self.graph_exporter.export_travel_costs(self.operational_graph)
+        nodes = list(self.operational_graph.nodes)
+        for edge in self.edges:
+            start_node_index = nodes.index(edge.start_node)
+            end_node_index = nodes.index(edge.end_node)
+            self.assertEqual(travel_costs[start_node_index][end_node_index], edge.attributes.cost)
+
     def test_export_travel_times(self):
         travel_times = self.graph_exporter.export_travel_times(self.operational_graph)
         nodes = list(self.operational_graph.nodes)
         for edge in self.edges:
             start_node_index = nodes.index(edge.start_node)
             end_node_index = nodes.index(edge.end_node)
-            self.assertEqual(travel_times[start_node_index][end_node_index], edge.attributes.cost)
+            self.assertEqual(travel_times[start_node_index][end_node_index], edge.attributes.travel_time_min)
 
     def test_delivery_request_indices(self):
         dr_indices = self.graph_exporter.export_delivery_request_nodes_indices(self.operational_graph)

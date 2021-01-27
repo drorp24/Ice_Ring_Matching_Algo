@@ -1,4 +1,5 @@
 import unittest
+from datetime import timedelta
 from random import Random
 
 from common.entities.base_entities.delivery_request import DeliveryRequest
@@ -6,6 +7,7 @@ from common.entities.base_entities.drone_loading_dock import DroneLoadingDock
 from common.entities.base_entities.entity_distribution.delivery_request_distribution import DeliveryRequestDistribution
 from common.entities.base_entities.entity_distribution.drone_loading_dock_distribution import \
     DroneLoadingDockDistribution
+from common.entities.base_entities.temporal import TimeDeltaExtension
 from common.graph.operational.operational_graph import OperationalNode, OperationalEdgeAttribs, OperationalEdge, \
     OperationalGraph
 
@@ -22,11 +24,14 @@ class BasicGraphNodeTestCases(unittest.TestCase):
         cls.dld_dataset_random = DroneLoadingDockDistribution().choose_rand(random=Random(100), amount=2)
         cls.example_node_drone_loading_dock = OperationalNode(internal_node=cls.dld_dataset_random[0])
 
-        cls.example_op_edge_attribs = OperationalEdgeAttribs(42)
+        cls.example_op_edge_attribs = OperationalEdgeAttribs(42, TimeDeltaExtension(timedelta(
+            minutes=42)))
 
         cls.example_op_edge = OperationalEdge(start_node=cls.example_node_delivery_request_0,
                                               end_node=cls.example_node_delivery_request_1,
-                                              attributes=OperationalEdgeAttribs(100))
+                                              attributes=OperationalEdgeAttribs(100,
+                                                                                TimeDeltaExtension(timedelta(
+                                                                                    minutes=42))))
 
         cls.example_operational_graph = OperationalGraph()
         cls.example_operational_graph.add_operational_nodes([cls.example_node_delivery_request_0,

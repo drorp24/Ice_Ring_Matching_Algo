@@ -67,7 +67,8 @@ class ORToolsMatcher(Matcher):
     def _set_constraints(self):
         matcher_constraints = ORToolsMatcherConstraints(self._index_manager, self._routing_model, self.matcher_input)
         matcher_constraints.add_demand()
-        matcher_constraints.add_time()
+        matcher_constraints.add_travel_cost()
+        matcher_constraints.add_travel_time()
         matcher_constraints.add_unmatched_penalty()
 
     def _create_drone_delivery_board(self, solution: Assignment) -> DroneDeliveryBoard:
@@ -105,7 +106,6 @@ class ORToolsMatcher(Matcher):
         matched_requests = []
 
         start_index = self._routing_model.Start(edd_index)
-        graph_start_index = self._index_manager.IndexToNode(start_index)
         index = solution.Value(self._routing_model.NextVar(start_index))
         while not self._routing_model.IsEnd(index) and not self._routing_model.IsStart(index):
             graph_index = self._index_manager.IndexToNode(index)
@@ -152,11 +152,11 @@ class ORToolsMatcher(Matcher):
             delivery_time_window=self._get_delivery_time_window(index, solution))
 
     def _get_delivery_time_window(self, index: int, solution: Assignment) -> TimeWindowExtension:
-        time_dimension = self._routing_model.GetDimensionOrDie(OrToolsDimensionDescription.time.value)
-        time_var = time_dimension.CumulVar(index)
+        travel_time_dimension = self._routing_model.GetDimensionOrDie(OrToolsDimensionDescription.travel_time.value)
+        travel_time_var = travel_time_dimension.CumulVar(index)
 
         return TimeWindowExtension(
             since=(self._matcher_input.config.zero_time.add_time_delta(
-                TimeDeltaExtension(timedelta(minutes=solution.Min(time_var))))),
+                TimeDeltaExtension(timedelta(minutes=solution.Min(travel_time_var))))),
             until=(self._matcher_input.config.zero_time.add_time_delta(
-                TimeDeltaExtension(timedelta(minutes=solution.Max(time_var))))))
+                TimeDeltaExtension(timedelta(minutes=solution.Max(travel_time_var))))))

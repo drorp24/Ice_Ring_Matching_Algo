@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from datetime import timedelta
 import numpy as np
 from dataclasses import dataclass
 from typing import List, Union
@@ -8,7 +9,7 @@ from networkx import DiGraph, subgraph, to_numpy_array
 from common.entities.base_entities.base_entity import JsonableBaseEntity
 from common.entities.base_entities.delivery_request import DeliveryRequest
 from common.entities.base_entities.drone_loading_dock import DroneLoadingDock
-from common.entities.base_entities.temporal import TimeWindowExtension, Temporal
+from common.entities.base_entities.temporal import TimeWindowExtension, Temporal, TimeDeltaExtension
 from common.utils.class_controller import name_to_class, get_all_module_class_names_from_globals
 from geometry.geo2d import Polygon2D
 from geometry.utils import Localizable
@@ -54,23 +55,30 @@ class OperationalNode(JsonableBaseEntity):
 @dataclass
 class OperationalEdgeAttribs(JsonableBaseEntity):
 
-    def __init__(self, cost: int):
+    def __init__(self, cost: float, travel_time: TimeDeltaExtension):
         self._cost = cost
+        self._travel_time_min = travel_time.in_minutes()
 
     @property
     def cost(self):
         return self._cost
 
+    @property
+    def travel_time_min(self):
+        return self._travel_time_min
+
     @classmethod
     def dict_to_obj(cls, dict_input):
         assert (dict_input['__class__'] == cls.__name__)
-        return OperationalEdgeAttribs(dict_input['cost'])
+        return OperationalEdgeAttribs(cost=dict_input['cost'],
+                                      travel_time=TimeDeltaExtension(timedelta(
+                                          minutes=dict_input['travel_time_min'])))
 
     def __eq__(self, other: OperationalEdgeAttribs):
-        return self.cost == other.cost
+        return self.cost == other.cost and self.travel_time_min == other.travel_time_min
 
     def __hash__(self):
-        return hash(self._cost)
+        return hash((self.cost, self.travel_time_min))
 
 
 class OperationalEdge(JsonableBaseEntity):
@@ -126,7 +134,10 @@ class OperationalGraph(JsonableBaseEntity):
     @property
     def edges(self) -> List[OperationalEdge]:
         internal_edges = self._internal_graph.edges.data(data=True)
-        return [OperationalEdge(edge[0], edge[1], OperationalEdgeAttribs(edge[2]['cost'])) for edge in internal_edges]
+        return [OperationalEdge(edge[0], edge[1], OperationalEdgeAttribs(edge[2]['cost'],
+                                                                         TimeDeltaExtension(timedelta(
+                                                                             minutes=edge[2]['travel_time_min']))))
+                for edge in internal_edges]
 
     @classmethod
     def dict_to_obj(cls, dict_input):
@@ -175,8 +186,14 @@ class OperationalGraph(JsonableBaseEntity):
         extracted_subgraph = self._extract_internal_subgraph_of_nodes(nodes_within_polygon)
         return OperationalGraph._create_from_extracted_subgraph(extracted_subgraph)
 
-    def to_numpy_array(self, nonedge: float, dtype) -> np.ndarray:
-        travel_times = to_numpy_array(self._internal_graph, weight="cost", nonedge=nonedge, dtype=dtype)
+    def to_cost_numpy_array(self, nonedge: float, dtype) -> np.ndarray:
+        costs = to_numpy_array(self._internal_graph, weight="cost", nonedge=nonedge, dtype=dtype)
+        if nonedge != 0:
+            self._zero_nodes_travel_time_to_themselves(costs)
+        return costs
+
+    def to_travel_time_numpy_array(self, nonedge: float, dtype) -> np.ndarray:
+        travel_times = to_numpy_array(self._internal_graph, weight="travel_time_min", nonedge=nonedge, dtype=dtype)
         if nonedge != 0:
             self._zero_nodes_travel_time_to_themselves(travel_times)
         return travel_times

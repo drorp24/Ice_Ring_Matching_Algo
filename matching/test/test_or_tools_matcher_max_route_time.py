@@ -44,8 +44,9 @@ class ORToolsMatcherMaxRouteTimeTestCase(TestCase):
         cls.edd1_max_endurance = cls.empty_drone_delivery_1.max_route_time_in_minutes
         cls.edd1_max_range = cls.empty_drone_delivery_1.get_formation_max_range_in_meters()
         cls.edd1_velocity_per_minute = cls.empty_drone_delivery_1.velocity_meter_per_sec * 60.0
-        cls.empty_drone_delivery_2 = cls._create_sufficient_route_time_empty_drone_delivery(max_route_times_in_minutes=60,
-                                                                                         velocity_meter_per_sec=10.0)
+        cls.empty_drone_delivery_2 = cls._create_sufficient_route_time_empty_drone_delivery(
+            max_route_times_in_minutes=60,
+            velocity_meter_per_sec=10.0)
         cls.edd2_max_endurance = cls.empty_drone_delivery_2.max_route_time_in_minutes
         cls.edd2_max_range = cls.empty_drone_delivery_2.get_formation_max_range_in_meters()
         cls.edd2_velocity_per_minute = cls.empty_drone_delivery_2.velocity_meter_per_sec * 60.0
@@ -55,7 +56,9 @@ class ORToolsMatcherMaxRouteTimeTestCase(TestCase):
     def test_when_wait_time_longer_than_max_route_time(self):
         delivery_requests = self._create_2_delivery_requests_with_big_time_window_difference()
         match_config = self._create_match_config_with_waiting_time(waiting_time=self.edd2_max_endurance)
-        graph = self._create_graph(delivery_requests, self.loading_dock, 1/self.edd2_velocity_per_minute) # Assuming Velocity of edd1 and edd2 is similar
+        graph = self._create_graph(delivery_requests, self.loading_dock,
+                                   1 / self.edd2_velocity_per_minute,
+                                   1 / self.edd2_velocity_per_minute)  # Assuming Velocity of edd1 and edd2 is similar
         match_input_1 = MatcherInput(graph, self.empty_board_1, match_config)
         match_input_2 = MatcherInput(graph, self.empty_board_2, match_config)
         matcher_1 = ORToolsMatcher(match_input_1)
@@ -69,8 +72,10 @@ class ORToolsMatcherMaxRouteTimeTestCase(TestCase):
     def test_when_travel_time_is_greater_than_max_route_time(self):
         delivery_requests = self._create_2_delivery_requests_with_big_travel_time_difference()
         match_config = self._create_match_config_with_waiting_time(waiting_time=0)
-        graph = self._create_graph(delivery_requests, self.loading_dock, 1/self.edd2_velocity_per_minute) # Assuming Velocity of edd1 and edd2 is similar
-        if abs(graph.calc_max_cost()-self.edd2_max_endurance/2.0) > 1e-6:
+        graph = self._create_graph(delivery_requests, self.loading_dock,
+                                   1 / self.edd2_velocity_per_minute,
+                                   1 / self.edd2_velocity_per_minute)  # Assuming Velocity of edd1 and edd2 is similar
+        if abs(graph.calc_max_cost() - self.edd2_max_endurance / 2.0) > 1e-6:
             print('Check cost calculation')
         match_input_1 = MatcherInput(graph, self.empty_board_1, match_config)
         match_input_2 = MatcherInput(graph, self.empty_board_2, match_config)
@@ -86,10 +91,10 @@ class ORToolsMatcherMaxRouteTimeTestCase(TestCase):
     def _create_limited_route_time_empty_drone_delivery(max_route_times_in_minutes: int, velocity_meter_per_sec: float):
         return EmptyDroneDelivery(EntityID(uuid.uuid4()), DroneFormations.get_drone_formation(
             DroneFormationType.PAIR, PackageConfigurationOption.LARGE_PACKAGES, DroneType.drone_type_1),
-            max_route_times_in_minutes, velocity_meter_per_sec)
+                                  max_route_times_in_minutes, velocity_meter_per_sec)
 
     @staticmethod
-    def _create_match_config_with_waiting_time(waiting_time: int=0):
+    def _create_match_config_with_waiting_time(waiting_time: int = 0):
         return MatcherConfig(
             zero_time=ZERO_TIME,
             solver=ORToolsSolverConfig(SolverVendor.OR_TOOLS, first_solution_strategy="path_cheapest_arc",
@@ -118,7 +123,8 @@ class ORToolsMatcherMaxRouteTimeTestCase(TestCase):
                     until=ZERO_TIME.add_time_delta(TimeDeltaExtension(timedelta(minutes=edd1_travel_time_to_dr1)))),
                 TimeWindowExtension(
                     since=ZERO_TIME.add_time_delta(TimeDeltaExtension(timedelta(minutes=self.edd1_max_endurance))),
-                    until=ZERO_TIME.add_time_delta(TimeDeltaExtension(timedelta(minutes=self.edd1_max_endurance+edd2_travel_time_to_dr2)))),
+                    until=ZERO_TIME.add_time_delta(
+                        TimeDeltaExtension(timedelta(minutes=self.edd1_max_endurance + edd2_travel_time_to_dr2)))),
             ]),
             package_type_distribution=PackageDistribution({PackageType.LARGE.name: 1}))
         return dist.choose_rand(Random(42), amount={DeliveryRequest: 2})
@@ -134,7 +140,8 @@ class ORToolsMatcherMaxRouteTimeTestCase(TestCase):
             time_window_distribution=ExactTimeWindowDistribution([
                 TimeWindowExtension(
                     since=ZERO_TIME,
-                    until=ZERO_TIME.add_time_delta(TimeDeltaExtension(timedelta(minutes=self.edd1_max_endurance/5.0)))),
+                    until=ZERO_TIME.add_time_delta(
+                        TimeDeltaExtension(timedelta(minutes=self.edd1_max_endurance / 5.0)))),
                 TimeWindowExtension(
                     since=ZERO_TIME,
                     until=ZERO_TIME.add_time_delta(TimeDeltaExtension(timedelta(minutes=self.edd2_max_endurance)))),
@@ -143,10 +150,11 @@ class ORToolsMatcherMaxRouteTimeTestCase(TestCase):
         return dist.choose_rand(Random(42), amount={DeliveryRequest: 2})
 
     @staticmethod
-    def _create_sufficient_route_time_empty_drone_delivery(max_route_times_in_minutes: int, velocity_meter_per_sec: float):
+    def _create_sufficient_route_time_empty_drone_delivery(max_route_times_in_minutes: int,
+                                                           velocity_meter_per_sec: float):
         return EmptyDroneDelivery(EntityID(uuid.uuid4()), DroneFormations.get_drone_formation(
             DroneFormationType.PAIR, PackageConfigurationOption.LARGE_PACKAGES, DroneType.drone_type_2),
-            max_route_times_in_minutes, velocity_meter_per_sec)
+                                  max_route_times_in_minutes, velocity_meter_per_sec)
 
     @staticmethod
     def _create_loading_dock() -> DroneLoadingDock:
@@ -158,9 +166,10 @@ class ORToolsMatcherMaxRouteTimeTestCase(TestCase):
                                         TimeDeltaExtension(timedelta(hours=4)))))
 
     @staticmethod
-    def _create_graph(delivery_requests: List[DeliveryRequest], loading_dock: DroneLoadingDock, edge_cost_factor: float=1.0) -> OperationalGraph:
+    def _create_graph(delivery_requests: List[DeliveryRequest], loading_dock: DroneLoadingDock,
+                      edge_cost_factor: float = 1.0, edge_travel_time_factor: float = 1.0) -> OperationalGraph:
         graph = OperationalGraph()
         graph.add_drone_loading_docks([loading_dock])
         graph.add_delivery_requests(delivery_requests)
-        build_fully_connected_graph(graph, edge_cost_factor)
+        build_fully_connected_graph(graph, edge_cost_factor, edge_travel_time_factor)
         return graph
