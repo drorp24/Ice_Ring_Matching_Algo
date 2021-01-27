@@ -27,7 +27,7 @@ class PotentialEnvelopeCollection:
         raise NotImplementedError
 
 
-def get_distantest_shapeable(external_point: Point2D, potential_envelope: List[ShapeableCollection]) -> Shapeable:
+def get_farest_shapeable(external_point: Point2D, potential_envelope: List[ShapeableCollection]) -> Shapeable:
     distantest_shapeables = []
     distances = []
     for collection in potential_envelope:
