@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from datetime import timedelta
 import numpy as np
 from dataclasses import dataclass
 from typing import List, Union
@@ -9,7 +8,7 @@ from networkx import DiGraph, subgraph, to_numpy_array
 from common.entities.base_entities.base_entity import JsonableBaseEntity
 from common.entities.base_entities.delivery_request import DeliveryRequest
 from common.entities.base_entities.drone_loading_dock import DroneLoadingDock
-from common.entities.base_entities.temporal import TimeWindowExtension, Temporal, TimeDeltaExtension
+from common.entities.base_entities.temporal import TimeWindowExtension, Temporal
 from common.utils.class_controller import name_to_class, get_all_module_class_names_from_globals
 from geometry.geo2d import Polygon2D
 from geometry.utils import Localizable
@@ -54,28 +53,14 @@ class OperationalNode(JsonableBaseEntity):
 
 @dataclass
 class OperationalEdgeAttribs(JsonableBaseEntity):
-
-    def __init__(self, cost: float, travel_time: TimeDeltaExtension):
-        self._cost = cost
-        self._travel_time_min = travel_time.in_minutes()
-
-    @property
-    def cost(self):
-        return self._cost
-
-    @property
-    def travel_time_min(self):
-        return self._travel_time_min
+    cost: float
+    travel_time_min: float
 
     @classmethod
     def dict_to_obj(cls, dict_input):
         assert (dict_input['__class__'] == cls.__name__)
         return OperationalEdgeAttribs(cost=dict_input['cost'],
-                                      travel_time=TimeDeltaExtension(timedelta(
-                                          minutes=dict_input['travel_time_min'])))
-
-    def __eq__(self, other: OperationalEdgeAttribs):
-        return self.cost == other.cost and self.travel_time_min == other.travel_time_min
+                                      travel_time_min=dict_input['travel_time_min'])
 
     def __hash__(self):
         return hash((self.cost, self.travel_time_min))
@@ -134,9 +119,7 @@ class OperationalGraph(JsonableBaseEntity):
     @property
     def edges(self) -> List[OperationalEdge]:
         internal_edges = self._internal_graph.edges.data(data=True)
-        return [OperationalEdge(edge[0], edge[1], OperationalEdgeAttribs(edge[2]['cost'],
-                                                                         TimeDeltaExtension(timedelta(
-                                                                             minutes=edge[2]['travel_time_min']))))
+        return [OperationalEdge(edge[0], edge[1], OperationalEdgeAttribs(edge[2]['cost'], edge[2]['travel_time_min']))
                 for edge in internal_edges]
 
     @classmethod

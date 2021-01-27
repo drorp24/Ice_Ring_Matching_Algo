@@ -27,7 +27,7 @@ class ExactPointLocationDistribution(PointLocationDistribution):
         self._amount_count = 0
 
     def choose_rand(self, random: Random, amount: int = 1) -> List[Point2D]:
-        if self._amount_count  + amount > len(self._points):
+        if self._amount_count + amount > len(self._points):
             raise RuntimeError(
                 f"Used {self._amount_count} randomized choices which is \
                 more than the initially given {len(self._points)} ")
