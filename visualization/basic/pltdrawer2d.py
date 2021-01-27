@@ -14,15 +14,21 @@ from visualization.basic.drawer2d import Drawer2D, Drawer2DCoordinateSys
 
 GEOGRAPHIC_RADIUS_SIZE_RATIO = 0.1
 
+class MapImage:
+    def __init__(self, map_background_path, west_lon, east_lon, south_lat, north_lat):
+        self.map_background_path = map_background_path
+        self.west_lon = west_lon
+        self.east_lon = east_lon
+        self.south_lat = south_lat
+        self.north_lat = north_lat
 
-def create_drawer_2d(coordinate_sys: Drawer2DCoordinateSys = Drawer2DCoordinateSys.CARTESIAN) -> Drawer2D:
-    return PltDrawer2D(coordinate_sys)
-
+def create_drawer_2d(coordinate_sys: Drawer2DCoordinateSys = Drawer2DCoordinateSys.CARTESIAN, mapImage: MapImage = None) -> Drawer2D:
+    return PltDrawer2D(coordinate_sys, mapImage)
 
 class PltDrawer2D(Drawer2D):
-    def __init__(self, coordinate_sys: Drawer2DCoordinateSys = Drawer2DCoordinateSys.CARTESIAN):
+    def __init__(self, coordinate_sys: Drawer2DCoordinateSys = Drawer2DCoordinateSys.CARTESIAN, mapImage: MapImage = None):
         self._coordinate_sys = coordinate_sys
-        self._init_according_to_coordinate_system()
+        self._init_according_to_coordinate_system(mapImage)
 
     def add_point2d(self, point2d: Point2D, radius=0.05, edgecolor: Color = Color.Blue, facecolor: Color = Color.Blue,
                     facecolor_alpha=1, linewidth=2, label=None) -> None:
@@ -87,7 +93,7 @@ class PltDrawer2D(Drawer2D):
         self._ax.axis('scaled')
         plt.savefig(file_name)
 
-    def _init_according_to_coordinate_system(self):
+    def _init_according_to_coordinate_system(self, mapImage: MapImage):
         if self._coordinate_sys is Drawer2DCoordinateSys.CARTESIAN:
             self._fig, self._ax = plt.subplots()
             plt.title('90\xb0', fontsize=14)
@@ -96,18 +102,20 @@ class PltDrawer2D(Drawer2D):
         elif self._coordinate_sys is Drawer2DCoordinateSys.GEOGRAPHIC:
             self._fig = plt.figure()
             self._ax = plt.axes(projection=ccrs.PlateCarree())
-            map_background_path = filePath(r"visualization/basic/gush_dan_background.Png")
-            map_background_img = plt.imread(map_background_path)
-            west_lon = 34.83927
-            east_lon = 35.32341
-            south_lat = 31.77279
-            north_lat = 32.19276
-            map_background_img_extent = (west_lon,
-                                         east_lon,
-                                         south_lat,
-                                         north_lat)
-            self._ax.imshow(map_background_img, origin='upper', extent=map_background_img_extent,
-                            transform=ccrs.PlateCarree())
+            if mapImage is not None:
+                map_background_path = mapImage.map_background_path
+                west_lon = mapImage.west_lon
+                east_lon = mapImage.east_lon
+                south_lat = mapImage.south_lat
+                north_lat = mapImage.north_lat
+
+                map_background_img_extent = (west_lon,
+                                             east_lon,
+                                             south_lat,
+                                             north_lat)
+                map_background_img = plt.imread(map_background_path)
+                self._ax.imshow(map_background_img, origin='upper', extent=map_background_img_extent,
+                                transform=ccrs.PlateCarree())
         else:
             raise NotImplementedError("Non valid Drawer2DCoordinateSys.")
 

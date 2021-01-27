@@ -4,6 +4,7 @@ from pprint import pprint
 from random import Random
 from uuid import UUID
 
+from common.entities.base_entities.drone import PackageConfiguration
 from common.entities.base_entities.entity_distribution.package_distribution import PackageDistribution, \
     ExactPackageDistribution
 from common.entities.base_entities.entity_id import EntityID
@@ -160,18 +161,18 @@ class BasicPackageGeneration(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls) -> None:
-        cls.pd = PackageDistribution({PackageType.TINY.name: 0.8, PackageType.SMALL.name: 0.4})
+        cls.pd = PackageDistribution({PackageType.TINY: 0.8, PackageType.SMALL: 0.4})
 
     def test_probability_of_package_generation_is_correct(self):
         rand_samples = 10000
-        values_random_sample = list(map(lambda i: self.pd.choose_rand(Random(i))[0].name, range(rand_samples)))
+        values_random_sample = list(map(lambda i: self.pd.choose_rand(Random(i))[0], range(rand_samples)))
         sample_count = dict(Counter(values_random_sample))
-        expected_prob = {PackageType.TINY.name: 0.66,
-                         PackageType.SMALL.name: 0.33,
-                         PackageType.MEDIUM.name: 0.0,
-                         PackageType.LARGE.name: 0.0}
+        expected_prob = {PackageType.TINY: 0.66,
+                         PackageType.SMALL: 0.33,
+                         PackageType.MEDIUM: 0.0,
+                         PackageType.LARGE: 0.0}
         for package in PackageType:
-            assert_samples_approx_expected(self, package.name, expected_prob, sample_count)
+            assert_samples_approx_expected(self, package, expected_prob, sample_count)
 
     def test_exact_package_distribution(self):
         expected_pt_1 = PackageType.TINY
@@ -185,3 +186,9 @@ class BasicPackageGeneration(unittest.TestCase):
         self.assertEqual([expected_pt_1], actual_pt_1)
         self.assertEqual([expected_pt_2, expected_pt_3], actual_pt_2_3)
         self.assertRaises(RuntimeError, exact_pt_dist.choose_rand, (Random(42), 1))
+
+    def test_package_configuration_comparison(self):
+        self.assertTrue(PackageConfiguration.TINY_X16 < PackageConfiguration.TINY_X32)
+        self.assertTrue(PackageConfiguration.MEDIUM_X4 < PackageConfiguration.TINY_X32)
+        self.assertTrue(PackageConfiguration.MEDIUM_X8 > PackageConfiguration.TINY_X16)
+        self.assertTrue(PackageConfiguration.MEDIUM_X8 > PackageConfiguration.SMALL_X8)

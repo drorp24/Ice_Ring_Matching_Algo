@@ -226,22 +226,20 @@ class Polygon2D(Geometry2D, Surface2D):
     def points(self) -> List[Point2D]:
         raise NotImplementedError()
 
-    @property
     @abstractmethod
-    def holes(self) -> List[LinearRing2D]:
+    def calc_holes(self) -> List[LinearRing2D]:
         raise NotImplementedError()
 
-    @property
     @abstractmethod
-    def boundary(self) -> LinearRing2D:
+    def calc_boundary(self) -> LinearRing2D:
         raise NotImplementedError()
 
-    @property
-    def centroid(self) -> Point2D:
+    @abstractmethod
+    def calc_centroid(self) -> Point2D:
         raise NotImplementedError()
 
-    @property
-    def bbox(self) -> Bbox2D:
+    @abstractmethod
+    def calc_bbox(self) -> Bbox2D:
         raise NotImplementedError()
 
     @abstractmethod

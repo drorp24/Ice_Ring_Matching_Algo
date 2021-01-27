@@ -2,10 +2,14 @@ from datetime import date, time
 from random import Random
 from typing import List
 
-from common.entities.base_entities.delivery_request import build_delivery_request_distribution, DeliveryRequest
+from common.entities.base_entities.delivery_request import DeliveryRequest
+from common.entities.base_entities.entity_distribution.delivery_requestion_dataset_builder import \
+    build_delivery_request_distribution
+from common.entities.base_entities.entity_distribution.drone_loading_dock_distribution import \
+    DroneLoadingDockDistribution
 from common.entities.generator.delivery_request_generator import DeliveryRequestDatasetStructure, DeliveryRequestDatasetGenerator
 from common.entities.distribution.distribution import Range
-from common.entities.base_entities.drone_loading_dock import DroneLoadingDock, DroneLoadingDockDistribution
+from common.entities.base_entities.drone_loading_dock import DroneLoadingDock
 from common.entities.base_entities.temporal import DateTimeExtension
 from common.graph.operational import graph_creator
 from common.graph.operational.operational_graph import OperationalGraph

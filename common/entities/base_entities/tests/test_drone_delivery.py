@@ -1,16 +1,18 @@
 import unittest
 import uuid
 from datetime import date, time, timedelta
+from pathlib import Path
 from random import Random
 from typing import List
 
 from common.entities.base_entities.delivery_request import DeliveryRequest
-from common.entities.base_entities.drone import PlatformType
+from common.entities.base_entities.drone import DroneType
 from common.entities.base_entities.drone_delivery import DroneDelivery, EmptyDroneDelivery, MatchedDroneLoadingDock, \
     MatchedDeliveryRequest
 from common.entities.base_entities.drone_delivery_board import EmptyDroneDeliveryBoard, DroneDeliveryBoard, \
     UnmatchedDeliveryRequest
-from common.entities.base_entities.drone_formation import DroneFormations, FormationSize, FormationOptions
+from common.entities.base_entities.drone_formation import DroneFormations, DroneFormationType, \
+    PackageConfigurationOption
 from common.entities.base_entities.entity_distribution.delivery_request_distribution import DeliveryRequestDistribution
 from common.entities.base_entities.entity_distribution.drone_loading_dock_distribution import \
     DroneLoadingDockDistribution
@@ -22,6 +24,8 @@ ZERO_TIME = DateTimeExtension(dt_date=date(2020, 1, 23), dt_time=time(11, 30, 0)
 
 class BasicDroneDeliveryGenerationTests(unittest.TestCase):
 
+    drone_delivery_board_json_path = Path('common/entities/base_entities/tests/delivery_board_test_file.json')
+
     @classmethod
     def setUpClass(cls):
         cls.delivery_requests = cls._create_delivery_requests()
@@ -32,11 +36,15 @@ class BasicDroneDeliveryGenerationTests(unittest.TestCase):
                                              cls.empty_drone_delivery_board.empty_drone_deliveries,
                                              cls.matched_drone_loading_dock)
 
+    @classmethod
+    def tearDownClass(cls):
+        cls.drone_delivery_board_json_path.unlink()
+
     def test_empty_drone_delivery(self):
         self.assertEqual(self.empty_drone_delivery_1.drone_formation, DroneFormations.get_drone_formation(
-            FormationSize.MINI, FormationOptions.TINY_PACKAGES, PlatformType.platform_1))
+            DroneFormationType.PAIR, PackageConfigurationOption.TINY_PACKAGES, DroneType.drone_type_1))
         self.assertEqual(self.empty_drone_delivery_2.drone_formation, DroneFormations.get_drone_formation(
-            FormationSize.MEDIUM, FormationOptions.TINY_PACKAGES, PlatformType.platform_1))
+            DroneFormationType.QUAD, PackageConfigurationOption.TINY_PACKAGES, DroneType.drone_type_1))
 
     def test_drone_delivery_time_window_output_validation(self):
         # --- validate first delivery time_window
@@ -55,28 +63,28 @@ class BasicDroneDeliveryGenerationTests(unittest.TestCase):
 
     def test_drone_delivery_output_formation_validation(self):
         self.assertEqual(self.drone_delivery_1.drone_formation, DroneFormations.get_drone_formation(
-            FormationSize.MINI, FormationOptions.TINY_PACKAGES, PlatformType.platform_1))
+            DroneFormationType.PAIR, PackageConfigurationOption.TINY_PACKAGES, DroneType.drone_type_1))
         self.assertEqual(self.drone_delivery_2.drone_formation, DroneFormations.get_drone_formation(
-            FormationSize.MEDIUM, FormationOptions.TINY_PACKAGES, PlatformType.platform_1))
+            DroneFormationType.QUAD, PackageConfigurationOption.TINY_PACKAGES, DroneType.drone_type_1))
 
     def test_empty_drone_delivery_board(self):
         self.assertEqual(len(self.empty_drone_delivery_board.empty_drone_deliveries), 2)
         self.assertEqual(self.empty_drone_delivery_board.empty_drone_deliveries[0].drone_formation,
                          DroneFormations.get_drone_formation(
-                             FormationSize.MINI, FormationOptions.TINY_PACKAGES, PlatformType.platform_1))
+                             DroneFormationType.PAIR, PackageConfigurationOption.TINY_PACKAGES, DroneType.drone_type_1))
         self.assertEqual(self.empty_drone_delivery_board.empty_drone_deliveries[1].drone_formation,
                          DroneFormations.get_drone_formation(
-                             FormationSize.MEDIUM, FormationOptions.TINY_PACKAGES,
-                             PlatformType.platform_1))
+                             DroneFormationType.QUAD, PackageConfigurationOption.TINY_PACKAGES,
+                             DroneType.drone_type_1))
 
     def test_drone_delivery_board(self):
         self.assertEqual(len(self.drone_delivery_board.drone_deliveries), 2)
         self.assertEqual(self.drone_delivery_board.drone_deliveries[0].drone_formation,
                          DroneFormations.get_drone_formation(
-                             FormationSize.MINI, FormationOptions.TINY_PACKAGES, PlatformType.platform_1))
+                             DroneFormationType.PAIR, PackageConfigurationOption.TINY_PACKAGES, DroneType.drone_type_1))
         self.assertEqual(self.drone_delivery_board.drone_deliveries[1].drone_formation,
                          DroneFormations.get_drone_formation(
-                             FormationSize.MEDIUM, FormationOptions.TINY_PACKAGES, PlatformType.platform_1))
+                             DroneFormationType.QUAD, PackageConfigurationOption.TINY_PACKAGES, DroneType.drone_type_1))
 
     def test_2_matched_drone_deliveries_are_equal(self):
         actual_matched_delivery_request = MatchedDeliveryRequest(
@@ -91,7 +99,7 @@ class BasicDroneDeliveryGenerationTests(unittest.TestCase):
 
     def test_2_empty_drone_deliveries_are_equal(self):
         actual_empty_drone_delivery = EmptyDroneDelivery(self.entity_id_1, DroneFormations.get_drone_formation(
-            FormationSize.MINI, FormationOptions.TINY_PACKAGES, PlatformType.platform_1))
+            DroneFormationType.PAIR, PackageConfigurationOption.TINY_PACKAGES, DroneType.drone_type_1))
         self.assertEqual(self.empty_drone_delivery_1, actual_empty_drone_delivery)
 
     def test_2_drone_deliveries_are_equal(self):
@@ -108,6 +116,13 @@ class BasicDroneDeliveryGenerationTests(unittest.TestCase):
             unmatched_delivery_requests=[self.unmatched_delivery_request])
         self.assertEqual(self.drone_delivery_board, actual_drone_delivery_board)
 
+    def test_drone_delivery_board_to_json_and_back_to_drone_delivery_board(self):
+        self.drone_delivery_board.to_json(self.drone_delivery_board_json_path)
+
+        drone_delivery_board_from_json = DroneDeliveryBoard.from_json(DroneDeliveryBoard,
+                                                                      self.drone_delivery_board_json_path)
+        self.assertEqual(self.drone_delivery_board, drone_delivery_board_from_json)
+
     @staticmethod
     def _create_delivery_requests() -> List[DeliveryRequest]:
         return DeliveryRequestDistribution().choose_rand(random=Random(42), amount={DeliveryRequest: 3})
@@ -116,9 +131,9 @@ class BasicDroneDeliveryGenerationTests(unittest.TestCase):
         self.entity_id_1 = EntityID(uuid.uuid4())
         self.entity_id_2 = EntityID(uuid.uuid4())
         self.empty_drone_delivery_1 = EmptyDroneDelivery(self.entity_id_1, DroneFormations.get_drone_formation(
-            FormationSize.MINI, FormationOptions.TINY_PACKAGES, PlatformType.platform_1))
+            DroneFormationType.PAIR, PackageConfigurationOption.TINY_PACKAGES, DroneType.drone_type_1))
         self.empty_drone_delivery_2 = EmptyDroneDelivery(self.entity_id_2, DroneFormations.get_drone_formation(
-            FormationSize.MEDIUM, FormationOptions.TINY_PACKAGES, PlatformType.platform_1))
+            DroneFormationType.QUAD, PackageConfigurationOption.TINY_PACKAGES, DroneType.drone_type_1))
         return EmptyDroneDeliveryBoard([self.empty_drone_delivery_1, self.empty_drone_delivery_2])
 
     @staticmethod
