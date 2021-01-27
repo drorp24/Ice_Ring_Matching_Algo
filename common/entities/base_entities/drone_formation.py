@@ -1,7 +1,7 @@
 from __future__ import annotations
 from enum import Enum, auto
-from functools import lru_cache
 
+from common.entities.base_entities.base_entity import JsonableBaseEntity
 from common.entities.base_entities.drone import DronePackageConfiguration, PackageConfiguration, PackageTypeAmountMap
 from common.entities.base_entities.drone import DroneType, DroneConfigurations
 from common.entities.base_entities.package import PackageType
@@ -36,9 +36,10 @@ class DroneFormationType(Enum):
         return self.value < other.value
 
 
-class DroneFormation:
+class DroneFormation(JsonableBaseEntity):
 
-    def __init__(self, drone_formation_type: DroneFormationType, drone_package_configuration: DronePackageConfiguration):
+    def __init__(self, drone_formation_type: DroneFormationType,
+                 drone_package_configuration: DronePackageConfiguration):
         self._drone_formation_type = drone_formation_type
         self._drone_package_configuration = drone_package_configuration
 
@@ -47,11 +48,11 @@ class DroneFormation:
         return self._drone_formation_type
 
     @property
-    def drone_configuration(self) -> DronePackageConfiguration:
+    def drone_package_configuration(self) -> DronePackageConfiguration:
         return self._drone_package_configuration
 
     def get_drone_type(self) -> DroneType:
-        return self._drone_package_configuration.drone_type
+        return self._drone_package_configuration.get_drone_type()
 
     def get_package_type_amount(self, package_type: PackageType) -> int:
         return self.drone_formation_type.get_amount_of_drones() * \
@@ -79,8 +80,21 @@ class DroneFormation:
     def __hash__(self):
         return hash((self._drone_formation_type, self._drone_package_configuration))
 
+    def __eq__(self, other):
+        return self.drone_formation_type == other.drone_formation_type \
+               and self.drone_package_configuration == other.drone_package_configuration
+
+    @classmethod
+    def dict_to_obj(cls, dict_input):
+        assert (dict_input['__class__'] == cls.__name__)
+        return DroneFormation(
+            drone_formation_type=DroneFormationType.dict_to_obj(dict_input['drone_formation_type']),
+            drone_package_configuration=DronePackageConfiguration.dict_to_obj(
+                dict_input['drone_package_configuration']))
+
 
 class AutoName(Enum):
+    # noinspection PyMethodParameters
     def _generate_next_value_(name, start, count, last_values):
         return name
 

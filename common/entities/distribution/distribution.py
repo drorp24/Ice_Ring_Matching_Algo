@@ -129,9 +129,6 @@ class Range:
     def __hash__(self):
         return hash((self.start, self.stop))
 
-    def __eq__(self, other: Range):
-        return self.start == other.start and self.stop == other.stop
-
     def __contains__(self, item: float):
         return self.start <= item <= self.stop
 
