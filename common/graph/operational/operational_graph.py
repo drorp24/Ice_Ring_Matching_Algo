@@ -53,15 +53,17 @@ class OperationalNode(JsonableBaseEntity):
 
 @dataclass
 class OperationalEdgeAttribs(JsonableBaseEntity):
-    cost: int
+    cost: float
+    travel_time_min: float
 
     @classmethod
     def dict_to_obj(cls, dict_input):
         assert (dict_input['__class__'] == cls.__name__)
-        return OperationalEdgeAttribs(dict_input['cost'])
+        return OperationalEdgeAttribs(cost=dict_input['cost'],
+                                      travel_time_min=dict_input['travel_time_min'])
 
     def __hash__(self):
-        return hash(self.cost)
+        return hash((self.cost, self.travel_time_min))
 
 
 class OperationalEdge(JsonableBaseEntity):
@@ -117,7 +119,8 @@ class OperationalGraph(JsonableBaseEntity):
     @property
     def edges(self) -> List[OperationalEdge]:
         internal_edges = self._internal_graph.edges.data(data=True)
-        return [OperationalEdge(edge[0], edge[1], OperationalEdgeAttribs(edge[2]['cost'])) for edge in internal_edges]
+        return [OperationalEdge(edge[0], edge[1], OperationalEdgeAttribs(edge[2]['cost'], edge[2]['travel_time_min']))
+                for edge in internal_edges]
 
     @classmethod
     def dict_to_obj(cls, dict_input):
@@ -166,8 +169,14 @@ class OperationalGraph(JsonableBaseEntity):
         extracted_subgraph = self._extract_internal_subgraph_of_nodes(nodes_within_polygon)
         return OperationalGraph._create_from_extracted_subgraph(extracted_subgraph)
 
-    def to_numpy_array(self, nonedge: float, dtype) -> np.ndarray:
-        travel_times = to_numpy_array(self._internal_graph, weight="cost", nonedge=nonedge, dtype=dtype)
+    def to_cost_numpy_array(self, nonedge: float, dtype) -> np.ndarray:
+        costs = to_numpy_array(self._internal_graph, weight="cost", nonedge=nonedge, dtype=dtype)
+        if nonedge != 0:
+            self._zero_nodes_travel_time_to_themselves(costs)
+        return costs
+
+    def to_travel_time_numpy_array(self, nonedge: float, dtype) -> np.ndarray:
+        travel_times = to_numpy_array(self._internal_graph, weight="travel_time_min", nonedge=nonedge, dtype=dtype)
         if nonedge != 0:
             self._zero_nodes_travel_time_to_themselves(travel_times)
         return travel_times

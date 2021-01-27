@@ -22,11 +22,11 @@ class BasicGraphNodeTestCases(unittest.TestCase):
         cls.dld_dataset_random = DroneLoadingDockDistribution().choose_rand(random=Random(100), amount=2)
         cls.example_node_drone_loading_dock = OperationalNode(internal_node=cls.dld_dataset_random[0])
 
-        cls.example_op_edge_attribs = OperationalEdgeAttribs(42)
+        cls.example_op_edge_attribs = OperationalEdgeAttribs(cost=42, travel_time_min=42)
 
         cls.example_op_edge = OperationalEdge(start_node=cls.example_node_delivery_request_0,
                                               end_node=cls.example_node_delivery_request_1,
-                                              attributes=OperationalEdgeAttribs(100))
+                                              attributes=cls.example_op_edge_attribs)
 
         cls.example_operational_graph = OperationalGraph()
         cls.example_operational_graph.add_operational_nodes([cls.example_node_delivery_request_0,
