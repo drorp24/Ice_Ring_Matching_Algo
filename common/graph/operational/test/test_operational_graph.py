@@ -80,13 +80,13 @@ class BasicDeliveryRequestGraphTestCases(unittest.TestCase):
         graph.add_drone_loading_docks(docks)
         graph.add_delivery_requests(delivery_requests)
         edges = [OperationalEdge(OperationalNode(docks[0]), OperationalNode(delivery_requests[0]),
-                                 OperationalEdgeAttribs(cost_dock_to_dr_1, travel_time_dock_to_dr_1)),
+                                 OperationalEdgeAttribs(cost_dock_to_dr_1, travel_time_dock_to_dr_1.in_minutes())),
                  OperationalEdge(OperationalNode(delivery_requests[0]), OperationalNode(docks[0]),
-                                 OperationalEdgeAttribs(cost_dock_to_dr_1, travel_time_dock_to_dr_1)),
+                                 OperationalEdgeAttribs(cost_dock_to_dr_1, travel_time_dock_to_dr_1.in_minutes())),
                  OperationalEdge(OperationalNode(docks[0]), OperationalNode(delivery_requests[1]),
-                                 OperationalEdgeAttribs(cost_dock_to_dr_2, travel_time_dock_to_dr_2)),
+                                 OperationalEdgeAttribs(cost_dock_to_dr_2, travel_time_dock_to_dr_2.in_minutes())),
                  OperationalEdge(OperationalNode(delivery_requests[1]), OperationalNode(docks[0]),
-                                 OperationalEdgeAttribs(cost_dock_to_dr_2, travel_time_dock_to_dr_2))
+                                 OperationalEdgeAttribs(cost_dock_to_dr_2, travel_time_dock_to_dr_2.in_minutes()))
                  ]
         graph.add_operational_edges(edges)
         nonedge = 10000
@@ -157,10 +157,10 @@ class BasicDeliveryRequestGraphTestCases(unittest.TestCase):
         for dk in self.dld_dataset_random:
             for dl in self.dr_dataset_morning:
                 edges.append(OperationalEdge(OperationalNode(dk), OperationalNode(dl),
-                                             OperationalEdgeAttribs(Random().choice(range(10)),
-                                                                    TimeDeltaExtension(timedelta(
-                                                                        minutes=Random().choice(range(10)))))))
-        drg.add_operational_edges(edges)
+                                             OperationalEdgeAttribs(cost=Random().choice(range(10)),
+                                                                    travel_time_min=Random().choice(range(10)))))
+
+                drg.add_operational_edges(edges)
         returned_edges = list(drg.edges)
         self.assertEqual(len(drg.edges), len(edges))
         self.assertEqual(returned_edges[0].start_node, edges[0].start_node)

@@ -1,5 +1,5 @@
 import unittest
-from datetime import date, time, timedelta
+from datetime import date, time
 from random import Random
 
 from common.entities.base_entities.delivery_request import DeliveryRequest
@@ -7,7 +7,7 @@ from common.entities.base_entities.entity_distribution.delivery_request_distribu
 from common.entities.base_entities.entity_distribution.drone_loading_dock_distribution import \
     DroneLoadingDockDistribution
 from common.entities.base_entities.package import PackageType
-from common.entities.base_entities.temporal import DateTimeExtension, TimeDeltaExtension
+from common.entities.base_entities.temporal import DateTimeExtension
 from common.graph.operational.operational_graph import OperationalGraph, OperationalEdge, OperationalNode, \
     OperationalEdgeAttribs
 from common.graph.operational.export_ortools_graph import OrtoolsGraphExporter
@@ -33,14 +33,13 @@ class BasicOrtoolsExporterTestCases(unittest.TestCase):
         for dk in cls.dld_dataset_random:
             for dl in cls.dr_dataset_random:
                 edges.append(OperationalEdge(OperationalNode(dk), OperationalNode(dl),
-                                             OperationalEdgeAttribs(Random().choice(range(10)),
-                                                                    TimeDeltaExtension(timedelta(
-                                                                        minutes=Random().choice(range(10)))))))
+                                             OperationalEdgeAttribs(cost=Random().choice(range(10)),
+                                                                    travel_time_min=Random().choice(range(10)))))
         return edges
 
     def test_export_time_window(self):
-        zero_time = DateTimeExtension(dt_date=date(2021, 1, 1),dt_time=time(0, 0, 0))
-        time_windows = self.graph_exporter.export_time_windows(self.operational_graph,zero_time)
+        zero_time = DateTimeExtension(dt_date=date(2021, 1, 1), dt_time=time(0, 0, 0))
+        time_windows = self.graph_exporter.export_time_windows(self.operational_graph, zero_time)
 
         self.assertEqual(len(self.operational_graph.nodes), len(time_windows))
         self.assertEqual(time_windows[0], self.dr_dataset_random[0].time_window.get_relative_time_in_min(zero_time))

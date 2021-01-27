@@ -1,12 +1,11 @@
 import itertools
 import math
-from datetime import timedelta
 from itertools import repeat
 from typing import List
 
 from common.entities.base_entities.delivery_request import DeliveryRequest
 from common.entities.base_entities.drone_loading_dock import DroneLoadingDock
-from common.entities.base_entities.temporal import Temporal, TimeDeltaExtension
+from common.entities.base_entities.temporal import Temporal
 from common.entities.base_entities.zone import Zone
 from common.graph.operational.graph_utils import sort_delivery_requests_by_zone, grouping_delivery_requests
 from common.graph.operational.operational_graph import OperationalGraph, OperationalEdge, OperationalEdgeAttribs, \
@@ -36,7 +35,7 @@ def add_locally_connected_dr_graph(graph, dr_connection_options: [DeliveryReques
         for end_dr in end_dr_options:
             if has_overlapping_time_window(start_dr, end_dr):
                 cost = calc_cost(start_dr, end_dr)
-                travel_time = calc_travel_time(start_dr, end_dr)
+                travel_time = calc_travel_time_in_min(start_dr, end_dr)
                 edges.append(OperationalEdge(OperationalNode(start_dr),
                                              OperationalNode(end_dr),
                                              OperationalEdgeAttribs(cost, travel_time)))
@@ -51,16 +50,16 @@ def _create_directed_from_edges(origin_node: OperationalNode, destinations: List
                                      OperationalEdgeAttribs(
                                          calc_cost(origin_node.internal_node, y.internal_node,
                                                    edge_cost_factor),
-                                         calc_travel_time(origin_node.internal_node, y.internal_node,
-                                                          edge_travel_time_factor)
+                                         calc_travel_time_in_min(origin_node.internal_node, y.internal_node,
+                                                                 edge_travel_time_factor)
                                      )),
                      destinations)) + \
             list(map(lambda y: OperationalEdge(y, origin_node,
                                                OperationalEdgeAttribs(
                                                    calc_cost(origin_node.internal_node, y.internal_node,
                                                              edge_cost_factor),
-                                                   calc_travel_time(origin_node.internal_node,
-                                                                    y.internal_node, edge_travel_time_factor)
+                                                   calc_travel_time_in_min(origin_node.internal_node,
+                                                                           y.internal_node, edge_travel_time_factor)
                                                )),
                      destinations))
     return edges
@@ -103,10 +102,10 @@ def add_fully_connected_loading_docks(graph: OperationalGraph, drone_loading_doc
 def create_two_way_directed_edges(node_content_1, node_content_2) -> [OperationalEdge]:
     return [OperationalEdge(OperationalNode(node_content_1), OperationalNode(node_content_2),
                             OperationalEdgeAttribs(calc_cost(node_content_1, node_content_2),
-                                                   calc_travel_time(node_content_1, node_content_2))),
+                                                   calc_travel_time_in_min(node_content_1, node_content_2))),
             OperationalEdge(OperationalNode(node_content_2), OperationalNode(node_content_1),
                             OperationalEdgeAttribs(calc_cost(node_content_2, node_content_1),
-                                                   calc_travel_time(node_content_1, node_content_2)))]
+                                                   calc_travel_time_in_min(node_content_1, node_content_2)))]
 
 
 def has_overlapping_time_window(start: Temporal, end: Temporal):
@@ -135,6 +134,5 @@ def calc_cost(start: Localizable, end: Localizable, edge_cost_factor: float = 1.
     return calc_distance(end, start) * edge_cost_factor
 
 
-def calc_travel_time(start: Localizable, end: Localizable, edge_travel_time_factor: float = 1.0) -> TimeDeltaExtension:
-    return TimeDeltaExtension(time_delta=timedelta(
-        minutes=calc_distance(end, start) * edge_travel_time_factor))
+def calc_travel_time_in_min(start: Localizable, end: Localizable, edge_travel_time_factor: float = 1.0) -> float:
+    return calc_distance(end, start) * edge_travel_time_factor
