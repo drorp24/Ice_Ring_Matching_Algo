@@ -69,15 +69,6 @@ class PotentialEnvelopeCollectionIterator:
 
 def get_max_distance(external_point: Point2D, potential_envelope_collection: PotentialEnvelopeCollection) -> float:
 
-    # distantest_shapeables = []
-    # distances = []
-    # for collection in potential_envelope:
-    #     shapeable_distances = list(map(lambda shapeable:
-    #                                    external_point.calc_distance_to_point(shapeable.calc_location()),
-    #                                    collection.shapeabls()))
-    #     distances.append(max(shapeable_distances))
-    #     distantest_shapeables.append(collection.shapeabls()[shapeable_distances.index(max(shapeable_distances))])
-    # return distantest_shapeables[distances.index(max(distances))]
     distances = list(
         map(lambda collection: max(list(
             map(lambda shapeable: external_point.calc_distance_to_point(shapeable.calc_location()),collection))),
