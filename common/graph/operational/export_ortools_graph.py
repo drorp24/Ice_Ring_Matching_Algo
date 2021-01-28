@@ -24,8 +24,13 @@ class OrtoolsGraphExporter(GraphExporter):
         priorities = [node.get_priority() for node in nodes]
         return priorities
 
+    def export_travel_costs(self, graph: OperationalGraph) -> np.ndarray:
+        arr = graph.to_cost_numpy_array(nonedge=sys.maxsize, dtype=np.int64)
+        arr = self._validate_nonedge_is_maxsize(arr)
+        return arr
+
     def export_travel_times(self, graph: OperationalGraph) -> np.ndarray:
-        arr = graph.to_numpy_array(nonedge=sys.maxsize, dtype=np.int64)
+        arr = graph.to_travel_time_numpy_array(nonedge=sys.maxsize, dtype=np.int64)
         arr = self._validate_nonedge_is_maxsize(arr)
         return arr
 

@@ -1,13 +1,14 @@
 from dataclasses import dataclass
 from functools import lru_cache
 
+from common.entities.base_entities.base_entity import JsonableBaseEntity
 from common.entities.base_entities.delivery_request import DeliveryRequest
 from common.entities.base_entities.drone import PackageTypeAmountMap
 from common.entities.base_entities.drone_delivery import DroneDelivery, EmptyDroneDelivery
 from common.entities.base_entities.package import PackageType
 
 
-class EmptyDroneDeliveryBoard:
+class EmptyDroneDeliveryBoard(JsonableBaseEntity):
     def __init__(self, empty_drone_deliveries: [EmptyDroneDelivery]):
         self._empty_drone_deliveries = empty_drone_deliveries
 
@@ -28,14 +29,22 @@ class EmptyDroneDeliveryBoard:
     def max_route_times_in_minutes(self) -> [int]:
         return [edd.drone_formation.max_route_times_in_minutes() for edd in self._empty_drone_deliveries]
 
+    def __eq__(self, other):
+        return self.empty_drone_deliveries == other.empty_drone_deliveries
+
+    @classmethod
+    def dict_to_obj(cls, dict_input):
+        assert (dict_input['__class__'] == cls.__name__)
+        return EmptyDroneDeliveryBoard(
+            empty_drone_deliveries=[EmptyDroneDelivery.dict_to_obj(empty_drone_delivery_dict)
+                                    for empty_drone_delivery_dict
+                                    in dict_input['empty_drone_deliveries']])
+
 
 @dataclass
-class UnmatchedDeliveryRequest:
+class UnmatchedDeliveryRequest(JsonableBaseEntity):
     graph_index: int
     delivery_request: DeliveryRequest
-
-    def __eq__(self, other):
-        return self.graph_index == other.graph_index and self.delivery_request == other.delivery_request
 
     def __str__(self):
         return '[UnmatchedDeliveryRequest(graph_index=' + str(self.graph_index) + ', priority=' + str(
@@ -44,8 +53,15 @@ class UnmatchedDeliveryRequest:
     def __hash__(self):
         return hash((self.graph_index, self.delivery_request))
 
+    @classmethod
+    def dict_to_obj(cls, dict_input):
+        assert (dict_input['__class__'] == cls.__name__)
+        return UnmatchedDeliveryRequest(
+            graph_index=dict_input['graph_index'],
+            delivery_request=DeliveryRequest.dict_to_obj(dict_input['delivery_request']))
 
-class DroneDeliveryBoard:
+
+class DroneDeliveryBoard(JsonableBaseEntity):
     def __init__(self, drone_deliveries: [DroneDelivery], unmatched_delivery_requests: [UnmatchedDeliveryRequest]):
         self._drone_deliveries = drone_deliveries
         self._unmatched_delivery_requests = unmatched_delivery_requests
@@ -92,3 +108,12 @@ class DroneDeliveryBoard:
 
     def __hash__(self):
         return hash((tuple(self._drone_deliveries), tuple(self._unmatched_delivery_requests)))
+
+    @classmethod
+    def dict_to_obj(cls, dict_input):
+        assert (dict_input['__class__'] == cls.__name__)
+        return DroneDeliveryBoard(
+            drone_deliveries=[DroneDelivery.dict_to_obj(drone_delivery_dict) for drone_delivery_dict in
+                              dict_input['drone_deliveries']],
+            unmatched_delivery_requests=[UnmatchedDeliveryRequest.dict_to_obj(unmatched_dict) for unmatched_dict in
+                                         dict_input['unmatched_delivery_requests']])

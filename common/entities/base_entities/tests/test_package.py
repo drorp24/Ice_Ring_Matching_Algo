@@ -4,6 +4,7 @@ from pprint import pprint
 from random import Random
 from uuid import UUID
 
+from common.entities.base_entities.drone import PackageConfiguration
 from common.entities.base_entities.entity_distribution.package_distribution import PackageDistribution, \
     ExactPackageDistribution
 from common.entities.base_entities.entity_id import EntityID
@@ -185,3 +186,9 @@ class BasicPackageGeneration(unittest.TestCase):
         self.assertEqual([expected_pt_1], actual_pt_1)
         self.assertEqual([expected_pt_2, expected_pt_3], actual_pt_2_3)
         self.assertRaises(RuntimeError, exact_pt_dist.choose_rand, (Random(42), 1))
+
+    def test_package_configuration_comparison(self):
+        self.assertTrue(PackageConfiguration.TINY_X16 < PackageConfiguration.TINY_X32)
+        self.assertTrue(PackageConfiguration.MEDIUM_X4 < PackageConfiguration.TINY_X32)
+        self.assertTrue(PackageConfiguration.MEDIUM_X8 > PackageConfiguration.TINY_X16)
+        self.assertTrue(PackageConfiguration.MEDIUM_X8 > PackageConfiguration.SMALL_X8)
