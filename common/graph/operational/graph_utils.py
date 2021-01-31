@@ -1,4 +1,3 @@
-from operator import itemgetter
 from typing import List, Dict
 
 import numpy as np
@@ -6,17 +5,19 @@ import numpy as np
 from common.entities.base_entities.delivery_request import DeliveryRequest
 from common.entities.base_entities.zone import Zone
 from common.tools.clustering_alg import fit_k_means
-from geometry.geo2d import Polygon2D
 from visualization.basic.pltdrawer2d import create_drawer_2d
 from visualization.operational.operational_drawer2d import add_operational_graph
 
+#TOOO: meital fix function
+def sort_delivery_requests_by_zone(delivery_requests: [DeliveryRequest], zones: [Zone]) -> Dict[
+    int, List[DeliveryRequest]]:
+    return {zone_index: [dr for dr in delivery_requests if dr.calc_location() in zone.region] for
+            zone_index, zone in enumerate(zones)}
 
-def sort_delivery_requests_by_zone(delivery_requests: [DeliveryRequest], zones: [Zone]) -> {
-    Polygon2D, List[DeliveryRequest]}:
-    return dict(
-        filter(itemgetter(1),
-               {zone_index: [dr for dr in delivery_requests if dr.calc_location() in zones[zone_index].region] for
-                zone_index in range(0, len(zones))}.items()))
+    # return dict(
+    #     filter(itemgetter(1),
+    #            {zone_index: [dr for dr in delivery_requests if dr.calc_location() in zones[zone_index].region] for
+    #             zone_index in range(0, len(zones))}.items()))
 
 
 def grouping_delivery_requests(delivery_requests: List[DeliveryRequest], max_groups: int = 10) -> \
