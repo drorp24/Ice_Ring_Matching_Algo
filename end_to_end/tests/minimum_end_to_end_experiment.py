@@ -71,8 +71,8 @@ def create_single_package_distribution():
 
 def _create_empty_drone_delivery_board(
         drone_formation_policy=DroneFormationTypePolicy({DroneFormationType.PAIR: 1, DroneFormationType.QUAD: 0}),
-        package_configurations_policy=PackageConfigurationPolicy({PackageConfiguration.LARGE_X2: 0.9,
-                                                                  PackageConfiguration.MEDIUM_X4: 0.1,
+        package_configurations_policy=PackageConfigurationPolicy({PackageConfiguration.LARGE_X2: 1.0,
+                                                                  PackageConfiguration.MEDIUM_X4: 0.0,
                                                                   PackageConfiguration.SMALL_X8: 0,
                                                                   PackageConfiguration.TINY_X16: 0}),
         drone_type: DroneType = DroneType.drone_type_1,
@@ -121,7 +121,7 @@ class BasicMinimumEnd2EndExperiment:
 
     def test_small_supplier_category(self):
         start_time = datetime.now()
-        empty_drone_delivery_board = _create_empty_drone_delivery_board(amount=20, max_route_time_entire_board=45,
+        empty_drone_delivery_board = _create_empty_drone_delivery_board(amount=20, max_route_time_entire_board=50,
                                                                         velocity_entire_board=10.0)
         print("--- _create_empty_drone_delivery_board run time: %s  ---" % (datetime.now() - start_time))
         start_time = datetime.now()
@@ -129,7 +129,7 @@ class BasicMinimumEnd2EndExperiment:
         supplier_category = self.supplier_category_distribution.choose_rand(random=Random(10),
                                                                             amount={DeliveryRequest: 37,
                                                                                     DroneLoadingDock: 1})
-        fully_connected_graph = create_fully_connected_graph_model(supplier_category, edge_cost_factor=25.0)
+        fully_connected_graph = create_fully_connected_graph_model(supplier_category, edge_travel_time_factor=80.0)
         print("--- create_fully_connected_graph_model run time: %s  ---" % (datetime.now() - start_time))
         start_time = datetime.now()
 
@@ -168,5 +168,5 @@ class BasicMinimumEnd2EndExperiment:
 
 
 if __name__ == '__main__':
-    experiment = BasicMinimumEnd2EndExperiment('north')
+    experiment = BasicMinimumEnd2EndExperiment('center')
     experiment.test_small_supplier_category()
