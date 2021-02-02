@@ -30,11 +30,8 @@ from visualization.basic.pltdrawer2d import create_drawer_2d, MapImage
 from visualization.basic.pltgantt_drawer import create_gantt_drawer
 from visualization.operational import operational_drawer2d
 from visualization.operational import operational_gantt_drawer
-
-west_lon = 34.83927
-east_lon = 35.32341
-south_lat = 31.77279
-north_lat = 32.19276
+import numpy as np
+import matplotlib.pyplot as plt
 
 ZERO_TIME = DateTimeExtension(dt_date=date(2021, 1, 1), dt_time=time(0, 0, 0))
 
@@ -86,13 +83,15 @@ def _create_empty_drone_delivery_board(
 
 class BasicMinimumEnd2EndExperiment:
 
-    def __init__(self, scene: str):
+    def __init__(self, scene: str, lowest_priority: int = 10, dr_timewindow: int = 3 ):
         self.matcher_config = Path("end_to_end/tests/jsons/test_matcher_config.json")
+        self.lowest_priority = lowest_priority
+        self.dr_timewindow = dr_timewindow
         if scene == 'north':
             self.supplier_category_distribution = SupplierCategoryDistribution(
                 zero_time_distribution=DateTimeDistribution([ZERO_TIME]),
                 delivery_requests_distribution=_create_delivery_request_distribution(
-                    create_point_2d(35.45, 33.4 - 0.5 * 1), 0.05, 0.06, 10, 3),
+                    create_point_2d(35.45, 33.4 - 0.5 * 1), 0.05, 0.06, lowest_priority, dr_timewindow),
                 drone_loading_docks_distribution=DroneLoadingDockDistribution(
                     drone_loading_station_distributions=DroneLoadingStationDistribution(
                         drone_station_locations_distribution=UniformPointInBboxDistribution(35.19336,
@@ -107,7 +106,7 @@ class BasicMinimumEnd2EndExperiment:
             self.supplier_category_distribution = SupplierCategoryDistribution(
                 zero_time_distribution=DateTimeDistribution([ZERO_TIME]),
                 delivery_requests_distribution=_create_delivery_request_distribution(create_point_2d(35.11, 32.0), 0.03,
-                                                                                     0.05, 10, 3),
+                                                                                     0.05, lowest_priority, dr_timewindow),
                 drone_loading_docks_distribution=DroneLoadingDockDistribution(
                     drone_loading_station_distributions=DroneLoadingStationDistribution(
                         drone_station_locations_distribution=UniformPointInBboxDistribution(35.11,
@@ -119,18 +118,22 @@ class BasicMinimumEnd2EndExperiment:
             self.mapImage = MapImage(map_background_path=Path(r"visualization/basic/gush_dan_background.Png"),
                                      west_lon=34.83927, east_lon=35.32341, south_lat=31.77279, north_lat=32.19276)
 
-    def test_small_supplier_category(self):
+    def test_small_supplier_category(self, drones_amount=20, drone_max_route_time=50,
+                                     delivery_request_amount=37, seed=10, print_flag=True, draw_flag=True):
         start_time = datetime.now()
-        empty_drone_delivery_board = _create_empty_drone_delivery_board(amount=20, max_route_time_entire_board=50,
+        empty_drone_delivery_board = _create_empty_drone_delivery_board(amount=drones_amount,
+                                                                        max_route_time_entire_board=drone_max_route_time,
                                                                         velocity_entire_board=10.0)
-        print("--- _create_empty_drone_delivery_board run time: %s  ---" % (datetime.now() - start_time))
+        if print_flag:
+            print("--- _create_empty_drone_delivery_board run time: %s  ---" % (datetime.now() - start_time))
         start_time = datetime.now()
 
-        supplier_category = self.supplier_category_distribution.choose_rand(random=Random(10),
-                                                                            amount={DeliveryRequest: 37,
+        supplier_category = self.supplier_category_distribution.choose_rand(random=Random(seed),
+                                                                            amount={DeliveryRequest: delivery_request_amount,
                                                                                     DroneLoadingDock: 1})
         fully_connected_graph = create_fully_connected_graph_model(supplier_category, edge_travel_time_factor=80.0)
-        print("--- create_fully_connected_graph_model run time: %s  ---" % (datetime.now() - start_time))
+        if print_flag:
+            print("--- create_fully_connected_graph_model run time: %s  ---" % (datetime.now() - start_time))
         start_time = datetime.now()
 
         match_config_file_path = Path('end_to_end/tests/jsons/test_matcher_config.json')
@@ -139,11 +142,34 @@ class BasicMinimumEnd2EndExperiment:
                                      config=match_config)
 
         delivery_board = calc_assignment(matcher_input=matcher_input)
-        print("--- calc_assignment run time: %s  ---" % (datetime.now() - start_time))
+        assignment_run_time = datetime.now() - start_time
+        if print_flag:
+            print("--- calc_assignment run time: %s  ---" % assignment_run_time)
+            print(delivery_board)
 
-        print(delivery_board)
+        num_unmatched_dr = len(delivery_board.unmatched_delivery_requests)
+        total_priority = fully_connected_graph.calc_overall_priority()
+        unmatched_priority = total_priority - delivery_board.get_total_priority()
+        priority_eff1 = 100.0*(1-(self.lowest_priority*num_unmatched_dr-unmatched_priority)/total_priority)
+        priority_eff2 = 100.0*(1-unmatched_priority/total_priority)
+        priority_eff = max(priority_eff1, priority_eff2)
+        matching_eff = 100.0*(1.0 - num_unmatched_dr/delivery_request_amount)
 
-        self._draw_matched_scenario(delivery_board, fully_connected_graph, supplier_category, self.mapImage)
+        if draw_flag:
+            self._draw_matched_scenario(delivery_board, fully_connected_graph, supplier_category, self.mapImage)
+
+        return [priority_eff, matching_eff, assignment_run_time.total_seconds()]
+
+    def e2e_analysis(self, drones_amount_list, delivery_request_amount_list):
+        performance_matrix = np.zeros((len(drones_amount_list), len(delivery_request_amount_list), 3))
+        for i, drones_amount in enumerate(drones_amount_list):
+            for j, delivery_request_amount in enumerate(delivery_request_amount_list):
+                performance_matrix[i,j,:] = self.test_small_supplier_category(drones_amount=drones_amount,
+                                                                              delivery_request_amount=
+                                                                              delivery_request_amount,
+                                                                              print_flag=False,
+                                                                              draw_flag=False)
+        return performance_matrix
 
     @staticmethod
     def _draw_matched_scenario(delivery_board, fully_connected_graph, supplier_category, map_image):
@@ -168,5 +194,32 @@ class BasicMinimumEnd2EndExperiment:
 
 
 if __name__ == '__main__':
-    experiment = BasicMinimumEnd2EndExperiment('center')
-    experiment.test_small_supplier_category()
+    scene = 'center' # 'north'
+    mode = 'sweep_drones' # 'single', 'sweep_drones', 'sweep_requests', 'sweep_seed' ;
+
+    experiment = BasicMinimumEnd2EndExperiment(scene)
+    if mode == 'single':
+        [priority_eff, matching_eff, assignment_run_time] = experiment.test_small_supplier_category(drones_amount=2,
+                                                                                                    delivery_request_amount=47)
+        print(priority_eff, matching_eff)
+
+    if mode == 'sweep_drones':
+        drones_amount_list = list(range(2, 30, 2))
+        delivery_request_amount_list = [37, 47]
+        analysis_matrix = experiment.e2e_analysis(drones_amount_list, delivery_request_amount_list)
+
+        for idx, amount in enumerate(delivery_request_amount_list):
+            fig = plt.figure(idx)
+            ax = plt.subplot(111)
+            ax.plot(drones_amount_list, np.squeeze(analysis_matrix[:,idx,1]),
+                    'ro-', linewidth=2, markersize=10, markerfacecolor='blue', label="Package delivered")
+            ax.plot(drones_amount_list, np.squeeze(analysis_matrix[:,idx,0]),
+                    'gs--', linewidth=2, markersize=7, markerfacecolor='darkorange', label="Priority weighted")
+            ax.set_xlabel('Number of drones')
+            ax.set_ylabel('Delivering Efficiency [%]')
+            ax.set_title('Delivering Efficiency vs. Fleet Size (%s delivery requests)' % amount)
+            ax.set_xlim(0, drones_amount_list[-1]+1)
+            ax.set_ylim(0, 105)
+            ax.grid('on')
+            plt.legend(loc='upper left')
+        plt.show()
