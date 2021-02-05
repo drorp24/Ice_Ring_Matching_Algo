@@ -84,7 +84,7 @@ class PltDrawer2D(Drawer2D):
             plt.legend(bbox_to_anchor=(1.01, 1), loc="upper left", ncol=3)
 
     def draw(self, block=True) -> None:
-        # self._ax.axis('scaled')
+        self._ax.axis('scaled')
         self._fig.tight_layout()
         self._fig.show()
         plt.show(block=block)
