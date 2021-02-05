@@ -12,6 +12,8 @@ from common.entities.base_entities.entity_distribution.distribution_utils import
 from common.entities.base_entities.entity_distribution.drone_loading_dock_distribution import \
     DroneLoadingDockDistribution
 from common.entities.base_entities.entity_distribution.temporal_distribution import DateTimeDistribution
+from common.entities.base_entities.entity_distribution.zone_delivery_request_distribution import \
+    ZoneDeliveryRequestDistribution
 from common.entities.base_entities.package_delivery_plan import PackageDeliveryPlan
 from common.entities.base_entities.temporal import DateTimeExtension
 from common.entities.distribution.distribution import HierarchialDistribution, Range
@@ -35,9 +37,12 @@ class SupplierCategoryDistribution(HierarchialDistribution):
         sc_amount = extract_amount_in_range(internal_amount.pop(SupplierCategory), random)
         dld_amount = extract_amount_in_range(internal_amount.pop(DroneLoadingDock), random)
         zero_time = self.zero_time_distribution.choose_rand(random=random, amount=1)
+        zones = self.delivery_requests_distribution.zones if isinstance(self.delivery_requests_distribution,
+                                                                        ZoneDeliveryRequestDistribution) else []
         return SupplierCategory(self.delivery_requests_distribution.choose_rand(random=random, amount=internal_amount),
                                 self.drone_loading_docks_distribution.choose_rand(random=random, amount=dld_amount),
-                                zero_time[0])
+                                zero_time[0],
+                                zones=zones)
 
     @classmethod
     def distribution_class(cls) -> type:
