@@ -15,12 +15,17 @@ def create_fully_connected_graph_model(supplier_category: SupplierCategory,
     return operational_graph
 
 
-# TODO: edge_cost_factor , edge_travel_time_factor
- #TODO: think how to send zone , adding to SupplierCategory influence on SupplierCategoryDistribution
-def create_grouped_dr_graph_model(supplier_category: SupplierCategory,zones:[Zone]) -> OperationalGraph:
-    return create_grouped_dr_graph(delivery_requests=supplier_category.delivery_requests,
-                                   drone_loading_docks=supplier_category.drone_loading_docks,
-                                   zones=zones)
+def create_clustered_delivery_requests_graph_model(supplier_category: SupplierCategory,
+                                                   edge_cost_factor: float = 1.0,
+                                                   edge_travel_time_factor: float = 1.0,
+                                                   max_clusters: int = 1
+                                                   ) -> OperationalGraph:
+    return create_clustered_delivery_requests_graph(delivery_requests=supplier_category.delivery_requests,
+                                                    drone_loading_docks=supplier_category.drone_loading_docks,
+                                                    zones=supplier_category.zones,
+                                                    edge_cost_factor=edge_cost_factor,
+                                                    edge_travel_time_factor=edge_travel_time_factor,
+                                                    max_clusters=max_clusters)
 
 
 def calc_assignment(matcher_input: MatcherInput) -> DroneDeliveryBoard:
