@@ -1,7 +1,7 @@
 import itertools
 from abc import abstractmethod
 from random import Random, randint
-from typing import List
+from typing import List, Union
 
 from common.entities.distribution.distribution import Distribution, UniformDistribution, Range, ChoiceDistribution, \
     UniformChoiceDistribution
@@ -75,15 +75,21 @@ class UniformPointsInPolygonDistribution(PointLocationDistribution):
 
 class NormalPointsInMultiPolygonDistribution(PointLocationDistribution):
 
-    def __init__(self, multi_polygon: MultiPolygon2D, max_centroids_per_polygon: int = 1):
+    def __init__(self, multi_polygon: MultiPolygon2D, max_centroids_per_polygon: Union[int, Range] = 1,
+                 sigma_x: float = 1, sigma_y: float = 1):
         self._multi_polygon = multi_polygon
         self._max_centroids_per_polygon = max_centroids_per_polygon
+        self._sigma_x = sigma_x
+        self._sigma_y = sigma_y
 
     def choose_rand(self, random: Random, amount: int = 1) -> List[Point2D]:
-        polygon_centroids_dict = \
-            {polygon_idx: UniformPointsInPolygonDistribution(polygon_obj).
-                choose_rand(random, randint(1, self._max_centroids_per_polygon))
-             for polygon_idx, polygon_obj in enumerate(self._multi_polygon.to_polygons())}
+        centroids_per_polygon = randint(int(self._max_centroids_per_polygon.start),
+                                        int(self._max_centroids_per_polygon.stop)) if isinstance(
+            self._max_centroids_per_polygon, Range) else self._max_centroids_per_polygon
+
+        polygon_centroids_dict = {
+            polygon_idx: UniformPointsInPolygonDistribution(polygon_obj).choose_rand(random, centroids_per_polygon)
+            for polygon_idx, polygon_obj in enumerate(self._multi_polygon.to_polygons())}
 
         chosen_polygons_idx = [UniformChoiceDistribution(list(polygon_centroids_dict.keys())).choose_rand(random)[0]
                                for _ in range(amount)]
@@ -92,8 +98,10 @@ class NormalPointsInMultiPolygonDistribution(PointLocationDistribution):
                           for chosen_polygon_idx in chosen_polygons_idx]
 
         return [NormalPointInPolygonDistribution(polygon=self._multi_polygon.to_polygons()[chosen_polygons_idx],
-                                                 center_point=chosen_center).choose_rand(
-            random=random)[0] for (chosen_polygons_idx, chosen_center) in zip(chosen_polygons_idx, chosen_centers)]
+                                                 center_point=chosen_center, sigma_x=self._sigma_x,
+                                                 sigma_y=self._sigma_y).choose_rand(
+            random=random)[0]
+                for (chosen_polygons_idx, chosen_center) in zip(chosen_polygons_idx, chosen_centers)]
 
 
 class NormalPointDistribution(PointLocationDistribution):
