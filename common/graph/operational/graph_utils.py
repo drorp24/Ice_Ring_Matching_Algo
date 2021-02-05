@@ -8,21 +8,15 @@ from common.tools.clustering_alg import fit_k_means
 from visualization.basic.pltdrawer2d import create_drawer_2d
 from visualization.operational.operational_drawer2d import add_operational_graph
 
-#TOOO: meital fix function
+
 def sort_delivery_requests_by_zone(delivery_requests: [DeliveryRequest], zones: [Zone]) -> Dict[
     int, List[DeliveryRequest]]:
     return {zone_index: [dr for dr in delivery_requests if dr.calc_location() in zone.region] for
             zone_index, zone in enumerate(zones)}
 
-    # return dict(
-    #     filter(itemgetter(1),
-    #            {zone_index: [dr for dr in delivery_requests if dr.calc_location() in zones[zone_index].region] for
-    #             zone_index in range(0, len(zones))}.items()))
-
-
-def grouping_delivery_requests(delivery_requests: List[DeliveryRequest], max_groups: int = 10) -> \
+def split_delivery_requests_into_clusters(delivery_requests: List[DeliveryRequest], max_clusters: int = 10) -> \
         Dict[int, List[DeliveryRequest]]:
-    best_fit = fit_k_means(data=_get_delivery_requests_locations(delivery_requests), max_clusters=max_groups)
+    best_fit = fit_k_means(data=_get_delivery_requests_locations(delivery_requests), max_clusters=max_clusters)
 
     return {center_label: [k for k, v in zip(delivery_requests, best_fit.labels) if v == center_label] for
             center_label, center in enumerate(best_fit.centers)}
