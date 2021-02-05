@@ -35,7 +35,7 @@ class ORToolsMatcherConstraints:
         self._reloading_virtual_depos_indices = reloading_virtual_depos_indices
         self._reload_time_in_minutes = reload_time_in_minutes
         self._depos = self._graph_exporter.export_basis_nodes_indices(self._matcher_input.graph) \
-                      + self._reloading_virtual_depos_indices
+            + self._reloading_virtual_depos_indices
 
     def add_travel_cost(self):
         travel_cost_callback_index = self._routing_model.RegisterTransitCallback(self._get_travel_cost_callback)
@@ -130,7 +130,7 @@ class ORToolsMatcherConstraints:
             index = self._index_manager.NodeToIndex(graph_index)
             time_dimension.CumulVar(index).SetRange(time_window[0], time_window[1])
 
-    def _get_travel_cost_callback(self, from_index: np.int64, to_index: np.int64) -> np.ndarray:
+    def _get_travel_cost_callback(self, from_index: np.int64, to_index: np.int64) -> np.int64:
         from_node = self._index_manager.IndexToNode(from_index)
         to_node = self._index_manager.IndexToNode(to_index)
         if self._are_nodes_consecutive_depos(from_node, to_node):
@@ -142,7 +142,7 @@ class ORToolsMatcherConstraints:
                 to_node = 0
             return self._travel_cost_matrix[from_node][to_node]
 
-    def _get_travel_time_callback(self, from_index: np.int64, to_index: np.int64) -> np.ndarray:
+    def _get_travel_time_callback(self, from_index: np.int64, to_index: np.int64) -> np.int64:
         from_node = self._index_manager.IndexToNode(from_index)
         to_node = self._index_manager.IndexToNode(to_index)
         if self._are_nodes_consecutive_depos(from_node, to_node):
