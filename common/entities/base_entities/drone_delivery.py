@@ -22,6 +22,7 @@ class EmptyDroneDelivery(JsonableBaseEntity):
         self._drone_formation = drone_formation
         self._max_route_times_in_minutes = max_route_time_in_minutes  # TODO: Change to real endurance
         self._velocity_meter_per_sec = velocity_meter_per_sec  # TODO: Change to real velocity
+        self._reload_time_in_minutes = 60  # TODO: Change to real reload_time
 
     def __eq__(self, other):
         return self._id == other.id and self._drone_formation == other.drone_formation
@@ -40,6 +41,10 @@ class EmptyDroneDelivery(JsonableBaseEntity):
     @property
     def max_route_time_in_minutes(self) -> int:
         return self._max_route_times_in_minutes
+
+    @property
+    def reload_time_in_minutes(self) -> int:
+        return self._reload_time_in_minutes
 
     @property
     def velocity_meter_per_sec(self) -> float:

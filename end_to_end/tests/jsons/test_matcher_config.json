@@ -19,7 +19,7 @@
       "__enum__": "SolverVendor.OR_TOOLS"
     },
     "first_solution_strategy": "path_cheapest_arc",
-    "local_search_strategy": "automatic",
+    "local_search_strategy": "GUIDED_LOCAL_SEARCH",
     "timeout_sec": 60
   },
   "constraints": {
@@ -30,7 +30,7 @@
     },
     "time": {
       "__class__": "TimeConstraints",
-      "max_waiting_time": 0,
+      "max_waiting_time": 30000000000,
       "max_route_time": 30000000000,
       "count_time_from_zero": false
     },
