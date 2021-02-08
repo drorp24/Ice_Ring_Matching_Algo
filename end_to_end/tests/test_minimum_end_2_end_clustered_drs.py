@@ -34,11 +34,6 @@ from visualization.basic.pltgantt_drawer import create_gantt_drawer
 from visualization.operational import operational_drawer2d
 from visualization.operational import operational_gantt_drawer
 
-west_lon = 34.83927
-east_lon = 35.32341
-south_lat = 31.77279
-north_lat = 32.19276
-
 ZERO_TIME = DateTimeExtension(dt_date=date(2021, 1, 1), dt_time=time(0, 0, 0))
 
 
@@ -76,10 +71,9 @@ class BasicMinimumEnd2EndClusteredDrsTest(unittest.TestCase):
         self._test_clustered_drs(zone_amount=2, max_centroids_per_zone=3, drs_amount=37, docks_amount=1,
                                  max_clusters_per_zone=3, dr_timewindow=18, draw_match=False)
 
-
     def _test_clustered_drs(self, zone_amount: int = 1, max_centroids_per_zone: int = 1, drs_amount: int = 10,
                             docks_amount: int = 1, max_clusters_per_zone: int = 1, dr_timewindow: int = 3,
-                            draw_match: bool = False,drone_deliveries_amount = 20):
+                            draw_match: bool = False, drone_deliveries_amount=20):
         print("--- _test_clustered_drs time: %s  ---" % datetime.now())
         start_time = datetime.now()
 
@@ -111,7 +105,7 @@ class BasicMinimumEnd2EndClusteredDrsTest(unittest.TestCase):
                 sum([sum(range(0, len(drs))) for drs in expected_delivery_requests_clusters]) +
                 len(supplier_category.delivery_requests))
 
-        print("#expected delivery requests clusters",len(expected_delivery_requests_clusters))
+        print("#expected delivery requests clusters", len(expected_delivery_requests_clusters))
         self.assertLessEqual(len(expected_delivery_requests_clusters), max_clusters_per_zone * zone_amount)
         self.assertEqual((drs_amount + docks_amount), len(clustered_connected_graph.nodes))
         self.assertEqual(expected_num_edge_in_graph, len(clustered_connected_graph.edges))
@@ -119,13 +113,13 @@ class BasicMinimumEnd2EndClusteredDrsTest(unittest.TestCase):
         print("--- assert expected values run time: %s  ---" % (datetime.now() - start_time))
 
         delivery_board = self._run_match(clustered_connected_graph, drone_deliveries_amount)
-        #print(delivery_board)
+        # print(delivery_board)
 
         if draw_match:
-            self._draw_matched_scenario(clustered_connected_graph,delivery_board,supplier_category, self.mapImage)
+            self._draw_matched_supplier_category(clustered_connected_graph, delivery_board, supplier_category,
+                                                 self.mapImage)
 
-    def _draw_matched_scenario(self, clustered_connected_graph, delivery_board,supplier_category, map_image):
-
+    def _draw_matched_supplier_category(self, clustered_connected_graph, delivery_board, supplier_category, map_image):
         dr_drawer = create_drawer_2d(Drawer2DCoordinateSys.GEOGRAPHIC, map_image)
         operational_drawer2d.add_operational_graph(dr_drawer, clustered_connected_graph, draw_internal=True,
                                                    draw_edges=False)
@@ -145,8 +139,9 @@ class BasicMinimumEnd2EndClusteredDrsTest(unittest.TestCase):
         operational_gantt_drawer.add_delivery_board(board_gantt_drawer, delivery_board, True)
         board_gantt_drawer.draw(True)
 
-    def _run_match(self, clustered_connected_graph,drone_deliveries_amount) -> DroneDeliveryBoard:
-        empty_drone_delivery_board = _create_empty_drone_delivery_board(amount=drone_deliveries_amount, max_route_time_entire_board=45,
+    def _run_match(self, clustered_connected_graph, drone_deliveries_amount) -> DroneDeliveryBoard:
+        empty_drone_delivery_board = _create_empty_drone_delivery_board(amount=drone_deliveries_amount,
+                                                                        max_route_time_entire_board=45,
                                                                         velocity_entire_board=10.0)
 
         matcher_input = MatcherInput(graph=clustered_connected_graph, empty_board=empty_drone_delivery_board,
