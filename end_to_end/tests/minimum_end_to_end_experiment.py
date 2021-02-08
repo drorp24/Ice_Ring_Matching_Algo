@@ -118,7 +118,7 @@ class BasicMinimumEnd2EndExperiment:
             self.mapImage = MapImage(map_background_path=Path(r"visualization/basic/gush_dan_background.Png"),
                                      west_lon=34.83927, east_lon=35.32341, south_lat=31.77279, north_lat=32.19276)
 
-    def test_small_supplier_category(self, drones_amount=20, drone_max_route_time=50,
+    def test_small_supplier_category(self, drones_amount=20, drone_max_route_time=45,
                                      delivery_request_amount=37, seed=10, print_flag=True, draw_flag=True):
         start_time = datetime.now()
         empty_drone_delivery_board = _create_empty_drone_delivery_board(amount=drones_amount,
@@ -131,7 +131,7 @@ class BasicMinimumEnd2EndExperiment:
         supplier_category = self.supplier_category_distribution.choose_rand(random=Random(seed),
                                                                             amount={DeliveryRequest: delivery_request_amount,
                                                                                     DroneLoadingDock: 1})
-        fully_connected_graph = create_fully_connected_graph_model(supplier_category, edge_travel_time_factor=80.0)
+        fully_connected_graph = create_fully_connected_graph_model(supplier_category, edge_travel_time_factor=70.0)
         if print_flag:
             print("--- create_fully_connected_graph_model run time: %s  ---" % (datetime.now() - start_time))
         start_time = datetime.now()
@@ -196,17 +196,18 @@ class BasicMinimumEnd2EndExperiment:
 
 
 if __name__ == '__main__':
-    scene = 'center' # 'north'
-    mode = 'sweep_drones' # 'single', 'sweep_drones', 'sweep_requests', 'sweep_seed' ;
+    scene = 'center' # 'center', 'north'
+    mode = 'single' # 'single', 'sweep_drones', 'sweep_requests', 'sweep_seed' ;
 
     experiment = BasicMinimumEnd2EndExperiment(scene)
     if mode == 'single':
-        [priority_eff, matching_eff, assignment_run_time] = experiment.test_small_supplier_category(drones_amount=2,
-                                                                                                    delivery_request_amount=47)
+        [priority_eff, matching_eff, assignment_run_time] = experiment.test_small_supplier_category(drones_amount=20,
+                                                                                                    drone_max_route_time=50,
+                                                                                                    delivery_request_amount=37)
 
     if mode == 'sweep_drones':
-        drones_amount_list = list(range(2, 30, 2))
-        delivery_request_amount_list = [37, 47]
+        drones_amount_list = list(range(4, 30, 2))
+        delivery_request_amount_list = [37]
         seed_list = [10]
         analysis_matrix = experiment.e2e_analysis(drones_amount_list, delivery_request_amount_list, seed_list)
 
@@ -217,9 +218,9 @@ if __name__ == '__main__':
                     'ro-', linewidth=2, markersize=10, markerfacecolor='blue', label="Package delivered")
             ax.plot(drones_amount_list, np.squeeze(analysis_matrix[:, idx, 0, 0]),
                     'gs--', linewidth=2, markersize=7, markerfacecolor='darkorange', label="Priority weighted")
-            ax.set_xlabel('Number of drones')
+            ax.set_xlabel('Number of vehicles')
             ax.set_ylabel('Delivering Efficiency [%]')
-            ax.set_title('Delivering Efficiency vs. Fleet Size (%s delivery requests)' % amount)
+            ax.set_title('Delivering Efficiency vs. Fleet Size (%s requests)' % amount)
             ax.set_xlim(0, drones_amount_list[-1]+1)
             ax.set_ylim(0, 105)
             ax.grid('on')
