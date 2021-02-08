@@ -38,6 +38,15 @@ class ZoneDeliveryRequestDistribution(DeliveryRequestDistribution):
                          priority_distribution)
         self._zones = zones
 
+    @classmethod
+    def create_from_base_class(cls, zones: List[Zone], delivery_request_distribution: DeliveryRequestDistribution):
+        return ZoneDeliveryRequestDistribution(
+            zones,
+            relative_location_distribution=delivery_request_distribution._relative_location_distribution,
+            delivery_option_distributions=delivery_request_distribution._do_distribution_options,
+            time_window_distributions=delivery_request_distribution._time_window_distributions,
+            priority_distribution=delivery_request_distribution._priority_distribution)
+
     @property
     def zones(self) -> List[Zone]:
         return self._zones
