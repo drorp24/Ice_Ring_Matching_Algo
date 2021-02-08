@@ -4,6 +4,7 @@ from typing import List
 
 import matplotlib.pyplot as plt
 
+from common.entities.distribution.distribution import Range
 from geometry.distribution.geo_distribution import UniformPointInBboxDistribution, MultiPointInBboxDistribution, \
     ExactPointLocationDistribution, UniformPointsInPolygonDistribution, NormalPointInPolygonDistribution, \
     NormalPointsInMultiPolygonDistribution
@@ -43,6 +44,8 @@ class BasicPointTestCase(unittest.TestCase):
         cls.nppd = NormalPointInPolygonDistribution(cls.polygon1, cls.polygon1.calc_centroid())
         cls.npmpd = NormalPointsInMultiPolygonDistribution(multi_polygon=cls.multi_polygon1,
                                                            max_centroids_per_polygon=3)
+        cls.npmpd_range = NormalPointsInMultiPolygonDistribution(multi_polygon=cls.multi_polygon1,
+                                                                 max_centroids_per_polygon=Range(1, 3))
 
     def test_sampling_uniform_points_in_bbox(self):
         points = self.pd1.choose_rand(Random(42), 100)
@@ -99,6 +102,10 @@ class BasicPointTestCase(unittest.TestCase):
 
     def test_sampling_normal_points_in_multi_polygon(self):
         points = self.npmpd.choose_rand(Random(42), 100)
+        self.assertTrue(all([p in self.polygon1 or self.polygon3 for p in points]))
+
+    def test_sampling_normal_points_in_multi_polygon_given_range(self):
+        points = self.npmpd_range.choose_rand(Random(42), 100)
         self.assertTrue(all([p in self.polygon1 or self.polygon3 for p in points]))
 
     @staticmethod

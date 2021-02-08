@@ -3,11 +3,11 @@ from functools import lru_cache
 from typing import Tuple, List
 import numpy as np
 
-from common.entities.base_entities.package import PackageType
-from common.graph.operational.export_graph import GraphExporter, OperationalGraph
-from common.entities.base_entities.drone_loading_dock import DroneLoadingDock
 from common.entities.base_entities.delivery_request import DeliveryRequest
+from common.entities.base_entities.drone_loading_dock import DroneLoadingDock
+from common.entities.base_entities.package import PackageType
 from common.entities.base_entities.temporal import DateTimeExtension
+from common.graph.operational.export_graph import GraphExporter, OperationalGraph
 
 
 class OrtoolsGraphExporter(GraphExporter):
@@ -65,11 +65,8 @@ class OrtoolsGraphExporter(GraphExporter):
 
     @lru_cache()
     def export_package_type_demands(self, graph: OperationalGraph, package_type: PackageType) -> List[int]:
-        delivery_request_indices = self.export_delivery_request_nodes_indices(graph)
-        delivery_requests_nodes = np.array(graph.nodes)
-        delivery_requests_nodes = list(delivery_requests_nodes[delivery_request_indices])
-        delivery_requests = [node.internal_node for node in delivery_requests_nodes]
-        base_empty_demands = [0] * len(self.export_basis_nodes_indices(graph))
-        demands = base_empty_demands + [delivery_request.delivery_options[0].get_package_type_amount(package_type)
-                                        for i, delivery_request in enumerate(delivery_requests)]
+        demands = [internal_node.delivery_options[0].get_package_type_amount(package_type)
+                   if isinstance(internal_node, DeliveryRequest) else 0
+                   for internal_node in [node.internal_node for node in graph.nodes]]
+
         return demands

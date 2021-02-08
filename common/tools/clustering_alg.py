@@ -43,11 +43,12 @@ def _silhouette_score(estimator: ClusterMixin, data: np.ndarray):
 
 def fit_k_means(data: np.ndarray, max_clusters: int) -> BestFit:
     k_means_estimator = KMeans(random_state=0)
-    params_grid = {'n_clusters': list(range(1, max_clusters))}
+    params_grid = {'n_clusters': list(range(1, max_clusters + 1))}
     grid_search = GridSearchCV(k_means_estimator, params_grid, scoring=_silhouette_score,
                                cv=[(slice(None), slice(None))],
                                error_score=-1)
     grid_search.fit(data)
 
-    return BestFit.create_best_fit(grid_search.best_estimator_.labels_,
+    best = BestFit.create_best_fit(grid_search.best_estimator_.labels_,
                                    grid_search.best_estimator_.cluster_centers_)
+    return best
