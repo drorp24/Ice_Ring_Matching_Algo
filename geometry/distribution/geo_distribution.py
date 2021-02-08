@@ -73,6 +73,36 @@ class UniformPointsInPolygonDistribution(PointLocationDistribution):
         return chosen_points
 
 
+class NormalPointDistribution(PointLocationDistribution):
+
+    def __init__(self, center_point: Point2D, sigma_x: float = 1, sigma_y: float = 1):
+        self._center_point = center_point
+        self._sigma_x = sigma_x
+        self._sigma_y = sigma_y
+
+    def choose_rand(self, random: Random, amount: int = 1) -> List[Point2D]:
+        x_list = [random.normalvariate(self._center_point.x, self._sigma_x) for _ in range(amount)]
+        y_list = [random.normalvariate(self._center_point.y, self._sigma_y) for _ in range(amount)]
+        return [create_point_2d(x, y) for (x, y) in zip(x_list, y_list)]
+
+
+class NormalPointInPolygonDistribution(NormalPointDistribution):
+
+    def __init__(self, polygon: Polygon2D, center_point: Point2D, sigma_x: float = 1, sigma_y: float = 1):
+        super().__init__(center_point, sigma_x, sigma_y)
+        self._polygon = polygon
+
+    def choose_rand(self, random: Random, amount: int = 1) -> List[Point2D]:
+
+        chosen_points = []
+        while len(chosen_points) < amount:
+            point = super().choose_rand(random)[0]
+            if point in self._polygon:
+                chosen_points.append(point)
+
+        return chosen_points
+
+
 class NormalPointsInMultiPolygonDistribution(PointLocationDistribution):
 
     def __init__(self, multi_polygon: MultiPolygon2D, max_centroids_per_polygon: Union[int, Range] = 1,
@@ -102,36 +132,6 @@ class NormalPointsInMultiPolygonDistribution(PointLocationDistribution):
                                                  sigma_y=self._sigma_y).choose_rand(
             random=random)[0]
                 for (chosen_polygons_idx, chosen_center) in zip(chosen_polygons_idx, chosen_centers)]
-
-
-class NormalPointDistribution(PointLocationDistribution):
-
-    def __init__(self, center_point: Point2D, sigma_x: float = 1, sigma_y: float = 1):
-        self._center_point = center_point
-        self._sigma_x = sigma_x
-        self._sigma_y = sigma_y
-
-    def choose_rand(self, random: Random, amount: int = 1) -> List[Point2D]:
-        x_list = [random.normalvariate(self._center_point.x, self._sigma_x) for _ in range(amount)]
-        y_list = [random.normalvariate(self._center_point.y, self._sigma_y) for _ in range(amount)]
-        return [create_point_2d(x, y) for (x, y) in zip(x_list, y_list)]
-
-
-class NormalPointInPolygonDistribution(NormalPointDistribution):
-
-    def __init__(self, polygon: Polygon2D, center_point: Point2D, sigma_x: float = 1, sigma_y: float = 1):
-        super().__init__(center_point, sigma_x, sigma_y)
-        self._polygon = polygon
-
-    def choose_rand(self, random: Random, amount: int = 1) -> List[Point2D]:
-
-        chosen_points = []
-        while len(chosen_points) < amount:
-            point = super().choose_rand(random)[0]
-            if point in self._polygon:
-                chosen_points.append(point)
-
-        return chosen_points
 
 
 class MultiPointInBboxDistribution(PointLocationDistribution):
