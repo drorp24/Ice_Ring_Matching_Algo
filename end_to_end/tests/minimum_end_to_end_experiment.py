@@ -150,9 +150,8 @@ class BasicMinimumEnd2EndExperiment:
         num_unmatched_dr = len(delivery_board.unmatched_delivery_requests)
         total_priority = fully_connected_graph.calc_overall_priority()
         unmatched_priority = total_priority - delivery_board.get_total_priority()
-        priority_eff1 = 100.0*(1-(self.lowest_priority*num_unmatched_dr-unmatched_priority)/total_priority)
-        priority_eff2 = 100.0*(1-unmatched_priority/total_priority)
-        priority_eff = max(priority_eff1, priority_eff2)
+        priority_eff = 100.0*(1-(self.lowest_priority*num_unmatched_dr - unmatched_priority)/
+                               (self.lowest_priority*delivery_request_amount - total_priority))
         matching_eff = 100.0*(1.0 - num_unmatched_dr/delivery_request_amount)
 
         if draw_flag:
@@ -206,8 +205,8 @@ if __name__ == '__main__':
                                                                                                     delivery_request_amount=37)
 
     if mode == 'sweep_drones':
-        drones_amount_list = list(range(4, 30, 2))
-        delivery_request_amount_list = [37]
+        drones_amount_list = list(range(4, 32, 2))
+        delivery_request_amount_list = [37, 60]
         seed_list = [10]
         analysis_matrix = experiment.e2e_analysis(drones_amount_list, delivery_request_amount_list, seed_list)
 
@@ -249,8 +248,8 @@ if __name__ == '__main__':
 
     if mode == 'sweep_seed':
         drones_amount_list = [20]
-        delivery_request_amount_list = [37]
-        seed_list = sample(range(10, 100), 15)
+        delivery_request_amount_list = [60]
+        seed_list = sample(range(10, 1000), 25)
         analysis_matrix = experiment.e2e_analysis(drones_amount_list, delivery_request_amount_list, seed_list)
         for idx, amount in enumerate(drones_amount_list):
             fig = plt.figure(idx)
@@ -260,6 +259,6 @@ if __name__ == '__main__':
                      color=['b','g'], alpha=0.5, label=["Package delivered", "Priority weighted"])
             ax.set_xlabel('Delivering Efficiency [%]')
             ax.set_title('Delivering Efficiency Histogram variable Seed (%s drones, %s requests)' % (amount, delivery_request_amount_list[0]))
-            plt.legend(loc='upper left')
+            plt.legend(loc='upper right')
 
     plt.show()
