@@ -968,5 +968,6 @@
       "minute": 0,
       "second": 0
     }
-  }
+  },
+  "zones": []
 }
