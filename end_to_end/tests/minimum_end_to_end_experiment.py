@@ -200,8 +200,12 @@ class BasicMinimumEnd2EndExperiment:
 
 if __name__ == '__main__':
 
-    experiment = BasicMinimumEnd2EndExperiment('north')
-    experiment.test_small_supplier_category()
+    scene = 'center'  # 'center', 'north'
+    mode = 'single'  # 'single', 'sweep_drones', 'sweep_requests', 'sweep_seed' ;
+    experiment = BasicMinimumEnd2EndExperiment(scene)
+    [priority_eff, matching_eff, assignment_run_time] = experiment.test_small_supplier_category(drones_amount=20,
+                                                                                                drone_max_route_time=50,
+                                                                                                delivery_request_amount=37)
 
     # scene = 'center' # 'center', 'north'
     # mode = 'single' # 'single', 'sweep_drones', 'sweep_requests', 'sweep_seed' ;
