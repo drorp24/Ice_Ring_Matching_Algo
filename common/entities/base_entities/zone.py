@@ -18,4 +18,4 @@ class Zone(JsonableBaseEntity):
         return Zone(_ShapelyPolygon2D.dict_to_obj(dict_input["region"]))
 
     def __eq__(self, other):
-        return self.region == other.region
+        return self.region.points == other.region.points

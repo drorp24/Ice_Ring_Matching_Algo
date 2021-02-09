@@ -7,35 +7,49 @@ from common.entities.base_entities.delivery_request import DeliveryRequest
 from common.entities.base_entities.drone_loading_dock import DroneLoadingDock
 from common.entities.base_entities.temporal import Temporal
 from common.entities.base_entities.zone import Zone
-from common.graph.operational.graph_utils import sort_delivery_requests_by_zone, grouping_delivery_requests
+from common.graph.operational.graph_utils import sort_delivery_requests_by_zone, split_delivery_requests_into_clusters
 from common.graph.operational.operational_graph import OperationalGraph, OperationalEdge, OperationalEdgeAttribs, \
     OperationalNode
 from geometry.utils import Localizable
 
 
-def create_grouped_dr_graph(delivery_requests: [DeliveryRequest], drone_loading_docks: [DroneLoadingDock],
-                            zones: [Zone]) -> OperationalGraph:
+def create_clustered_delivery_requests_graph(delivery_requests: [DeliveryRequest],
+                                             drone_loading_docks: [DroneLoadingDock],
+                                             zones: [Zone],
+                                             edge_cost_factor: float = 1.0,
+                                             edge_travel_time_factor: float = 1.0,
+                                             max_clusters: int = 1
+                                             ) -> OperationalGraph:
     delivery_requests_by_zone = sort_delivery_requests_by_zone(delivery_requests, zones)
 
-    delivery_requests_groups = list(itertools.chain.from_iterable((
-        map(lambda item: list(grouping_delivery_requests(item[1]).values()), delivery_requests_by_zone.items()))))
+    delivery_requests_clusters = list(itertools.chain.from_iterable((
+        map(lambda item: list(
+            split_delivery_requests_into_clusters(delivery_requests=item[1], max_clusters=max_clusters).values()),
+            delivery_requests_by_zone.items()))))
 
     graph = OperationalGraph()
-    list(map(add_locally_connected_dr_graph, repeat(graph), delivery_requests_groups))
-    add_fully_connected_loading_docks(graph, drone_loading_docks)
+    list(map(add_locally_connected_dr_graph, repeat(graph), delivery_requests_clusters,
+             repeat(edge_cost_factor),
+             repeat(edge_travel_time_factor),
+             repeat(math.inf)))
+    add_fully_connected_loading_docks(graph, drone_loading_docks, edge_cost_factor, edge_travel_time_factor)
+
     return graph
 
 
 def add_locally_connected_dr_graph(graph, dr_connection_options: [DeliveryRequest],
-                                   max_distance_to_connect_km=math.inf):
+                                   edge_cost_factor: float = 1.0,
+                                   edge_travel_time_factor: float = 1.0,
+                                   max_distance_to_connect_km=math.inf
+                                   ):
     edges = []
     graph.add_delivery_requests(dr_connection_options)
     for start_dr in dr_connection_options:
         end_dr_options = calc_under_distance(dr_connection_options, start_dr, max_distance_to_connect_km)
         for end_dr in end_dr_options:
             if has_overlapping_time_window(start_dr, end_dr):
-                cost = calc_cost(start_dr, end_dr)
-                travel_time = calc_travel_time_in_min(start_dr, end_dr)
+                cost = calc_cost(start_dr, end_dr, edge_cost_factor)
+                travel_time = calc_travel_time_in_min(start_dr, end_dr, edge_travel_time_factor)
                 edges.append(OperationalEdge(OperationalNode(start_dr),
                                              OperationalNode(end_dr),
                                              OperationalEdgeAttribs(cost, travel_time)))
@@ -88,24 +102,31 @@ def build_fully_connected_graph(graph: OperationalGraph,
         graph.add_operational_edges(edges)
 
 
-def add_fully_connected_loading_docks(graph: OperationalGraph, drone_loading_docks: [DroneLoadingDock]):
+def add_fully_connected_loading_docks(graph: OperationalGraph, drone_loading_docks: [DroneLoadingDock],
+                                      edge_cost_factor: float = 1.0,
+                                      edge_travel_time_factor: float = 1.0):
     graph.add_operational_nodes([OperationalNode(dld) for dld in drone_loading_docks])
     dr_in_graph = get_delivery_requests_from_graph(graph)
     edges = []
     for dld in drone_loading_docks:
         for dr in dr_in_graph:
             if has_overlapping_time_window(dld, dr):
-                edges += create_two_way_directed_edges(dld, dr)
+                edges += create_two_way_directed_edges(dld, dr, edge_cost_factor, edge_travel_time_factor)
     graph.add_operational_edges(edges)
 
 
-def create_two_way_directed_edges(node_content_1, node_content_2) -> [OperationalEdge]:
+def create_two_way_directed_edges(node_content_1, node_content_2,
+                                  edge_cost_factor: float = 1.0,
+                                  edge_travel_time_factor: float = 1.0
+                                  ) -> [OperationalEdge]:
     return [OperationalEdge(OperationalNode(node_content_1), OperationalNode(node_content_2),
-                            OperationalEdgeAttribs(calc_cost(node_content_1, node_content_2),
-                                                   calc_travel_time_in_min(node_content_1, node_content_2))),
+                            OperationalEdgeAttribs(calc_cost(node_content_1, node_content_2, edge_cost_factor),
+                                                   calc_travel_time_in_min(node_content_1, node_content_2,
+                                                                           edge_travel_time_factor))),
             OperationalEdge(OperationalNode(node_content_2), OperationalNode(node_content_1),
-                            OperationalEdgeAttribs(calc_cost(node_content_2, node_content_1),
-                                                   calc_travel_time_in_min(node_content_1, node_content_2)))]
+                            OperationalEdgeAttribs(calc_cost(node_content_2, node_content_1, edge_cost_factor),
+                                                   calc_travel_time_in_min(node_content_1, node_content_2,
+                                                                           edge_travel_time_factor)))]
 
 
 def has_overlapping_time_window(start: Temporal, end: Temporal):

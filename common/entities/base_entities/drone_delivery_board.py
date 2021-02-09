@@ -103,6 +103,7 @@ class DroneDeliveryBoard(JsonableBaseEntity):
                f"Total amount per package type: {self.get_total_amount_per_package_type()}\n" \
                f"Total work time in minutes: {self.get_total_work_time_in_minutes()}\n" \
                f"Total priority: {self.get_total_priority()}\n" \
+               f"Unmatched delivery requests amount: {len(self._unmatched_delivery_requests)}\n" \
                f"{drone_deliveries_str}\n" \
                f"{unmatched_delivery_requests_str}"
 

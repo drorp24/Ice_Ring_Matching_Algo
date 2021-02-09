@@ -56,7 +56,7 @@ class PackageTypeAmountMap(JsonableBaseEntity):
         return hash(tuple(sorted(self._package_type_to_amounts.items())))
 
     def __str__(self):
-        return '[' + ''.join(
+        return '[' + ' '.join(
             map(lambda item: str(item[0]).split('.')[1] + ':' + str(item[1]),
                 self.package_type_to_amounts.items())) + ']'
 

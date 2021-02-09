@@ -1,6 +1,7 @@
 from datetime import time, date, timedelta, datetime
 from pathlib import Path
 from random import Random, sample
+import numpy as np
 
 from common.entities.base_entities.drone import PackageConfiguration, DroneType
 from common.entities.base_entities.drone_formation import DroneFormationType
@@ -30,8 +31,11 @@ from visualization.basic.pltdrawer2d import create_drawer_2d, MapImage
 from visualization.basic.pltgantt_drawer import create_gantt_drawer
 from visualization.operational import operational_drawer2d
 from visualization.operational import operational_gantt_drawer
-import numpy as np
-import matplotlib.pyplot as plt
+
+west_lon = 34.83927
+east_lon = 35.32341
+south_lat = 31.77279
+north_lat = 32.19276
 
 ZERO_TIME = DateTimeExtension(dt_date=date(2021, 1, 1), dt_time=time(0, 0, 0))
 
@@ -68,8 +72,8 @@ def create_single_package_distribution():
 
 def _create_empty_drone_delivery_board(
         drone_formation_policy=DroneFormationTypePolicy({DroneFormationType.PAIR: 1, DroneFormationType.QUAD: 0}),
-        package_configurations_policy=PackageConfigurationPolicy({PackageConfiguration.LARGE_X2: 1.0,
-                                                                  PackageConfiguration.MEDIUM_X4: 0.0,
+        package_configurations_policy=PackageConfigurationPolicy({PackageConfiguration.LARGE_X2: 0.9,
+                                                                  PackageConfiguration.MEDIUM_X4: 0.1,
                                                                   PackageConfiguration.SMALL_X8: 0,
                                                                   PackageConfiguration.TINY_X16: 0}),
         drone_type: DroneType = DroneType.drone_type_1,
@@ -195,70 +199,74 @@ class BasicMinimumEnd2EndExperiment:
 
 
 if __name__ == '__main__':
-    scene = 'center' # 'center', 'north'
-    mode = 'single' # 'single', 'sweep_drones', 'sweep_requests', 'sweep_seed' ;
 
-    experiment = BasicMinimumEnd2EndExperiment(scene)
-    if mode == 'single':
-        [priority_eff, matching_eff, assignment_run_time] = experiment.test_small_supplier_category(drones_amount=20,
-                                                                                                    drone_max_route_time=50,
-                                                                                                    delivery_request_amount=37)
+    experiment = BasicMinimumEnd2EndExperiment('north')
+    experiment.test_small_supplier_category()
 
-    if mode == 'sweep_drones':
-        drones_amount_list = list(range(4, 32, 2))
-        delivery_request_amount_list = [37, 60]
-        seed_list = [10]
-        analysis_matrix = experiment.e2e_analysis(drones_amount_list, delivery_request_amount_list, seed_list)
-
-        for idx, amount in enumerate(delivery_request_amount_list):
-            fig = plt.figure(idx)
-            ax = plt.subplot(111)
-            ax.plot(drones_amount_list, np.squeeze(analysis_matrix[:, idx, 0, 1]),
-                    'ro-', linewidth=2, markersize=10, markerfacecolor='blue', label="Package delivered")
-            ax.plot(drones_amount_list, np.squeeze(analysis_matrix[:, idx, 0, 0]),
-                    'gs--', linewidth=2, markersize=7, markerfacecolor='darkorange', label="Priority weighted")
-            ax.set_xlabel('Number of vehicles')
-            ax.set_ylabel('Delivering Efficiency [%]')
-            ax.set_title('Delivering Efficiency vs. Fleet Size (%s requests)' % amount)
-            ax.set_xlim(0, drones_amount_list[-1]+1)
-            ax.set_ylim(0, 105)
-            ax.grid('on')
-            plt.legend(loc='upper left')
-
-    if mode == 'sweep_requests':
-        drones_amount_list = [20]
-        delivery_request_amount_list = list(range(10, 120, 10))
-        seed_list = [10]
-        analysis_matrix = experiment.e2e_analysis(drones_amount_list, delivery_request_amount_list, seed_list)
-
-        for idx, amount in enumerate(drones_amount_list):
-            fig = plt.figure(idx)
-            ax = plt.subplot(111)
-            ax.plot(delivery_request_amount_list, np.squeeze(analysis_matrix[idx, :, 0, 1]),
-                    'ro-', linewidth=2, markersize=10, markerfacecolor='blue', label="Package delivered")
-            ax.plot(delivery_request_amount_list, np.squeeze(analysis_matrix[idx, :, 0, 0]),
-                    'gs--', linewidth=2, markersize=7, markerfacecolor='darkorange', label="Priority weighted")
-            ax.set_xlabel('Number of delivery requests')
-            ax.set_ylabel('Delivering Efficiency [%]')
-            ax.set_title('Delivering Efficiency vs. Demand Size (%s drones)' % amount)
-            ax.set_xlim(0, delivery_request_amount_list[-1] + 1)
-            ax.set_ylim(0, 105)
-            ax.grid('on')
-            plt.legend(loc='lower left')
-
-    if mode == 'sweep_seed':
-        drones_amount_list = [20]
-        delivery_request_amount_list = [60]
-        seed_list = sample(range(10, 1000), 25)
-        analysis_matrix = experiment.e2e_analysis(drones_amount_list, delivery_request_amount_list, seed_list)
-        for idx, amount in enumerate(drones_amount_list):
-            fig = plt.figure(idx)
-            ax = plt.subplot(111)
-            ax.plot()
-            plt.hist([np.squeeze(analysis_matrix[idx, 0, :, 1]), np.squeeze(analysis_matrix[idx, 0, :, 0])],
-                     color=['b','g'], alpha=0.5, label=["Package delivered", "Priority weighted"])
-            ax.set_xlabel('Delivering Efficiency [%]')
-            ax.set_title('Delivering Efficiency Histogram variable Seed (%s drones, %s requests)' % (amount, delivery_request_amount_list[0]))
-            plt.legend(loc='upper right')
-
-    plt.show()
+    # scene = 'center' # 'center', 'north'
+    # mode = 'single' # 'single', 'sweep_drones', 'sweep_requests', 'sweep_seed' ;
+    #
+    # experiment = BasicMinimumEnd2EndExperiment(scene)
+    # if mode == 'single':
+    #     [priority_eff, matching_eff, assignment_run_time] = experiment.test_small_supplier_category(drones_amount=20,
+    #                                                                                                 drone_max_route_time=50,
+    #                                                                                                 delivery_request_amount=37)
+    #
+    # if mode == 'sweep_drones':
+    #     drones_amount_list = list(range(4, 32, 2))
+    #     delivery_request_amount_list = [37, 60]
+    #     seed_list = [10]
+    #     analysis_matrix = experiment.e2e_analysis(drones_amount_list, delivery_request_amount_list, seed_list)
+    #
+    #     for idx, amount in enumerate(delivery_request_amount_list):
+    #         fig = plt.figure(idx)
+    #         ax = plt.subplot(111)
+    #         ax.plot(drones_amount_list, np.squeeze(analysis_matrix[:, idx, 0, 1]),
+    #                 'ro-', linewidth=2, markersize=10, markerfacecolor='blue', label="Package delivered")
+    #         ax.plot(drones_amount_list, np.squeeze(analysis_matrix[:, idx, 0, 0]),
+    #                 'gs--', linewidth=2, markersize=7, markerfacecolor='darkorange', label="Priority weighted")
+    #         ax.set_xlabel('Number of vehicles')
+    #         ax.set_ylabel('Delivering Efficiency [%]')
+    #         ax.set_title('Delivering Efficiency vs. Fleet Size (%s requests)' % amount)
+    #         ax.set_xlim(0, drones_amount_list[-1]+1)
+    #         ax.set_ylim(0, 105)
+    #         ax.grid('on')
+    #         plt.legend(loc='upper left')
+    #
+    # if mode == 'sweep_requests':
+    #     drones_amount_list = [20]
+    #     delivery_request_amount_list = list(range(10, 120, 10))
+    #     seed_list = [10]
+    #     analysis_matrix = experiment.e2e_analysis(drones_amount_list, delivery_request_amount_list, seed_list)
+    #
+    #     for idx, amount in enumerate(drones_amount_list):
+    #         fig = plt.figure(idx)
+    #         ax = plt.subplot(111)
+    #         ax.plot(delivery_request_amount_list, np.squeeze(analysis_matrix[idx, :, 0, 1]),
+    #                 'ro-', linewidth=2, markersize=10, markerfacecolor='blue', label="Package delivered")
+    #         ax.plot(delivery_request_amount_list, np.squeeze(analysis_matrix[idx, :, 0, 0]),
+    #                 'gs--', linewidth=2, markersize=7, markerfacecolor='darkorange', label="Priority weighted")
+    #         ax.set_xlabel('Number of delivery requests')
+    #         ax.set_ylabel('Delivering Efficiency [%]')
+    #         ax.set_title('Delivering Efficiency vs. Demand Size (%s drones)' % amount)
+    #         ax.set_xlim(0, delivery_request_amount_list[-1] + 1)
+    #         ax.set_ylim(0, 105)
+    #         ax.grid('on')
+    #         plt.legend(loc='lower left')
+    #
+    # if mode == 'sweep_seed':
+    #     drones_amount_list = [20]
+    #     delivery_request_amount_list = [60]
+    #     seed_list = sample(range(10, 1000), 25)
+    #     analysis_matrix = experiment.e2e_analysis(drones_amount_list, delivery_request_amount_list, seed_list)
+    #     for idx, amount in enumerate(drones_amount_list):
+    #         fig = plt.figure(idx)
+    #         ax = plt.subplot(111)
+    #         ax.plot()
+    #         plt.hist([np.squeeze(analysis_matrix[idx, 0, :, 1]), np.squeeze(analysis_matrix[idx, 0, :, 0])],
+    #                  color=['b','g'], alpha=0.5, label=["Package delivered", "Priority weighted"])
+    #         ax.set_xlabel('Delivering Efficiency [%]')
+    #         ax.set_title('Delivering Efficiency Histogram variable Seed (%s drones, %s requests)' % (amount, delivery_request_amount_list[0]))
+    #         plt.legend(loc='upper right')
+    #
+    # plt.show()
