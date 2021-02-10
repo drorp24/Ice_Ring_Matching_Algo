@@ -8,8 +8,8 @@ from common.entities.base_entities.drone_loading_dock import DroneLoadingDock
 from common.entities.base_entities.entity_distribution.delivery_requestion_dataset_builder import \
     build_zone_delivery_request_distribution
 from common.entities.base_entities.zone import Zone
-from end_to_end.distribution.supplier_category_distribution import SupplierCategoryDistribution
-from end_to_end.supplier_category import SupplierCategory
+from experiment.distribution.supplier_category_distribution import SupplierCategoryDistribution
+from experiment.supplier_category import SupplierCategory
 from geometry.distribution.geo_distribution import NormalPointsInMultiPolygonDistribution
 from geometry.geo_factory import create_polygon_2d, create_point_2d, create_multipolygon_2d
 
@@ -56,6 +56,7 @@ class BasicSupplierCategoryTests(unittest.TestCase):
         loaded_supplier_category_dict = SupplierCategory.json_to_dict(self.test_with_zones_json_file_name)
         loaded_supplier_category = self.supplier_category_with_zones.dict_to_obj(loaded_supplier_category_dict)
         self.assertEqual(self.supplier_category_with_zones, loaded_supplier_category)
+
 
 def _create_zones(zone_amount: int = 1) -> List[Zone]:
     return [

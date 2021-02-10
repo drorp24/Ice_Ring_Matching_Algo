@@ -1,7 +1,9 @@
 from datetime import time, date, timedelta, datetime
 from pathlib import Path
 from random import Random, sample
+
 import numpy as np
+from networkx.drawing.tests.test_pylab import plt
 
 from common.entities.base_entities.drone import PackageConfiguration, DroneType
 from common.entities.base_entities.drone_formation import DroneFormationType
@@ -20,11 +22,11 @@ from common.entities.base_entities.fleet.fleet_property_sets import DroneFormati
     PackageConfigurationPolicy, DroneSetProperties
 from common.entities.base_entities.package import PackageType
 from common.entities.base_entities.temporal import DateTimeExtension, TimeDeltaExtension
-from end_to_end.distribution.supplier_category_distribution import SupplierCategoryDistribution
-from end_to_end.minimum_end_to_end import *
+from experiment.distribution.supplier_category_distribution import SupplierCategoryDistribution
+from experiment.supplier_category_graph_creator import *
 from geometry.distribution.geo_distribution import NormalPointDistribution, UniformPointInBboxDistribution
-from geometry.geo_factory import create_point_2d
 from geometry.geo2d import Point2D
+from geometry.geo_factory import create_point_2d
 from matching.matcher_config import MatcherConfig
 from visualization.basic.drawer2d import Drawer2DCoordinateSys
 from visualization.basic.pltdrawer2d import create_drawer_2d, MapImage
@@ -87,7 +89,7 @@ def _create_empty_drone_delivery_board(
 
 class BasicMinimumEnd2EndExperiment:
 
-    def __init__(self, scene: str, lowest_priority: int = 10, dr_timewindow: int = 3 ):
+    def __init__(self, scene: str, lowest_priority: int = 10, dr_timewindow: int = 3):
         self.matcher_config = Path("end_to_end/tests/jsons/test_matcher_config.json")
         self.lowest_priority = lowest_priority
         self.dr_timewindow = dr_timewindow
@@ -110,7 +112,8 @@ class BasicMinimumEnd2EndExperiment:
             self.supplier_category_distribution = SupplierCategoryDistribution(
                 zero_time_distribution=DateTimeDistribution([ZERO_TIME]),
                 delivery_requests_distribution=_create_delivery_request_distribution(create_point_2d(35.11, 32.0), 0.03,
-                                                                                     0.05, lowest_priority, dr_timewindow),
+                                                                                     0.05, lowest_priority,
+                                                                                     dr_timewindow),
                 drone_loading_docks_distribution=DroneLoadingDockDistribution(
                     drone_loading_station_distributions=DroneLoadingStationDistribution(
                         drone_station_locations_distribution=UniformPointInBboxDistribution(35.11,
@@ -133,8 +136,9 @@ class BasicMinimumEnd2EndExperiment:
         start_time = datetime.now()
 
         supplier_category = self.supplier_category_distribution.choose_rand(random=Random(seed),
-                                                                            amount={DeliveryRequest: delivery_request_amount,
-                                                                                    DroneLoadingDock: 1})
+                                                                            amount={
+                                                                                DeliveryRequest: delivery_request_amount,
+                                                                                DroneLoadingDock: 1})
         fully_connected_graph = create_fully_connected_graph_model(supplier_category, edge_travel_time_factor=70.0)
         if print_flag:
             print("--- create_fully_connected_graph_model run time: %s  ---" % (datetime.now() - start_time))
@@ -154,26 +158,26 @@ class BasicMinimumEnd2EndExperiment:
         num_unmatched_dr = len(delivery_board.unmatched_delivery_requests)
         total_priority = fully_connected_graph.calc_overall_priority()
         unmatched_priority = total_priority - delivery_board.get_total_priority()
-        priority_eff = 100.0*(1-(self.lowest_priority*num_unmatched_dr - unmatched_priority)/
-                               (self.lowest_priority*delivery_request_amount - total_priority))
-        matching_eff = 100.0*(1.0 - num_unmatched_dr/delivery_request_amount)
+        priority_eff = 100.0 * (1 - (self.lowest_priority * num_unmatched_dr - unmatched_priority) /
+                                (self.lowest_priority * delivery_request_amount - total_priority))
+        matching_eff = 100.0 * (1.0 - num_unmatched_dr / delivery_request_amount)
 
         if draw_flag:
             self._draw_matched_scenario(delivery_board, fully_connected_graph, supplier_category, self.mapImage)
 
         return [priority_eff, matching_eff, assignment_run_time.total_seconds()]
 
-    def e2e_analysis(self, drones_amount_list, delivery_request_amount_list, seed_list = [10]):
+    def e2e_analysis(self, drones_amount_list, delivery_request_amount_list, seed_list=[10]):
         performance_matrix = np.zeros((len(drones_amount_list), len(delivery_request_amount_list), len(seed_list), 3))
         for i, drones_amount in enumerate(drones_amount_list):
             for j, delivery_request_amount in enumerate(delivery_request_amount_list):
                 for k, seed in enumerate(seed_list):
-                    performance_matrix[i,j,k,:] = self.test_small_supplier_category(drones_amount=drones_amount,
-                                                                                  delivery_request_amount=
-                                                                                  delivery_request_amount,
-                                                                                  seed = seed,
-                                                                                  print_flag=False,
-                                                                                  draw_flag=False)
+                    performance_matrix[i, j, k, :] = self.test_small_supplier_category(drones_amount=drones_amount,
+                                                                                       delivery_request_amount=
+                                                                                       delivery_request_amount,
+                                                                                       seed=seed,
+                                                                                       print_flag=False,
+                                                                                       draw_flag=False)
         return performance_matrix
 
     @staticmethod
@@ -200,77 +204,70 @@ class BasicMinimumEnd2EndExperiment:
 
 if __name__ == '__main__':
 
-    scene = 'center'  # 'center', 'north'
-    mode = 'single'  # 'single', 'sweep_drones', 'sweep_requests', 'sweep_seed' ;
-    experiment = BasicMinimumEnd2EndExperiment(scene)
-    [priority_eff, matching_eff, assignment_run_time] = experiment.test_small_supplier_category(drones_amount=20,
-                                                                                                drone_max_route_time=50,
-                                                                                                delivery_request_amount=37)
+    scene = 'center' # 'center', 'north'
+    mode = 'single' # 'single', 'sweep_drones', 'sweep_requests', 'sweep_seed' ;
 
-    # scene = 'center' # 'center', 'north'
-    # mode = 'single' # 'single', 'sweep_drones', 'sweep_requests', 'sweep_seed' ;
-    #
-    # experiment = BasicMinimumEnd2EndExperiment(scene)
-    # if mode == 'single':
-    #     [priority_eff, matching_eff, assignment_run_time] = experiment.test_small_supplier_category(drones_amount=20,
-    #                                                                                                 drone_max_route_time=50,
-    #                                                                                                 delivery_request_amount=37)
-    #
-    # if mode == 'sweep_drones':
-    #     drones_amount_list = list(range(4, 32, 2))
-    #     delivery_request_amount_list = [37, 60]
-    #     seed_list = [10]
-    #     analysis_matrix = experiment.e2e_analysis(drones_amount_list, delivery_request_amount_list, seed_list)
-    #
-    #     for idx, amount in enumerate(delivery_request_amount_list):
-    #         fig = plt.figure(idx)
-    #         ax = plt.subplot(111)
-    #         ax.plot(drones_amount_list, np.squeeze(analysis_matrix[:, idx, 0, 1]),
-    #                 'ro-', linewidth=2, markersize=10, markerfacecolor='blue', label="Package delivered")
-    #         ax.plot(drones_amount_list, np.squeeze(analysis_matrix[:, idx, 0, 0]),
-    #                 'gs--', linewidth=2, markersize=7, markerfacecolor='darkorange', label="Priority weighted")
-    #         ax.set_xlabel('Number of vehicles')
-    #         ax.set_ylabel('Delivering Efficiency [%]')
-    #         ax.set_title('Delivering Efficiency vs. Fleet Size (%s requests)' % amount)
-    #         ax.set_xlim(0, drones_amount_list[-1]+1)
-    #         ax.set_ylim(0, 105)
-    #         ax.grid('on')
-    #         plt.legend(loc='upper left')
-    #
-    # if mode == 'sweep_requests':
-    #     drones_amount_list = [20]
-    #     delivery_request_amount_list = list(range(10, 120, 10))
-    #     seed_list = [10]
-    #     analysis_matrix = experiment.e2e_analysis(drones_amount_list, delivery_request_amount_list, seed_list)
-    #
-    #     for idx, amount in enumerate(drones_amount_list):
-    #         fig = plt.figure(idx)
-    #         ax = plt.subplot(111)
-    #         ax.plot(delivery_request_amount_list, np.squeeze(analysis_matrix[idx, :, 0, 1]),
-    #                 'ro-', linewidth=2, markersize=10, markerfacecolor='blue', label="Package delivered")
-    #         ax.plot(delivery_request_amount_list, np.squeeze(analysis_matrix[idx, :, 0, 0]),
-    #                 'gs--', linewidth=2, markersize=7, markerfacecolor='darkorange', label="Priority weighted")
-    #         ax.set_xlabel('Number of delivery requests')
-    #         ax.set_ylabel('Delivering Efficiency [%]')
-    #         ax.set_title('Delivering Efficiency vs. Demand Size (%s drones)' % amount)
-    #         ax.set_xlim(0, delivery_request_amount_list[-1] + 1)
-    #         ax.set_ylim(0, 105)
-    #         ax.grid('on')
-    #         plt.legend(loc='lower left')
-    #
-    # if mode == 'sweep_seed':
-    #     drones_amount_list = [20]
-    #     delivery_request_amount_list = [60]
-    #     seed_list = sample(range(10, 1000), 25)
-    #     analysis_matrix = experiment.e2e_analysis(drones_amount_list, delivery_request_amount_list, seed_list)
-    #     for idx, amount in enumerate(drones_amount_list):
-    #         fig = plt.figure(idx)
-    #         ax = plt.subplot(111)
-    #         ax.plot()
-    #         plt.hist([np.squeeze(analysis_matrix[idx, 0, :, 1]), np.squeeze(analysis_matrix[idx, 0, :, 0])],
-    #                  color=['b','g'], alpha=0.5, label=["Package delivered", "Priority weighted"])
-    #         ax.set_xlabel('Delivering Efficiency [%]')
-    #         ax.set_title('Delivering Efficiency Histogram variable Seed (%s drones, %s requests)' % (amount, delivery_request_amount_list[0]))
-    #         plt.legend(loc='upper right')
-    #
-    # plt.show()
+    experiment = BasicMinimumEnd2EndExperiment(scene)
+
+    if mode == 'single':
+        [priority_eff, matching_eff, assignment_run_time] = experiment.test_small_supplier_category(drones_amount=20,
+                                                                                                    drone_max_route_time=50,
+                                                                                                    delivery_request_amount=37)
+    if mode == 'sweep_drones':
+        drones_amount_list = list(range(4, 32, 2))
+        delivery_request_amount_list = [37, 60]
+        seed_list = [10]
+        analysis_matrix = experiment.e2e_analysis(drones_amount_list, delivery_request_amount_list, seed_list)
+
+        for idx, amount in enumerate(delivery_request_amount_list):
+            fig = plt.figure(idx)
+            ax = plt.subplot(111)
+            ax.plot(drones_amount_list, np.squeeze(analysis_matrix[:, idx, 0, 1]),
+                    'ro-', linewidth=2, markersize=10, markerfacecolor='blue', label="Package delivered")
+            ax.plot(drones_amount_list, np.squeeze(analysis_matrix[:, idx, 0, 0]),
+                    'gs--', linewidth=2, markersize=7, markerfacecolor='darkorange', label="Priority weighted")
+            ax.set_xlabel('Number of vehicles')
+            ax.set_ylabel('Delivering Efficiency [%]')
+            ax.set_title('Delivering Efficiency vs. Fleet Size (%s requests)' % amount)
+            ax.set_xlim(0, drones_amount_list[-1]+1)
+            ax.set_ylim(0, 105)
+            ax.grid('on')
+            plt.legend(loc='upper left')
+
+    if mode == 'sweep_requests':
+        drones_amount_list = [20]
+        delivery_request_amount_list = list(range(10, 120, 10))
+        seed_list = [10]
+        analysis_matrix = experiment.e2e_analysis(drones_amount_list, delivery_request_amount_list, seed_list)
+
+        for idx, amount in enumerate(drones_amount_list):
+            fig = plt.figure(idx)
+            ax = plt.subplot(111)
+            ax.plot(delivery_request_amount_list, np.squeeze(analysis_matrix[idx, :, 0, 1]),
+                    'ro-', linewidth=2, markersize=10, markerfacecolor='blue', label="Package delivered")
+            ax.plot(delivery_request_amount_list, np.squeeze(analysis_matrix[idx, :, 0, 0]),
+                    'gs--', linewidth=2, markersize=7, markerfacecolor='darkorange', label="Priority weighted")
+            ax.set_xlabel('Number of delivery requests')
+            ax.set_ylabel('Delivering Efficiency [%]')
+            ax.set_title('Delivering Efficiency vs. Demand Size (%s drones)' % amount)
+            ax.set_xlim(0, delivery_request_amount_list[-1] + 1)
+            ax.set_ylim(0, 105)
+            ax.grid('on')
+            plt.legend(loc='lower left')
+
+    if mode == 'sweep_seed':
+        drones_amount_list = [20]
+        delivery_request_amount_list = [60]
+        seed_list = sample(range(10, 1000), 25)
+        analysis_matrix = experiment.e2e_analysis(drones_amount_list, delivery_request_amount_list, seed_list)
+        for idx, amount in enumerate(drones_amount_list):
+            fig = plt.figure(idx)
+            ax = plt.subplot(111)
+            ax.plot()
+            plt.hist([np.squeeze(analysis_matrix[idx, 0, :, 1]), np.squeeze(analysis_matrix[idx, 0, :, 0])],
+                     color=['b','g'], alpha=0.5, label=["Package delivered", "Priority weighted"])
+            ax.set_xlabel('Delivering Efficiency [%]')
+            ax.set_title('Delivering Efficiency Histogram variable Seed (%s drones, %s requests)' % (amount, delivery_request_amount_list[0]))
+            plt.legend(loc='upper right')
+
+    plt.show()

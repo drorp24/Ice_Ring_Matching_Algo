@@ -1,16 +1,13 @@
 from typing import List
 
+import cartopy.crs as ccrs
 import matplotlib.pyplot as plt
 import numpy as np
-import cartopy.crs as ccrs
-
-from pathlib import Path as filePath
 from matplotlib.patches import Polygon, Circle, PathPatch, Path, Patch
 
 from geometry.geo2d import Point2D, Polygon2D, LineString2D, LinearRing2D
 from visualization.basic.color import Color
 from visualization.basic.drawer2d import Drawer2D, Drawer2DCoordinateSys
-
 
 GEOGRAPHIC_RADIUS_SIZE_RATIO = 0.1
 

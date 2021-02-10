@@ -39,7 +39,7 @@ class SupplierCategory(JsonableBaseEntity):
             drone_loading_docks=[DroneLoadingDock.dict_to_obj(dld_dict)
                                  for dld_dict in dict_input['drone_loading_docks']],
             zero_time=DateTimeExtension.from_dict(dict_input['zero_time']),
-            zones = [Zone.dict_to_obj(zone_dict) for zone_dict in dict_input['zones']])
+            zones=[Zone.dict_to_obj(zone_dict) for zone_dict in dict_input['zones']])
 
     def __eq__(self, other):
         return self.zero_time == other.zero_time and self.delivery_requests == other.delivery_requests and \

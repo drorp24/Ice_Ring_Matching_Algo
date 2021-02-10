@@ -22,8 +22,8 @@ from common.entities.base_entities.fleet.fleet_property_sets import DroneFormati
     PackageConfigurationPolicy, DroneSetProperties
 from common.entities.base_entities.package import PackageType
 from common.entities.base_entities.temporal import DateTimeExtension, TimeDeltaExtension
-from end_to_end.distribution.supplier_category_distribution import SupplierCategoryDistribution
-from end_to_end.minimum_end_to_end import *
+from experiment.distribution.supplier_category_distribution import SupplierCategoryDistribution
+from experiment.supplier_category_graph_creator import *
 from geometry.distribution.geo_distribution import UniformPointInBboxDistribution, \
     NormalPointsInMultiPolygonDistribution
 from geometry.geo_factory import create_point_2d, create_polygon_2d, create_multipolygon_2d
@@ -35,6 +35,8 @@ from visualization.operational import operational_drawer2d
 from visualization.operational import operational_gantt_drawer
 
 ZERO_TIME = DateTimeExtension(dt_date=date(2021, 1, 1), dt_time=time(0, 0, 0))
+
+PRINT_LOGS = False
 
 
 class BasicMinimumEnd2EndClusteredDrsTest(unittest.TestCase):
@@ -74,7 +76,8 @@ class BasicMinimumEnd2EndClusteredDrsTest(unittest.TestCase):
     def _test_clustered_drs(self, zone_amount: int = 1, max_centroids_per_zone: int = 1, drs_amount: int = 10,
                             docks_amount: int = 1, max_clusters_per_zone: int = 1, dr_timewindow: int = 3,
                             draw_match: bool = False, drone_deliveries_amount=20):
-        print("--- _test_clustered_drs time: %s  ---" % datetime.now())
+        if PRINT_LOGS:
+            print("--- _test_clustered_drs time: %s  ---" % datetime.now())
         start_time = datetime.now()
 
         supplier_category = _create_supplier_category_distribution(
@@ -92,7 +95,8 @@ class BasicMinimumEnd2EndClusteredDrsTest(unittest.TestCase):
                                                                                    edge_travel_time_factor=25.0,
                                                                                    max_clusters_per_zone=max_clusters_per_zone)
 
-        print("--- clustered_connected_graph run time: %s  ---" % (datetime.now() - start_time))
+        if PRINT_LOGS:
+            print("--- clustered_connected_graph run time: %s  ---" % (datetime.now() - start_time))
         start_time = datetime.now()
 
         expected_delivery_requests_clusters = list(itertools.chain.from_iterable((
@@ -104,13 +108,14 @@ class BasicMinimumEnd2EndClusteredDrsTest(unittest.TestCase):
         expected_num_edge_in_graph = 2 * (
                 sum([sum(range(0, len(drs))) for drs in expected_delivery_requests_clusters]) +
                 len(supplier_category.delivery_requests))
-
-        print("#expected delivery requests clusters", len(expected_delivery_requests_clusters))
+        if PRINT_LOGS:
+            print("#expected delivery requests clusters", len(expected_delivery_requests_clusters))
         self.assertLessEqual(len(expected_delivery_requests_clusters), max_clusters_per_zone * zone_amount)
         self.assertEqual((drs_amount + docks_amount), len(clustered_connected_graph.nodes))
         self.assertEqual(expected_num_edge_in_graph, len(clustered_connected_graph.edges))
 
-        print("--- assert expected values run time: %s  ---" % (datetime.now() - start_time))
+        if PRINT_LOGS:
+            print("--- assert expected values run time: %s  ---" % (datetime.now() - start_time))
 
         delivery_board = self._run_match(clustered_connected_graph, drone_deliveries_amount)
         # print(delivery_board)
@@ -150,7 +155,8 @@ class BasicMinimumEnd2EndClusteredDrsTest(unittest.TestCase):
 
         delivery_board = calc_assignment(matcher_input=matcher_input)
 
-        print("--- calc_assignment run time: %s  ---" % (datetime.now() - start_time))
+        if PRINT_LOGS:
+            print("--- calc_assignment run time: %s  ---" % (datetime.now() - start_time))
 
         return delivery_board
 
