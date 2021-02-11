@@ -15,8 +15,10 @@ class EntityID(JsonableBaseEntity):
 
     @classmethod
     def dict_to_obj(cls, dict_input):
-        assert (dict_input['__class__'] == cls.__name__)
-        return EntityID(uuid_utils.convert_str_to_uuid(dict_input['uuid']))
+        if dict_input.__class__ == str:
+            return EntityID(dict_input)
+        if dict_input['__class__'] and dict_input['__class__'] == cls.__name__:
+            return EntityID(uuid_utils.convert_str_to_uuid(dict_input['uuid']))
 
     def __hash__(self):
         return hash(self._uuid)

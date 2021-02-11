@@ -3,6 +3,7 @@ from typing import List
 from common.entities.base_entities.base_entity import JsonableBaseEntity
 from common.entities.base_entities.package import PackageType
 from common.entities.base_entities.package_delivery_plan import PackageDeliveryPlan
+from common.entities.base_entities.entity_id import EntityID
 from geometry.geo2d import Point2D, Polygon2D
 from geometry.geo_factory import calc_centroid, calc_convex_hull_polygon
 from geometry.utils import Localizable
@@ -10,12 +11,13 @@ from geometry.utils import Localizable
 
 class CustomerDelivery(JsonableBaseEntity, Localizable):
 
-    def __init__(self, package_delivery_plans: List[PackageDeliveryPlan]):
+    def __init__(self, package_delivery_plans: List[PackageDeliveryPlan], customer_delivery_id: EntityID):
+        self._id = customer_delivery_id
         self._package_delivery_plans = package_delivery_plans
 
     @property
-    def package_delivery_plans(self) -> List[PackageDeliveryPlan]:
-        return self._package_delivery_plans
+    def id(self) -> EntityID:
+        return self._id
 
     def calc_location(self) -> Point2D:
         return calc_centroid([pdp.drop_point for pdp in self._package_delivery_plans])
