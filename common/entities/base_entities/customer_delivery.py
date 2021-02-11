@@ -19,6 +19,10 @@ class CustomerDelivery(JsonableBaseEntity, Localizable):
     def id(self) -> EntityID:
         return self._id
 
+    @property
+    def package_delivery_plans(self) -> List[PackageDeliveryPlan]:
+        return self._package_delivery_plans
+
     def calc_location(self) -> Point2D:
         return calc_centroid([pdp.drop_point for pdp in self._package_delivery_plans])
 
