@@ -47,6 +47,7 @@ class DeliveryOption(JsonableBaseEntity, Localizable):
     def dict_to_obj(cls, dict_input):
         assert (dict_input['__class__'] == cls.__name__)
         return DeliveryOption(
+            delivery_options_id=EntityID.dict_to_obj(dict_input['id']),
             customer_deliveries=[CustomerDelivery.dict_to_obj(cd_dict) for cd_dict in
                                  dict_input['customer_deliveries']])
 

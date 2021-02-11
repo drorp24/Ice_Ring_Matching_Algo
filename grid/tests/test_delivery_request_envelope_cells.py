@@ -58,7 +58,10 @@ class BasicDeliveryRequestEnvelopeCellsTestCase(unittest.TestCase):
                                         pitch=Angle(45, AngleUnit.DEGREE),
                                         package_type=PackageType.TINY)
 
-        cls.do_1 = DeliveryOption([CustomerDelivery([cls.pdp_1, cls.pdp_2, cls.pdp_3])])
+        cls.do_1 = DeliveryOption(delivery_options_id=EntityID(UUID(int=14)),
+                                  customer_deliveries=[CustomerDelivery(customer_delivery_id=EntityID(UUID(int=24)),
+                                                                        package_delivery_plans=[cls.pdp_1, cls.pdp_2,
+                                                                                                cls.pdp_3])])
 
         cls.dr_1 = DeliveryRequest(delivery_options=[cls.do_1],
                                    time_window=TimeWindowExtension(
