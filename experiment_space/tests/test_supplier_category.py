@@ -8,8 +8,8 @@ from common.entities.base_entities.drone_loading_dock import DroneLoadingDock
 from common.entities.base_entities.entity_distribution.delivery_requestion_dataset_builder import \
     build_zone_delivery_request_distribution
 from common.entities.base_entities.zone import Zone
-from experiment.distribution.supplier_category_distribution import SupplierCategoryDistribution
-from experiment.supplier_category import SupplierCategory
+from experiment_space.distribution.supplier_category_distribution import SupplierCategoryDistribution
+from experiment_space.supplier_category import SupplierCategory
 from geometry.distribution.geo_distribution import NormalPointsInMultiPolygonDistribution
 from geometry.geo_factory import create_polygon_2d, create_point_2d, create_multipolygon_2d
 
@@ -22,7 +22,7 @@ class BasicSupplierCategoryTests(unittest.TestCase):
     def setUpClass(cls):
         cls.supplier_category = SupplierCategoryDistribution().choose_rand(random=Random(),
                                                                            amount={DeliveryRequest: 10,
-                                                                                   DroneLoadingDock: 1})
+                                                                                   DroneLoadingDock: 1})[0]
         zones = _create_zones(2)
         zone_delivery_request_distribution = build_zone_delivery_request_distribution(
             zones=zones,
@@ -34,7 +34,7 @@ class BasicSupplierCategoryTests(unittest.TestCase):
         cls.supplier_category_with_zones = SupplierCategoryDistribution(
             delivery_requests_distribution=zone_delivery_request_distribution).choose_rand(random=Random(),
                                                                                            amount={DeliveryRequest: 10,
-                                                                                                   DroneLoadingDock: 1})
+                                                                                                   DroneLoadingDock: 1})[0]
 
     @classmethod
     def tearDownClass(cls):
@@ -59,13 +59,11 @@ class BasicSupplierCategoryTests(unittest.TestCase):
 
 
 def _create_zones(zone_amount: int = 1) -> List[Zone]:
-    return [
-               Zone(create_polygon_2d([create_point_2d(35.03, 31.82),
-                                       create_point_2d(35.03, 32.01),
-                                       create_point_2d(35.3, 32.01),
-                                       create_point_2d(35.3, 31.82)])),
-               Zone(create_polygon_2d([create_point_2d(35.03, 32.01),
-                                       create_point_2d(35.09, 32.18),
-                                       create_point_2d(35.3, 32.18),
-                                       create_point_2d(35.3, 32.01)]))
-           ][0:zone_amount]
+    return [Zone(create_polygon_2d([create_point_2d(35.03, 31.82),
+                                    create_point_2d(35.03, 32.01),
+                                    create_point_2d(35.3, 32.01),
+                                    create_point_2d(35.3, 31.82)])),
+            Zone(create_polygon_2d([create_point_2d(35.03, 32.01),
+                                    create_point_2d(35.09, 32.18),
+                                    create_point_2d(35.3, 32.18),
+                                    create_point_2d(35.3, 32.01)]))][0:zone_amount]

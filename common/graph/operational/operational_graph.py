@@ -136,7 +136,7 @@ class OperationalGraph(JsonableBaseEntity):
     def calc_min_cost(self) -> float:
         return min(e.attributes.cost for e in self.edges[:])
 
-    def calc_overall_priority(self) -> int:
+    def calc_total_priority(self) -> int:
         return sum(n.get_priority() for n in self.nodes[:])
 
     def is_empty(self):

@@ -1,5 +1,5 @@
 from common.graph.operational.graph_creator import *
-from experiment.supplier_category import SupplierCategory
+from experiment_space.supplier_category import SupplierCategory
 
 
 def create_fully_connected_graph_model(supplier_category: SupplierCategory,

@@ -7,8 +7,8 @@ from common.entities.base_entities.fleet.empty_drone_delivery_board_generation i
 from common.entities.base_entities.fleet.fleet_property_sets import DroneSetProperties, DroneFormationTypePolicy, \
     PackageConfigurationPolicy
 from common.entities.base_entities.package import PackageType
-from experiment.supplier_category_graph_creator import create_fully_connected_graph_model, calc_assignment
-from experiment.supplier_category import SupplierCategory
+from experiment_space.supplier_category_graph_creator import create_fully_connected_graph_model, calc_assignment
+from experiment_space.supplier_category import SupplierCategory
 from matching.matcher_config import MatcherConfig
 from matching.matcher_input import MatcherInput
 

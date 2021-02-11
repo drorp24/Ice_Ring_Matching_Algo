@@ -22,8 +22,8 @@ from common.entities.base_entities.fleet.fleet_property_sets import DroneFormati
     PackageConfigurationPolicy, DroneSetProperties
 from common.entities.base_entities.package import PackageType
 from common.entities.base_entities.temporal import DateTimeExtension, TimeDeltaExtension
-from experiment.distribution.supplier_category_distribution import SupplierCategoryDistribution
-from experiment.supplier_category_graph_creator import *
+from experiment_space.distribution.supplier_category_distribution import SupplierCategoryDistribution
+from experiment_space.supplier_category_graph_creator import *
 from geometry.distribution.geo_distribution import NormalPointDistribution, UniformPointInBboxDistribution
 from geometry.geo2d import Point2D
 from geometry.geo_factory import create_point_2d
@@ -156,7 +156,7 @@ class BasicMinimumEnd2EndExperiment:
             print(delivery_board)
 
         num_unmatched_dr = len(delivery_board.unmatched_delivery_requests)
-        total_priority = fully_connected_graph.calc_overall_priority()
+        total_priority = fully_connected_graph.calc_total_priority()
         unmatched_priority = total_priority - delivery_board.get_total_priority()
         priority_eff = 100.0 * (1 - (self.lowest_priority * num_unmatched_dr - unmatched_priority) /
                                 (self.lowest_priority * delivery_request_amount - total_priority))

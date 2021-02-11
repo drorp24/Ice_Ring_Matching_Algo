@@ -17,7 +17,7 @@ from common.entities.base_entities.entity_distribution.zone_delivery_request_dis
 from common.entities.base_entities.package_delivery_plan import PackageDeliveryPlan
 from common.entities.base_entities.temporal import DateTimeExtension
 from common.entities.distribution.distribution import HierarchialDistribution, Range
-from experiment.supplier_category import SupplierCategory
+from experiment_space.supplier_category import SupplierCategory
 
 DEFAULT_DATE_TIME_MORNING = [DateTimeExtension(dt_date=date(2021, 1, 1), dt_time=time(6, 0, 0))]
 
