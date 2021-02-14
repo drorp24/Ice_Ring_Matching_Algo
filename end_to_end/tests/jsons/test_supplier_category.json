@@ -6,11 +6,11 @@
       "delivery_options": [
         {
           "__class__": "DeliveryOption",
-          "id": {"__class__": "EntityID", "uuid": "1be86230-1029-4da2-aaf5-64a082e424df"},
+          "id": {"__class__": "EntityID", "uuid": "1be86230-1029-4da2-aaf5-64a082e424df","internal_type": "str"},
           "customer_deliveries": [
             {
               "__class__": "CustomerDelivery",
-              "id": {"__class__": "EntityID", "uuid": "67476688-740b-45fe-961e-6cff6703d97c"},
+              "id": {"__class__": "EntityID", "uuid": "67476688-740b-45fe-961e-6cff6703d97c","internal_type": "str"},
               "package_delivery_plans": [
                 {
                   "__class__": "PackageDeliveryPlan",
@@ -24,7 +24,7 @@
                     "x": 31.423594393642162,
                     "y": 110.60794139871453
                   },
-                  "id": {"__class__": "EntityID", "uuid": "3dafe91f88bf6cf7e6b2cffd9b35dda5"},
+                  "id": {"__class__": "EntityID", "uuid": "3dafe91f88bf6cf7e6b2cffd9b35dda5","internal_type": "UUID"},
                   "package_type": {
                     "__enum__": "PackageType.LARGE"
                   },
@@ -50,7 +50,7 @@
                 "x": 31.423594393642162,
                 "y": 110.60794139871453
               },
-              "id": {"__class__": "EntityID", "uuid": "3dafe91f88bf6cf7e6b2cffd9b35dda5"},
+              "id": {"__class__": "EntityID", "uuid": "3dafe91f88bf6cf7e6b2cffd9b35dda5","internal_type": "UUID"},
               "package_type": {
                 "__enum__": "PackageType.LARGE"
               },
@@ -99,11 +99,11 @@
       "delivery_options": [
         {
           "__class__": "DeliveryOption",
-          "id": {"__class__": "EntityID", "uuid": "f24108d8-0a92-4c05-a8f9-7f996f5e3375"},
+          "id": {"__class__": "EntityID", "uuid": "f24108d8-0a92-4c05-a8f9-7f996f5e3375","internal_type": "str"},
           "customer_deliveries": [
             {
               "__class__": "CustomerDelivery",
-              "id": {"__class__": "EntityID", "uuid": "20725776-af8a-48f7-a190-6d7ee3ece933"},
+              "id": {"__class__": "EntityID", "uuid": "20725776-af8a-48f7-a190-6d7ee3ece933","internal_type": "str"},
               "package_delivery_plans": [
                 {
                   "__class__": "PackageDeliveryPlan",
@@ -117,7 +117,7 @@
                     "x": 22.954115503576457,
                     "y": 106.42080225910564
                   },
-                  "id": {"__class__": "EntityID", "uuid": "b0a2bb10a97b2093dc70d34153fcec66"},
+                  "id": {"__class__": "EntityID", "uuid": "b0a2bb10a97b2093dc70d34153fcec66","internal_type": "UUID"},
                   "package_type": {
                     "__enum__": "PackageType.MEDIUM"
                   },
@@ -143,7 +143,7 @@
                 "x": 22.954115503576457,
                 "y": 106.42080225910564
               },
-              "id": {"__class__": "EntityID", "uuid": "b0a2bb10a97b2093dc70d34153fcec66"},
+              "id": {"__class__": "EntityID", "uuid": "b0a2bb10a97b2093dc70d34153fcec66","internal_type": "UUID"},
               "package_type": {
                 "__enum__": "PackageType.MEDIUM"
               },
@@ -192,11 +192,11 @@
       "delivery_options": [
         {
           "__class__": "DeliveryOption",
-           "id": {"__class__": "EntityID", "uuid": "f24108d8-0a92-4c05-a8f9-7f996f5e3374"},
+           "id": {"__class__": "EntityID", "uuid": "f24108d8-0a92-4c05-a8f9-7f996f5e3374","internal_type": "str"},
           "customer_deliveries": [
             {
               "__class__": "CustomerDelivery",
-               "id": {"__class__": "EntityID", "uuid": "ba77e146-9dc4-48fa-ab7a-353c76ef97f6"},
+               "id": {"__class__": "EntityID", "uuid": "ba77e146-9dc4-48fa-ab7a-353c76ef97f6","internal_type": "str"},
               "package_delivery_plans": [
                 {
                   "__class__": "PackageDeliveryPlan",
@@ -210,7 +210,7 @@
                     "x": 7.400376380870033,
                     "y": 185.10702206850272
                   },
-                  "id": {"__class__": "EntityID", "uuid": "8aeca731d7860113d28ee1c2358d6f6e"},
+                  "id": {"__class__": "EntityID", "uuid": "8aeca731d7860113d28ee1c2358d6f6e","internal_type": "UUID"},
                   "package_type": {
                     "__enum__": "PackageType.SMALL"
                   },
@@ -236,7 +236,7 @@
                 "x": 7.400376380870033,
                 "y": 185.10702206850272
               },
-              "id": {"__class__": "EntityID", "uuid": "8aeca731d7860113d28ee1c2358d6f6e"},
+              "id": {"__class__": "EntityID", "uuid": "8aeca731d7860113d28ee1c2358d6f6e","internal_type": "UUID"},
               "package_type": {
                 "__enum__": "PackageType.SMALL"
               },
@@ -285,11 +285,11 @@
       "delivery_options": [
         {
           "__class__": "DeliveryOption",
-          "id": {"__class__": "EntityID", "uuid": "f24108d8-0a92-4c05-a8f9-7f996f5e3373"},
+          "id": {"__class__": "EntityID", "uuid": "f24108d8-0a92-4c05-a8f9-7f996f5e3373","internal_type": "str"},
           "customer_deliveries": [
             {
               "__class__": "CustomerDelivery",
-               "id": {"__class__": "EntityID", "uuid": "778e843c-4dd5-45a6-99f1-8fe8b9011aa1"},
+               "id": {"__class__": "EntityID", "uuid": "778e843c-4dd5-45a6-99f1-8fe8b9011aa1","internal_type": "str"},
               "package_delivery_plans": [
                 {
                   "__class__": "PackageDeliveryPlan",
@@ -303,7 +303,7 @@
                     "x": 68.87173192988996,
                     "y": 171.15326508519368
                   },
-                  "id": {"__class__": "EntityID", "uuid": "53e6a9e6b437a18bce78dbe49c3a6cde"},
+                  "id": {"__class__": "EntityID", "uuid": "53e6a9e6b437a18bce78dbe49c3a6cde","internal_type": "UUID"},
                   "package_type": {
                     "__enum__": "PackageType.LARGE"
                   },
@@ -329,7 +329,7 @@
                 "x": 68.87173192988996,
                 "y": 171.15326508519368
               },
-              "id": {"__class__": "EntityID", "uuid": "53e6a9e6b437a18bce78dbe49c3a6cde"},
+              "id": {"__class__": "EntityID", "uuid": "53e6a9e6b437a18bce78dbe49c3a6cde","internal_type": "UUID"},
               "package_type": {
                 "__enum__": "PackageType.LARGE"
               },
@@ -378,11 +378,11 @@
       "delivery_options": [
         {
           "__class__": "DeliveryOption",
-          "id": {"__class__": "EntityID", "uuid": "f24108d8-0a92-4c05-a8f9-7f996f5e3372"},
+          "id": {"__class__": "EntityID", "uuid": "f24108d8-0a92-4c05-a8f9-7f996f5e3372","internal_type": "str"},
           "customer_deliveries": [
             {
               "__class__": "CustomerDelivery",
-              "id": {"__class__": "EntityID", "uuid": "4c248049-7076-4353-b346-0b47c5bebbc9"},
+              "id": {"__class__": "EntityID", "uuid": "4c248049-7076-4353-b346-0b47c5bebbc9","internal_type": "str"},
               "package_delivery_plans": [
                 {
                   "__class__": "PackageDeliveryPlan",
@@ -396,7 +396,7 @@
                     "x": 94.49699941655801,
                     "y": 182.8401389865619
                   },
-                  "id": {"__class__": "EntityID", "uuid": "580fa1a8db332968a5f13907db46c4ee"},
+                  "id": {"__class__": "EntityID", "uuid": "580fa1a8db332968a5f13907db46c4ee","internal_type": "UUID"},
                   "package_type": {
                     "__enum__": "PackageType.TINY"
                   },
@@ -422,7 +422,7 @@
                 "x": 94.49699941655801,
                 "y": 182.8401389865619
               },
-              "id": {"__class__": "EntityID", "uuid": "580fa1a8db332968a5f13907db46c4ee"},
+              "id": {"__class__": "EntityID", "uuid": "580fa1a8db332968a5f13907db46c4ee","internal_type": "UUID"},
               "package_type": {
                 "__enum__": "PackageType.TINY"
               },
@@ -471,11 +471,11 @@
       "delivery_options": [
         {
           "__class__": "DeliveryOption",
-          "id": {"__class__": "EntityID", "uuid": "f24108d8-0a92-4c05-a8f9-7f996f5e3371"},
+          "id": {"__class__": "EntityID", "uuid": "f24108d8-0a92-4c05-a8f9-7f996f5e3371","internal_type": "str"},
           "customer_deliveries": [
             {
               "__class__": "CustomerDelivery",
-              "id": {"__class__": "EntityID", "uuid": "4c248049-7076-4353-b346-0b47c5bebbc8"},
+              "id": {"__class__": "EntityID", "uuid": "4c248049-7076-4353-b346-0b47c5bebbc8","internal_type": "str"},
               "package_delivery_plans": [
                 {
                   "__class__": "PackageDeliveryPlan",
@@ -489,7 +489,7 @@
                     "x": 13.683374599365372,
                     "y": 193.9490276108808
                   },
-                  "id": {"__class__": "EntityID", "uuid": "a4814f5bd3fe19341a36993b9d2cff74"},
+                  "id": {"__class__": "EntityID", "uuid": "a4814f5bd3fe19341a36993b9d2cff74","internal_type": "UUID"},
                   "package_type": {
                     "__enum__": "PackageType.LARGE"
                   },
@@ -515,7 +515,7 @@
                 "x": 13.683374599365372,
                 "y": 193.9490276108808
               },
-              "id": {"__class__": "EntityID", "uuid": "a4814f5bd3fe19341a36993b9d2cff74"},
+              "id": {"__class__": "EntityID", "uuid": "a4814f5bd3fe19341a36993b9d2cff74","internal_type": "UUID"},
               "package_type": {
                 "__enum__": "PackageType.LARGE"
               },
@@ -564,11 +564,11 @@
       "delivery_options": [
         {
           "__class__": "DeliveryOption",
-          "id": {"__class__": "EntityID", "uuid": "f24108d8-0a92-4c05-a8f9-7f996f5e3370"},
+          "id": {"__class__": "EntityID", "uuid": "f24108d8-0a92-4c05-a8f9-7f996f5e3370","internal_type": "str"},
           "customer_deliveries": [
             {
               "__class__": "CustomerDelivery",
-                "id": {"__class__": "EntityID", "uuid": "4c248049-7076-4353-b346-0b47c5bebbc7"},
+                "id": {"__class__": "EntityID", "uuid": "4c248049-7076-4353-b346-0b47c5bebbc7","internal_type": "str"},
               "package_delivery_plans": [
                 {
                   "__class__": "PackageDeliveryPlan",
@@ -582,7 +582,7 @@
                     "x": 25.725799817192918,
                     "y": 101.40722196764996
                   },
-                  "id": {"__class__": "EntityID", "uuid": "fd938ee78ea1d1ec488cfcaa31809429"},
+                  "id": {"__class__": "EntityID", "uuid": "fd938ee78ea1d1ec488cfcaa31809429","internal_type": "UUID"},
                   "package_type": {
                     "__enum__": "PackageType.LARGE"
                   },
@@ -608,7 +608,7 @@
                 "x": 25.725799817192918,
                 "y": 101.40722196764996
               },
-              "id": {"__class__": "EntityID", "uuid": "fd938ee78ea1d1ec488cfcaa31809429"},
+              "id": {"__class__": "EntityID", "uuid": "fd938ee78ea1d1ec488cfcaa31809429","internal_type": "UUID"},
               "package_type": {
                 "__enum__": "PackageType.LARGE"
               },
@@ -657,11 +657,11 @@
       "delivery_options": [
         {
           "__class__": "DeliveryOption",
-          "id": {"__class__": "EntityID", "uuid": "f24108d8-0a92-4c05-a8f9-7f996f5e3365"},
+          "id": {"__class__": "EntityID", "uuid": "f24108d8-0a92-4c05-a8f9-7f996f5e3365","internal_type": "str"},
           "customer_deliveries": [
             {
               "__class__": "CustomerDelivery",
-                "id": {"__class__": "EntityID", "uuid": "4c248049-7076-4353-b346-0b47c5bebbc6"},
+                "id": {"__class__": "EntityID", "uuid": "4c248049-7076-4353-b346-0b47c5bebbc6","internal_type": "str"},
               "package_delivery_plans": [
                 {
                   "__class__": "PackageDeliveryPlan",
@@ -675,7 +675,7 @@
                     "x": 40.29834271607928,
                     "y": 171.79063071199425
                   },
-                  "id": {"__class__": "EntityID", "uuid": "d19b434020e88402727bd32395820147"},
+                  "id": {"__class__": "EntityID", "uuid": "d19b434020e88402727bd32395820147","internal_type": "UUID"},
                   "package_type": {
                     "__enum__": "PackageType.LARGE"
                   },
@@ -701,7 +701,7 @@
                 "x": 40.29834271607928,
                 "y": 171.79063071199425
               },
-              "id": {"__class__": "EntityID", "uuid": "d19b434020e88402727bd32395820147"},
+              "id": {"__class__": "EntityID", "uuid": "d19b434020e88402727bd32395820147","internal_type": "UUID"},
               "package_type": {
                 "__enum__": "PackageType.LARGE"
               },
@@ -750,11 +750,11 @@
       "delivery_options": [
         {
           "__class__": "DeliveryOption",
-          "id": {"__class__": "EntityID", "uuid": "f24108d8-0a92-4c05-a8f9-7f996f5e3355"},
+          "id": {"__class__": "EntityID", "uuid": "f24108d8-0a92-4c05-a8f9-7f996f5e3355", "internal_type": "str"},
           "customer_deliveries": [
             {
               "__class__": "CustomerDelivery",
-                "id": {"__class__": "EntityID", "uuid": "4c248049-7076-4353-b346-0b47c5bebbc5"},
+                "id": {"__class__": "EntityID", "uuid": "4c248049-7076-4353-b346-0b47c5bebbc5", "internal_type": "str"},
               "package_delivery_plans": [
                 {
                   "__class__": "PackageDeliveryPlan",
@@ -768,7 +768,7 @@
                     "x": 47.61026795375846,
                     "y": 184.60944250908818
                   },
-                  "id": {"__class__": "EntityID", "uuid": "8010b7af8df0e2793a2ea41bf6ba81eb"},
+                  "id": {"__class__": "EntityID", "uuid": "8010b7af8df0e2793a2ea41bf6ba81eb","internal_type": "UUID"},
                   "package_type": {
                     "__enum__": "PackageType.MEDIUM"
                   },
@@ -794,7 +794,7 @@
                 "x": 47.61026795375846,
                 "y": 184.60944250908818
               },
-              "id": {"__class__": "EntityID", "uuid": "8010b7af8df0e2793a2ea41bf6ba81eb"},
+              "id": {"__class__": "EntityID", "uuid": "8010b7af8df0e2793a2ea41bf6ba81eb","internal_type": "UUID"},
               "package_type": {
                 "__enum__": "PackageType.MEDIUM"
               },
@@ -843,11 +843,11 @@
       "delivery_options": [
         {
           "__class__": "DeliveryOption",
-          "id": {"__class__": "EntityID", "uuid": "f24108d8-0a92-4c05-a8f9-7f996f5e3345"},
+          "id": {"__class__": "EntityID", "uuid": "f24108d8-0a92-4c05-a8f9-7f996f5e3345","internal_type": "str"},
           "customer_deliveries": [
             {
               "__class__": "CustomerDelivery",
-                "id": {"__class__": "EntityID", "uuid": "4c248049-7076-4353-b346-0b47c5bebbc4"},
+                "id": {"__class__": "EntityID", "uuid": "4c248049-7076-4353-b346-0b47c5bebbc4","internal_type": "str"},
               "package_delivery_plans": [
                 {
                   "__class__": "PackageDeliveryPlan",
@@ -861,7 +861,7 @@
                     "x": 1.0787848978618175,
                     "y": 131.32009519652811
                   },
-                  "id": {"__class__": "EntityID", "uuid": "0295154c8557afe1499068c87041be39"},
+                  "id": {"__class__": "EntityID", "uuid": "0295154c8557afe1499068c87041be39","internal_type": "UUID"},
                   "package_type": {
                     "__enum__": "PackageType.LARGE"
                   },
@@ -887,7 +887,7 @@
                 "x": 1.0787848978618175,
                 "y": 131.32009519652811
               },
-              "id": {"__class__": "EntityID", "uuid": "0295154c8557afe1499068c87041be39"},
+              "id": {"__class__": "EntityID", "uuid": "0295154c8557afe1499068c87041be39","internal_type": "UUID"},
               "package_type": {
                 "__enum__": "PackageType.LARGE"
               },
