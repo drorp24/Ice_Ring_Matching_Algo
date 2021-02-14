@@ -21,8 +21,8 @@ class EntityID(JsonableBaseEntity):
 
     @classmethod
     def dict_to_obj(cls, dict_input):
-        if dict_input['internal_type'] == str:
-            return EntityID(dict_input)
+        if dict_input['internal_type'] == 'str':
+            return EntityID(dict_input['uuid'])
         if dict_input['internal_type'] =='UUID':
             return EntityID(uuid_utils.convert_str_to_uuid(dict_input['uuid']))
 
