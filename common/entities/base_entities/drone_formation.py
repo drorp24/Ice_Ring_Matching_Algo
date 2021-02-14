@@ -110,20 +110,28 @@ class DroneTypeToPackageConfigurationOption:
     drone_configurations_map: {PackageConfigurationOption: [DronePackageConfiguration]} = {
         PackageConfigurationOption.LARGE_PACKAGES: [
             DroneConfigurations.get_drone_configuration(DroneType.drone_type_1, PackageConfiguration.LARGE_X2),
+            DroneConfigurations.get_drone_configuration(DroneType.drone_type_2, PackageConfiguration.LARGE_X4),
             DroneConfigurations.get_drone_configuration(DroneType.drone_type_3, PackageConfiguration.LARGE_X2),
-            DroneConfigurations.get_drone_configuration(DroneType.drone_type_2, PackageConfiguration.LARGE_X2)],
+            DroneConfigurations.get_drone_configuration(DroneType.drone_type_4, PackageConfiguration.LARGE_X2)
+        ],
         PackageConfigurationOption.MEDIUM_PACKAGES: [
             DroneConfigurations.get_drone_configuration(DroneType.drone_type_1, PackageConfiguration.MEDIUM_X4),
-            DroneConfigurations.get_drone_configuration(DroneType.drone_type_3, PackageConfiguration.MEDIUM_X8),
-            DroneConfigurations.get_drone_configuration(DroneType.drone_type_2, PackageConfiguration.MEDIUM_X8)],
+            DroneConfigurations.get_drone_configuration(DroneType.drone_type_2, PackageConfiguration.MEDIUM_X8),
+            DroneConfigurations.get_drone_configuration(DroneType.drone_type_3, PackageConfiguration.MEDIUM_X4),
+            DroneConfigurations.get_drone_configuration(DroneType.drone_type_4, PackageConfiguration.MEDIUM_X4)
+        ],
         PackageConfigurationOption.SMALL_PACKAGES: [
             DroneConfigurations.get_drone_configuration(DroneType.drone_type_1, PackageConfiguration.SMALL_X8),
-            DroneConfigurations.get_drone_configuration(DroneType.drone_type_3, PackageConfiguration.SMALL_X16),
-            DroneConfigurations.get_drone_configuration(DroneType.drone_type_2, PackageConfiguration.SMALL_X16)],
+            DroneConfigurations.get_drone_configuration(DroneType.drone_type_2, PackageConfiguration.SMALL_X16),
+            DroneConfigurations.get_drone_configuration(DroneType.drone_type_3, PackageConfiguration.SMALL_X8),
+            DroneConfigurations.get_drone_configuration(DroneType.drone_type_4, PackageConfiguration.SMALL_X8)
+        ],
         PackageConfigurationOption.TINY_PACKAGES: [
             DroneConfigurations.get_drone_configuration(DroneType.drone_type_1, PackageConfiguration.TINY_X16),
-            DroneConfigurations.get_drone_configuration(DroneType.drone_type_3, PackageConfiguration.TINY_X32),
-            DroneConfigurations.get_drone_configuration(DroneType.drone_type_2, PackageConfiguration.TINY_X32)],
+            DroneConfigurations.get_drone_configuration(DroneType.drone_type_2, PackageConfiguration.TINY_X32),
+            DroneConfigurations.get_drone_configuration(DroneType.drone_type_3, PackageConfiguration.TINY_X16),
+            DroneConfigurations.get_drone_configuration(DroneType.drone_type_4, PackageConfiguration.TINY_X16)
+        ],
     }
 
     @classmethod

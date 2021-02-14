@@ -17,8 +17,8 @@ class BasicDroneConfigurationTypeGenerationTests(unittest.TestCase):
             DroneType.drone_type_1, PackageConfiguration.SMALL_X8)
         cls.drone_type_1_16X1 = DroneConfigurations.get_drone_configuration(
             DroneType.drone_type_1, PackageConfiguration.TINY_X16)
-        cls.drone_type_2_2X8 = DroneConfigurations.get_drone_configuration(
-            DroneType.drone_type_2, PackageConfiguration.LARGE_X2)
+        cls.drone_type_2_4X8 = DroneConfigurations.get_drone_configuration(
+            DroneType.drone_type_2, PackageConfiguration.LARGE_X4)
         cls.drone_type_2_8X4 = DroneConfigurations.get_drone_configuration(
             DroneType.drone_type_2, PackageConfiguration.MEDIUM_X8)
         cls.drone_type_2_16X2 = DroneConfigurations.get_drone_configuration(
@@ -31,7 +31,7 @@ class BasicDroneConfigurationTypeGenerationTests(unittest.TestCase):
         self.assertEqual(self.drone_type_1_4X4.drone_type, DroneType.drone_type_1)
         self.assertEqual(self.drone_type_1_8X2.drone_type, DroneType.drone_type_1)
         self.assertEqual(self.drone_type_1_16X1.drone_type, DroneType.drone_type_1)
-        self.assertEqual(self.drone_type_2_2X8.drone_type, DroneType.drone_type_2)
+        self.assertEqual(self.drone_type_2_4X8.drone_type, DroneType.drone_type_2)
         self.assertEqual(self.drone_type_2_8X4.drone_type, DroneType.drone_type_2)
         self.assertEqual(self.drone_type_2_16X2.drone_type, DroneType.drone_type_2)
         self.assertEqual(self.drone_type_2_32X1.drone_type, DroneType.drone_type_2)
@@ -41,7 +41,7 @@ class BasicDroneConfigurationTypeGenerationTests(unittest.TestCase):
         self.assertEqual(self.drone_type_1_4X4.get_package_type_amount(PackageType.MEDIUM), 4)
         self.assertEqual(self.drone_type_1_8X2.get_package_type_amount(PackageType.SMALL), 8)
         self.assertEqual(self.drone_type_1_16X1.get_package_type_amount(PackageType.TINY), 16)
-        self.assertEqual(self.drone_type_2_2X8.get_package_type_amount(PackageType.LARGE), 2)
+        self.assertEqual(self.drone_type_2_4X8.get_package_type_amount(PackageType.LARGE), 4)
         self.assertEqual(self.drone_type_2_8X4.get_package_type_amount(PackageType.MEDIUM), 8)
         self.assertEqual(self.drone_type_2_16X2.get_package_type_amount(PackageType.SMALL), 16)
         self.assertEqual(self.drone_type_2_32X1.get_package_type_amount(PackageType.TINY), 32)
