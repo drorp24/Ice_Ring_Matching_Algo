@@ -8,6 +8,7 @@ from common.entities.base_entities.package import PackageType
 class DroneType(Enum):
     drone_type_1 = 4
     drone_type_2 = 6
+    drone_type_3 = 10
 
     @classmethod
     def dict_to_obj(cls, input_dict):
@@ -140,7 +141,9 @@ class DroneTypeToPackageConfigurationOptions:
     drone_configurations_map: {DroneType: [PackageConfiguration]} = \
         {DroneType.drone_type_1: [PackageConfiguration.LARGE_X2, PackageConfiguration.MEDIUM_X4,
                                   PackageConfiguration.SMALL_X8, PackageConfiguration.TINY_X16],
-         DroneType.drone_type_2: [PackageConfiguration.LARGE_X4, PackageConfiguration.MEDIUM_X8,
+         DroneType.drone_type_2: [PackageConfiguration.LARGE_X2, PackageConfiguration.MEDIUM_X8,
+                                  PackageConfiguration.SMALL_X16, PackageConfiguration.TINY_X32],
+         DroneType.drone_type_3: [PackageConfiguration.LARGE_X2, PackageConfiguration.MEDIUM_X8,
                                   PackageConfiguration.SMALL_X16, PackageConfiguration.TINY_X32]}
 
     @classmethod
