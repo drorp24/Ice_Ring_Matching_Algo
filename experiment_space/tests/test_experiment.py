@@ -40,7 +40,7 @@ class BasicExperimentTest(unittest.TestCase):
                                 empty_drone_delivery_board=self.empty_drone_delivery_board,
                                 graph_creation_algorithm=self.default_graph_creation_algorithm)
 
-        result_drone_delivery_board = experiment.run_experiment()
+        result_drone_delivery_board = experiment.run_match()
 
         analyzers_to_run = [MatchedDeliveryRequestsAnalyzer(),
                             UnmatchedDeliveryRequestsAnalyzer(),
@@ -59,7 +59,7 @@ class BasicExperimentTest(unittest.TestCase):
             empty_drone_delivery_boards=[self.empty_drone_delivery_board],
             graph_creation_algorithms=[self.default_graph_creation_algorithm]).calc_cartesian_product_experiments()
 
-        result_drone_delivery_boards = [experiment.run_experiment() for experiment in experiments]
+        result_drone_delivery_boards = [experiment.run_match() for experiment in experiments]
 
         analyzers_to_run = [MatchedDeliveryRequestsAnalyzer(),
                             UnmatchedDeliveryRequestsAnalyzer(),
@@ -81,7 +81,7 @@ class BasicExperimentTest(unittest.TestCase):
             graph_creation_algorithms=[self.default_graph_creation_algorithm]) \
             .calc_random_k_experiments(random=Random(42), amount=50)
 
-        result_drone_delivery_boards = [experiment.run_experiment() for experiment in experiments]
+        result_drone_delivery_boards = [experiment.run_match() for experiment in experiments]
 
         analyzers_to_run = [MatchedDeliveryRequestsAnalyzer(),
                             UnmatchedDeliveryRequestsAnalyzer(),

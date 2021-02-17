@@ -10,9 +10,10 @@ class Analyzer:
     def calc_analysis(delivery_board: DroneDeliveryBoard):
         pass
 
+    @classmethod
     @property
     @abstractmethod
-    def name(self):
+    def name(cls):
         pass
 
 
