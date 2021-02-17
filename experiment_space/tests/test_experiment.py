@@ -1,7 +1,6 @@
 import unittest
 from random import Random
 
-from common.entities.base_entities.drone_delivery_board import EmptyDroneDeliveryBoard
 from common.entities.base_entities.fleet.empty_drone_delivery_board_generation import generate_empty_delivery_board
 from common.entities.base_entities.fleet.fleet_property_sets import DroneSetProperties
 from experiment_space.analyzer.quantitative_analyzer import MatchedDeliveryRequestsAnalyzer, \
