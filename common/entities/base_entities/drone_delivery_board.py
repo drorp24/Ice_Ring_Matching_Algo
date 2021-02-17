@@ -75,19 +75,11 @@ class DroneDeliveryBoard(JsonableBaseEntity):
         return self._unmatched_delivery_requests
 
     @lru_cache()
-    def get_total_work_time_in_minutes(self) -> float:
-        return sum([drone_delivery.get_total_work_time_in_minutes() for drone_delivery in self._drone_deliveries])
-
-    @lru_cache()
     def get_total_amount_per_package_type(self) -> PackageTypeAmountMap:
         amount_per_package_type = PackageTypeAmountMap({package: 0 for package in PackageType})
         for drone_delivery in self._drone_deliveries:
             amount_per_package_type.add_to_map(drone_delivery.get_total_package_type_amount_map())
         return amount_per_package_type
-
-    @lru_cache()
-    def get_total_priority(self) -> int:
-        return sum(drone_delivery.get_total_priority() for drone_delivery in self._drone_deliveries)
 
     def __eq__(self, other):
         return self.drone_deliveries == other.drone_deliveries \
@@ -101,9 +93,6 @@ class DroneDeliveryBoard(JsonableBaseEntity):
 
         return f"\n[DroneDeliveryBoard]\n" \
                f"Total amount per package type: {self.get_total_amount_per_package_type()}\n" \
-               f"Total work time in minutes: {self.get_total_work_time_in_minutes()}\n" \
-               f"Total priority: {self.get_total_priority()}\n" \
-               f"Unmatched delivery requests amount: {len(self._unmatched_delivery_requests)}\n" \
                f"{drone_deliveries_str}\n" \
                f"{unmatched_delivery_requests_str}"
 

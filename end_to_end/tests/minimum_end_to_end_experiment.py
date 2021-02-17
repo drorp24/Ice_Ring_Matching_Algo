@@ -23,7 +23,7 @@ from common.entities.base_entities.fleet.fleet_property_sets import DroneFormati
 from common.entities.base_entities.package import PackageType
 from common.entities.base_entities.temporal import DateTimeExtension, TimeDeltaExtension
 from experiment_space.distribution.supplier_category_distribution import SupplierCategoryDistribution
-from experiment_space.supplier_category_graph_creator import *
+from experiment_space.graph_creation_algorithm import *
 from geometry.distribution.geo_distribution import NormalPointDistribution, UniformPointInBboxDistribution
 from geometry.geo2d import Point2D
 from geometry.geo_factory import create_point_2d
@@ -180,32 +180,11 @@ class BasicMinimumEnd2EndExperiment:
                                                                                        draw_flag=False)
         return performance_matrix
 
-    @staticmethod
-    def _draw_matched_scenario(delivery_board, fully_connected_graph, supplier_category, map_image):
-        dr_drawer = create_drawer_2d(Drawer2DCoordinateSys.GEOGRAPHIC, map_image)
-        operational_drawer2d.add_operational_graph(dr_drawer, fully_connected_graph, draw_internal=True,
-                                                   draw_edges=False)
-        dr_drawer.draw(False)
-        board_map_drawer = create_drawer_2d(Drawer2DCoordinateSys.GEOGRAPHIC, map_image)
-        operational_drawer2d.add_delivery_board(board_map_drawer, delivery_board, draw_unmatched=True)
-        board_map_drawer.draw(False)
-        row_names = ["Unmatched Out"] + \
-                    ["[" + str(delivery.drone_formation.drone_formation_type.name) + "] * " +
-                     str(delivery.drone_formation.drone_package_configuration.package_type_map)
-                     for delivery in delivery_board.drone_deliveries]
-        board_gantt_drawer = create_gantt_drawer(zero_time=supplier_category.zero_time,
-                                                 hours_period=24,
-                                                 row_names=row_names,
-                                                 rows_title='Formation Type x Package Type Amounts'
-                                                 )
-        operational_gantt_drawer.add_delivery_board(board_gantt_drawer, delivery_board, True)
-        board_gantt_drawer.draw(True)
-
 
 if __name__ == '__main__':
 
-    scene = 'center' # 'center', 'north'
-    mode = 'single' # 'single', 'sweep_drones', 'sweep_requests', 'sweep_seed' ;
+    scene = 'center'  # 'center', 'north'
+    mode = 'single'  # 'single', 'sweep_drones', 'sweep_requests', 'sweep_seed' ;
 
     experiment = BasicMinimumEnd2EndExperiment(scene)
 
@@ -229,7 +208,7 @@ if __name__ == '__main__':
             ax.set_xlabel('Number of vehicles')
             ax.set_ylabel('Delivering Efficiency [%]')
             ax.set_title('Delivering Efficiency vs. Fleet Size (%s requests)' % amount)
-            ax.set_xlim(0, drones_amount_list[-1]+1)
+            ax.set_xlim(0, drones_amount_list[-1] + 1)
             ax.set_ylim(0, 105)
             ax.grid('on')
             plt.legend(loc='upper left')
@@ -265,9 +244,10 @@ if __name__ == '__main__':
             ax = plt.subplot(111)
             ax.plot()
             plt.hist([np.squeeze(analysis_matrix[idx, 0, :, 1]), np.squeeze(analysis_matrix[idx, 0, :, 0])],
-                     color=['b','g'], alpha=0.5, label=["Package delivered", "Priority weighted"])
+                     color=['b', 'g'], alpha=0.5, label=["Package delivered", "Priority weighted"])
             ax.set_xlabel('Delivering Efficiency [%]')
-            ax.set_title('Delivering Efficiency Histogram variable Seed (%s drones, %s requests)' % (amount, delivery_request_amount_list[0]))
+            ax.set_title('Delivering Efficiency Histogram variable Seed (%s drones, %s requests)' % (
+            amount, delivery_request_amount_list[0]))
             plt.legend(loc='upper right')
 
     plt.show()

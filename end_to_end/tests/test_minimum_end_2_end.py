@@ -7,7 +7,7 @@ from common.entities.base_entities.fleet.empty_drone_delivery_board_generation i
 from common.entities.base_entities.fleet.fleet_property_sets import DroneSetProperties, DroneFormationTypePolicy, \
     PackageConfigurationPolicy
 from common.entities.base_entities.package import PackageType
-from experiment_space.supplier_category_graph_creator import create_fully_connected_graph_model, calc_assignment
+from experiment_space.graph_creation_algorithm import create_fully_connected_graph_model, calc_assignment
 from experiment_space.supplier_category import SupplierCategory
 from matching.matcher_config import MatcherConfig
 from matching.matcher_input import MatcherInput
@@ -47,7 +47,7 @@ class BasicMinimumEnd2End(unittest.TestCase):
 
         delivery_board = calc_assignment(matcher_input=matcher_input)
         self.assertEqual(len(delivery_board.unmatched_delivery_requests), 4)
-        amount_per_package_type = delivery_board.get_total_amount_per_package_type()
+        amount_per_package_type = delivery_board._calc_total_amount_matched_per_package_type()
         self.assertEqual(amount_per_package_type.get_package_type_amount(PackageType.TINY), 1)
         self.assertEqual(amount_per_package_type.get_package_type_amount(PackageType.MEDIUM), 1)
         self.assertEqual(amount_per_package_type.get_package_type_amount(PackageType.LARGE), 4)

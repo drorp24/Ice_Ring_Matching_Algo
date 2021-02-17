@@ -23,7 +23,7 @@ from common.entities.base_entities.fleet.fleet_property_sets import DroneFormati
 from common.entities.base_entities.package import PackageType
 from common.entities.base_entities.temporal import DateTimeExtension, TimeDeltaExtension
 from experiment_space.distribution.supplier_category_distribution import SupplierCategoryDistribution
-from experiment_space.supplier_category_graph_creator import *
+from experiment_space.graph_creation_algorithm import *
 from geometry.distribution.geo_distribution import UniformPointInBboxDistribution, \
     NormalPointsInMultiPolygonDistribution
 from geometry.geo_factory import create_point_2d, create_polygon_2d, create_multipolygon_2d
