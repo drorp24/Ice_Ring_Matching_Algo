@@ -166,7 +166,8 @@ class DroneDelivery(EmptyDroneDelivery):
             .format(id=self.id,
                     origin_capacity=self.drone_formation.get_package_type_amount_map(),
                     total_amount_per_package_type=str(self.get_total_package_type_amount_map()),
-                    priority=str(self.get_total_priority()), total_time=str(self.get_total_work_time_in_minutes()),
+                    priority=str(self.get_total_priority()),
+                    total_time=str(self.get_total_work_time_in_minutes()),
                     start_drone_loading_docks=str(self.start_drone_loading_docks),
                     matched_requests='\n'.join(map(str, self._matched_requests)),
                     end_drone_loading_docks=str(self.end_drone_loading_docks))
