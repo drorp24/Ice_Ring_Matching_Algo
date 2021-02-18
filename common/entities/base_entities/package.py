@@ -6,7 +6,7 @@ from enum import Enum
 from common.entities.base_entities.base_entity import JsonableBaseEntity
 
 MAX_POTENTIAL_DROP_ENV_RADIUS_METERS: float = 1000.0
-MAX_DELTA_BETWEEN_MIN_AND_MAX_RADIUS: float = 100.0
+MAX_DELTA_BETWEEN_MIN_AND_MAX_RADIUS: float = 300.0
 
 
 class PotentialDropEnvelope(JsonableBaseEntity):

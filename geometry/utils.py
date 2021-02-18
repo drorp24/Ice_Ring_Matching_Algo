@@ -1,6 +1,8 @@
 from abc import abstractmethod, ABC
 from typing import Tuple, List, Iterator, Union
 
+from optional import Optional
+
 from geometry.geo2d import Point2D, Polygon2D, EmptyGeometry2D
 
 

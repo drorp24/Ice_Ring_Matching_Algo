@@ -12,8 +12,7 @@ from geometry.utils import Shapeable
 class PotentialDropEnvelopes(ShapeableCollection):
 
     def __init__(self, drop_point: Point2D, drop_azimuth: Optional.of(Angle),
-                 drop_envelopes: List[DropEnvelope], slide_service:_SlidesService = MockSlidesServiceWrapper()):
-        assert len(drop_envelopes) == slide_service.drone_azimuth_level_amount
+                 drop_envelopes: List[DropEnvelope]):
         self._drop_point = drop_point
         self._drop_azimuth = drop_azimuth
         self._internal_envelopes = {drop_envelope.drone_azimuth: drop_envelope for drop_envelope in drop_envelopes}

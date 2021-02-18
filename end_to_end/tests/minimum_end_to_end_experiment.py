@@ -101,7 +101,7 @@ class BasicMinimumEnd2EndExperiment:
                                                                                             32.6675
                                                                                             )),
                     time_window_distributions=create_standard_full_day_test_time()))
-            self.mapImage = MapImage(map_background_path=Path(r"visualization/basic/north_map.Png"),
+            self.mapImage = MapImage(map_background_path=Path("visualization/basic/North_map.png"),
                                      west_lon=34.90777, east_lon=35.90753, south_lat=32.48928, north_lat=33.93233)
         elif scene == 'center':
             self.supplier_category_distribution = SupplierCategoryDistribution(
@@ -116,7 +116,7 @@ class BasicMinimumEnd2EndExperiment:
                                                                                             )),
                     time_window_distributions=create_standard_full_day_test_time()))
             self.matcher_config = Path("end_to_end/tests/jsons/test_matcher_config.json")
-            self.mapImage = MapImage(map_background_path=Path(r"visualization/basic/gush_dan_background.Png"),
+            self.mapImage = MapImage(map_background_path=Path("visualization/basic/gush_dan_background.Png"),
                                      west_lon=34.83927, east_lon=35.32341, south_lat=31.77279, north_lat=32.19276)
 
     def test_small_supplier_category(self):

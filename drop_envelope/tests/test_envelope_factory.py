@@ -46,5 +46,5 @@ class BasicSlideTestCase(unittest.TestCase):
         potential_drop_envelope_with_drop_azimuth = create_potential_drop_envelope(drop_azimuth=Optional.of(Angle(value=50, unit=AngleUnit.DEGREE)),
                                                                                    package_type=self.package_type,
                                                                                    drop_point=self.drop_point)
-        self.assertEqual(len(potential_drop_envelope_with_drop_azimuth.envelopes), 8)
+        self.assertEqual(len(potential_drop_envelope_with_drop_azimuth.envelopes), 3)
         self.assertEqual(len(potential_drop_envelope_without_drop_azimuth.envelopes), 8)

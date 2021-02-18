@@ -6,11 +6,11 @@ from geometry.geo2d import Point2D
 
 
 class DeliveryRequestPotentialEnvelope(PotentialEnvelopeCollection):
+
     def __init__(self, potential_drop_envelopes: List[PotentialDropEnvelopes], centroid: Point2D):
         self._potential_drop_envelopes = potential_drop_envelopes
         self._centroid = centroid
 
-    @property
     def centroid(self) -> Point2D:
         return self._centroid
 
@@ -20,3 +20,5 @@ class DeliveryRequestPotentialEnvelope(PotentialEnvelopeCollection):
 
     def shapeable_collection(self) -> List[ShapeableCollection]:
         return self.potential_drop_envelopes
+
+

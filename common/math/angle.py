@@ -6,7 +6,7 @@ from random import Random
 from typing import List
 
 from common.entities.base_entities.base_entity import JsonableBaseEntity
-from common.entities.distribution.distribution import UniformDistribution, Range
+from common.entities.distribution.distribution import UniformDistribution, Range, ChoiceDistribution, Distribution
 from geometry.geo2d import Vector2D
 from geometry.geo_factory import create_vector_2d
 
@@ -93,3 +93,20 @@ class AngleUniformDistribution(UniformDistribution):
     @classmethod
     def distribution_class(cls) -> type:
         return Angle
+
+
+class ChoicesAngleDistribution(AngleUniformDistribution):
+    def __init__(self, angles: List[Angle]):
+        angles_values = list(map(lambda angle: angle.degrees, angles))
+        min_angle = angles[angles_values.index(int(min(angles_values)))]
+        max_angle = angles[angles_values.index(int(max(angles_values)))]
+        super(ChoicesAngleDistribution, self).__init__(start_angle=min_angle, end_angle=max_angle)
+        self.angles = angles
+
+    def choose_rand(self, random: Random, amount: int = 1):
+        return random.choices(self.angles, weights=[1 for i in range(len(self.angles))],  k=amount)
+
+    @classmethod
+    def distribution_class(cls) -> type:
+        Angle
+
