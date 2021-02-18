@@ -33,10 +33,12 @@ def calc_drone_deliveries(drone_set_properties: DroneSetProperties,
                                                        max_route_time_entire_board, velocity_entire_board))
     return empty_deliveries
 
-def generate_empty_delivery_board(drone_set_properties: [DroneSetProperties]) -> EmptyDroneDeliveryBoard:
+def generate_empty_delivery_board(drone_set_properties: [DroneSetProperties],max_route_time_entire_board: int,
+                                     velocity_entire_board: float) -> EmptyDroneDeliveryBoard:
     total_drone_deliveries = []
     for drone_properties in drone_set_properties:
-        total_drone_deliveries += calc_drone_deliveries(drone_properties)
+        total_drone_deliveries += calc_drone_deliveries(drone_properties,max_route_time_entire_board,
+                                   velocity_entire_board)
     return EmptyDroneDeliveryBoard(total_drone_deliveries)
 
 

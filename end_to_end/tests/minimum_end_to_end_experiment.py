@@ -129,7 +129,9 @@ class BasicMinimumEnd2EndExperiment:
         supplier_category = self.supplier_category_distribution.choose_rand(random=Random(10),
                                                                             amount={DeliveryRequest: 37,
                                                                                     DroneLoadingDock: 1})
-        fully_connected_graph = create_fully_connected_graph_model(supplier_category, edge_cost_factor=25.0)
+        fully_connected_graph = create_fully_connected_graph_model(supplier_category, edge_cost_factor=25.0,
+                                                                   edge_travel_time_factor=25.0)
+
         print("--- create_fully_connected_graph_model run time: %s  ---" % (datetime.now() - start_time))
         start_time = datetime.now()
 

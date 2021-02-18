@@ -12,6 +12,8 @@ from common.entities.distribution.distribution import UniformChoiceDistribution,
 from geometry.distribution.geo_distribution import PointLocationDistribution
 from geometry.geo2d import Point2D
 from geometry.geo_factory import create_zero_point_2d
+import uuid
+from common.entities.base_entities.entity_id import EntityID
 
 DEFAULT_PDP_DISTRIB = PackageDeliveryPlanDistribution(relative_location_distribution=DEFAULT_RELATIVE_DROP_DISTRIB,
                                                       azimuth_distribution=DEFAULT_AZI_DISTRIB,
@@ -60,8 +62,8 @@ class CustomerDeliveryDistribution(HierarchialDistribution):
     @staticmethod
     def _calc_result_list(internal_amount: Dict[type, int], pdp_distribution: PackageDeliveryPlanDistribution,
                           random: Random, sampled_distributions: Dict[str, list]) -> List[CustomerDelivery]:
-        return [CustomerDelivery(
-            pdp_distribution.choose_rand(random=random, amount=internal_amount[PackageDeliveryPlan], base_loc=loc))
+
+        return [CustomerDelivery(customer_delivery_id=EntityID(uuid.uuid4()),package_delivery_plans = pdp_distribution.choose_rand(random=random, amount=internal_amount[PackageDeliveryPlan], base_loc=loc))
             for loc in sampled_distributions['location']]
 
     @staticmethod
