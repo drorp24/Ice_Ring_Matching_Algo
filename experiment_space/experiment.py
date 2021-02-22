@@ -36,6 +36,10 @@ class Experiment:
     def matcher_config(self):
         return self._matcher_config
 
+    @property
+    def graph_creation_algorithm(self):
+        return self._graph_creation_algorithm
+
     def run_match(self) -> DroneDeliveryBoard:
         graph = self._graph_creation_algorithm.create(supplier_category=self._supplier_category)
         matcher_input = MatcherInput(graph=graph, empty_board=self._empty_drone_delivery, config=self._matcher_config)

@@ -1,8 +1,8 @@
 import uuid
 
-from common.entities.base_entities.drone_delivery import EmptyDroneDelivery
 from common.entities.base_entities.drone_delivery import DEFAULT_MAX_ROUTE_TIME_IN_MINUTES, \
     DEFAULT_VELOCITY_METER_PER_SEC
+from common.entities.base_entities.drone_delivery import EmptyDroneDelivery
 from common.entities.base_entities.drone_delivery_board import EmptyDroneDeliveryBoard
 from common.entities.base_entities.entity_id import EntityID
 from common.entities.base_entities.fleet.fleet_configuration_attribution import FleetConfigurationAttribution, \

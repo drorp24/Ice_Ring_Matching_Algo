@@ -28,11 +28,7 @@ from geometry.distribution.geo_distribution import NormalPointDistribution, Unif
 from geometry.geo2d import Point2D
 from geometry.geo_factory import create_point_2d
 from matching.matcher_config import MatcherConfig
-from visualization.basic.drawer2d import Drawer2DCoordinateSys
-from visualization.basic.pltdrawer2d import create_drawer_2d, MapImage
-from visualization.basic.pltgantt_drawer import create_gantt_drawer
-from visualization.operational import operational_drawer2d
-from visualization.operational import operational_gantt_drawer
+from visualization.basic.pltdrawer2d import MapImage
 
 west_lon = 34.83927
 east_lon = 35.32341
