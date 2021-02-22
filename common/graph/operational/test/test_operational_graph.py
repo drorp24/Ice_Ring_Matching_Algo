@@ -5,6 +5,7 @@ from datetime import time, date, timedelta, datetime
 from math import sqrt
 from random import Random
 from typing import List
+from uuid import uuid4
 
 import numpy as np
 from numpy.testing import assert_array_equal
@@ -20,6 +21,7 @@ from common.entities.base_entities.entity_distribution.drone_loading_dock_distri
     DroneLoadingDockDistribution
 from common.entities.base_entities.entity_distribution.temporal_distribution import TimeDeltaDistribution, \
     TimeWindowDistribution, DateTimeDistribution
+from common.entities.base_entities.entity_id import EntityID
 from common.entities.base_entities.temporal import DateTimeExtension, TimeDeltaExtension, TimeWindowExtension
 from common.entities.base_entities.zone import Zone
 from common.entities.generator.delivery_request_generator import DeliveryRequestDatasetGenerator, \
@@ -283,9 +285,9 @@ class BasicDeliveryRequestGraphTestCases(unittest.TestCase):
 def create_deliveries_zones() -> List[Zone]:
     return [
         Zone(create_polygon_2d([create_point_2d(100, 50), create_point_2d(100, 150), create_point_2d(200, 150),
-                                create_point_2d(200, 50)])),
+                                create_point_2d(200, 50)]),id = EntityID(uuid=uuid4())),
         Zone(create_polygon_2d([create_point_2d(1100, 150), create_point_2d(1100, 1150), create_point_2d(1200, 1150),
-                                create_point_2d(1200, 150)])),
+                                create_point_2d(1200, 150)]),id = EntityID(uuid=uuid4())),
     ]
 
 

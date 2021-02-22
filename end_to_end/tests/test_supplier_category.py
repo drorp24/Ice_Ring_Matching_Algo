@@ -12,6 +12,8 @@ from end_to_end.distribution.supplier_category_distribution import SupplierCateg
 from end_to_end.supplier_category import SupplierCategory
 from geometry.distribution.geo_distribution import NormalPointsInMultiPolygonDistribution
 from geometry.geo_factory import create_polygon_2d, create_point_2d, create_multipolygon_2d
+from common.entities.base_entities.entity_id import EntityID
+from uuid import uuid4
 
 
 class BasicSupplierCategoryTests(unittest.TestCase):
@@ -62,9 +64,9 @@ def _create_zones(zone_amount: int = 1) -> List[Zone]:
                Zone(create_polygon_2d([create_point_2d(35.03, 31.82),
                                        create_point_2d(35.03, 32.01),
                                        create_point_2d(35.3, 32.01),
-                                       create_point_2d(35.3, 31.82)])),
+                                       create_point_2d(35.3, 31.82)]),id = EntityID(uuid=uuid4())),
                Zone(create_polygon_2d([create_point_2d(35.03, 32.01),
                                        create_point_2d(35.09, 32.18),
                                        create_point_2d(35.3, 32.18),
-                                       create_point_2d(35.3, 32.01)]))
+                                       create_point_2d(35.3, 32.01)]),id = EntityID(uuid=uuid4()))
            ][0:zone_amount]
