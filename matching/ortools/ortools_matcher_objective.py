@@ -15,6 +15,12 @@ class ORToolsMatcherObjective:
     def add_priority(self):
         priority_callback_index = self._routing_model.RegisterPositiveUnaryTransitCallback(self._get_priority_callback)
         self._routing_model.SetArcCostEvaluatorOfAllVehicles(priority_callback_index)
+        self._routing_model.AddDimension(
+            priority_callback_index,
+            0,
+            1000,
+            True,
+            'priority')
 
     def _get_priority_callback(self, from_index):
         from_node = self._index_manager.IndexToNode(from_index)

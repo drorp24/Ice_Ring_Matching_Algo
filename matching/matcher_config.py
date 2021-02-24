@@ -1,17 +1,19 @@
 from common.entities.base_entities.base_entity import JsonableBaseEntity
 from common.entities.base_entities.temporal import DateTimeExtension
 from matching.constraint_config import ConstraintsConfig
+from matching.monitor_config import MonitorConfig
 from matching.solver_config import SolverConfig
 from matching.solver_factory import create_solver_config
 
 
 class MatcherConfig(JsonableBaseEntity):
     def __init__(self, zero_time: DateTimeExtension, solver: SolverConfig, constraints: ConstraintsConfig,
-                 unmatched_penalty: int):
+                 unmatched_penalty: int, monitor: MonitorConfig):
         self._zero_time = zero_time
         self._solver = solver
         self._constraints = constraints
         self._unmatched_penalty = unmatched_penalty
+        self._monitor = monitor
 
     @classmethod
     def dict_to_obj(cls, dict_input):
@@ -21,7 +23,8 @@ class MatcherConfig(JsonableBaseEntity):
             zero_time=DateTimeExtension.from_dict(dict_input["zero_time"]),
             solver=create_solver_config(dict_input["solver"]),
             constraints=ConstraintsConfig.dict_to_obj(dict_input["constraints"]),
-            unmatched_penalty=dict_input["unmatched_penalty"])
+            unmatched_penalty=dict_input["unmatched_penalty"],
+            monitor=MonitorConfig.dict_to_obj(dict_input["monitor"]))
 
     @property
     def zero_time(self) -> DateTimeExtension:
@@ -38,6 +41,10 @@ class MatcherConfig(JsonableBaseEntity):
     @property
     def unmatched_penalty(self) -> int:
         return self._unmatched_penalty
+
+    @property
+    def monitor(self) -> MonitorConfig:
+        return self._monitor
 
     def __eq__(self, other):
         return (self.zero_time == other.zero_time) and \

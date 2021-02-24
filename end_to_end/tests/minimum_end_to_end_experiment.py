@@ -100,17 +100,17 @@ class BasicMinimumEnd2EndExperiment:
 
     def test_small_scenario(self):
         start_time = datetime.now()
-        empty_drone_delivery_board = _create_empty_drone_delivery_board(amount=20)
+        empty_drone_delivery_board = _create_empty_drone_delivery_board(amount=16)
         print("--- _create_empty_drone_delivery_board run time: %s  ---" % (datetime.now() - start_time))
         start_time = datetime.now()
 
         scenario = self.scenario_distribution.choose_rand(random=Random(10),
-                                                          amount={DeliveryRequest: 37, DroneLoadingDock: 1})
+                                                          amount={DeliveryRequest: 100, DroneLoadingDock: 1})
         fully_connected_graph = create_fully_connected_graph_model(scenario)
         print("--- create_fully_connected_graph_model run time: %s  ---" % (datetime.now() - start_time))
         start_time = datetime.now()
 
-        match_config_file_path = 'jsons/test_matcher_config.json'
+        match_config_file_path = 'end_to_end/tests/jsons/test_matcher_config.json'
         # end_to_end/tests/jsons/test_matcher_config.json
         match_config = MatcherConfig.dict_to_obj(MatcherConfig.json_to_dict(match_config_file_path))
         matcher_input = MatcherInput(graph=fully_connected_graph, empty_board=empty_drone_delivery_board,

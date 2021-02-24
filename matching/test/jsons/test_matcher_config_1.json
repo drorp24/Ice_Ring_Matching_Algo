@@ -37,7 +37,15 @@
         "count_priority_from_zero": true
       }
     },
-    "unmatched_penalty": 5
+    "unmatched_penalty": 5,
+  "monitor": {
+    "__class__": "MonitorConfig",
+    "enabled": true,
+    "min_iterations": 100000,
+    "save_data": true,
+    "plot_data": true,
+    "output_directory" : "outputs"
+  }
  }
 
 

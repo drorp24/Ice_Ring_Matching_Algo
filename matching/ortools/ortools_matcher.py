@@ -11,11 +11,14 @@ from common.entities.base_entities.temporal import TimeDeltaExtension, TimeWindo
 from common.graph.operational.export_ortools_graph import OrtoolsGraphExporter
 from matching.matcher import Matcher
 from matching.matcher_input import MatcherInput
+from matching.monitor_plotter import create_monitor_figure
 from matching.ortools.ortools_matcher_constraints import ORToolsMatcherConstraints, OrToolsDimensionDescription
+from matching.ortools.ortools_matcher_monitor import ORToolsMatcherMonitor
 from matching.ortools.ortools_matcher_objective import ORToolsMatcherObjective
 
 
 class ORToolsMatcher(Matcher):
+    solutions = []
 
     def __init__(self, matcher_input: MatcherInput):
         super().__init__(matcher_input)
@@ -27,9 +30,11 @@ class ORToolsMatcher(Matcher):
 
         self._set_objective()
         self._set_constraints()
+        self._set_monitor()
 
     def match(self) -> DroneDeliveryBoard:
         solution = self._routing_model.SolveWithParameters(self._search_parameters)
+        self._save_monitor_data()
         return self._create_drone_delivery_board(solution)
 
     def _set_index_manager(self) -> RoutingIndexManager:
@@ -69,6 +74,21 @@ class ORToolsMatcher(Matcher):
         matcher_constraints.add_demand()
         matcher_constraints.add_time()
         matcher_constraints.add_unmatched_penalty()
+
+    def _set_monitor(self):
+        if not self.matcher_input.config.monitor.enabled:
+            return
+
+        self.matcher_monitor = ORToolsMatcherMonitor(self._index_manager, self._routing_model, self._search_parameters,
+                                                     self.matcher_input)
+        self.matcher_monitor.add_search_monitor()
+
+    def _save_monitor_data(self):
+        monitor_config = self.matcher_input.config.monitor
+        if not monitor_config.enabled or not (monitor_config.save_data or monitor_config.plot_data):
+            return
+
+        create_monitor_figure(self.matcher_monitor.monitor, self.matcher_input)
 
     def _create_drone_delivery_board(self, solution: Assignment) -> DroneDeliveryBoard:
 
