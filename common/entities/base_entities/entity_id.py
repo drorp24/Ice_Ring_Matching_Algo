@@ -1,4 +1,4 @@
-from uuid import UUID
+import uuid
 from typing import Union
 
 from common.entities.base_entities.base_entity import JsonableBaseEntity
@@ -7,7 +7,7 @@ from common.utils import uuid_utils
 
 class EntityID(JsonableBaseEntity):
 
-    def __init__(self, uuid: Union[UUID,str]):
+    def __init__(self, uuid: Union[uuid.UUID,str]):
         self._uuid = uuid
         self._internal_type = uuid.__class__.__name__
 
@@ -18,6 +18,10 @@ class EntityID(JsonableBaseEntity):
     @property
     def internal_type(self):
         return self._internal_type
+
+    @classmethod
+    def generate_uuid(cls):
+        return EntityID(uuid.uuid4())
 
     @classmethod
     def dict_to_obj(cls, dict_input):
