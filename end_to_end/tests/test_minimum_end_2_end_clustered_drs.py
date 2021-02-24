@@ -167,11 +167,11 @@ def _create_zones(zone_amount: int = 1) -> List[Zone]:
                Zone(create_polygon_2d([create_point_2d(35.03, 31.82),
                                        create_point_2d(35.03, 32.01),
                                        create_point_2d(35.3, 32.01),
-                                       create_point_2d(35.3, 31.82)]),id = EntityID(uuid=uuid4())),
+                                       create_point_2d(35.3, 31.82)]),id = EntityID.generate_uuid()),
                Zone(create_polygon_2d([create_point_2d(35.03, 32.01),
                                        create_point_2d(35.09, 32.18),
                                        create_point_2d(35.3, 32.18),
-                                       create_point_2d(35.3, 32.01)]),id = EntityID(uuid=uuid4()))
+                                       create_point_2d(35.3, 32.01)]),id = EntityID.generate_uuid())
            ][0:zone_amount]
 
 

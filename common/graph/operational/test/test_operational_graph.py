@@ -285,9 +285,9 @@ class BasicDeliveryRequestGraphTestCases(unittest.TestCase):
 def create_deliveries_zones() -> List[Zone]:
     return [
         Zone(create_polygon_2d([create_point_2d(100, 50), create_point_2d(100, 150), create_point_2d(200, 150),
-                                create_point_2d(200, 50)]),id = EntityID(uuid=uuid4())),
+                                create_point_2d(200, 50)]),id = EntityID.generate_uuid()),
         Zone(create_polygon_2d([create_point_2d(1100, 150), create_point_2d(1100, 1150), create_point_2d(1200, 1150),
-                                create_point_2d(1200, 150)]),id = EntityID(uuid=uuid4())),
+                                create_point_2d(1200, 150)]),id = EntityID.generate_uuid()),
     ]
 
 
