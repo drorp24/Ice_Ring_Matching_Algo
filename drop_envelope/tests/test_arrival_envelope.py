@@ -47,7 +47,7 @@ class BasicArrivalEnvelopeTestCase(unittest.TestCase):
         self.assertEqual(arrival_envelopes[2], potential_arrival_envelope.arrival_envelopes[arrival_azimuths[2]])
         self.assertEqual(arrival_envelopes[3], potential_arrival_envelope.arrival_envelopes[arrival_azimuths[3]])
 
-    def test_cal_cost(self):
+    def test_calc_cost(self):
         arrival_azimuths_1 = list(map(lambda value: Angle(value=value, unit=AngleUnit.DEGREE), list(range(0, 360, 45))))
         arrival_envelopes_1 = list(
             map(lambda arrival_azimuth: ArrivalEnvelope.from_maneuver_angle(centroid=self.centroid,

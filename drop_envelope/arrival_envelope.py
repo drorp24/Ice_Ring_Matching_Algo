@@ -1,14 +1,14 @@
-import sys
 from math import cos, sin
 from typing import List, Dict, Union
 from common.math.angle import Angle, AngleUnit
 from geometry.geo2d import Point2D, Polygon2D, EmptyGeometry2D
 from geometry.geo_factory import create_point_2d, create_polygon_2d, create_empty_geometry_2d
-import numpy as np
+import itertools
 
 
 class ArrivalEnvelope:
-    def __init__(self, arrival_azimuth: Angle, repr_point: Point2D, maneuver_polygon: Union[Polygon2D, EmptyGeometry2D]):
+    def __init__(self, arrival_azimuth: Angle, repr_point: Point2D,
+                 maneuver_polygon: Union[Polygon2D, EmptyGeometry2D]):
         self._arrival_azimuth = arrival_azimuth
         self._repr_point = repr_point
         self._maneuver_polygon = maneuver_polygon
@@ -47,8 +47,8 @@ class ArrivalEnvelope:
     def maneuver_polygon(self) -> Union[Polygon2D, EmptyGeometry2D]:
         return self._maneuver_polygon
 
-    def calc_cost(self, other) -> float:
-        return self._repr_point.calc_distance_to_point(other.repr_point)
+    def calc_cost(self, other_arrival_envelope) -> float:
+        return self._repr_point.calc_distance_to_point(other_arrival_envelope.repr_point)
 
     def contains(self, point: Point2D) -> bool:
         if isinstance(self.maneuver_polygon, EmptyGeometry2D):
@@ -88,16 +88,9 @@ class PotentialArrivalEnvelope:
 
 def calc_cost(potential_arrival_envelope_1: PotentialArrivalEnvelope,
               potential_arrival_envelope_2: PotentialArrivalEnvelope) -> float:
-
-    arrival_envelopes_1 = potential_arrival_envelope_1.arrival_envelopes.values()
-    arrival_envelopes_2 = potential_arrival_envelope_2.arrival_envelopes.values()
-    costs = np.empty((len(arrival_envelopes_1), len(arrival_envelopes_2)))
-    costs.fill(sys.maxsize)
-    for i, origin_envelope in enumerate(arrival_envelopes_1):
-        for j, destination_envelope in enumerate(arrival_envelopes_2):
-            costs[i, j] =origin_envelope.calc_cost(destination_envelope) +\
-                         origin_envelope.calc_cost(destination_envelope) * \
-                         (1-cos(origin_envelope.arrival_azimuth.radians - destination_envelope.arrival_azimuth.radians))
-    return np.min(costs)
-
-
+    arrival_envelopes_tuples = itertools.product(*[potential_arrival_envelope_1.arrival_envelopes.values(),
+                                                   potential_arrival_envelope_2.arrival_envelopes.values()])
+    costs = list(map(lambda ar_tuple: ar_tuple[0].calc_cost(ar_tuple[1]) *
+                                      (2 - cos(ar_tuple[0].arrival_azimuth.radians -
+                                               ar_tuple[1].arrival_azimuth.radians)), arrival_envelopes_tuples))
+    return min(costs)

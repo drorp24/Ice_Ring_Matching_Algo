@@ -13,7 +13,7 @@ from common.entities.base_entities.package import PackageType
 from common.entities.base_entities.package_delivery_plan import PackageDeliveryPlan
 from common.math.angle import Angle, AngleUnit, ChoicesAngleDistribution
 from drop_envelope.azimuth_quantization import get_azimuth_quantization_values
-from drop_envelope.envelope_factory import create_delivery_request_envelope
+from drop_envelope.delivery_request_envelope import DeliveryRequestPotentialEnvelope
 from drop_envelope.slide_service import MockSlidesServiceWrapper
 from geometry.distribution.geo_distribution import NormalPointDistribution
 from geometry.geo_factory import create_point_2d
@@ -55,7 +55,7 @@ class BasicDeliveryRequestEnvelope(unittest.TestCase):
         dr = self.dr_distribution.choose_rand(random=Random(),
                                               amount={DeliveryRequest: 1, DeliveryOption: 1, CustomerDelivery: 1,
                                                       PackageDeliveryPlan: 2})
-        dr_potential_envelope = create_delivery_request_envelope(dr[0])
+        dr_potential_envelope = DeliveryRequestPotentialEnvelope.from_delivery_request(dr[0])
         potential_drop_envelopes = dr_potential_envelope.potential_drop_envelopes
         legend_names = []
         legend_colors = []
@@ -93,7 +93,7 @@ class BasicDeliveryRequestEnvelope(unittest.TestCase):
         dr = self.dr_distribution.choose_rand(random=Random(10),
                                               amount={DeliveryRequest: 1, DeliveryOption: 1, CustomerDelivery: 1,
                                                       PackageDeliveryPlan: 2})
-        dr_potential_envelope = create_delivery_request_envelope(dr[0])
+        dr_potential_envelope = DeliveryRequestPotentialEnvelope.from_delivery_request(dr[0])
         potential_drop_envelopes = dr_potential_envelope.potential_drop_envelopes
         self.assertEqual(len(potential_drop_envelopes), 2)
         self.assertAlmostEqual(dr_potential_envelope.centroid().x, 12.735, delta=0.001)
@@ -103,7 +103,7 @@ class BasicDeliveryRequestEnvelope(unittest.TestCase):
         dr = self.dr_distribution.choose_rand(random=Random(12),
                                               amount={DeliveryRequest: 1, DeliveryOption: 1, CustomerDelivery: 1,
                                                       PackageDeliveryPlan: 2})
-        dr_potential_envelope = create_delivery_request_envelope(dr[0])
+        dr_potential_envelope = DeliveryRequestPotentialEnvelope.from_delivery_request(dr[0])
         maneuver_angle = Angle(value=90, unit=AngleUnit.DEGREE)
         potential_arrival_envelope = dr_potential_envelope.get_potential_arrival_envelope(
             get_azimuth_quantization_values(MockSlidesServiceWrapper.drone_azimuth_level_amount),
