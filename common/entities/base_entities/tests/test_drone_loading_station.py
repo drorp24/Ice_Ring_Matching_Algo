@@ -35,8 +35,8 @@ class BasicDroneLoadingStationGenerationTests(unittest.TestCase):
         station = drone_loading_station_distribution.choose_rand(random=Random(100), amount=1)[0]
         self.assertGreaterEqual(station.calc_location().x, 5)
         self.assertGreaterEqual(station.calc_location().y, 5)
-        polygon = station.get_shape()
-        self.assertEqual(create_empty_geometry_2d(), polygon)
+        location = station.get_shape()
+        self.assertEqual(station.location, location)
         self.assertEqual(station.calc_area(), 0)
 
 

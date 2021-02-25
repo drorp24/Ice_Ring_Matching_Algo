@@ -36,7 +36,7 @@ class Shapeable(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def get_shape(self) -> Union[Polygon2D, EmptyGeometry2D]:
+    def get_shape(self) -> Union[Polygon2D, Point2D]:
         raise NotImplementedError
 
     @abstractmethod

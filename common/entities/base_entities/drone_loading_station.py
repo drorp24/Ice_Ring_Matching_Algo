@@ -1,6 +1,6 @@
 from common.entities.base_entities.base_entity import JsonableBaseEntity
-from geometry.geo2d import Point2D, EmptyGeometry2D
-from geometry.geo_factory import convert_dict_to_point_2d, create_empty_geometry_2d
+from geometry.geo2d import Point2D
+from geometry.geo_factory import convert_dict_to_point_2d
 from geometry.utils import Shapeable
 
 
@@ -27,8 +27,8 @@ class DroneLoadingStation(JsonableBaseEntity, Shapeable):
     def calc_location(self) -> Point2D:
         return self.location
 
-    def get_shape(self) -> EmptyGeometry2D:
-        return create_empty_geometry_2d()
+    def get_shape(self) -> Point2D:
+        return self.location
 
     def calc_area(self) -> float:
         return 0
