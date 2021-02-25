@@ -64,10 +64,10 @@ class DroneLoadingDock(JsonableBaseEntity, Localizable, Temporal, ShapeableColle
                                 drone_type=DroneType.dict_to_obj(dict_input['drone_type']),
                                 time_window=TimeWindowExtension.dict_to_obj(dict_input['time_window']))
 
-    def shapeabls(self) -> List[Shapeable]:
+    def get_shapeabls(self) -> List[Shapeable]:
         return [self.drone_loading_station]
 
-    def centroid(self) -> Point2D:
+    def get_centroid(self) -> Point2D:
         return self.drone_loading_station.calc_location()
 
 

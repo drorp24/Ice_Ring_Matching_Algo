@@ -14,9 +14,9 @@ class LoadingDockPotentialEnvelope(PotentialEnvelopeCollection):
     def loading_dock(self) -> DroneLoadingDock:
         return self._loading_dock
 
-    def shapeable_collection(self) -> List[ShapeableCollection]:
+    def get_shapeable_collection(self) -> List[ShapeableCollection]:
         return [self.loading_dock]
 
-    def centroid(self) -> Point2D:
+    def get_centroid(self) -> Point2D:
         return self.loading_dock.calc_location()
 

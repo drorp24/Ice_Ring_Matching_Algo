@@ -10,23 +10,23 @@ from geometry.utils import Shapeable
 class ShapeableCollection:
 
     @abstractmethod
-    def shapeabls(self) -> List[Shapeable]:
+    def get_shapeabls(self) -> List[Shapeable]:
         raise NotImplementedError
 
     @abstractmethod
-    def centroid(self) -> Point2D:
+    def get_centroid(self) -> Point2D:
         raise NotImplementedError
 
     def get_shapeabls_centroids(self) -> List[Point2D]:
-        centroids = [shapeable.calc_location() for shapeable in self.shapeabls()]
+        centroids = [shapeable.calc_location() for shapeable in self.get_shapeabls()]
         return centroids
 
     def __iter__(self):
         return ShapeableCollectionIterator(self)
 
     def __getitem__(self, shpaeable_index) -> Shapeable:
-        assert shpaeable_index >= 0 or shpaeable_index < len(self.shapeabls())
-        return self.shapeabls()[shpaeable_index]
+        assert shpaeable_index >= 0 or shpaeable_index < len(self.get_shapeabls())
+        return self.get_shapeabls()[shpaeable_index]
 
 
 class ShapeableCollectionIterator:
@@ -35,8 +35,8 @@ class ShapeableCollectionIterator:
         self._index = 0
 
     def __next__(self) -> Shapeable:
-        if self._index < len(self._shapeable_collection.shapeabls()):
-            result = self._shapeable_collection.shapeabls()[self._index]
+        if self._index < len(self._shapeable_collection.get_shapeabls()):
+            result = self._shapeable_collection.get_shapeabls()[self._index]
             self._index += 1
             return result
         raise StopIteration
@@ -45,19 +45,25 @@ class ShapeableCollectionIterator:
 class PotentialEnvelopeCollection:
 
     @abstractmethod
-    def shapeable_collection(self) -> List[ShapeableCollection]:
+    def get_shapeable_collection(self) -> List[ShapeableCollection]:
         raise NotImplementedError
 
     @abstractmethod
-    def centroid(self) -> Point2D:
+    def get_centroid(self) -> Point2D:
         raise NotImplementedError
+
+    def get_largest_distance_from_centroid(self) -> float:
+        distances = list(
+            map(lambda collection: max(list(
+                map(lambda shapeable: self.get_centroid().calc_distance_to_point(shapeable.calc_location()), collection))),
+                self.get_shapeable_collection()))
+        return max(distances)
 
     def get_potential_arrival_envelope(self, arrival_azimuths: List[Angle], maneuver_angle: Angle) -> \
             PotentialArrivalEnvelope:
-        centroid = self.centroid()
-        max_radius = get_max_distance(external_point=centroid,
-                                      potential_envelope_collection=self)
-        centroid_collection = [collection.get_shapeabls_centroids() for collection in self.shapeable_collection()]
+        centroid = self.get_centroid()
+        max_radius = self.get_largest_distance_from_centroid()
+        centroid_collection = [collection.get_shapeabls_centroids() for collection in self.get_shapeable_collection()]
         arrival_envelopes = list(filter(lambda arrival_envelope: arrival_envelope.contains_all(centroid_collection),
                                         map(lambda arrival_azimuth:
                                             ArrivalEnvelope.from_maneuver_angle(centroid=centroid,
@@ -71,8 +77,8 @@ class PotentialEnvelopeCollection:
         return PotentialEnvelopeCollectionIterator(self)
 
     def __getitem__(self, shapeable_collection_index) -> ShapeableCollection:
-        assert shapeable_collection_index >= 0 or shapeable_collection_index < len(self.shapeable_collection())
-        return self.shapeable_collection()[shapeable_collection_index]
+        assert shapeable_collection_index >= 0 or shapeable_collection_index < len(self.get_shapeable_collection())
+        return self.get_shapeable_collection()[shapeable_collection_index]
 
 
 class PotentialEnvelopeCollectionIterator:
@@ -81,16 +87,8 @@ class PotentialEnvelopeCollectionIterator:
         self._index = 0
 
     def __next__(self) -> ShapeableCollection:
-        if self._index < len(self._potential_envelope_collection.shapeable_collection()):
-            result = self._potential_envelope_collection.shapeable_collection()[self._index]
+        if self._index < len(self._potential_envelope_collection.get_shapeable_collection()):
+            result = self._potential_envelope_collection.get_shapeable_collection()[self._index]
             self._index += 1
             return result
         raise StopIteration
-
-
-def get_max_distance(external_point: Point2D, potential_envelope_collection: PotentialEnvelopeCollection) -> float:
-    distances = list(
-        map(lambda collection: max(list(
-            map(lambda shapeable: external_point.calc_distance_to_point(shapeable.calc_location()), collection))),
-            potential_envelope_collection))
-    return max(distances)

@@ -41,8 +41,8 @@ class BasicLoadingDockEnvelope(unittest.TestCase):
                                delta=0.01)
         self.assertAlmostEqual(loading_dock_potential_envelope.loading_dock.drone_loading_station.location.y, 65.74725,
                                delta=0.01)
-        self.assertAlmostEqual(loading_dock_potential_envelope.centroid().x, 47.45706, delta=0.01)
-        self.assertAlmostEqual(loading_dock_potential_envelope.centroid().y, 65.74725, delta=0.01)
+        self.assertAlmostEqual(loading_dock_potential_envelope.get_centroid().x, 47.45706, delta=0.01)
+        self.assertAlmostEqual(loading_dock_potential_envelope.get_centroid().y, 65.74725, delta=0.01)
         self.assertEqual(len(potential_arrival_envelope.arrival_envelopes), 8)
         self.assertAlmostEqual(list(potential_arrival_envelope.arrival_envelopes.values())[0].repr_point.x, 47.45706,
                                delta=0.01)

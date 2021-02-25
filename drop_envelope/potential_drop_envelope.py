@@ -17,7 +17,7 @@ class PotentialDropEnvelopes(ShapeableCollection):
                  drop_envelopes: List[DropEnvelope]):
         self._drop_point = drop_point
         self._drop_azimuth = drop_azimuth
-        self._internal_envelopes = {drop_envelope.drone_azimuth: drop_envelope for drop_envelope in drop_envelopes}
+        self._internal_envelopes = drop_envelopes
 
     @classmethod
     def from_drop_envelope_properties(cls, drop_azimuth: Optional.of(Angle), package_type: PackageType,
@@ -52,10 +52,10 @@ class PotentialDropEnvelopes(ShapeableCollection):
 
     @property
     def envelopes(self) -> List[DropEnvelope]:
-        return list(self._internal_envelopes.values())
+        return self._internal_envelopes
 
-    def shapeabls(self) -> List[Shapeable]:
+    def get_shapeabls(self) -> List[Shapeable]:
         return self.envelopes
 
-    def centroid(self) -> Point2D:
+    def get_centroid(self) -> Point2D:
         return self.drop_point

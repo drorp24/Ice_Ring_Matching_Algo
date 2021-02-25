@@ -25,12 +25,16 @@ class DeliveryRequestPotentialEnvelope(PotentialEnvelopeCollection):
         return DeliveryRequestPotentialEnvelope(potential_drop_envelopes=dr_potential_drop_envelopes,
                                                 centroid=delivery_request.calc_location())
 
+    @property
     def centroid(self) -> Point2D:
         return self._centroid
+
+    def get_centroid(self) -> Point2D:
+        return self.centroid
 
     @property
     def potential_drop_envelopes(self) -> List[PotentialDropEnvelopes]:
         return self._potential_drop_envelopes
 
-    def shapeable_collection(self) -> List[ShapeableCollection]:
+    def get_shapeable_collection(self) -> List[ShapeableCollection]:
         return self.potential_drop_envelopes
