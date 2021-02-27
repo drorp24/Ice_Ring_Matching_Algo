@@ -29,7 +29,7 @@ class Experiment:
         return self._supplier_category
 
     @property
-    def empty_drone_delivery(self):
+    def empty_drone_delivery_board(self):
         return self._empty_drone_delivery
 
     @property
@@ -58,7 +58,7 @@ class Experiment:
 
     def __eq__(self, other):
         return self.supplier_category == other.supplier_category \
-               and self.empty_drone_delivery == other.empty_drone_delivery \
+               and self.empty_drone_delivery_board == other.empty_drone_delivery_board \
                and self.matcher_config == other.matcher_config
 
 

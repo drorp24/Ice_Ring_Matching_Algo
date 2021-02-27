@@ -73,20 +73,19 @@ class CapacityConstraints(JsonableBaseEntity):
 
 
 class ConstraintsConfig(JsonableBaseEntity):
-    def __init__(self, capacity_constraints: CapacityConstraints, time_constraints: TimeConstraints,
-                 priority_constraints: PriorityConstraints):
-        self._capacity_constraints = capacity_constraints
-        self._time_constraints = time_constraints
-        self._priority_constraints = priority_constraints
+    def __init__(self, capacity: CapacityConstraints, time: TimeConstraints, priority: PriorityConstraints):
+        self._capacity_constraints = capacity
+        self._time_constraints = time
+        self._priority_constraints = priority
 
     @classmethod
     def dict_to_obj(cls, dict_input):
         assert (dict_input['__class__'] == cls.__name__)
 
         return ConstraintsConfig(
-            capacity_constraints=CapacityConstraints.dict_to_obj(dict_input["capacity"]),
-            time_constraints=TimeConstraints.dict_to_obj(dict_input["time"]),
-            priority_constraints=PriorityConstraints.dict_to_obj(dict_input["priority"]))
+            capacity=CapacityConstraints.dict_to_obj(dict_input["capacity"]),
+            time=TimeConstraints.dict_to_obj(dict_input["time"]),
+            priority=PriorityConstraints.dict_to_obj(dict_input["priority"]))
 
     @property
     def capacity(self) -> CapacityConstraints:

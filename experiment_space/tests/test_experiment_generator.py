@@ -1,0 +1,70 @@
+import unittest
+
+from common.entities.base_entities.fleet.empty_drone_delivery_board_generation import build_empty_drone_delivery_board
+from common.entities.base_entities.fleet.fleet_property_sets import DroneSetProperties
+from experiment_space.experiment import Experiment
+from experiment_space.experiment_generator import create_options_class, ExperimentOptions
+from experiment_space.graph_creation_algorithm import FullyConnectedGraphAlgorithm
+from experiment_space.supplier_category import SupplierCategory
+from matching.matcher_config import MatcherConfig
+
+
+class BasicExperimentGeneratorTest(unittest.TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        supplier_category_path = '/Users/gilbaz/Code/Ice_Ring/experiment_space/tests/jsons/test_supplier_category.json'
+        supplier_category = SupplierCategory.from_json(SupplierCategory, supplier_category_path)
+        matcher_config_path = '/Users/gilbaz/Code/Ice_Ring/experiment_space/tests/jsons/test_matcher_config.json'
+        matcher_config = MatcherConfig.from_json(MatcherConfig, matcher_config_path)
+        drone_set_properties_path = '/Users/gilbaz/Code/Ice_Ring/experiment_space/tests/jsons/test_drone_set_properties.json'
+        drone_set_properties = DroneSetProperties.from_json(DroneSetProperties, drone_set_properties_path)
+        empty_drone_delivery_board = build_empty_drone_delivery_board(drone_set_properties,
+                                                                      max_route_time_entire_board=400,
+                                                                      velocity_entire_board=10.0)
+        default_graph_creation_algorithm = FullyConnectedGraphAlgorithm()
+        cls.base_experiment = Experiment(supplier_category=supplier_category,
+                                         matcher_config=matcher_config,
+                                         empty_drone_delivery_board=empty_drone_delivery_board,
+                                         graph_creation_algorithm=default_graph_creation_algorithm)
+
+    def test_experiment_generator_cartesian_samples_without_changes_maps_back_to_self(self):
+        base_experiment_options = create_options_class(self.base_experiment, ['SupplierCategory', 'MatcherConfig'])
+        sample = ExperimentOptions.calc_cartesian_product(base_experiment_options)
+        self.assertEqual(sample[0], self.base_experiment)
+
+    def test_experiment_generator_random_sample_without_changes_maps_back_to_self(self):
+        base_experiment_options = create_options_class(self.base_experiment, ['SupplierCategory', 'MatcherConfig'])
+        sample = ExperimentOptions.calc_random_k(base_experiment_options, 1)
+        self.assertEqual(sample[0], self.base_experiment)
+
+    def test_experiment_generator_random_k_samples_without_changes_maps_back_to_self(self):
+        base_experiment_options = create_options_class(self.base_experiment, ['SupplierCategory', 'MatcherConfig'])
+        samples = ExperimentOptions.calc_random_k(base_experiment_options, 10)
+        for sample in samples:
+            self.assertEqual(sample, self.base_experiment)
+
+    def test_experiment_generator_cartesian_product_with_added_zones_and_unmatched_penalty(self):
+        base_experiment_options = create_options_class(self.base_experiment, ['SupplierCategory', 'MatcherConfig'])
+        base_experiment_options.supplier_category[0].zones.append('a')
+        base_experiment_options.supplier_category[0].zones.append('b')
+        base_experiment_options.matcher_config[0].unmatched_penalty.append(1000)
+        base_experiment_options.matcher_config[0].unmatched_penalty.append(2000)
+        base_experiment_options.matcher_config[0].unmatched_penalty.append(5000)
+        base_experiment_options.matcher_config[0].unmatched_penalty.append(10000)
+        base_experiment_options.matcher_config[0].unmatched_penalty.append(50000)
+        samples = ExperimentOptions.calc_cartesian_product(base_experiment_options)
+        self.assertEqual(len(samples), len(base_experiment_options.supplier_category[0].zones) *
+                         len(base_experiment_options.matcher_config[0].unmatched_penalty))
+
+    def test_experiment_generator_random_sample_with_added_zones_and_unmatched_penalty(self):
+        base_experiment_options = create_options_class(self.base_experiment, ['SupplierCategory', 'MatcherConfig'])
+        base_experiment_options.supplier_category[0].zones.append('a')
+        base_experiment_options.supplier_category[0].zones.append('b')
+        base_experiment_options.matcher_config[0].unmatched_penalty.append(1000)
+        base_experiment_options.matcher_config[0].unmatched_penalty.append(2000)
+        base_experiment_options.matcher_config[0].unmatched_penalty.append(5000)
+        base_experiment_options.matcher_config[0].unmatched_penalty.append(10000)
+        base_experiment_options.matcher_config[0].unmatched_penalty.append(50000)
+        samples = ExperimentOptions.calc_random_k(base_experiment_options, 50)
+        self.assertEqual(len(samples), 50)

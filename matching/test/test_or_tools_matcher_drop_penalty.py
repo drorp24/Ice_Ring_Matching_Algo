@@ -126,11 +126,11 @@ class ORToolsMatcherDropPenaltyTestCase(TestCase):
             solver=ORToolsSolverConfig(SolverVendor.OR_TOOLS, first_solution_strategy="path_cheapest_arc",
                                        local_search_strategy="automatic", timeout_sec=30),
             constraints=ConstraintsConfig(
-                capacity_constraints=CapacityConstraints(count_capacity_from_zero=True),
-                time_constraints=TimeConstraints(max_waiting_time=10,
-                                                 max_route_time=300,
-                                                 count_time_from_zero=False),
-                priority_constraints=PriorityConstraints(True)),
+                capacity=CapacityConstraints(count_capacity_from_zero=True),
+                time=TimeConstraints(max_waiting_time=10,
+                                     max_route_time=300,
+                                     count_time_from_zero=False),
+                priority=PriorityConstraints(True)),
             unmatched_penalty=0)
 
     @staticmethod

@@ -127,7 +127,7 @@ class PackageConfiguration(Enum):
         return DroneType[split_name[1]]
 
     def __dict__(self):
-        return {'__enum__': str(self.__dict__())}
+        return {'__enum__': str(self.value.__dict__())}
 
     def __repr__(self):
         return 'PackageConfiguration: ' + str(self.__dict__())
