@@ -16,11 +16,6 @@ class UnmatchedDeliveryRequestsAnalyzer(QuantitativeAnalyzer):
     def _calc_amount_of_unmatched_delivery_requests(delivery_board):
         return len(delivery_board.unmatched_delivery_requests)
 
-    @classmethod
-    @property
-    def name(cls):
-        return 'unmatched_delivery_requests_amount'
-
 
 class MatchedDeliveryRequestsAnalyzer(QuantitativeAnalyzer):
 
@@ -32,11 +27,6 @@ class MatchedDeliveryRequestsAnalyzer(QuantitativeAnalyzer):
     def _calc_amount_of_matched_delivery_request(delivery_board):
         return sum(list(map(lambda delivery: len(delivery.matched_requests), list(delivery_board.drone_deliveries))))
 
-    @classmethod
-    @property
-    def name(cls):
-        return 'matched_delivery_requests_amount'
-
 
 class MatchPercentageDeliveryRequestAnalyzer(QuantitativeAnalyzer):
 
@@ -45,11 +35,6 @@ class MatchPercentageDeliveryRequestAnalyzer(QuantitativeAnalyzer):
         unmatched_amount = UnmatchedDeliveryRequestsAnalyzer.calc_analysis(delivery_board)
         matched_amount = MatchedDeliveryRequestsAnalyzer.calc_analysis(delivery_board)
         return matched_amount / max(unmatched_amount + matched_amount, 0.0001)
-
-    @classmethod
-    @property
-    def name(cls):
-        return 'matched_delivery_requests_percentage'
 
 
 class TotalWorkTimeAnalyzer(QuantitativeAnalyzer):
@@ -61,11 +46,6 @@ class TotalWorkTimeAnalyzer(QuantitativeAnalyzer):
     @staticmethod
     def _calc_total_work_time_in_minutes(delivery_board: DroneDeliveryBoard) -> float:
         return sum([delivery.get_total_work_time_in_minutes() for delivery in delivery_board.drone_deliveries])
-
-    @classmethod
-    @property
-    def name(cls):
-        return 'total_work_time_in_minutes'
 
 
 class AmountMatchedPerPackageType(Analyzer):
@@ -80,8 +60,3 @@ class AmountMatchedPerPackageType(Analyzer):
         for drone_delivery in delivery_board.drone_deliveries:
             amount_matched_per_package_type.add_to_map(drone_delivery.get_total_package_type_amount_map())
         return amount_matched_per_package_type.package_type_to_amounts
-
-    @classmethod
-    @property
-    def name(cls):
-        return 'amount_matched_per_package_type'

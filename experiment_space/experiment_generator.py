@@ -1,9 +1,9 @@
 import itertools
-from random import choices
+from random import Random
 from typing import List, Union
 
 
-class ExperimentOptions:
+class Options:
 
     def get_first_sample(self):
         d = {k: v[0] for k, v in self.__dict__.items() if k is not 'internal_class' and k[:1] != '_'}
@@ -11,23 +11,25 @@ class ExperimentOptions:
         return a(**d)
 
     def calc_cartesian_product(self):
-        options = ExperimentOptions.to_dict(self)
-        options = {k: [{'internal_list': ExperimentOptions.calc_cartesian_product(i)} if ExperimentOptions.is_options_class(i) else i for i in v] for
-                   k, v in options.items()}
-        options = ExperimentOptions.extract_internal_list(options)
-        items = ExperimentOptions.dict_of_lists_to_generator_of_dicts(options)
+        options = Options.to_dict(self)
+        options = {
+            k: [{'internal_list': Options.calc_cartesian_product(i)} if Options.is_options_class(i) else i for i in v]
+            for k, v in options.items()}
+        options = Options.extract_internal_list(options)
+        items = Options.dict_of_lists_to_generator_of_dicts(options)
         klass = self.__dict__.get('internal_class')
         d_list = list(items)
         return [klass(**d) for d in d_list]
 
-    def calc_random_k(self, amount: int):
-        options = ExperimentOptions.to_dict(self)
-        options = {k: [{'internal_list': ExperimentOptions.calc_random_k(i, amount)} if ExperimentOptions.is_options_class(i) else i for i in v] for
-                   k, v in options.items()}
-        options = ExperimentOptions.extract_internal_list(options)
-        items = ExperimentOptions.dict_of_lists_to_generator_of_dicts(options)
+    def calc_random_k(self, amount: int = 1, random: Random = Random(42)):
+        options = Options.to_dict(self)
+        options = {
+            k: [{'internal_list': Options.calc_random_k(i, amount)} if Options.is_options_class(i) else i for i in v]
+            for k, v in options.items()}
+        options = Options.extract_internal_list(options)
+        items = Options.dict_of_lists_to_generator_of_dicts(options)
         klass = self.__dict__.get('internal_class')
-        d_list = choices(list(items), k=amount)
+        d_list = random.choices(list(items), k=amount)
         return [klass(**d) for d in d_list]
 
     def to_dict(self):
@@ -70,7 +72,7 @@ def calc_internal_extract(base_instance, hierarchical_classes: List[str]):
     return base_instance
 
 
-def create_options_class(base_instance: object, hierarchical_classes: List[str] = []):
+def create_options_class(base_instance: object, hierarchical_classes: List[str] = []) -> Options:
     internal_extracted = {'internal_class': type(base_instance)}
     internal_extracted.update(extract_properties_option_from_class(base_instance, hierarchical_classes))
-    return type(type(base_instance).__name__ + 'Options', (ExperimentOptions,), internal_extracted)
+    return type(type(base_instance).__name__ + 'Options', (Options,), internal_extracted)

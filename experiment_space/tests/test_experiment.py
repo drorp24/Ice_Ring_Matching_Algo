@@ -6,7 +6,8 @@ from common.entities.base_entities.fleet.fleet_property_sets import DroneSetProp
 from experiment_space.analyzer.quantitative_analyzer import MatchedDeliveryRequestsAnalyzer, \
     UnmatchedDeliveryRequestsAnalyzer, MatchPercentageDeliveryRequestAnalyzer, TotalWorkTimeAnalyzer, \
     AmountMatchedPerPackageType
-from experiment_space.experiment import Experiment, MultiExperiment
+from experiment_space.experiment import Experiment
+from experiment_space.experiment_generator import create_options_class, Options
 from experiment_space.graph_creation_algorithm import FullyConnectedGraphAlgorithm, \
     ClusteredDeliveryRequestGraphAlgorithm
 from experiment_space.supplier_category import SupplierCategory
@@ -41,30 +42,39 @@ class BasicExperimentTest(unittest.TestCase):
 
         result_drone_delivery_board = experiment.run_match()
 
-        analyzers_to_run = [MatchedDeliveryRequestsAnalyzer(),
-                            UnmatchedDeliveryRequestsAnalyzer(),
-                            MatchPercentageDeliveryRequestAnalyzer(),
-                            TotalWorkTimeAnalyzer(),
-                            AmountMatchedPerPackageType()]
+        analyzers_to_run = [MatchedDeliveryRequestsAnalyzer,
+                            UnmatchedDeliveryRequestsAnalyzer,
+                            MatchPercentageDeliveryRequestAnalyzer,
+                            TotalWorkTimeAnalyzer,
+                            AmountMatchedPerPackageType]
 
         analysis_results = Experiment.run_analysis_suite(result_drone_delivery_board, analyzers_to_run)
 
-        print(analysis_results)
+        self.assertEqual(list(analysis_results.keys()), [a.__name__ for a in analyzers_to_run])
+        self.assertEqual(type(analysis_results[MatchedDeliveryRequestsAnalyzer.__name__]), int)
+        self.assertEqual(type(analysis_results[UnmatchedDeliveryRequestsAnalyzer.__name__]), int)
+        self.assertEqual(type(analysis_results[MatchPercentageDeliveryRequestAnalyzer.__name__]), float)
+        self.assertEqual(type(analysis_results[MatchedDeliveryRequestsAnalyzer.__name__]), int)
 
     def test_cartesian_product_experiments(self):
-        experiments = MultiExperiment(
-            supplier_categories=[self.supplier_category, self.supplier_category, self.supplier_category],
-            matcher_configs=[self.matcher_config, self.matcher_config],
-            empty_drone_delivery_boards=[self.empty_drone_delivery_board],
-            graph_creation_algorithms=[self.default_graph_creation_algorithm]).calc_cartesian_product_experiments()
+        base_experiment = Experiment(supplier_category=self.supplier_category,
+                                     matcher_config=self.matcher_config,
+                                     empty_drone_delivery_board=self.empty_drone_delivery_board,
+                                     graph_creation_algorithm=self.default_graph_creation_algorithm)
+
+        experiment_options = create_options_class(base_experiment)
+        experiment_options.supplier_category += [self.supplier_category, self.supplier_category]
+        experiment_options.matcher_config += [self.matcher_config]
+
+        experiments = Options.calc_cartesian_product(experiment_options)
 
         result_drone_delivery_boards = [experiment.run_match() for experiment in experiments]
 
-        analyzers_to_run = [MatchedDeliveryRequestsAnalyzer(),
-                            UnmatchedDeliveryRequestsAnalyzer(),
-                            MatchPercentageDeliveryRequestAnalyzer(),
-                            TotalWorkTimeAnalyzer(),
-                            AmountMatchedPerPackageType()]
+        analyzers_to_run = [MatchedDeliveryRequestsAnalyzer,
+                            UnmatchedDeliveryRequestsAnalyzer,
+                            MatchPercentageDeliveryRequestAnalyzer,
+                            TotalWorkTimeAnalyzer,
+                            AmountMatchedPerPackageType]
 
         analysis_results = [Experiment.run_analysis_suite(result, analyzers_to_run) for result in
                             result_drone_delivery_boards]
@@ -73,20 +83,24 @@ class BasicExperimentTest(unittest.TestCase):
         self.assertEqual(len(analysis_results[0].keys()), 5)
 
     def test_random_k_experiments(self):
-        experiments = MultiExperiment(
-            supplier_categories=[self.supplier_category, self.supplier_category, self.supplier_category],
-            matcher_configs=[self.matcher_config, self.matcher_config],
-            empty_drone_delivery_boards=[self.empty_drone_delivery_board],
-            graph_creation_algorithms=[self.default_graph_creation_algorithm]) \
-            .calc_random_k_experiments(random=Random(42), amount=50)
+        base_experiment = Experiment(supplier_category=self.supplier_category,
+                                     matcher_config=self.matcher_config,
+                                     empty_drone_delivery_board=self.empty_drone_delivery_board,
+                                     graph_creation_algorithm=self.default_graph_creation_algorithm)
+
+        experiment_options = create_options_class(base_experiment)
+        experiment_options.supplier_category += [self.supplier_category, self.supplier_category]
+        experiment_options.matcher_config += [self.matcher_config]
+
+        experiments = experiment_options.calc_random_k(experiment_options, amount=50, random=Random(100024))
 
         result_drone_delivery_boards = [experiment.run_match() for experiment in experiments]
 
-        analyzers_to_run = [MatchedDeliveryRequestsAnalyzer(),
-                            UnmatchedDeliveryRequestsAnalyzer(),
-                            MatchPercentageDeliveryRequestAnalyzer(),
-                            TotalWorkTimeAnalyzer(),
-                            AmountMatchedPerPackageType()]
+        analyzers_to_run = [MatchedDeliveryRequestsAnalyzer,
+                            UnmatchedDeliveryRequestsAnalyzer,
+                            MatchPercentageDeliveryRequestAnalyzer,
+                            TotalWorkTimeAnalyzer,
+                            AmountMatchedPerPackageType]
 
         analysis_results = [Experiment.run_analysis_suite(result, analyzers_to_run) for result in
                             result_drone_delivery_boards]
