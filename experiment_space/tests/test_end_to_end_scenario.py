@@ -50,13 +50,13 @@ class BasicMinimumEnd2End(unittest.TestCase):
         delivery_board = e.run_match()
 
         analysis = Experiment.run_analysis_suite(delivery_board,
-                                                 [UnmatchedDeliveryRequestsAnalyzer(),
-                                                  AmountMatchedPerPackageType()])
+                                                 [UnmatchedDeliveryRequestsAnalyzer,
+                                                  AmountMatchedPerPackageType])
 
-        unmatched_delivery_requests = analysis[AmountMatchedPerPackageType.name]
+        unmatched_delivery_requests = analysis[AmountMatchedPerPackageType.__name__]
         self.assertEqual(len(unmatched_delivery_requests), 4)
 
-        amount_per_package_type = analysis[AmountMatchedPerPackageType.name]
+        amount_per_package_type = analysis[AmountMatchedPerPackageType.__name__]
         self.assertEqual(amount_per_package_type.get(PackageType.TINY), 1)
         self.assertEqual(amount_per_package_type.get(PackageType.MEDIUM), 1)
         self.assertEqual(amount_per_package_type.get(PackageType.LARGE), 4)

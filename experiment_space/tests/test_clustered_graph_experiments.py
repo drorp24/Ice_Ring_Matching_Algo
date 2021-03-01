@@ -117,8 +117,8 @@ class BasicMinimumEnd2EndClusteredDrsTest(unittest.TestCase):
             print("--- assert expected values run time: %s  ---" % (datetime.now() - start_time))
 
         delivery_board = self._run_match_experiment(graph_algorithm, drone_deliveries_amount, supplier_category)
-        analysis = Experiment.run_analysis_suite(delivery_board, [MatchedDeliveryRequestsAnalyzer()])
-        self.assertGreater(analysis[MatchedDeliveryRequestsAnalyzer.name], 0)
+        analysis = Experiment.run_analysis_suite(delivery_board, [MatchedDeliveryRequestsAnalyzer])
+        self.assertGreater(analysis[MatchedDeliveryRequestsAnalyzer.__name__], 0)
 
         if draw_match:
             draw_matched_scenario(delivery_board, clustered_graph, supplier_category, self.mapImage)
