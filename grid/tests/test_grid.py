@@ -141,7 +141,7 @@ def create_inf_dist_dr_data_set() -> List[DeliveryRequest]:
                            time_window=TimeWindowExtension(
                                DateTimeExtension(dt_date=date(2021, 1, 1), dt_time=time(6, 0, 0)),
                                DateTimeExtension(dt_date=date(2021, 1, 1), dt_time=time(6, 0, 0))),
-                           priority=1)
+                           priority=1,id=EntityID.generate_uuid())
 
     pdp_2 = PackageDeliveryPlan(id=EntityID(UUID(int=44)),
                                 drop_point=create_point_2d(30, 40),
@@ -155,5 +155,5 @@ def create_inf_dist_dr_data_set() -> List[DeliveryRequest]:
                            time_window=TimeWindowExtension(
                                DateTimeExtension(dt_date=date(2021, 1, 1), dt_time=time(6, 0, 0)),
                                DateTimeExtension(dt_date=date(2021, 1, 1), dt_time=time(6, 0, 0))),
-                           priority=1)
+                           priority=1,id=EntityID.generate_uuid())
     return [dr_1, dr_2]
