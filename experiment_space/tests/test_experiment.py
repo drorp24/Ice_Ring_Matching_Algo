@@ -5,7 +5,7 @@ from common.entities.base_entities.fleet.empty_drone_delivery_board_generation i
 from common.entities.base_entities.fleet.fleet_property_sets import DroneSetProperties
 from experiment_space.analyzer.quantitative_analyzer import MatchedDeliveryRequestsAnalyzer, \
     UnmatchedDeliveryRequestsAnalyzer, MatchPercentageDeliveryRequestAnalyzer, TotalWorkTimeAnalyzer, \
-    AmountMatchedPerPackageType
+    AmountMatchedPerPackageTypeAnalyzer
 from experiment_space.experiment import Experiment
 from experiment_space.experiment_generator import create_options_class, Options
 from experiment_space.graph_creation_algorithm import FullyConnectedGraphAlgorithm, \
@@ -46,7 +46,7 @@ class BasicExperimentTest(unittest.TestCase):
                             UnmatchedDeliveryRequestsAnalyzer,
                             MatchPercentageDeliveryRequestAnalyzer,
                             TotalWorkTimeAnalyzer,
-                            AmountMatchedPerPackageType]
+                            AmountMatchedPerPackageTypeAnalyzer]
 
         analysis_results = Experiment.run_analysis_suite(result_drone_delivery_board, analyzers_to_run)
 
@@ -74,7 +74,7 @@ class BasicExperimentTest(unittest.TestCase):
                             UnmatchedDeliveryRequestsAnalyzer,
                             MatchPercentageDeliveryRequestAnalyzer,
                             TotalWorkTimeAnalyzer,
-                            AmountMatchedPerPackageType]
+                            AmountMatchedPerPackageTypeAnalyzer]
 
         analysis_results = [Experiment.run_analysis_suite(result, analyzers_to_run) for result in
                             result_drone_delivery_boards]
@@ -94,13 +94,13 @@ class BasicExperimentTest(unittest.TestCase):
 
         experiments = experiment_options.calc_random_k(experiment_options, amount=50, random=Random(100024))
 
-        result_drone_delivery_boards = [experiment.run_match() for experiment in experiments]
+        result_drone_delivery_boards= [experiment.run_match() for experiment in experiments]
 
         analyzers_to_run = [MatchedDeliveryRequestsAnalyzer,
                             UnmatchedDeliveryRequestsAnalyzer,
                             MatchPercentageDeliveryRequestAnalyzer,
                             TotalWorkTimeAnalyzer,
-                            AmountMatchedPerPackageType]
+                            AmountMatchedPerPackageTypeAnalyzer]
 
         analysis_results = [Experiment.run_analysis_suite(result, analyzers_to_run) for result in
                             result_drone_delivery_boards]

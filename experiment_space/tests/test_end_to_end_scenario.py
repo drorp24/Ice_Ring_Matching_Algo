@@ -7,7 +7,7 @@ from common.entities.base_entities.fleet.empty_drone_delivery_board_generation i
 from common.entities.base_entities.fleet.fleet_property_sets import DroneSetProperties, DroneFormationTypePolicy, \
     PackageConfigurationPolicy
 from common.entities.base_entities.package import PackageType
-from experiment_space.analyzer.quantitative_analyzer import AmountMatchedPerPackageType, \
+from experiment_space.analyzer.quantitative_analyzer import AmountMatchedPerPackageTypeAnalyzer, \
     UnmatchedDeliveryRequestsAnalyzer
 from experiment_space.experiment import Experiment
 from experiment_space.graph_creation_algorithm import FullyConnectedGraphAlgorithm
@@ -51,12 +51,12 @@ class BasicMinimumEnd2End(unittest.TestCase):
 
         analysis = Experiment.run_analysis_suite(delivery_board,
                                                  [UnmatchedDeliveryRequestsAnalyzer,
-                                                  AmountMatchedPerPackageType])
+                                                  AmountMatchedPerPackageTypeAnalyzer])
 
-        unmatched_delivery_requests = analysis[AmountMatchedPerPackageType.__name__]
+        unmatched_delivery_requests = analysis[AmountMatchedPerPackageTypeAnalyzer.__name__]
         self.assertEqual(len(unmatched_delivery_requests), 4)
 
-        amount_per_package_type = analysis[AmountMatchedPerPackageType.__name__]
+        amount_per_package_type = analysis[AmountMatchedPerPackageTypeAnalyzer.__name__]
         self.assertEqual(amount_per_package_type.get(PackageType.TINY), 1)
         self.assertEqual(amount_per_package_type.get(PackageType.MEDIUM), 1)
         self.assertEqual(amount_per_package_type.get(PackageType.LARGE), 4)

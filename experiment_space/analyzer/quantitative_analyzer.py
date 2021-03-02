@@ -48,11 +48,11 @@ class TotalWorkTimeAnalyzer(QuantitativeAnalyzer):
         return sum([delivery.get_total_work_time_in_minutes() for delivery in delivery_board.drone_deliveries])
 
 
-class AmountMatchedPerPackageType(Analyzer):
+class AmountMatchedPerPackageTypeAnalyzer(Analyzer):
 
     @staticmethod
     def calc_analysis(delivery_board: DroneDeliveryBoard) -> Dict:
-        return AmountMatchedPerPackageType._calc_total_amount_matched_per_package_type(delivery_board)
+        return AmountMatchedPerPackageTypeAnalyzer._calc_total_amount_matched_per_package_type(delivery_board)
 
     @staticmethod
     def _calc_total_amount_matched_per_package_type(delivery_board: DroneDeliveryBoard) -> Dict:
@@ -60,3 +60,30 @@ class AmountMatchedPerPackageType(Analyzer):
         for drone_delivery in delivery_board.drone_deliveries:
             amount_matched_per_package_type.add_to_map(drone_delivery.get_total_package_type_amount_map())
         return amount_matched_per_package_type.package_type_to_amounts
+
+
+class MatchingEfficiencyAnalyzer(QuantitativeAnalyzer):
+
+    @staticmethod
+    def calc_analysis(delivery_board: DroneDeliveryBoard) -> float:
+        return MatchingEfficiencyAnalyzer._calc_match_efficiency_score(delivery_board)
+
+    @staticmethod
+    def _calc_match_efficiency_score(delivery_board: DroneDeliveryBoard) -> float:
+        amount_unmatched = UnmatchedDeliveryRequestsAnalyzer.calc_analysis(delivery_board)
+        amount_matched = MatchedDeliveryRequestsAnalyzer.calc_analysis(delivery_board)
+        return 100.0 * (1.0 - amount_unmatched / (amount_unmatched + amount_matched))
+
+
+class MatchingPriorityEfficiencyAnalyzer(QuantitativeAnalyzer):
+
+    @staticmethod
+    def calc_analysis(delivery_board: DroneDeliveryBoard) -> float:
+        return MatchingPriorityEfficiencyAnalyzer._calc_match_priority_efficiency_score(delivery_board)
+
+    @staticmethod
+    def _calc_match_priority_efficiency_score(delivery_board: DroneDeliveryBoard) -> float:
+        # TODO: Define reasonable priority weighted efficiency score - this is the previous calculation:
+        # priority_eff = 100.0 * (1 - (self.lowest_priority * num_unmatched_dr - unmatched_priority) /
+        #                             (self.lowest_priority * delivery_request_amount - total_priority))
+        raise Exception()
