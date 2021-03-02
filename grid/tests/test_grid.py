@@ -123,7 +123,7 @@ def create_no_zero_dist_dr_data_set() -> List[DeliveryRequest]:
                            time_window=TimeWindowExtension(
                                DateTimeExtension(dt_date=date(2021, 1, 1), dt_time=time(6, 0, 0)),
                                DateTimeExtension(dt_date=date(2021, 1, 1), dt_time=time(6, 0, 0))),
-                           priority=1)
+                           priority=1,id=EntityID.generate_uuid())
     return [dr_1, dr_2]
 
 
