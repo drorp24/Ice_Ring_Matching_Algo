@@ -6,6 +6,7 @@ from common.entities.base_entities.base_entity import JsonableBaseEntity
 from common.entities.base_entities.delivery_option import DeliveryOption
 from common.entities.base_entities.entity_distribution.temporal_distribution import TimeDeltaDistribution, \
     DateTimeDistribution, TimeWindowDistribution
+from common.entities.base_entities.entity_id import EntityID
 from common.entities.base_entities.temporal import TimeWindowExtension, Temporal, DateTimeExtension, TimeDeltaExtension
 from geometry.geo2d import Point2D
 from geometry.geo_factory import calc_centroid
@@ -14,14 +15,19 @@ from geometry.utils import Localizable
 
 class DeliveryRequest(JsonableBaseEntity, Localizable, Temporal):
 
-    def __init__(self, delivery_options: [DeliveryOption], time_window: TimeWindowExtension, priority: int):
+    def __init__(self, delivery_options: [DeliveryOption], time_window: TimeWindowExtension, priority: int,id:EntityID):
         self._delivery_options = delivery_options if delivery_options is not None else []
         self._time_window = time_window
         self._priority = priority
+        self._id = id
 
     @property
     def delivery_options(self) -> [DeliveryOption]:
         return self._delivery_options
+
+    @property
+    def id(self) -> EntityID:
+        return self._id
 
     @property
     def time_window(self) -> TimeWindowExtension:
@@ -40,7 +46,8 @@ class DeliveryRequest(JsonableBaseEntity, Localizable, Temporal):
         return DeliveryRequest(
             delivery_options=[DeliveryOption.dict_to_obj(do_dict) for do_dict in dict_input['delivery_options']],
             time_window=TimeWindowExtension.dict_to_obj(dict_input['time_window']),
-            priority=dict_input['priority']
+            priority=dict_input['priority'],
+            id = EntityID.dict_to_obj(dict_input['id'])
         )
 
     def __eq__(self, other: DeliveryRequest):

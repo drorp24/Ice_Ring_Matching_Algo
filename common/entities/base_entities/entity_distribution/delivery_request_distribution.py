@@ -7,6 +7,7 @@ from common.entities.base_entities.customer_delivery import CustomerDelivery
 from common.entities.base_entities.delivery_option import DeliveryOption
 from common.entities.base_entities.delivery_request import DeliveryRequest, \
     create_default_time_window_for_delivery_request
+from common.entities.base_entities.entity_id import EntityID
 from common.entities.base_entities.entity_distribution.delivery_option_distribution import DeliveryOptionDistribution, \
     DEFAULT_CD_DISTRIB
 from common.entities.base_entities.entity_distribution.distribution_utils import add_base_point_to_relative_points, \
@@ -73,7 +74,7 @@ class DeliveryRequestDistribution(HierarchialDistribution):
     @staticmethod
     def _calc_result_list(do_distribution, internal_amount, random, sampled_distributions):
         return [DeliveryRequest(
-            do_distribution.choose_rand(random=random, base_loc=loc, amount=internal_amount), tw, priority)
+            do_distribution.choose_rand(random=random, base_loc=loc, amount=internal_amount), tw, priority,id=EntityID.generate_uuid())
             for (loc, tw, priority) in zip(sampled_distributions['location'],
                                            sampled_distributions['time_window'],
                                            sampled_distributions['priority'])]

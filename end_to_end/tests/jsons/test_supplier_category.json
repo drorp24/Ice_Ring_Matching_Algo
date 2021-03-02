@@ -3,6 +3,7 @@
   "delivery_requests": [
     {
       "__class__": "DeliveryRequest",
+      "id": {"__class__": "EntityID", "uuid": "f24108b7-0a92-4c05-a8f9-7f996f5e3345","internal_type": "str"},
       "delivery_options": [
         {
           "__class__": "DeliveryOption",
@@ -96,6 +97,7 @@
     },
     {
       "__class__": "DeliveryRequest",
+      "id": {"__class__": "EntityID", "uuid": "f24108a7-0a92-4c05-a8f9-7f996f5e3345","internal_type": "str"},
       "delivery_options": [
         {
           "__class__": "DeliveryOption",
@@ -189,6 +191,7 @@
     },
     {
       "__class__": "DeliveryRequest",
+      "id": {"__class__": "EntityID", "uuid": "f24108d0-0a92-4c05-a8f9-7f996f5e3345","internal_type": "str"},
       "delivery_options": [
         {
           "__class__": "DeliveryOption",
@@ -282,6 +285,7 @@
     },
     {
       "__class__": "DeliveryRequest",
+      "id": {"__class__": "EntityID", "uuid": "f24108d1-0a92-4c05-a8f9-7f996f5e3345","internal_type": "str"},
       "delivery_options": [
         {
           "__class__": "DeliveryOption",
@@ -375,6 +379,7 @@
     },
     {
       "__class__": "DeliveryRequest",
+      "id": {"__class__": "EntityID", "uuid": "f24108d2-0a92-4c05-a8f9-7f996f5e3345","internal_type": "str"},
       "delivery_options": [
         {
           "__class__": "DeliveryOption",
@@ -468,6 +473,7 @@
     },
     {
       "__class__": "DeliveryRequest",
+      "id": {"__class__": "EntityID", "uuid": "f24108d3-0a92-4c05-a8f9-7f996f5e3345","internal_type": "str"},
       "delivery_options": [
         {
           "__class__": "DeliveryOption",
@@ -561,6 +567,7 @@
     },
     {
       "__class__": "DeliveryRequest",
+      "id": {"__class__": "EntityID", "uuid": "f24108d4-0a92-4c05-a8f9-7f996f5e3345","internal_type": "str"},
       "delivery_options": [
         {
           "__class__": "DeliveryOption",
@@ -654,6 +661,7 @@
     },
     {
       "__class__": "DeliveryRequest",
+      "id": {"__class__": "EntityID", "uuid": "f24108d5-0a92-4c05-a8f9-7f996f5e3345","internal_type": "str"},
       "delivery_options": [
         {
           "__class__": "DeliveryOption",
@@ -747,6 +755,7 @@
     },
     {
       "__class__": "DeliveryRequest",
+      "id": {"__class__": "EntityID", "uuid": "f24108d6-0a92-4c05-a8f9-7f996f5e3345","internal_type": "str"},
       "delivery_options": [
         {
           "__class__": "DeliveryOption",
@@ -840,6 +849,7 @@
     },
     {
       "__class__": "DeliveryRequest",
+      "id": {"__class__": "EntityID", "uuid": "f24108d7-0a92-4c05-a8f9-7f996f5e3345","internal_type": "str"},
       "delivery_options": [
         {
           "__class__": "DeliveryOption",
