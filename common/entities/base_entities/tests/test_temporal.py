@@ -44,6 +44,13 @@ class BasicTemporalTests(unittest.TestCase):
         dt1_dict_after_to_after_from = dt1_after_from.__dict__()
         self.assertEqual(dt1_dict_after_to, dt1_dict_after_to_after_from)
 
+
+    def test_iso_to_dict_equivalence(self):
+        iso_string ='2021-03-03T10:28:16.217305'
+        excpected_dict={'__class__': 'DateTimeExtension','date': {'year': 2021, 'month': 3, 'day': 3}, 'time': {'hour': 10, 'minute': 28, 'second': 16}}
+        time_after_conver = DateTimeExtension.extract_time_from_iso(iso_string)
+        self.assertEqual(time_after_conver.__dict__(), excpected_dict)
+
     def test_time_window_to_dict(self):
         tw1_dict = self.tw1.__dict__()
         expected_dict = {'__class__': 'TimeWindowExtension',

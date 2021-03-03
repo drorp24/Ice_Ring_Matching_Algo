@@ -143,11 +143,12 @@ class DateTimeExtension(BaseEntity):
     def extract_time_dict_from_datetime(date_time: datetime) -> Dict:
         return {TIME: {HOUR: date_time.hour, MINUTE: date_time.minute, SECOND: date_time.second}}
 
+
     @staticmethod
-    def extract_time_from_iso(date_time: str) -> Dict:
-        date_time = datetime.fromisoformat(date_time)
-        return {DATE: {YEAR: date_time.year, MONTH: date_time.month, DAY: date_time.day},
-                TIME: {HOUR: date_time.hour, MINUTE: date_time.minute, SECOND: date_time.second}}
+    def extract_time_from_iso(date_time: str) -> DateTimeExtension:
+        date_time=datetime.fromisoformat(date_time)
+        return DateTimeExtension.from_dict({DATE: {YEAR: date_time.year, MONTH: date_time.month, DAY: date_time.day},
+                TIME: {HOUR: date_time.hour, MINUTE: date_time.minute, SECOND: date_time.second}})
 
     def add_time_delta(self, time_delta: TimeDeltaExtension) -> DateTimeExtension:
         return DateTimeExtension.from_dt(self.get_internal() + time_delta.get_internal())
