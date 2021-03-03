@@ -1,7 +1,5 @@
-from abc import ABC
 from dataclasses import dataclass
 from typing import Union
-from optional import Optional
 
 from common.entities.base_entities.package import PackageType
 from common.math.angle import Angle
