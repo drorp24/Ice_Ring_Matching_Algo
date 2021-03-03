@@ -945,8 +945,10 @@
   "drone_loading_docks": [
     {
       "__class__": "DroneLoadingDock",
+      "id": {"__class__": "EntityID", "uuid": "8010b7af8df0e2793a2ea41bf6ba81eb","internal_type": "UUID"},
       "drone_loading_station": {
         "__class__": "DroneLoadingStation",
+        "id": {"__class__": "EntityID", "uuid": "8010b7af8df0e2793a2ea41bf6ba81eb","internal_type": "UUID"},
         "location": {
           "__class__": "_ShapelyPoint2D",
           "x": 94.65514585085286,

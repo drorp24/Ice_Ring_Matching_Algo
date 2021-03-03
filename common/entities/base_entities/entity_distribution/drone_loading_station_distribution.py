@@ -3,6 +3,7 @@ from typing import List
 
 from common.entities.base_entities.drone_loading_station import DroneLoadingStation
 from common.entities.distribution.distribution import Distribution
+from common.entities.base_entities.entity_id import EntityID
 from geometry.distribution.geo_distribution import PointLocationDistribution, UniformPointInBboxDistribution
 from geometry.geo2d import Point2D
 from geometry.geo_factory import create_point_2d
@@ -21,7 +22,8 @@ class DroneLoadingStationDistribution(Distribution):
             List[DroneLoadingStation]:
         delta_locations = self._drone_station_locations_distributions.choose_rand(random=random, amount=amount)
         locations = [base_location.add_vector(delta.to_vector()) for delta in delta_locations]
-        return list(map(DroneLoadingStation, locations))
+        ids =[EntityID.generate_uuid() for i in delta_locations]
+        return list(map(DroneLoadingStation,ids, locations))
 
     @classmethod
     def distribution_class(cls) -> type:
