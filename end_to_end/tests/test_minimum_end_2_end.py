@@ -20,7 +20,9 @@ class BasicMinimumEnd2End(unittest.TestCase):
         cls.supplier_category = SupplierCategory.dict_to_obj(SupplierCategory.json_to_dict(
             Path('end_to_end/tests/jsons/test_supplier_category.json')))
         cls.empty_drone_delivery_board = \
-            generate_empty_delivery_board([BasicMinimumEnd2End._create_simple_drone_set_properties()])
+            generate_empty_delivery_board(drone_set_properties=[BasicMinimumEnd2End._create_simple_drone_set_properties()],
+                                          max_route_time_entire_board=400,
+                                          velocity_entire_board=10)
         cls.matcher_config = MatcherConfig.dict_to_obj(
             MatcherConfig.json_to_dict(Path('end_to_end/tests/jsons/test_matcher_config.json')))
 

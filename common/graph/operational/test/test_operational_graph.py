@@ -5,6 +5,7 @@ from datetime import time, date, timedelta, datetime
 from math import sqrt
 from random import Random
 from typing import List
+from uuid import uuid4
 
 import numpy as np
 from numpy.testing import assert_array_equal
@@ -20,13 +21,14 @@ from common.entities.base_entities.entity_distribution.drone_loading_dock_distri
     DroneLoadingDockDistribution
 from common.entities.base_entities.entity_distribution.temporal_distribution import TimeDeltaDistribution, \
     TimeWindowDistribution, DateTimeDistribution
+from common.entities.base_entities.entity_id import EntityID
 from common.entities.base_entities.temporal import DateTimeExtension, TimeDeltaExtension, TimeWindowExtension
 from common.entities.base_entities.zone import Zone
 from common.entities.generator.delivery_request_generator import DeliveryRequestDatasetGenerator, \
     DeliveryRequestDatasetStructure
 from common.graph.operational.graph_creator import add_locally_connected_dr_graph, add_fully_connected_loading_docks, \
-    create_grouped_dr_graph
-from common.graph.operational.graph_utils import sort_delivery_requests_by_zone, grouping_delivery_requests
+    create_clustered_delivery_requests_graph
+from common.graph.operational.graph_utils import sort_delivery_requests_by_zone, split_delivery_requests_into_clusters
 from common.graph.operational.operational_graph import OperationalEdge, \
     OperationalEdgeAttribs, OperationalNode, NonLocalizableNodeException, NonTemporalNodeException
 from common.graph.operational.operational_graph import OperationalGraph
@@ -230,18 +232,18 @@ class BasicDeliveryRequestGraphTestCases(unittest.TestCase):
         self.assertEqual(expected_nodes_in_region_1 * (expected_nodes_in_region_1 - 1), len(subgraph_in_region_1.edges))
 
     @unittest.skipIf(os.environ.get('NO_SLOW_TESTS', False), 'slow tests')
-    def test_grouped_graph_generation_one_zone_with_overlap_tw(self):
+    def test_clustered_graph_generation_one_zone_with_overlap_tw(self):
 
         region_dataset = self.dr_dataset_local_region_1_morning
         dld_dataset = create_loading_dock_morning_distribution()
         deliveries_zones = [create_deliveries_zones()[0]]
-        graph = create_grouped_dr_graph(region_dataset, dld_dataset, deliveries_zones)
+        graph = create_clustered_delivery_requests_graph(region_dataset, dld_dataset, deliveries_zones,max_clusters=10)
 
-        expected_delivery_requests_groups = list(itertools.chain.from_iterable((
-            map(lambda item: list(grouping_delivery_requests(item[1]).values()),
+        expected_delivery_requests_clusters = list(itertools.chain.from_iterable((
+            map(lambda item: list(split_delivery_requests_into_clusters(item[1]).values()),
                 sort_delivery_requests_by_zone(region_dataset, deliveries_zones).items()))))
 
-        expected_num_edge_in_graph = 2 * (sum([sum(range(0, len(drs))) for drs in expected_delivery_requests_groups]) +
+        expected_num_edge_in_graph = 2 * (sum([sum(range(0, len(drs))) for drs in expected_delivery_requests_clusters]) +
                                           len(region_dataset))
 
         num_nodes_in_graph = len(graph.nodes)
@@ -249,30 +251,30 @@ class BasicDeliveryRequestGraphTestCases(unittest.TestCase):
         self.assertEqual(expected_num_edge_in_graph, len(graph.edges))
 
     @unittest.skipIf(os.environ.get('NO_SLOW_TESTS', False), 'slow tests')
-    def test_grouped_graph_generation_one_zone_partial_overlap_tw(self):
+    def test_clustered_graph_generation_one_zone_no_overlap_tw(self):
         region_dataset = self.dr_dataset_local_region_2_afternoon + self.dr_dataset_local_region_2_morning
 
         dld_dataset = [create_loading_dock_morning_distribution()[0], create_loading_dock_afternoon_distribution()[0]]
         deliveries_zones = [create_deliveries_zones()[1]]
-        graph = create_grouped_dr_graph(region_dataset, dld_dataset, deliveries_zones)
+        graph = create_clustered_delivery_requests_graph(region_dataset, dld_dataset, deliveries_zones,max_clusters=10)
 
         num_nodes_in_graph = len(graph.nodes)
         self.assertEqual(len(region_dataset) + len(dld_dataset), num_nodes_in_graph)
-        self.assertEqual(2 * len(region_dataset) + 4, len(graph.edges))
+        self.assertEqual(2 * len(region_dataset), len(graph.edges))
 
     @unittest.skipIf(os.environ.get('NO_SLOW_TESTS', False), 'slow tests')
-    def test_grouped_graph_generation_two_zones_with_overlap_tw(self):
+    def test_clustered_graph_generation_two_zones_with_overlap_tw(self):
 
         region_dataset = self.dr_dataset_local_region_1_morning + self.dr_dataset_local_region_2_morning
         dld_dataset = create_loading_dock_morning_distribution()
         deliveries_zones = create_deliveries_zones()
-        graph = create_grouped_dr_graph(region_dataset, dld_dataset, deliveries_zones)
+        graph = create_clustered_delivery_requests_graph(region_dataset, dld_dataset, deliveries_zones,max_clusters=10)
 
-        expected_delivery_requests_groups = list(itertools.chain.from_iterable((
-            map(lambda item: list(grouping_delivery_requests(item[1]).values()),
+        expected_delivery_requests_clusters = list(itertools.chain.from_iterable((
+            map(lambda item: list(split_delivery_requests_into_clusters(item[1]).values()),
                 sort_delivery_requests_by_zone(region_dataset, deliveries_zones).items()))))
 
-        expected_num_edge_in_graph = 2 * (sum([sum(range(0, len(drs))) for drs in expected_delivery_requests_groups]) +
+        expected_num_edge_in_graph = 2 * (sum([sum(range(0, len(drs))) for drs in expected_delivery_requests_clusters]) +
                                           len(region_dataset))
 
         num_nodes_in_graph = len(graph.nodes)
@@ -283,9 +285,9 @@ class BasicDeliveryRequestGraphTestCases(unittest.TestCase):
 def create_deliveries_zones() -> List[Zone]:
     return [
         Zone(create_polygon_2d([create_point_2d(100, 50), create_point_2d(100, 150), create_point_2d(200, 150),
-                                create_point_2d(200, 50)])),
+                                create_point_2d(200, 50)]),id = EntityID.generate_uuid()),
         Zone(create_polygon_2d([create_point_2d(1100, 150), create_point_2d(1100, 1150), create_point_2d(1200, 1150),
-                                create_point_2d(1200, 150)])),
+                                create_point_2d(1200, 150)]),id = EntityID.generate_uuid()),
     ]
 
 

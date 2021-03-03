@@ -6,6 +6,7 @@ from common.entities.base_entities.customer_delivery import CustomerDelivery
 from common.entities.base_entities.drone import PackageTypeAmountMap
 from common.entities.base_entities.package import PackageType
 from common.entities.base_entities.package_delivery_plan import PackageDeliveryPlan
+from common.entities.base_entities.entity_id import EntityID
 from geometry.geo2d import Point2D
 from geometry.geo_factory import calc_centroid
 from geometry.utils import Localizable
@@ -13,8 +14,13 @@ from geometry.utils import Localizable
 
 class DeliveryOption(JsonableBaseEntity, Localizable):
 
-    def __init__(self, customer_deliveries: [CustomerDelivery]):
+    def __init__(self, customer_deliveries: [CustomerDelivery], delivery_options_id: EntityID):
+        self._id = delivery_options_id
         self._customer_deliveries = customer_deliveries if customer_deliveries is not None else []
+
+    @property
+    def id(self) -> EntityID:
+        return self._id
 
     @property
     def customer_deliveries(self) -> [CustomerDelivery]:
@@ -41,6 +47,7 @@ class DeliveryOption(JsonableBaseEntity, Localizable):
     def dict_to_obj(cls, dict_input):
         assert (dict_input['__class__'] == cls.__name__)
         return DeliveryOption(
+            delivery_options_id=EntityID.dict_to_obj(dict_input['id']),
             customer_deliveries=[CustomerDelivery.dict_to_obj(cd_dict) for cd_dict in
                                  dict_input['customer_deliveries']])
 

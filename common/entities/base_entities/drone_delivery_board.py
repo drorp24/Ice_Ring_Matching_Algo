@@ -102,12 +102,13 @@ class DroneDeliveryBoard(JsonableBaseEntity):
             else "[No unmatched delivery requests]"
 
         return "\n".join((
-            f"\n[DroneDeliveryBoard]",
-            f"Total amount per package type: {self.get_total_amount_per_package_type()}",
-            f"Total work time in minutes: {self.get_total_work_time_in_minutes()}",
-            f"Total priority: {self.get_total_priority()}",
-            f"{drone_deliveries_str}",
-            f"\n{unmatched_delivery_requests_str}"))
+               f"\n[DroneDeliveryBoard]",
+               f"Total amount per package type: {self.get_total_amount_per_package_type()}",
+               f"Total work time in minutes: {self.get_total_work_time_in_minutes()}",
+               f"Total priority: {self.get_total_priority()}",
+               f"Unmatched delivery requests amount: {len(self._unmatched_delivery_requests)}",
+               f"{drone_deliveries_str}",
+               f"\n{unmatched_delivery_requests_str}"))
 
     def __hash__(self):
         return hash((tuple(self._drone_deliveries), tuple(self._unmatched_delivery_requests)))

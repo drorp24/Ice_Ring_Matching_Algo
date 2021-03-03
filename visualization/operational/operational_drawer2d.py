@@ -121,7 +121,7 @@ def add_unmatched_delivery_requests(drawer: Drawer2D, unmatched_requests: [Unmat
 def add_drone_deliveries(drawer: Drawer2D, drone_deliveries: [DroneDelivery]):
     labels_handler = _MatchedDeliveryLabelsHandler()
     for i, delivery in enumerate(drone_deliveries):
-        if len(delivery.matched_requests) is 0:
+        if len(delivery.matched_requests) == 0:
             continue
         delivery_color = labels_handler.add_matched_delivery(delivery)
         add_drone_delivery(drawer, delivery, delivery_color)
