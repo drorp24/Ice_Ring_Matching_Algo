@@ -74,7 +74,6 @@ class ORToolsMatcherConstraints:
             index = self._routing_model.Start(vehicle_id)
             self._routing_model.AddToAssignment(travel_time_dimension.TransitVar(index))
             self._routing_model.AddToAssignment(travel_time_dimension.SlackVar(index))
-        # TODO: self._set_max_route_time_for_each_vehicle(travel_cost_dimension)
 
     def add_session_time(self):
         session_time_callback_index = self._routing_model.RegisterTransitCallback(self.create_session_evaluator())
@@ -114,12 +113,15 @@ class ORToolsMatcherConstraints:
             for node_index in self._graph_exporter.export_delivery_request_nodes_indices(self._matcher_input.graph):
                 index = self._index_manager.NodeToIndex(node_index)
                 demand_dimension.SlackVar(index).SetValue(0)
+            for node_index in self._arrive_indices:
+                index = self._index_manager.NodeToIndex(node_index)
+                demand_dimension.SetCumulVarSoftLowerBound(index, max(self._matcher_input.empty_board.get_package_type_amount_per_drone_delivery(package_type)), 100)
 
     def add_unmatched_penalty(self):
         for node in self._graph_exporter.export_delivery_request_nodes_indices(self._matcher_input.graph):
             self._routing_model.AddDisjunction([self._index_manager.NodeToIndex(node)],
                                                self._matcher_input.config.unmatched_penalty)
-        for node in self._reloading_virtual_depos_indices[1:]:
+        for node in self._reloading_virtual_depos_indices:
             self._routing_model.AddDisjunction([self._index_manager.NodeToIndex(node)],
                                                0)
 
@@ -137,14 +139,14 @@ class ORToolsMatcherConstraints:
 
     def _get_package_amount_by_type(self, from_index: np.int64, package_type: PackageType) -> int:
         from_node = self._index_manager.IndexToNode(from_index)
-        if from_node in self._reloading_virtual_depos_indices:
-            return -1 * max(self._matcher_input.empty_board.get_package_type_amount_per_drone_delivery(package_type))
-        return self._graph_exporter.export_package_type_demands(self._matcher_input.graph, package_type)[from_node]
-
-    def _reset_demand_nodes_slack(self, demand_dimension_name: str):
-        demand_dimension = self._routing_model.GetDimensionOrDie(demand_dimension_name)
-        for node in range(1, len(self._matcher_input.graph.nodes)):
-            demand_dimension.SlackVar(self._index_manager.NodeToIndex(node)).SetValue(0)
+        package_amount_by_type = 0
+        if from_node in self._basis_nodes_indices or from_node in self._depart_indices:
+            package_amount_by_type = max(self._matcher_input.empty_board.get_package_type_amount_per_drone_delivery(package_type))
+        elif from_node in self._arrive_indices:
+            package_amount_by_type = 0
+        else:
+            package_amount_by_type = -1 * self._graph_exporter.export_package_type_demands(self._matcher_input.graph, package_type)[from_node]
+        return package_amount_by_type
 
     def _instantiate_route_start_and_end_times_to_produce_feasible_times(self, time_dimension: RoutingDimension):
         for i in range(len(self._matcher_input.empty_board.empty_drone_deliveries)):
@@ -160,11 +162,6 @@ class ORToolsMatcherConstraints:
             graph_index = self._index_manager.IndexToNode(start_index)
             time_dimension.CumulVar(start_index).SetRange(time_windows[graph_index][0],
                                                           time_windows[graph_index][1])
-
-    def _set_max_route_time_for_each_vehicle(self, time_dimension: RoutingDimension):
-        for i, drone_delivery in enumerate(self._matcher_input.empty_board.empty_drone_deliveries):
-            max_route_time_in_minutes = drone_delivery.max_route_time_in_minutes
-            time_dimension.SetSpanUpperBoundForVehicle(max_route_time_in_minutes, i)
 
     def _add_time_window_constraints_for_each_delivery_except_depot(self, time_dimension: RoutingDimension,
                                                                     time_windows: List[Tuple[int, int]]):
