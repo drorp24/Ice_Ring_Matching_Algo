@@ -2,9 +2,10 @@ from common.entities.base_entities.base_entity import JsonableBaseEntity
 from common.entities.base_entities.entity_id import EntityID
 from geometry.geo2d import Point2D
 from geometry.geo_factory import convert_dict_to_point_2d
+from geometry.utils import Shapeable
 
 
-class DroneLoadingStation(JsonableBaseEntity):
+class DroneLoadingStation(JsonableBaseEntity, Shapeable):
 
     def __init__(self,id:EntityID, location: Point2D):
         self._id=id
@@ -31,3 +32,13 @@ class DroneLoadingStation(JsonableBaseEntity):
         assert (dict_input['__class__'] == cls.__name__)
         return DroneLoadingStation(id=EntityID.dict_to_obj(dict_input['id']),
                                    location=convert_dict_to_point_2d(dict_input['location']))
+
+    def calc_location(self) -> Point2D:
+        return self.location
+
+    def get_shape(self) -> Point2D:
+        return self.location
+
+    def calc_area(self) -> float:
+        return 0
+

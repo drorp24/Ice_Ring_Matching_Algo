@@ -1,4 +1,5 @@
 from datetime import date, time, timedelta
+from typing import List
 
 from common.entities.base_entities.base_entity import JsonableBaseEntity
 from common.entities.base_entities.drone import DroneType
@@ -7,11 +8,12 @@ from common.entities.base_entities.drone_loading_station import DroneLoadingStat
 from common.entities.base_entities.entity_distribution.temporal_distribution import TimeDeltaDistribution, \
     DateTimeDistribution, TimeWindowDistribution
 from common.entities.base_entities.temporal import TimeWindowExtension, Temporal, DateTimeExtension, TimeDeltaExtension
+from drop_envelope.envelope_collections import ShapeableCollection
 from geometry.geo2d import Point2D
-from geometry.utils import Localizable
+from geometry.utils import Localizable, Shapeable
 
 
-class DroneLoadingDock(JsonableBaseEntity, Localizable, Temporal):
+class DroneLoadingDock(JsonableBaseEntity, Localizable, Temporal, ShapeableCollection):
 
     def __init__(self,id:EntityID, drone_loading_station: DroneLoadingStation,
                  drone_type: DroneType,
@@ -70,6 +72,12 @@ class DroneLoadingDock(JsonableBaseEntity, Localizable, Temporal):
                                 drone_loading_station=DroneLoadingStation.dict_to_obj(dict_input['drone_loading_station']),
                                 drone_type=DroneType.dict_to_obj(dict_input['drone_type']),
                                 time_window=TimeWindowExtension.dict_to_obj(dict_input['time_window']))
+
+    def get_shapeabls(self) -> List[Shapeable]:
+        return [self.drone_loading_station]
+
+    def get_centroid(self) -> Point2D:
+        return self.drone_loading_station.calc_location()
 
 
 def create_default_time_window_for_drone_loading_dock():
