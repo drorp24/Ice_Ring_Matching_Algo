@@ -92,7 +92,7 @@ class BasicMinimumEnd2EndExperiment:
             self.supplier_category_distribution = SupplierCategoryDistribution(
                 zero_time_distribution=DateTimeDistribution([ZERO_TIME]),
                 delivery_requests_distribution=_create_delivery_request_distribution(
-                    create_point_2d(35.46, 33.25), 0.2, 0.3, 10, 12),
+                    create_point_2d(35.46, 33.25), 0.2, 0.3, 10, 20),
                 drone_loading_docks_distribution=DroneLoadingDockDistribution(
                     drone_loading_station_distributions=DroneLoadingStationDistribution(
                         drone_station_locations_distribution=UniformPointInBboxDistribution(35.19336,
@@ -121,13 +121,13 @@ class BasicMinimumEnd2EndExperiment:
 
     def test_small_supplier_category(self):
         start_time = datetime.now()
-        empty_drone_delivery_board = _create_empty_drone_delivery_board(amount=4, max_route_time_entire_board=45,
+        empty_drone_delivery_board = _create_empty_drone_delivery_board(amount=10, max_route_time_entire_board=45,
                                                                         velocity_entire_board=10)
         print("--- _create_empty_drone_delivery_board run time: %s  ---" % (datetime.now() - start_time))
         start_time = datetime.now()
 
         supplier_category = self.supplier_category_distribution.choose_rand(random=Random(10),
-                                                                            amount={DeliveryRequest: 15,
+                                                                            amount={DeliveryRequest: 70,
                                                                                     DroneLoadingDock: 1})
         fully_connected_graph = create_fully_connected_graph_model(supplier_category, edge_cost_factor=25.0,
                                                                    edge_travel_time_factor=25.0)

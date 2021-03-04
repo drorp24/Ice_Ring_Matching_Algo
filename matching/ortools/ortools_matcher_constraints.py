@@ -59,7 +59,6 @@ class ORToolsMatcherConstraints:
             self._matcher_input.config.constraints.time.count_time_from_zero,
             OrToolsDimensionDescription.travel_time.value)
         travel_time_dimension = self._routing_model.GetDimensionOrDie(OrToolsDimensionDescription.travel_time.value)
-        travel_time_dimension.SetGlobalSpanCostCoefficient(1)
         self._add_time_window_constraints_for_each_delivery_except_depot(travel_time_dimension, self._time_windows)
         self._add_time_window_constraints_for_each_vehicle_start_node(travel_time_dimension, self._time_windows)
         for node in range(self._num_of_nodes):
@@ -70,6 +69,10 @@ class ORToolsMatcherConstraints:
                 travel_time_dimension.SlackVar(index).SetMax(0)
             self._routing_model.AddToAssignment(travel_time_dimension.TransitVar(index))
             self._routing_model.AddToAssignment(travel_time_dimension.SlackVar(index))
+        for node in self._graph_exporter.export_delivery_request_nodes_indices(self._matcher_input.graph):
+            index = self._index_manager.NodeToIndex(node)
+            coefficient = max(self._graph_exporter.export_priorities(self._matcher_input.graph)) / self._graph_exporter.export_priorities(self._matcher_input.graph)[node]
+            travel_time_dimension.SetCumulVarSoftUpperBound(index, 0, int(coefficient))
         for vehicle_id in range(self._matcher_input.empty_board.amount_of_formations()):
             index = self._routing_model.Start(vehicle_id)
             self._routing_model.AddToAssignment(travel_time_dimension.TransitVar(index))

@@ -23,7 +23,7 @@ class ORToolsMatcherObjective:
         def priority(from_node):
             if from_node in self._reloading_virtual_depos_indices:
                 from_node = self._graph_exporter.export_basis_nodes_indices(self._matcher_input.graph)[0]
-            priority = self._graph_exporter.export_priorities(self._matcher_input.graph)[from_node]
+            priority = self._graph_exporter.export_priorities(self._matcher_input.graph)[from_node] * 1000
             return priority
 
         _priorities = {}
