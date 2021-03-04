@@ -87,7 +87,6 @@ class ORToolsMatcherConstraints:
         session_time_dimension = self._routing_model.GetDimensionOrDie(OrToolsDimensionDescription.session_time.value)
         for node_index in range(self._num_of_nodes):
             index = self._index_manager.NodeToIndex(node_index)
-            # self._routing_model.AddVariableMinimizedByFinalizer(session_time_dimension.CumulVar(index))
             if node_index not in self._depos:
                 session_time_dimension.SlackVar(index).SetValue(0)
             self._routing_model.AddToAssignment(session_time_dimension.TransitVar(index))
