@@ -15,16 +15,22 @@ from matching.ortools.ortools_matcher_constraints import ORToolsMatcherConstrain
 from matching.ortools.ortools_matcher_objective import ORToolsMatcherObjective
 
 AVERAGE_RELOAD_PER_FORMATION = 3
+NUM_OF_NODES_IN_RELOADING_DEPO = 2 # Reloading depo consists of 2 nodes:
+                                        # arrive node & depart node so we can reset the cumulated time between them.
 
 
 class ORToolsMatcher(Matcher):
 
     def __init__(self, matcher_input: MatcherInput):
         super().__init__(matcher_input)
+        num_of_reloading_depo_nodes = self._matcher_input.empty_board.amount_of_formations() \
+                                      * AVERAGE_RELOAD_PER_FORMATION * NUM_OF_NODES_IN_RELOADING_DEPO
         self._reloading_virtual_depos_indices = list(range(
             len(self._matcher_input.graph.nodes),
-            len(self._matcher_input.graph.nodes)
-            + self._matcher_input.empty_board.amount_of_formations() * AVERAGE_RELOAD_PER_FORMATION))
+            len(self._matcher_input.graph.nodes) + num_of_reloading_depo_nodes))
+        self._arrive_indices = self._reloading_virtual_depos_indices[0::2]
+        self._depart_indices = self._reloading_virtual_depos_indices[1::2]
+        self._num_of_nodes = len(self._matcher_input.graph.nodes) + len(self._reloading_virtual_depos_indices)
         self._graph_exporter = OrtoolsGraphExporter()
         self._index_manager = self._set_index_manager()
         self._routing_model = self._set_routing_model()
@@ -38,12 +44,10 @@ class ORToolsMatcher(Matcher):
         return self._create_drone_delivery_board(solution)
 
     def _set_index_manager(self) -> RoutingIndexManager:
-        num_vehicles = self._matcher_input.empty_board.amount_of_formations()
         depot_ids_start = self._graph_exporter.export_basis_nodes_indices(self._matcher_input.graph)
         # TODO depot_ids_end = self._graph_exporter.export_basis_nodes_indices(self._match_input.graph)
-        num_of_nodes = len(self.matcher_input.graph.nodes) + len(self._reloading_virtual_depos_indices)
-        manager = pywrapcp.RoutingIndexManager(num_of_nodes,
-                                               num_vehicles,
+        manager = pywrapcp.RoutingIndexManager(self._num_of_nodes,
+                                               self._matcher_input.empty_board.amount_of_formations(),
                                                depot_ids_start[0])
         # TODO add depot_ids_end as forth param)
 
@@ -72,11 +76,12 @@ class ORToolsMatcher(Matcher):
 
     def _set_constraints(self):
         matcher_constraints = ORToolsMatcherConstraints(self._index_manager, self._routing_model, self.matcher_input,
-                                                        self._reloading_virtual_depos_indices, 60)
+                                                        self._arrive_indices, self._depart_indices)
         #  TODO: should be reload depos for every formation type (size and package)
         matcher_constraints.add_demand()
         matcher_constraints.add_travel_cost()
         matcher_constraints.add_travel_time()
+        matcher_constraints.add_session_time()
         matcher_constraints.add_unmatched_penalty()
 
     def _create_drone_delivery_board(self, solution: Assignment) -> DroneDeliveryBoard:
@@ -90,7 +95,7 @@ class ORToolsMatcher(Matcher):
         for edd_index, empty_drone_delivery in enumerate(self.matcher_input.empty_board.empty_drone_deliveries):
             start_index = self._routing_model.Start(edd_index)
             graph_start_index = self._index_manager.IndexToNode(start_index)
-            start_drone_loading_dock = self._create_drone_loading_dock(graph_start_index, start_index, solution)
+            start_drone_loading_dock = self._create_start_drone_loading_dock(graph_start_index, start_index, solution)
             index = solution.Value(self._routing_model.NextVar(start_index))
             matched_requests = []
             while not self._routing_model.IsEnd(index) and not self._routing_model.IsStart(index):
@@ -98,20 +103,21 @@ class ORToolsMatcher(Matcher):
                 if graph_index in self._graph_exporter.export_delivery_request_nodes_indices(self._matcher_input.graph):
                     matched_requests.append(
                         self._create_matched_delivery_request(graph_index, index, solution))
-                if graph_index in self._reloading_virtual_depos_indices:
-                    graph_index = 0
-                    end_drone_loading_dock = self._create_drone_loading_dock(graph_index, index, solution)
+                elif graph_index in self._arrive_indices:
+                    graph_index = self._graph_exporter.export_basis_nodes_indices(self._matcher_input.graph)[0]
+                    end_drone_loading_dock = self._create_end_drone_loading_dock(graph_index, index, solution)
                     drone_deliveries.append(
                         self._create_drone_delivery(edd_index, start_drone_loading_dock, end_drone_loading_dock,
                                                     matched_requests))
                     matched_requests = []
-                    start_drone_loading_dock = self._create_drone_loading_dock(
-                        graph_index, index, solution,
-                        empty_drone_delivery.reload_time_in_minutes)
+                elif graph_index in self._depart_indices:
+                    graph_index = self._graph_exporter.export_basis_nodes_indices(self._matcher_input.graph)[0]
+                    start_drone_loading_dock = self._create_start_drone_loading_dock(
+                        graph_index, index, solution)
                 index = solution.Value(self._routing_model.NextVar(index))
             if self._routing_model.IsEnd(index):
                 graph_index = self._index_manager.IndexToNode(index)
-                end_drone_loading_dock = self._create_drone_loading_dock(graph_index, index, solution)
+                end_drone_loading_dock = self._create_end_drone_loading_dock(graph_index, index, solution)
                 drone_deliveries.append(
                     self._create_drone_delivery(edd_index, start_drone_loading_dock, end_drone_loading_dock,
                                                 matched_requests))
@@ -121,7 +127,7 @@ class ORToolsMatcher(Matcher):
         if solution is None:
             return []
         unmatched_delivery_request = []
-        for index in range(self._routing_model.Size()):
+        for index in range(self._num_of_nodes):
             if self._routing_model.IsStart(index) or self._routing_model.IsEnd(
                     index) or index in self._reloading_virtual_depos_indices:
                 continue
@@ -133,22 +139,6 @@ class ORToolsMatcher(Matcher):
                         self.matcher_input.graph, graph_index)))
 
         return unmatched_delivery_request
-
-    # def _create_matched_delivery_requests(self, edd_index: int, solution: Assignment) -> List[MatchedDeliveryRequest]:
-    #     if solution is None:
-    #         return []
-    #     matched_requests = []
-    #     start_index = self._routing_model.Start(edd_index)
-    #     index = solution.Value(self._routing_model.NextVar(start_index))
-    #     if index in self._reloading_virtual_depos_indices:
-    #         index = solution.Value(self._routing_model.NextVar(index))
-    #     while not self._routing_model.IsEnd(index) and not self._routing_model.IsStart(index):
-    #         graph_index = self._index_manager.IndexToNode(index)
-    #         if graph_index in self._graph_exporter.export_delivery_request_nodes_indices(self._matcher_input.graph):
-    #             matched_requests.append(
-    #                 self._create_matched_delivery_request(graph_index, index, solution))
-    #         index = solution.Value(self._routing_model.NextVar(index))
-    #     return matched_requests
 
     def _create_drone_delivery(self, edd_index: int, start_drone_loading_dock: MatchedDroneLoadingDock,
                                end_drone_loading_dock: MatchedDroneLoadingDock,
@@ -170,29 +160,29 @@ class ORToolsMatcher(Matcher):
             matched_delivery_option_index=0,
             delivery_time_window=self._get_delivery_time_window(index, solution))
 
-    # def _create_start_drone_loading_dock(self, edd_index: int, solution: Assignment) -> MatchedDroneLoadingDock:
-    #     if solution is None:
-    #         raise ValueError('No Solution!')
-    #     start_index = self._routing_model.Start(edd_index)
-    #     graph_start_index = self._index_manager.IndexToNode(start_index)
-    #     return self._create_drone_loading_dock(graph_start_index, start_index, solution)
-    #
-    # def _create_end_drone_loading_dock(self, edd_index: int, solution: Assignment) -> MatchedDroneLoadingDock:
-    #     if solution is None:
-    #         raise ValueError('No Solution!')
-    #     end_index = self._routing_model.End(edd_index)
-    #     graph_end_index = self._index_manager.IndexToNode(end_index)
-    #     return self._create_drone_loading_dock(graph_end_index, end_index, solution)
-
-    def _create_drone_loading_dock(self, graph_index: int, index: int,
-                                   solution: Assignment, service_time_in_min=0) -> MatchedDroneLoadingDock:
+    def _create_start_drone_loading_dock(self, graph_index: int, index: int,
+                                   solution: Assignment) -> MatchedDroneLoadingDock:
         if solution is None:
             raise ValueError('No Solution!')
+
+        delivery_time_window = self._get_start_dock_time_window(graph_index, index, solution)
         return MatchedDroneLoadingDock(
             graph_index=graph_index,
             drone_loading_dock=self._graph_exporter.get_drone_loading_dock(
                 self.matcher_input.graph, graph_index),
-            delivery_time_window=self._get_delivery_time_window(index, solution, service_time_in_min))
+            delivery_time_window=delivery_time_window)
+
+    def _create_end_drone_loading_dock(self, graph_index: int, index: int,
+                                   solution: Assignment) -> MatchedDroneLoadingDock:
+        if solution is None:
+            raise ValueError('No Solution!')
+
+        delivery_time_window = self._get_delivery_time_window(index, solution)
+        return MatchedDroneLoadingDock(
+            graph_index=graph_index,
+            drone_loading_dock=self._graph_exporter.get_drone_loading_dock(
+                self.matcher_input.graph, graph_index),
+            delivery_time_window=delivery_time_window)
 
     def _get_delivery_time_window(self, index: int, solution: Assignment, service_time_in_min=0) -> TimeWindowExtension:
         if solution is None:
@@ -205,3 +195,17 @@ class ORToolsMatcher(Matcher):
                 TimeDeltaExtension(timedelta(minutes=solution.Min(travel_time_var) + service_time_in_min)))),
             until=(self._matcher_input.config.zero_time.add_time_delta(
                 TimeDeltaExtension(timedelta(minutes=solution.Max(travel_time_var) + service_time_in_min)))))
+
+    def _get_start_dock_time_window(self, graph_index, index, solution):
+        first_delivery_index = solution.Value(self._routing_model.NextVar(index))
+        travel_time_dimension = self._routing_model.GetDimensionOrDie(OrToolsDimensionDescription.travel_time.value)
+        first_delivery_min_arrival_time = solution.Min(travel_time_dimension.CumulVar(first_delivery_index))
+        travel_time_from_dock_to_first_delivery_in_min = self._graph_exporter.export_travel_times(
+            self._matcher_input.graph)[graph_index][self._index_manager.IndexToNode(first_delivery_index)]
+        service_time_in_min = float(first_delivery_min_arrival_time
+                                    - travel_time_from_dock_to_first_delivery_in_min)
+        return TimeWindowExtension(
+            since=self._matcher_input.config.zero_time.add_time_delta(
+                TimeDeltaExtension(timedelta(minutes=service_time_in_min))),
+            until=self._matcher_input.config.zero_time.add_time_delta(
+                TimeDeltaExtension(timedelta(minutes=service_time_in_min))))

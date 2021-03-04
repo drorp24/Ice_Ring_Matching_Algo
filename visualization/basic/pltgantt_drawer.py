@@ -45,17 +45,24 @@ class PltGanttDrawer(GanttDrawer):
                 side_text: str = None, color: Color = Color.Blue) -> None:
         since, until = time_window.get_relative_time_in_min(self._zero_time)
         y = self._calc_y(row)
-        self._ax.barh(y=y, width=until - since, height=self._bar_height, left=since,
-                      color=color.get_rgb_with_alpha(BAR_ALPHA), label=name,
-                      edgecolor=Color.Black.get_rgb(), linewidth=1)
-        if side_text:
-            self._ax.text(x=until + MARK_WIDTH_RATIO * self._hours_period, y=y - self._bar_height / 2, s=side_text,
-                          color=Color.Black.get_rgb(), fontsize=9)
-        if time_mark:
+        if not time_mark:
+            self._ax.barh(y=y, width=until - since, height=self._bar_height, left=since,
+                          color=color.get_rgb_with_alpha(BAR_ALPHA), label=name,
+                          edgecolor=Color.Black.get_rgb(), linewidth=1)
+
+            if side_text:
+                self._ax.text(x=until + MARK_WIDTH_RATIO * self._hours_period, y=y - self._bar_height / 2, s=side_text,
+                              color=Color.Black.get_rgb(), fontsize=9)
+        else:
             relative_time_in_min = time_mark.get_time_delta(self._zero_time).in_minutes()
-            width = MARK_WIDTH_RATIO * self._hours_period
-            self._ax.barh(y=y, width=width, height=self._bar_height, left=relative_time_in_min - width / 2,
+            mark_width = MARK_WIDTH_RATIO * self._hours_period
+            self._ax.barh(y=y, width=mark_width, height=self._bar_height, left=relative_time_in_min - mark_width / 2,
                           color=color.Black.get_rgb())
+
+            if side_text:
+                self._ax.text(x=relative_time_in_min + mark_width, y=y - self._bar_height / 2, s=side_text,
+                              color=Color.Black.get_rgb(), fontsize=9)
+
 
     def add_row_area(self, row: int, time_window: TimeWindowExtension,
                      facecolor: Color = Color.Red, face_alpha: float = 0,
