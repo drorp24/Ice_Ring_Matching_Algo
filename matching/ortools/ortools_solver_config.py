@@ -13,6 +13,22 @@ class ORToolsSolverConfig(SolverConfig, JsonableBaseEntity):
 
         self._timeout_sec = self.validate_timeout_sec(timeout_sec)
 
+    @property
+    def first_solution_strategy(self) -> str:
+        return super().first_solution_strategy
+
+    @property
+    def local_search_strategy(self) -> str:
+        return super().local_search_strategy
+
+    @property
+    def vendor(self) -> SolverVendor:
+        return super().vendor
+
+    @property
+    def timeout_sec(self) -> int:
+        return super().timeout_sec
+
     def get_first_solution_strategy_as_int(self) -> int:
         return FirstSolutionStrategy.DESCRIPTOR.enum_values_by_name.get(
             str.upper(self.first_solution_strategy)).number

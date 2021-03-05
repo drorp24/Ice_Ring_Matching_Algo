@@ -1,6 +1,7 @@
 import unittest
 from datetime import timedelta, date, time
 from pathlib import Path
+from random import Random
 
 from common.entities.base_entities.drone import DroneType, PackageConfiguration
 from common.entities.base_entities.drone_formation import DroneFormationType
@@ -14,8 +15,7 @@ from common.entities.base_entities.entity_distribution.package_distribution impo
 from common.entities.base_entities.entity_distribution.priority_distribution import PriorityDistribution
 from common.entities.base_entities.entity_distribution.temporal_distribution import TimeDeltaDistribution, \
     TimeWindowDistribution, DateTimeDistribution
-from common.entities.base_entities.fleet.empty_drone_delivery_board_generation import generate_empty_delivery_board, \
-    build_empty_drone_delivery_board
+from common.entities.base_entities.fleet.empty_drone_delivery_board_generation import build_empty_drone_delivery_board
 from common.entities.base_entities.fleet.fleet_property_sets import DroneSetProperties, DroneFormationTypePolicy, \
     PackageConfigurationPolicy
 from common.entities.base_entities.package import PackageType
@@ -23,11 +23,13 @@ from common.entities.base_entities.temporal import TimeDeltaExtension, DateTimeE
 from experiment_space.analyzer.quantitative_analyzer import MatchedDeliveryRequestsAnalyzer, \
     UnmatchedDeliveryRequestsAnalyzer, MatchPercentageDeliveryRequestAnalyzer, TotalWorkTimeAnalyzer, \
     AmountMatchedPerPackageTypeAnalyzer, MatchingEfficiencyAnalyzer
+from experiment_space.distribution.supplier_category_distribution import SupplierCategoryDistribution
 from experiment_space.experiment import Experiment
-from experiment_space.supplier_category import SupplierCategory
+from experiment_space.experiment_generator import create_options_class, Options
 from experiment_space.tests.test_clustered_graph_experiments import _create_standard_full_day_test_time, ZERO_TIME, \
-    FullyConnectedGraphAlgorithm
-from experiment_space.visualization.experiment_visualizer import draw_matched_scenario
+    FullyConnectedGraphAlgorithm, DeliveryRequest
+from experiment_space.visualization.experiment_visualizer import draw_matched_scenario, \
+    draw_labeled_analysis_bar_chart, draw_labeled_analysis_graph
 from geometry.distribution.geo_distribution import UniformPointInBboxDistribution, NormalPointDistribution
 from geometry.geo2d import Point2D
 from geometry.geo_factory import create_point_2d
@@ -40,38 +42,51 @@ south_lat = 31.77279
 north_lat = 32.19276
 
 ZERO_TIME = DateTimeExtension(dt_date=date(2021, 1, 1), dt_time=time(0, 0, 0))
+SHOW_VISUALS = True
 
 
 class EndToEndMultipleExperimentRun(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.supplier_category = SupplierCategory.dict_to_obj(
-            SupplierCategory.json_to_dict(Path('end_to_end/tests/jsons/test_supplier_category.json')))
-        cls.empty_drone_delivery_board = generate_empty_delivery_board(
-            [EndToEndMultipleExperimentRun._create_simple_drone_set_properties()])
+        cls.drone_set_properties = EndToEndMultipleExperimentRun._create_regular_drone_set_properties()
         cls.matcher_config = MatcherConfig.dict_to_obj(
-            MatcherConfig.json_to_dict(Path('end_to_end/tests/jsons/test_matcher_config.json')))
+            MatcherConfig.json_to_dict(Path('experiment_space/tests/jsons/test_matcher_config.json')))
 
-    def test_calc_center_scenario(self):
-        print('!!' + self.__str__())
-
-    def test_calc_center_scenario2(self):
-        print('!!' + self.__str__())
-
-    def test_calc_center_scenario3(self):
-        drone_station_location = create_point_2d(35.11, 31.79)
-
-        sampled_supplier_category = self.supplier_category
-
+    @unittest.skip
+    def test_calc_north_scenario_visualization(self):
+        sampled_supplier_category = self._create_sampled_supplier_category_north()
         experiment = Experiment(supplier_category=sampled_supplier_category,
-                                empty_drone_delivery_board=self.empty_drone_delivery_board,
+                                drone_set_properties=EndToEndMultipleExperimentRun._create_large_drone_set_properties(),
                                 matcher_config=self.matcher_config,
                                 graph_creation_algorithm=FullyConnectedGraphAlgorithm())
+        EndToEndMultipleExperimentRun._run_end_to_end_visual_experiment(experiment, SHOW_VISUALS)
 
-        graph = FullyConnectedGraphAlgorithm().create(sampled_supplier_category)
+    @unittest.skip
+    def test_calc_center_scenario_visualization(self):
+        sampled_supplier_category = self._create_sampled_supplier_category_center()
+        experiment = Experiment(supplier_category=sampled_supplier_category,
+                                drone_set_properties=self.drone_set_properties,
+                                matcher_config=self.matcher_config,
+                                graph_creation_algorithm=FullyConnectedGraphAlgorithm())
+        EndToEndMultipleExperimentRun._run_end_to_end_visual_experiment(experiment, SHOW_VISUALS)
 
-        result_drone_delivery_board = experiment.run_match()
+    @unittest.skip
+    def test_calc_center_scenario_with_different_first_solution_strategies(self):
+        sampled_supplier_category = self._create_sampled_supplier_category_center()
+        experiment = Experiment(supplier_category=sampled_supplier_category,
+                                drone_set_properties=self.drone_set_properties,
+                                matcher_config=self.matcher_config,
+                                graph_creation_algorithm=FullyConnectedGraphAlgorithm())
+        experiment_options = create_options_class(experiment, ['Experiment', 'MatcherConfig', 'ORToolsSolverConfig'])
+
+        first_solution_strategies = ['UNSET', 'AUTOMATIC', 'PATH_CHEAPEST_ARC', 'PATH_MOST_CONSTRAINED_ARC',
+                                     'EVALUATOR_STRATEGY', 'SAVINGS', 'SWEEP', 'CHRISTOFIDES', 'ALL_UNPERFORMED',
+                                     'BEST_INSERTION', 'PARALLEL_CHEAPEST_INSERTION', 'SEQUENTIAL_CHEAPEST_INSERTION',
+                                     'LOCAL_CHEAPEST_INSERTION', 'GLOBAL_CHEAPEST_ARC', 'LOCAL_CHEAPEST_ARC',
+                                     'FIRST_UNBOUND_MIN_VALUE']
+        experiment_options.matcher_config[0].solver[0].first_solution_strategy = first_solution_strategies
+        experiments = Options.calc_cartesian_product(experiment_options)
 
         analyzers_to_run = [MatchedDeliveryRequestsAnalyzer,
                             UnmatchedDeliveryRequestsAnalyzer,
@@ -80,27 +95,111 @@ class EndToEndMultipleExperimentRun(unittest.TestCase):
                             AmountMatchedPerPackageTypeAnalyzer,
                             MatchingEfficiencyAnalyzer]
 
+        labeled_results = [(str(labeled_experiment[0]),
+                            Experiment.run_analysis_suite(labeled_experiment[1].run_match(), analyzers_to_run))
+                           for labeled_experiment in zip(first_solution_strategies, experiments)]
+
+        draw_labeled_analysis_bar_chart(labeled_experiment_analysis=labeled_results,
+                                        analyzer=MatchPercentageDeliveryRequestAnalyzer,
+                                        title='Match percentage per first solution strategy type',
+                                        xlabel='First Solution Strategies',
+                                        ylabel='Match Percentage of Delivery Requests')
+
+    # @unittest.skip
+    def test_calc_center_scenario_with_different_fleet_sizes(self):
+        sampled_supplier_category = self._create_sampled_supplier_category_north()
+        experiment = Experiment(supplier_category=sampled_supplier_category,
+                                drone_set_properties=self.drone_set_properties,
+                                matcher_config=self.matcher_config,
+                                graph_creation_algorithm=FullyConnectedGraphAlgorithm())
+
+        experiment_options = create_options_class(experiment, ['Experiment', 'DroneSetProperties'])
+
+        drone_amount_options = list(range(2, 51, 3))
+        experiment_options.drone_set_properties[0].drone_amount = drone_amount_options
+        experiments = Options.calc_cartesian_product(experiment_options)
+
+        analyzers_to_run = [MatchedDeliveryRequestsAnalyzer,
+                            UnmatchedDeliveryRequestsAnalyzer,
+                            MatchPercentageDeliveryRequestAnalyzer,
+                            TotalWorkTimeAnalyzer,
+                            AmountMatchedPerPackageTypeAnalyzer,
+                            MatchingEfficiencyAnalyzer]
+
+        labeled_results = [(str(labeled_experiment[0]),
+                            Experiment.run_analysis_suite(labeled_experiment[1].run_match(), analyzers_to_run))
+                           for labeled_experiment in zip(drone_amount_options, experiments)]
+
+        draw_labeled_analysis_graph(labeled_experiment_analysis=labeled_results,
+                                    analyzer=MatchPercentageDeliveryRequestAnalyzer,
+                                    title='Match percentage per fleet size',
+                                    xlabel='Fleet Size',
+                                    ylabel='Match Percentage of Delivery Requests')
+
+        draw_labeled_analysis_graph(labeled_experiment_analysis=labeled_results,
+                                    analyzer=MatchingEfficiencyAnalyzer,
+                                    title='Match percentage per fleet size',
+                                    xlabel='Fleet Size',
+                                    ylabel='Match Efficiency')
+
+    @staticmethod
+    def _run_end_to_end_visual_experiment(experiment: Experiment, show_visuals: bool):
+        graph = experiment.graph_creation_algorithm.create(experiment.supplier_category)
+        result_drone_delivery_board = experiment.run_match()
+        analyzers_to_run = [MatchedDeliveryRequestsAnalyzer,
+                            UnmatchedDeliveryRequestsAnalyzer,
+                            MatchPercentageDeliveryRequestAnalyzer,
+                            TotalWorkTimeAnalyzer,
+                            AmountMatchedPerPackageTypeAnalyzer,
+                            MatchingEfficiencyAnalyzer]
         analysis_results = Experiment.run_analysis_suite(result_drone_delivery_board, analyzers_to_run)
-
         print(analysis_results)
-
-        map_image = MapImage(map_background_path=Path(r"visualization/basic/gush_dan_background.Png"),
-                             west_lon=west_lon, east_lon=east_lon, south_lat=south_lat, north_lat=north_lat)
-
-        draw_matched_scenario(delivery_board=result_drone_delivery_board, graph=graph,
-                              supplier_category=sampled_supplier_category, map_image=map_image)
-
-        self.assertEqual(1, 1)
+        if show_visuals:
+            map_image = MapImage(map_background_path=Path("visualization/basic/gush_dan_background.png"),
+                                 west_lon=west_lon, east_lon=east_lon, south_lat=south_lat, north_lat=north_lat)
+            draw_matched_scenario(delivery_board=result_drone_delivery_board, graph=graph,
+                                  supplier_category=experiment.supplier_category, map_image=map_image)
+        return analysis_results
 
     @classmethod
-    def _create_simple_drone_set_properties(cls):
+    def _create_sampled_supplier_category_north(cls):
+        return SupplierCategoryDistribution(
+            zero_time_distribution=DateTimeDistribution([ZERO_TIME]),
+            delivery_requests_distribution=cls._create_custom_delivery_request_distribution_north(),
+            drone_loading_docks_distribution=DroneLoadingDockDistribution(
+                drone_loading_station_distributions=DroneLoadingStationDistribution(
+                    drone_station_locations_distribution=UniformPointInBboxDistribution(35.11, 35.11, 31.79, 31.79)),
+                time_window_distributions=_create_standard_full_day_test_time())).choose_rand(Random(42), amount={
+            DeliveryRequest: 50})[0]
+
+    @classmethod
+    def _create_sampled_supplier_category_center(cls):
+        return SupplierCategoryDistribution(
+            zero_time_distribution=DateTimeDistribution([ZERO_TIME]),
+            delivery_requests_distribution=cls._create_custom_delivery_request_distribution_center(),
+            drone_loading_docks_distribution=DroneLoadingDockDistribution(
+                drone_loading_station_distributions=DroneLoadingStationDistribution(
+                    drone_station_locations_distribution=UniformPointInBboxDistribution(35.11, 35.11, 31.79, 31.79)),
+                time_window_distributions=_create_standard_full_day_test_time())).choose_rand(Random(42), amount={
+            DeliveryRequest: 25})[0]
+
+    @classmethod
+    def _create_regular_drone_set_properties(cls):
         return DroneSetProperties(drone_type=DroneType.drone_type_1,
                                   drone_formation_policy=DroneFormationTypePolicy(
-                                      {DroneFormationType.PAIR: 1.0, DroneFormationType.QUAD: 0.0}),
+                                      {DroneFormationType.PAIR: 0.9, DroneFormationType.QUAD: 0.1}),
                                   package_configuration_policy=PackageConfigurationPolicy(
-                                      {PackageConfiguration.LARGE_X2: 0.8, PackageConfiguration.MEDIUM_X4: 0.1,
-                                       PackageConfiguration.SMALL_X8: 0.1, PackageConfiguration.TINY_X16: 0.0}),
+                                      {PackageConfiguration.LARGE_X2: 1.0}),
                                   drone_amount=30)
+
+    @classmethod
+    def _create_large_drone_set_properties(cls):
+        return DroneSetProperties(drone_type=DroneType.drone_type_1,
+                                  drone_formation_policy=DroneFormationTypePolicy(
+                                      {DroneFormationType.PAIR: 0.9, DroneFormationType.QUAD: 0.1}),
+                                  package_configuration_policy=PackageConfigurationPolicy(
+                                      {PackageConfiguration.LARGE_X2: 1.0}),
+                                  drone_amount=100)
 
     @staticmethod
     def _create_custom_drone_loading_dock_distribution(drone_station_location):
@@ -113,13 +212,22 @@ class EndToEndMultipleExperimentRun(unittest.TestCase):
             time_window_distributions=_create_standard_full_day_test_time())
 
     @staticmethod
-    def _create_custom_delivery_request_distribution():
+    def _create_custom_delivery_request_distribution_north():
         return EndToEndMultipleExperimentRun._create_delivery_request_distribution(
             center_point=create_point_2d(35.11, 32.0),
-            sigma_lat=0.03,
-            sigma_lon=0.05,
+            sigma_lat=0.12,
+            sigma_lon=0.08,
             lowest_priority=10,
             dr_timewindow=3)
+
+    @staticmethod
+    def _create_custom_delivery_request_distribution_center():
+        return EndToEndMultipleExperimentRun._create_delivery_request_distribution(
+            center_point=create_point_2d(35.11, 31.84),
+            sigma_lat=0.04,
+            sigma_lon=0.06,
+            lowest_priority=10,
+            dr_timewindow=2)
 
     @staticmethod
     def _create_standard_full_day_test_time():

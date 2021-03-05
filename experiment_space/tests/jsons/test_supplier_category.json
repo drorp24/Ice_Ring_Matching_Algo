@@ -919,8 +919,8 @@
         "__class__": "DroneLoadingStation",
         "location": {
           "__class__": "_ShapelyPoint2D",
-          "x": 94.65514585085286,
-          "y": 47.933356530527135
+          "x": 35.11,
+          "y": 31.79
         }
       },
       "drone_type": {"__enum__": "DroneType.drone_type_2"},

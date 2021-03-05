@@ -46,7 +46,7 @@ class BasicExperimentGeneratorTest(unittest.TestCase):
             self.assertEqual(sample, self.base_experiment)
 
     def test_experiment_generator_cartesian_product_with_added_zones_and_unmatched_penalty(self):
-        base_experiment_options = create_options_class(self.base_experiment, ['SupplierCategory', 'MatcherConfig'])
+        base_experiment_options =  create_options_class(self.base_experiment, ['SupplierCategory', 'MatcherConfig'])
         base_experiment_options.supplier_category[0].zones.append('a')
         base_experiment_options.supplier_category[0].zones.append('b')
         base_experiment_options.matcher_config[0].unmatched_penalty.append(1000)

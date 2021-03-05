@@ -1,5 +1,7 @@
 from common.entities.base_entities.base_entity import JsonableBaseEntity
 from common.entities.base_entities.drone_delivery_board import EmptyDroneDeliveryBoard, DroneDeliveryBoard
+from common.entities.base_entities.fleet.empty_drone_delivery_board_generation import generate_empty_delivery_board
+from common.entities.base_entities.fleet.fleet_property_sets import DroneSetProperties
 from experiment_space.analyzer.analyzer import Analyzer
 from experiment_space.graph_creation_algorithm import GraphCreationAlgorithm
 from experiment_space.supplier_category import SupplierCategory
@@ -11,11 +13,11 @@ from matching.matcher_input import MatcherInput
 class Experiment(JsonableBaseEntity):
 
     def __init__(self, supplier_category: SupplierCategory,
-                 empty_drone_delivery_board: EmptyDroneDeliveryBoard,
+                 drone_set_properties: DroneSetProperties,
                  matcher_config: MatcherConfig,
                  graph_creation_algorithm: GraphCreationAlgorithm):
         self._supplier_category = supplier_category
-        self._empty_drone_delivery = empty_drone_delivery_board
+        self._drone_set_properties = drone_set_properties
         self._matcher_config = matcher_config
         self._graph_creation_algorithm = graph_creation_algorithm
 
@@ -24,8 +26,8 @@ class Experiment(JsonableBaseEntity):
         return self._supplier_category
 
     @property
-    def empty_drone_delivery_board(self):
-        return self._empty_drone_delivery
+    def drone_set_properties(self):
+        return self._drone_set_properties
 
     @property
     def matcher_config(self):
@@ -37,7 +39,8 @@ class Experiment(JsonableBaseEntity):
 
     def run_match(self) -> DroneDeliveryBoard:
         graph = self._graph_creation_algorithm.create(supplier_category=self._supplier_category)
-        matcher_input = MatcherInput(graph=graph, empty_board=self._empty_drone_delivery, config=self._matcher_config)
+        empty_drone_delivery_board = generate_empty_delivery_board([self._drone_set_properties])
+        matcher_input = MatcherInput(graph=graph, empty_board=empty_drone_delivery_board, config=self._matcher_config)
         delivery_board = create_matcher(matcher_input=matcher_input).match()
         return delivery_board
 
@@ -46,12 +49,12 @@ class Experiment(JsonableBaseEntity):
         return {analyzer.__name__: analyzer.calc_analysis(droneDeliveryBoard) for analyzer in analyzers}
 
     def __str__(self):
-        return str((self._supplier_category, self._empty_drone_delivery, self._matcher_config))
+        return str((self._supplier_category, self._drone_set_properties, self._matcher_config))
 
     def __hash__(self):
-        return hash((self._supplier_category, self._empty_drone_delivery, self._matcher_config))
+        return hash((self._supplier_category, self._drone_set_properties, self._matcher_config))
 
     def __eq__(self, other):
         return self.supplier_category == other.supplier_category \
-               and self.empty_drone_delivery_board == other.empty_drone_delivery_board \
+               and self.drone_set_properties == other.drone_set_properties \
                and self.matcher_config == other.matcher_config

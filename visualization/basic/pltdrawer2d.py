@@ -11,6 +11,7 @@ from visualization.basic.drawer2d import Drawer2D, Drawer2DCoordinateSys
 
 GEOGRAPHIC_RADIUS_SIZE_RATIO = 0.1
 
+
 class MapImage:
     def __init__(self, map_background_path, west_lon, east_lon, south_lat, north_lat):
         self.map_background_path = map_background_path
@@ -19,11 +20,15 @@ class MapImage:
         self.south_lat = south_lat
         self.north_lat = north_lat
 
-def create_drawer_2d(coordinate_sys: Drawer2DCoordinateSys = Drawer2DCoordinateSys.CARTESIAN, mapImage: MapImage = None) -> Drawer2D:
+
+def create_drawer_2d(coordinate_sys: Drawer2DCoordinateSys = Drawer2DCoordinateSys.CARTESIAN,
+                     mapImage: MapImage = None) -> Drawer2D:
     return PltDrawer2D(coordinate_sys, mapImage)
 
+
 class PltDrawer2D(Drawer2D):
-    def __init__(self, coordinate_sys: Drawer2DCoordinateSys = Drawer2DCoordinateSys.CARTESIAN, mapImage: MapImage = None):
+    def __init__(self, coordinate_sys: Drawer2DCoordinateSys = Drawer2DCoordinateSys.CARTESIAN,
+                 mapImage: MapImage = None):
         self._coordinate_sys = coordinate_sys
         self._init_according_to_coordinate_system(mapImage)
 
@@ -130,4 +135,4 @@ class PltDrawer2D(Drawer2D):
         else:
             plt.legend(handles=[
                 Patch(label=new_labels[i], color=new_label_colors[i].get_rgb()) for i, label in enumerate(new_labels)],
-                      loc="upper left", ncol=3, fontsize=fontsize)
+                loc="upper left", ncol=3, fontsize=fontsize)

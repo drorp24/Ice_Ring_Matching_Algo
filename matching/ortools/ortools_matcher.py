@@ -5,6 +5,7 @@ from ortools.constraint_solver import pywrapcp
 from ortools.constraint_solver.pywrapcp import RoutingIndexManager, RoutingModel, Assignment
 from ortools.constraint_solver.routing_parameters_pb2 import RoutingSearchParameters
 
+from common.entities.base_entities.delivery_request import DeliveryRequest
 from common.entities.base_entities.drone_delivery import DroneDelivery, MatchedDroneLoadingDock, MatchedDeliveryRequest
 from common.entities.base_entities.drone_delivery_board import DroneDeliveryBoard, UnmatchedDeliveryRequest
 from common.entities.base_entities.temporal import TimeDeltaExtension, TimeWindowExtension
@@ -19,7 +20,7 @@ class ORToolsMatcher(Matcher):
 
     def __init__(self, matcher_input: MatcherInput):
         super().__init__(matcher_input)
-
+        self._matcher_input = matcher_input
         self._graph_exporter = OrtoolsGraphExporter()
         self._index_manager = self._set_index_manager()
         self._routing_model = self._set_routing_model()
@@ -30,7 +31,15 @@ class ORToolsMatcher(Matcher):
 
     def match(self) -> DroneDeliveryBoard:
         solution = self._routing_model.SolveWithParameters(self._search_parameters)
-        return self._create_drone_delivery_board(solution)
+        if ORToolsMatcher.is_solution_valid(solution):
+            return self._create_drone_delivery_board(solution)
+        else:
+            return DroneDeliveryBoard([], [UnmatchedDeliveryRequest(i, node.internal_node) for i, node in enumerate(self.matcher_input.graph.nodes) if
+                                           isinstance(node.internal_node, DeliveryRequest)])
+
+    @staticmethod
+    def is_solution_valid(solution):
+        return solution is not None
 
     def _set_index_manager(self) -> RoutingIndexManager:
         num_vehicles = self._matcher_input.empty_board.amount_of_formations()
@@ -154,7 +163,6 @@ class ORToolsMatcher(Matcher):
     def _get_delivery_time_window(self, index: int, solution: Assignment) -> TimeWindowExtension:
         travel_time_dimension = self._routing_model.GetDimensionOrDie(OrToolsDimensionDescription.travel_time.value)
         travel_time_var = travel_time_dimension.CumulVar(index)
-
         return TimeWindowExtension(
             since=(self._matcher_input.config.zero_time.add_time_delta(
                 TimeDeltaExtension(timedelta(minutes=solution.Min(travel_time_var))))),

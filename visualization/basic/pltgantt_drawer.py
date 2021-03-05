@@ -78,7 +78,6 @@ class PltGanttDrawer(GanttDrawer):
 
     def draw(self, block=True) -> None:
         self._fig.show()
-        # plt.legend(bbox_to_anchor=(1.01, 1), loc="upper left")
         plt.show(block=block)
 
     def save_plot_to_png(self, file_name: Path) -> None:
