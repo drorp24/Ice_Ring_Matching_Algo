@@ -121,13 +121,13 @@ class BasicMinimumEnd2EndExperiment:
 
     def test_small_supplier_category(self):
         start_time = datetime.now()
-        empty_drone_delivery_board = _create_empty_drone_delivery_board(amount=10, max_route_time_entire_board=45,
+        empty_drone_delivery_board = _create_empty_drone_delivery_board(amount=4, max_route_time_entire_board=45,
                                                                         velocity_entire_board=10)
         print("--- _create_empty_drone_delivery_board run time: %s  ---" % (datetime.now() - start_time))
         start_time = datetime.now()
 
         supplier_category = self.supplier_category_distribution.choose_rand(random=Random(10),
-                                                                            amount={DeliveryRequest: 70,
+                                                                            amount={DeliveryRequest: 30,
                                                                                     DroneLoadingDock: 1})
         fully_connected_graph = create_fully_connected_graph_model(supplier_category, edge_cost_factor=25.0,
                                                                    edge_travel_time_factor=25.0)
@@ -145,7 +145,7 @@ class BasicMinimumEnd2EndExperiment:
 
         print(delivery_board)
 
-        self._draw_matched_scenario(delivery_board, fully_connected_graph, supplier_category, self.mapImage, aggregate_by_edd=True)
+        self._draw_matched_scenario(delivery_board, fully_connected_graph, supplier_category, self.mapImage, aggregate_by_edd=False)
 
     @staticmethod
     def _draw_matched_scenario(delivery_board, fully_connected_graph, supplier_category, map_image, aggregate_by_edd: bool = True):
@@ -172,7 +172,10 @@ class BasicMinimumEnd2EndExperiment:
                                              row_names=row_names,
                                              rows_title='Formation Type x Package Type Amounts',
                                              )
-        operational_gantt_drawer.add_delivery_board(board_gantt_drawer, delivery_board, True, aggregate_by_edd)
+        if aggregate_by_edd:
+            operational_gantt_drawer.add_delivery_board_with_row_per_edd(board_gantt_drawer, delivery_board, True)
+        else:
+            operational_gantt_drawer.add_delivery_board_with_row_per_drone_delivery(board_gantt_drawer, delivery_board, True)
         board_gantt_drawer.draw(True)
 
 

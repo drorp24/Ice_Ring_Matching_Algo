@@ -20,7 +20,7 @@
     },
     "first_solution_strategy": "path_cheapest_arc",
     "local_search_strategy": "GUIDED_LOCAL_SEARCH",
-    "timeout_sec": 30
+    "timeout_sec": 10
   },
   "constraints": {
     "__class__": "ConstraintsConfig",
