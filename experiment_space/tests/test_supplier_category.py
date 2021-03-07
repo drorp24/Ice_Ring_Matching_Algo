@@ -15,8 +15,8 @@ from geometry.geo_factory import create_polygon_2d, create_point_2d, create_mult
 
 
 class BasicSupplierCategoryTests(unittest.TestCase):
-    test_json_file_name = Path('end_to_end/tests/jsons/test_writing_supplier_category.json')
-    test_with_zones_json_file_name = Path('end_to_end/tests/jsons/test_writing_supplier_category_with_zones.json')
+    test_json_file_name = Path('experiment_space/tests/jsons/test_writing_supplier_category.json')
+    test_with_zones_json_file_name = Path('experiment_space/tests/jsons/test_writing_supplier_category_with_zones.json')
 
     @classmethod
     def setUpClass(cls):

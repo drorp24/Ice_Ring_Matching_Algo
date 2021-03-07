@@ -62,11 +62,12 @@ def extract_properties_from_class(base_instance):
 
 
 def extract_properties_option_from_class(base_instance, hierarchical_classes: List[str] = []):
-    if dataclasses.is_dataclass(base_instance):
-        d = {member: base_instance.internal_dict(member) for member in base_instance.__annotations__.keys()}
+    if dataclasses.is_dataclass(base_instance):  # base_instance.internal_dict(member)
+        d = {member: [calc_internal_extract(base_instance.__getattribute__(member), hierarchical_classes)] for member in
+             base_instance.__annotations__.keys()}
     else:
         d = {k: [calc_internal_extract(base_instance.__getattribute__(k), hierarchical_classes)] for k, v in
-         type(base_instance).__dict__.items() if k[:1] != '_' and not callable(getattr(type(base_instance), k))}
+             type(base_instance).__dict__.items() if k[:1] != '_' and not callable(getattr(type(base_instance), k))}
     return d
 
 
