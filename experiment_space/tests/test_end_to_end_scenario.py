@@ -20,11 +20,10 @@ class BasicMinimumEnd2End(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.supplier_category = SupplierCategory.dict_to_obj(SupplierCategory.json_to_dict(
-            Path('end_to_end/tests/jsons/test_supplier_category.json')))
-        cls.empty_drone_delivery_board = \
-            generate_empty_delivery_board([BasicMinimumEnd2End._create_simple_drone_set_properties()])
+            Path('experiment_space/tests/jsons/test_supplier_category.json')))
+        cls.drone_set_properties = BasicMinimumEnd2End._create_simple_drone_set_properties()
         cls.matcher_config = MatcherConfig.dict_to_obj(
-            MatcherConfig.json_to_dict(Path('end_to_end/tests/jsons/test_matcher_config.json')))
+            MatcherConfig.json_to_dict(Path('experiment_space/tests/jsons/test_matcher_config.json')))
 
     @classmethod
     def _create_simple_drone_set_properties(cls):
@@ -43,7 +42,7 @@ class BasicMinimumEnd2End(unittest.TestCase):
 
     def test_calc_assignment(self):
         e = Experiment(supplier_category=self.supplier_category,
-                       empty_drone_delivery_board=self.empty_drone_delivery_board,
+                       drone_set_properties=self.drone_set_properties,
                        matcher_config=self.matcher_config,
                        graph_creation_algorithm=FullyConnectedGraphAlgorithm())
 

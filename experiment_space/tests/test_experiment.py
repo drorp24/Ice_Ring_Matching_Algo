@@ -26,7 +26,7 @@ class BasicExperimentTest(unittest.TestCase):
 
         drone_set_properties_path = 'experiment_space/tests/jsons/test_drone_set_properties.json'
         drone_set_properties = DroneSetProperties.from_json(DroneSetProperties, drone_set_properties_path)
-        cls.empty_drone_delivery_board = generate_empty_delivery_board([drone_set_properties])
+        cls.drone_set_properties = drone_set_properties
 
         cls.clustered_graph_creation_algorithm = ClusteredDeliveryRequestGraphAlgorithm(edge_cost_factor=25.0,
                                                                                         edge_travel_time_factor=25.0,
@@ -37,7 +37,7 @@ class BasicExperimentTest(unittest.TestCase):
     def test_experiment(self):
         experiment = Experiment(supplier_category=self.supplier_category,
                                 matcher_config=self.matcher_config,
-                                empty_drone_delivery_board=self.empty_drone_delivery_board,
+                                drone_set_properties=self.drone_set_properties,
                                 graph_creation_algorithm=self.default_graph_creation_algorithm)
 
         result_drone_delivery_board = experiment.run_match()
@@ -59,7 +59,7 @@ class BasicExperimentTest(unittest.TestCase):
     def test_cartesian_product_experiments(self):
         base_experiment = Experiment(supplier_category=self.supplier_category,
                                      matcher_config=self.matcher_config,
-                                     empty_drone_delivery_board=self.empty_drone_delivery_board,
+                                     drone_set_properties=self.drone_set_properties,
                                      graph_creation_algorithm=self.default_graph_creation_algorithm)
 
         experiment_options = create_options_class(base_experiment)
@@ -85,7 +85,7 @@ class BasicExperimentTest(unittest.TestCase):
     def test_random_k_experiments(self):
         base_experiment = Experiment(supplier_category=self.supplier_category,
                                      matcher_config=self.matcher_config,
-                                     empty_drone_delivery_board=self.empty_drone_delivery_board,
+                                     drone_set_properties=self.drone_set_properties,
                                      graph_creation_algorithm=self.default_graph_creation_algorithm)
 
         experiment_options = create_options_class(base_experiment)

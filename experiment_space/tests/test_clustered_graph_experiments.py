@@ -43,7 +43,7 @@ class BasicMinimumEnd2EndClusteredDrsTest(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        match_config_file_path = Path('end_to_end/tests/jsons/test_matcher_config.json')
+        match_config_file_path = Path('experiment_space/tests/jsons/test_matcher_config.json')
         cls.match_config = MatcherConfig.dict_to_obj(MatcherConfig.json_to_dict(match_config_file_path))
 
         cls.mapImage = MapImage(map_background_path=Path(r"visualization/basic/gush_dan_background.Png"),
@@ -125,11 +125,11 @@ class BasicMinimumEnd2EndClusteredDrsTest(unittest.TestCase):
 
     def _run_match_experiment(self, graph_creation_algorithm, drone_deliveries_amount,
                               supplier_category) -> DroneDeliveryBoard:
-        empty_drone_delivery_board = _create_empty_drone_delivery_board(amount=drone_deliveries_amount,
-                                                                        max_route_time_entire_board=45,
-                                                                        velocity_entire_board=10.0)
+        empty_drone_delivery_board = _create_drone_set_properties(amount=drone_deliveries_amount,
+                                                                  max_route_time_entire_board=45,
+                                                                  velocity_entire_board=10.0)
         start_time = datetime.now()
-        delivery_board = Experiment(empty_drone_delivery_board=empty_drone_delivery_board,
+        delivery_board = Experiment(drone_set_properties=empty_drone_delivery_board,
                                     matcher_config=self.match_config,
                                     graph_creation_algorithm=graph_creation_algorithm,
                                     supplier_category=supplier_category).run_match()
@@ -181,7 +181,7 @@ def _create_uniformly_large_package_distribution():
     return package_distribution
 
 
-def _create_empty_drone_delivery_board(
+def _create_drone_set_properties(
         drone_formation_policy=DroneFormationTypePolicy({DroneFormationType.PAIR: 1, DroneFormationType.QUAD: 0}),
         package_configurations_policy=PackageConfigurationPolicy({PackageConfiguration.LARGE_X2: 0.9,
                                                                   PackageConfiguration.MEDIUM_X4: 0.1,
@@ -193,8 +193,7 @@ def _create_empty_drone_delivery_board(
                                               package_configuration_policy=package_configurations_policy,
                                               drone_formation_policy=drone_formation_policy,
                                               drone_amount=amount)
-    return build_empty_drone_delivery_board(drone_set_properties, max_route_time_entire_board,
-                                            velocity_entire_board)
+    return drone_set_properties
 
 
 def _create_supplier_category_distribution(zone_amount: int = 1, max_centroids_per_polygon: int = 1,

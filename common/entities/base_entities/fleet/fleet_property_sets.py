@@ -46,32 +46,34 @@ class PackageConfigurationPolicy(JsonableBaseEntity):
                 'policy': {pcp[0].name: pcp[1] for pcp in
                            self.policy.items()}}
 
-
 @dataclass
 class DroneSetProperties(JsonableBaseEntity):
-
-    def __init__(self, drone_type: DroneType, drone_formation_policy: DroneFormationTypePolicy,
-                 package_configuration_policy: PackageConfigurationPolicy, drone_amount: int):
-        self._drone_type = drone_type
-        self._drone_formation_policy = drone_formation_policy
-        self._package_configuration_policy = package_configuration_policy
-        self._drone_amount = drone_amount
-
-    @property
-    def drone_type(self) -> DroneType:
-        return self._drone_type
-
-    @property
-    def drone_formation_policy(self) -> DroneFormationTypePolicy:
-        return self._drone_formation_policy
-
-    @property
-    def package_configuration_policy(self) -> PackageConfigurationPolicy:
-        return self._package_configuration_policy
-
-    @property
-    def drone_amount(self) -> int:
-        return self._drone_amount
+    drone_type: DroneType
+    drone_formation_policy: DroneFormationTypePolicy
+    package_configuration_policy: PackageConfigurationPolicy
+    drone_amount: int
+    # def __init__(self, drone_type: DroneType, drone_formation_policy: DroneFormationTypePolicy,
+    #              package_configuration_policy: PackageConfigurationPolicy, drone_amount: int):
+    #     self._drone_type = drone_type
+    #     self._drone_formation_policy = drone_formation_policy
+    #     self._package_configuration_policy = package_configuration_policy
+    #     self._drone_amount = drone_amount
+    #
+    # @property
+    # def drone_type(self) -> DroneType:
+    #     return self._drone_type
+    #
+    # @property
+    # def drone_formation_policy(self) -> DroneFormationTypePolicy:
+    #     return self._drone_formation_policy
+    #
+    # @property
+    # def package_configuration_policy(self) -> PackageConfigurationPolicy:
+    #     return self._package_configuration_policy
+    #
+    # @property
+    # def drone_amount(self) -> int:
+    #     return self._drone_amount
 
     @classmethod
     def dict_to_obj(cls, dict_input):

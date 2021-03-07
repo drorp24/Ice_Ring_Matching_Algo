@@ -20,13 +20,10 @@ class BasicExperimentGeneratorTest(unittest.TestCase):
         matcher_config = MatcherConfig.from_json(MatcherConfig, matcher_config_path)
         drone_set_properties_path = '/Users/gilbaz/Code/Ice_Ring/experiment_space/tests/jsons/test_drone_set_properties.json'
         drone_set_properties = DroneSetProperties.from_json(DroneSetProperties, drone_set_properties_path)
-        empty_drone_delivery_board = build_empty_drone_delivery_board(drone_set_properties,
-                                                                      max_route_time_entire_board=400,
-                                                                      velocity_entire_board=10.0)
         default_graph_creation_algorithm = FullyConnectedGraphAlgorithm()
         cls.base_experiment = Experiment(supplier_category=supplier_category,
                                          matcher_config=matcher_config,
-                                         empty_drone_delivery_board=empty_drone_delivery_board,
+                                         drone_set_properties=drone_set_properties,
                                          graph_creation_algorithm=default_graph_creation_algorithm)
 
     def test_experiment_generator_cartesian_samples_without_changes_maps_back_to_self(self):

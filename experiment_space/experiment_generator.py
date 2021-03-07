@@ -1,3 +1,4 @@
+import dataclasses
 import itertools
 from random import Random
 from typing import List, Union
@@ -61,8 +62,12 @@ def extract_properties_from_class(base_instance):
 
 
 def extract_properties_option_from_class(base_instance, hierarchical_classes: List[str] = []):
-    return {k: [calc_internal_extract(base_instance.__getattribute__(k), hierarchical_classes)] for k, v in
-            type(base_instance).__dict__.items() if k[:1] != '_' and not callable(getattr(type(base_instance), k))}
+    if dataclasses.is_dataclass(base_instance):
+        d = {member: base_instance.internal_dict(member) for member in base_instance.__annotations__.keys()}
+    else:
+        d = {k: [calc_internal_extract(base_instance.__getattribute__(k), hierarchical_classes)] for k, v in
+         type(base_instance).__dict__.items() if k[:1] != '_' and not callable(getattr(type(base_instance), k))}
+    return d
 
 
 def calc_internal_extract(base_instance, hierarchical_classes: List[str]):
