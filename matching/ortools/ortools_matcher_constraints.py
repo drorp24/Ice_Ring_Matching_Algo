@@ -117,7 +117,7 @@ class ORToolsMatcherConstraints:
                 demand_dimension.SlackVar(index).SetValue(0)
             for node_index in self._arrive_indices:
                 index = self._index_manager.NodeToIndex(node_index)
-                demand_dimension.SetCumulVarSoftLowerBound(index, max(self._matcher_input.empty_board.get_package_type_amount_per_drone_delivery(package_type)), 100)
+                demand_dimension.SetCumulVarSoftUpperBound(index, 0, 1000)
 
     def add_unmatched_penalty(self):
         for node in self._graph_exporter.export_delivery_request_nodes_indices(self._matcher_input.graph):

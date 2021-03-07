@@ -14,7 +14,7 @@ from matching.matcher_input import MatcherInput
 from matching.ortools.ortools_matcher_constraints import ORToolsMatcherConstraints, OrToolsDimensionDescription
 from matching.ortools.ortools_matcher_objective import ORToolsMatcherObjective
 
-AVERAGE_RELOAD_PER_FORMATION = 5
+AVERAGE_RELOAD_PER_FORMATION = 4
 NUM_OF_NODES_IN_RELOADING_DEPO = 2 # Reloading depo consists of 2 nodes:
                                         # arrive node & depart node so we can reset the cumulated time between them.
 

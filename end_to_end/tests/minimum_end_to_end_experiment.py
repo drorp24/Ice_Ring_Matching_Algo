@@ -145,7 +145,7 @@ class BasicMinimumEnd2EndExperiment:
 
         print(delivery_board)
 
-        self._draw_matched_scenario(delivery_board, fully_connected_graph, supplier_category, self.mapImage, aggregate_by_edd=False)
+        self._draw_matched_scenario(delivery_board, fully_connected_graph, supplier_category, self.mapImage, aggregate_by_edd=True)
 
     @staticmethod
     def _draw_matched_scenario(delivery_board, fully_connected_graph, supplier_category, map_image, aggregate_by_edd: bool = True):
