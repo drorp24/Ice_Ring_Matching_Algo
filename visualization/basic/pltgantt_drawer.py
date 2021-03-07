@@ -51,9 +51,9 @@ class PltGanttDrawer(GanttDrawer):
                 mark_width = MARK_WIDTH_RATIO * self._hours_period
                 self._ax.barh(y=y, width=mark_width, height=bar_height, left=relative_time_in_min - mark_width / 2,
                               color=color.Black.get_rgb())
-                if side_text:
-                    self._ax.text(x=until + MARK_WIDTH_RATIO * self._hours_period, y=y - bar_height / 2, s=side_text,
-                                  color=Color.Black.get_rgb(), fontsize=9)
+            if side_text:
+                self._ax.text(x=until + MARK_WIDTH_RATIO * self._hours_period, y=y - bar_height / 2, s=side_text,
+                              color=Color.Black.get_rgb(), fontsize=9)
         else:
             if time_mark:
                 relative_time_in_min = time_mark.get_time_delta(self._zero_time).in_minutes()
