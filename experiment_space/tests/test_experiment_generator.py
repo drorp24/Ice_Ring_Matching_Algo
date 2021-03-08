@@ -1,7 +1,6 @@
 import unittest
 from random import Random
 
-from common.entities.base_entities.fleet.empty_drone_delivery_board_generation import build_empty_drone_delivery_board
 from common.entities.base_entities.fleet.fleet_property_sets import DroneSetProperties
 from experiment_space.experiment import Experiment
 from experiment_space.experiment_generator import create_options_class, Options

@@ -7,21 +7,17 @@ from common.entities.base_entities.drone import PackageTypeAmountMap
 from common.entities.base_entities.drone_formation import DroneFormation
 from common.entities.base_entities.drone_loading_dock import DroneLoadingDock
 from common.entities.base_entities.entity_id import EntityID
+from common.entities.base_entities.fleet.fleet_property_sets import BoardLevelProperties
 from common.entities.base_entities.package import PackageType
 from common.entities.base_entities.temporal import TimeWindowExtension
 
-DEFAULT_MAX_ROUTE_TIME_IN_MINUTES = 400
-DEFAULT_VELOCITY_METER_PER_SEC = 10.0
-
 
 class EmptyDroneDelivery(JsonableBaseEntity):
-    def __init__(self, id_: EntityID, drone_formation: DroneFormation,
-                 max_route_time_in_minutes: int = DEFAULT_MAX_ROUTE_TIME_IN_MINUTES,
-                 velocity_meter_per_sec: float = DEFAULT_VELOCITY_METER_PER_SEC):
+    def __init__(self, id_: EntityID, drone_formation: DroneFormation, board_level_properties=BoardLevelProperties()):
         self._id = id_
         self._drone_formation = drone_formation
-        self._max_route_times_in_minutes = max_route_time_in_minutes  # TODO: Change to real endurance
-        self._velocity_meter_per_sec = velocity_meter_per_sec  # TODO: Change to real velocity
+        self._max_route_times_in_minutes = board_level_properties.max_route_time_entire_board
+        self._velocity_meter_per_sec = board_level_properties.velocity_entire_board
 
     def __eq__(self, other):
         return self._id == other.id and self._drone_formation == other.drone_formation

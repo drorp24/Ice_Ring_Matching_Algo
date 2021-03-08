@@ -63,3 +63,16 @@ class DroneSetProperties(JsonableBaseEntity):
                 dict_input['package_configuration_policy']),
             drone_amount=dict_input['drone_amount']
         )
+
+
+@dataclass
+class BoardLevelProperties(JsonableBaseEntity):
+    max_route_time_entire_board: int = 400
+    velocity_entire_board: float = 10.0
+
+    @classmethod
+    def dict_to_obj(cls, dict_input):
+        return BoardLevelProperties(
+            max_route_time_entire_board=dict_input['max_route_time_entire_board'],
+            velocity_entire_board=dict_input['velocity_entire_board']
+        )

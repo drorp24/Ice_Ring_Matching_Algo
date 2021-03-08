@@ -18,7 +18,6 @@ from common.entities.base_entities.entity_distribution.temporal_distribution imp
     TimeWindowDistribution, DateTimeDistribution
 from common.entities.base_entities.entity_distribution.zone_delivery_request_distribution import \
     ZoneDeliveryRequestDistribution
-from common.entities.base_entities.fleet.empty_drone_delivery_board_generation import build_empty_drone_delivery_board
 from common.entities.base_entities.fleet.fleet_property_sets import DroneFormationTypePolicy, \
     PackageConfigurationPolicy, DroneSetProperties
 from common.entities.base_entities.package import PackageType

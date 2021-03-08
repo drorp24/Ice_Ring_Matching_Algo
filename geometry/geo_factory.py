@@ -9,10 +9,10 @@ from shapely.geometry import MultiPoint
 from geometry.geo2d import Point2D, Vector2D, MultiPolygon2D, EmptyGeometry2D, Bbox2D
 from geometry.geo2d import Polygon2D, LineString2D, LinearRing2D
 from geometry.math_wrapper import _MathVector2D
-from geometry.shapely_wrapper import _ShapelyMultiPolygon2D, _ShapelyEmptyGeometry, _ShapelyUtils
 from geometry.shapely_wrapper import _ShapelyMultiPolygon2D, _ShapelyEmptyGeometry, _ShapelyBbox2D
 from geometry.shapely_wrapper import _ShapelyPoint2D
 from geometry.shapely_wrapper import _ShapelyPolygon2D, _ShapelyLineString2D, _ShapelyLinearRing2D
+from geometry.shapely_wrapper import _ShapelyUtils
 from geometry.utils import GeometryUtils
 
 

@@ -15,9 +15,9 @@ from common.entities.base_entities.entity_distribution.package_distribution impo
 from common.entities.base_entities.entity_distribution.priority_distribution import PriorityDistribution
 from common.entities.base_entities.entity_distribution.temporal_distribution import TimeDeltaDistribution, \
     TimeWindowDistribution, DateTimeDistribution
-from common.entities.base_entities.fleet.empty_drone_delivery_board_generation import build_empty_drone_delivery_board
+from common.entities.base_entities.fleet.empty_drone_delivery_board_generation import generate_empty_delivery_board
 from common.entities.base_entities.fleet.fleet_property_sets import DroneSetProperties, DroneFormationTypePolicy, \
-    PackageConfigurationPolicy
+    PackageConfigurationPolicy, BoardLevelProperties
 from common.entities.base_entities.package import PackageType
 from common.entities.base_entities.temporal import TimeDeltaExtension, DateTimeExtension
 from experiment_space.analyzer.quantitative_analyzer import MatchedDeliveryRequestsAnalyzer, \
@@ -272,10 +272,12 @@ class EndToEndMultipleExperimentRun(unittest.TestCase):
             drone_formation_policy=DroneFormationTypePolicy({DroneFormationType.PAIR: 1, DroneFormationType.QUAD: 0}),
             package_configurations_policy=None,
             drone_type: DroneType = DroneType.drone_type_1,
-            amount: int = 30, max_route_time_entire_board: int = 400, velocity_entire_board: float = 10.0):
+            amount: int = 30,
+            max_route_time_entire_board: int = 400,
+            velocity_entire_board: float = 10.0):
+        board_level_properties = BoardLevelProperties(max_route_time_entire_board, velocity_entire_board)
         drone_set_properties = DroneSetProperties(drone_type=drone_type,
                                                   package_configuration_policy=package_configurations_policy,
                                                   drone_formation_policy=drone_formation_policy,
                                                   drone_amount=amount)
-        return build_empty_drone_delivery_board(drone_set_properties, max_route_time_entire_board,
-                                                velocity_entire_board)
+        return generate_empty_delivery_board(drone_set_properties, board_level_properties)
