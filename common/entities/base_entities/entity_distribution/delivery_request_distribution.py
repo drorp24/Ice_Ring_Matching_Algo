@@ -73,11 +73,12 @@ class DeliveryRequestDistribution(HierarchialDistribution):
 
     @staticmethod
     def _calc_result_list(do_distribution, internal_amount, random, sampled_distributions):
-        return [DeliveryRequest(
-            do_distribution.choose_rand(random=random, base_loc=loc, amount=internal_amount), tw, priority,id=EntityID.generate_uuid())
-            for (loc, tw, priority) in zip(sampled_distributions['location'],
-                                           sampled_distributions['time_window'],
-                                           sampled_distributions['priority'])]
+        return [DeliveryRequest(EntityID.generate_uuid(),
+                                do_distribution.choose_rand(random=random, base_loc=loc, amount=internal_amount), tw,
+                                priority)
+                for (loc, tw, priority) in zip(sampled_distributions['location'],
+                                               sampled_distributions['time_window'],
+                                               sampled_distributions['priority'])]
 
     @staticmethod
     def get_all_internal_types():

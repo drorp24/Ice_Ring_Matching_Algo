@@ -22,8 +22,8 @@ class DroneLoadingStationDistribution(Distribution):
             List[DroneLoadingStation]:
         delta_locations = self._drone_station_locations_distributions.choose_rand(random=random, amount=amount)
         locations = [base_location.add_vector(delta.to_vector()) for delta in delta_locations]
-        ids =[EntityID.generate_uuid() for i in delta_locations]
-        return list(map(DroneLoadingStation,ids, locations))
+        ids = [EntityID.generate_uuid() for delta_location in delta_locations]
+        return list(map(DroneLoadingStation, ids, locations))
 
     @classmethod
     def distribution_class(cls) -> type:

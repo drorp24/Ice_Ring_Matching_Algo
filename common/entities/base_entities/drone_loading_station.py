@@ -7,8 +7,8 @@ from geometry.utils import Shapeable
 
 class DroneLoadingStation(JsonableBaseEntity, Shapeable):
 
-    def __init__(self,id:EntityID, location: Point2D):
-        self._id=id
+    def __init__(self, id: EntityID, location: Point2D):
+        self._id = id
         self._location = location
 
     @property
@@ -21,11 +21,11 @@ class DroneLoadingStation(JsonableBaseEntity, Shapeable):
 
     def __eq__(self, other):
         return self.__class__ == other.__class__ and \
-               self.location == other.location and \
-               self.id == other.id
+               self.id == other.id and \
+               self.location == other.location
 
     def __hash__(self):
-        return hash(self._location)
+        return hash((self.id,self._location))
 
     @classmethod
     def dict_to_obj(cls, dict_input):
@@ -41,4 +41,3 @@ class DroneLoadingStation(JsonableBaseEntity, Shapeable):
 
     def calc_area(self) -> float:
         return 0
-
