@@ -33,8 +33,7 @@ class ORToolsMatcher(Matcher):
         self._routing_model = self._set_routing_model()
         self._search_parameters = self._set_search_params()
         self._solution_handler = ORToolsSolutionHandler(self._graph_exporter, self._index_manager, self._routing_model,
-                                                        self._matcher_input)
-
+                                                        self._matcher_input, self._arrive_indices, self._depart_indices)
         self._set_objective()
         self._set_constraints()
         # self._set_reloading_depos_for_each_formation(num_of_reloading_depo_nodes_per_formation)
