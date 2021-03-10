@@ -1,19 +1,15 @@
-from datetime import timedelta
-from typing import List
-
 from ortools.constraint_solver import pywrapcp
-from ortools.constraint_solver.pywrapcp import RoutingIndexManager, RoutingModel, Assignment
+from ortools.constraint_solver.pywrapcp import RoutingIndexManager, RoutingModel
 from ortools.constraint_solver.routing_parameters_pb2 import RoutingSearchParameters
 
-from common.entities.base_entities.drone_delivery import DroneDelivery, MatchedDroneLoadingDock, MatchedDeliveryRequest
-from common.entities.base_entities.drone_delivery_board import DroneDeliveryBoard, UnmatchedDeliveryRequest
-from common.entities.base_entities.temporal import TimeDeltaExtension, TimeWindowExtension
+from common.entities.base_entities.drone_delivery_board import DroneDeliveryBoard
 from common.graph.operational.export_ortools_graph import OrtoolsGraphExporter
 from matching.matcher import Matcher
 from matching.matcher_input import MatcherInput
 from matching.monitor_plotter import create_monitor_figure
 from matching.ortools.ortools_matcher_constraints import ORToolsMatcherConstraints, OrToolsDimensionDescription
 from matching.ortools.ortools_matcher_monitor import ORToolsMatcherMonitor
+from matching.ortools.ortools_matcher_constraints import ORToolsMatcherConstraints
 from matching.ortools.ortools_matcher_objective import ORToolsMatcherObjective
 from matching.ortools.ortools_solution_handler import ORToolsSolutionHandler
 

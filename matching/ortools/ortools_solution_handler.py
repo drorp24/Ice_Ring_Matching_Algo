@@ -21,6 +21,7 @@ class ORToolsSolutionHandler:
         self._matcher_input = matcher_input
 
     def create_drone_delivery_board(self, solution: Assignment) -> DroneDeliveryBoard:
+
         return DroneDeliveryBoard(drone_deliveries=self._create_drone_deliveries(solution),
                                   unmatched_delivery_requests=self._extract_unmatched_delivery_requests(solution))
 
@@ -54,7 +55,6 @@ class ORToolsSolutionHandler:
         matched_requests = []
 
         start_index = self._routing_model.Start(edd_index)
-        graph_start_index = self._index_manager.IndexToNode(start_index)
         index = solution.Value(self._routing_model.NextVar(start_index))
         while not self._routing_model.IsEnd(index) and not self._routing_model.IsStart(index):
             graph_index = self._index_manager.IndexToNode(index)
@@ -101,11 +101,11 @@ class ORToolsSolutionHandler:
             delivery_time_window=self._get_delivery_time_window(index, solution))
 
     def _get_delivery_time_window(self, index: int, solution: Assignment) -> TimeWindowExtension:
-        time_dimension = self._routing_model.GetDimensionOrDie(OrToolsDimensionDescription.time.value)
-        time_var = time_dimension.CumulVar(index)
+        travel_time_dimension = self._routing_model.GetDimensionOrDie(OrToolsDimensionDescription.travel_time.value)
+        travel_time_var = travel_time_dimension.CumulVar(index)
 
         return TimeWindowExtension(
             since=(self._matcher_input.config.zero_time.add_time_delta(
-                TimeDeltaExtension(timedelta(minutes=solution.Min(time_var))))),
+                TimeDeltaExtension(timedelta(minutes=solution.Min(travel_time_var))))),
             until=(self._matcher_input.config.zero_time.add_time_delta(
-                TimeDeltaExtension(timedelta(minutes=solution.Max(time_var))))))
+                TimeDeltaExtension(timedelta(minutes=solution.Max(travel_time_var))))))
