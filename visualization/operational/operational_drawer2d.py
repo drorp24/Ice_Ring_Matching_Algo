@@ -105,9 +105,8 @@ class _MatchedDeliveryLabelsHandler:
 
     def add_matched_delivery(self, delivery: DroneDelivery) -> Color:
         self.matched_delivery_labels.append("[" +
-                                            str(delivery.drone_formation.drone_formation_type.value) + "] * " +
-                                            str(delivery.drone_formation.drone_configuration.package_type_map.
-                                                get_package_type_amounts()))
+                                            str(delivery.drone_formation.drone_formation_type.name) + "] * " +
+                                            str(delivery.drone_formation.drone_package_configuration.package_type_map))
         delivery_color = self._optional_delivery_colors[
             len(self.selected_delivery_colors) % len(self._optional_delivery_colors)]
         self.selected_delivery_colors.append(delivery_color)
@@ -122,7 +121,7 @@ def add_unmatched_delivery_requests(drawer: Drawer2D, unmatched_requests: [Unmat
 def add_drone_deliveries(drawer: Drawer2D, drone_deliveries: [DroneDelivery]):
     labels_handler = _MatchedDeliveryLabelsHandler()
     for i, delivery in enumerate(drone_deliveries):
-        if len(delivery.matched_requests) is 0:
+        if len(delivery.matched_requests) == 0:
             continue
         delivery_color = labels_handler.add_matched_delivery(delivery)
         add_drone_delivery(drawer, delivery, delivery_color)

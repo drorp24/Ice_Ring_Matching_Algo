@@ -30,3 +30,12 @@ class BasicDropEnvelopeTestCase(unittest.TestCase):
     def test_create_drop_envelope_with_drop_azimuth(self):
         drop_envelope = DropEnvelope(drop_envelope_properties=self.drop_envelope_properties_2)
         self.assertEqual(drop_envelope.drop_point, create_point_2d(x=10, y=10))
+
+    def test_create_from_properties(self):
+        ref_drop_envelope = DropEnvelope(drop_envelope_properties=self.drop_envelope_properties_2)
+        drop_envelope = DropEnvelope.from_drop_envelope_properties(
+            drone_azimuth=self.drop_envelope_properties_2.drone_azimuth,
+            drop_point=self.drop_envelope_properties_2.drop_point,
+            drop_azimuth=Optional.of(self.drop_envelope_properties_2.drop_azimuth),
+            package_type=self.drop_envelope_properties_2.package_type)
+        self.assertEqual(drop_envelope, ref_drop_envelope)

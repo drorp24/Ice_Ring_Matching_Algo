@@ -24,7 +24,7 @@ OPERATING_TIME_WINDOW_COLOR = Color.Red
 def add_delivery_board(drawer: GanttDrawer, board: DroneDeliveryBoard, draw_unmatched=True):
     for i, delivery in enumerate(board.drone_deliveries):
         delivery_row = i + 1 + UNMATCHED_ROW_NUMBER
-        if len(delivery.matched_requests) is 0:
+        if len(delivery.matched_requests) == 0:
             continue
         drawer.add_row_area(
             row=delivery_row,

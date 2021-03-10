@@ -1,6 +1,8 @@
 from dataclasses import dataclass
 from typing import Union
 
+from optional import Optional
+
 from common.entities.base_entities.package import PackageType
 from common.math.angle import Angle
 from drop_envelope.slide_service import MockSlidesServiceWrapper
@@ -25,6 +27,17 @@ class DropEnvelope(Shapeable):
         self._internal_envelope = MockSlidesServiceWrapper.get_slide(self._drone_azimuth, self._drop_azimuth,
                                                                      self._package_type).shift(self._drop_point)
 
+    @classmethod
+    def from_drop_envelope_properties(cls, drone_azimuth: Angle, drop_azimuth: Optional.of(Angle),
+                                      package_type: PackageType, drop_point: Point2D):
+        if drop_azimuth.is_empty():
+            drop_azimuth = Optional.of(drone_azimuth)
+        drop_envelope_properties = DropEnvelopeProperties(drop_point=drop_point,
+                                                          drop_azimuth=drop_azimuth.get(),
+                                                          drone_azimuth=drone_azimuth,
+                                                          package_type=package_type)
+        return DropEnvelope(drop_envelope_properties)
+
     @property
     def package_type(self) -> PackageType:
         return self._package_type
@@ -46,7 +59,7 @@ class DropEnvelope(Shapeable):
         return self._drop_point
 
     def calc_location(self) -> Point2D:
-        return self._internal_envelope.centroid()
+        return self._internal_envelope.calc_centroid()
 
     def get_shape(self) -> Polygon2D:
         return self._internal_envelope

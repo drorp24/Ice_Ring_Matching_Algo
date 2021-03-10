@@ -39,12 +39,17 @@ class FleetPartition(object):
 
     def __init__(self, drone_set_properties: DroneSetProperties):
         self.fleet_partition_parameters: FleetPartitionParameters = FleetPartitionParameters([], [], 0)
-        self.fleet_partition_parameters.fleet_drone_amount = drone_set_properties.drone_amount
+        self.fleet_partition_parameters.fleet_drone_amount = drone_set_properties.drone_amount - \
+                                                             FleetPartition.is_drone_amount_odd(drone_set_properties)
         formation_type_policy = drone_set_properties.drone_formation_policy.policy
         self.fleet_partition_parameters.formation_drone_amount_options = FleetPartition \
             .get_amount_of_drones_per_type_in_policy(formation_type_policy)
         self.fleet_partition_parameters.formation_type_probabilities = FleetPartition \
             .get_probs_per_type_in_policy(formation_type_policy)
+
+    @staticmethod
+    def is_drone_amount_odd(drone_set_properties):
+        return drone_set_properties.drone_amount % 2 != 0
 
     @staticmethod
     def get_probs_per_type_in_policy(formation_type_policy):

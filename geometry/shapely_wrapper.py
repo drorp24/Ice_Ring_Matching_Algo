@@ -186,16 +186,16 @@ class _ShapelyPolygon2D(_ShapelyGeometry, Polygon2D):
             boundary_points=[_ShapelyPoint2D.dict_to_obj(point_dict) for point_dict in
                              dict_input['points']])
 
-    def holes(self) -> List[LinearRing2D]:
+    def calc_holes(self) -> List[LinearRing2D]:
         raise NotImplementedError
 
-    def boundary(self) -> LinearRing2D:
+    def calc_boundary(self) -> LinearRing2D:
         return _ShapelyLinearRing2D(self.points)
 
-    def centroid(self) -> Point2D:
+    def calc_centroid(self) -> Point2D:
         return _ShapelyUtils.convert_shapely_to_point_2d(self._shapely_obj.centroid)
 
-    def bbox(self) -> Bbox2D:
+    def calc_bbox(self) -> Bbox2D:
         min_x, min_y, max_x, max_y = self._shapely_obj.bounds
         return _ShapelyBbox2D(min_x, min_y, max_x, max_y)
 
