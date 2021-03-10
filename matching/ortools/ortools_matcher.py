@@ -14,7 +14,7 @@ from matching.matcher_input import MatcherInput
 from matching.ortools.ortools_matcher_constraints import ORToolsMatcherConstraints, OrToolsDimensionDescription
 from matching.ortools.ortools_matcher_objective import ORToolsMatcherObjective
 
-AVERAGE_RELOAD_PER_FORMATION = 4
+RELOAD_PER_FORMATION = 5
 NUM_OF_NODES_IN_RELOADING_DEPO = 2 # Reloading depo consists of 2 nodes:
                                         # arrive node & depart node so we can reset the cumulated time between them.
 
@@ -23,8 +23,9 @@ class ORToolsMatcher(Matcher):
 
     def __init__(self, matcher_input: MatcherInput):
         super().__init__(matcher_input)
+        num_of_reloading_depo_nodes_per_formation = RELOAD_PER_FORMATION * NUM_OF_NODES_IN_RELOADING_DEPO
         num_of_reloading_depo_nodes = self._matcher_input.empty_board.amount_of_formations() \
-                                      * AVERAGE_RELOAD_PER_FORMATION * NUM_OF_NODES_IN_RELOADING_DEPO
+                                      * num_of_reloading_depo_nodes_per_formation
         self._reloading_virtual_depos_indices = list(range(
             len(self._matcher_input.graph.nodes),
             len(self._matcher_input.graph.nodes) + num_of_reloading_depo_nodes))
@@ -38,6 +39,7 @@ class ORToolsMatcher(Matcher):
 
         self._set_objective()
         self._set_constraints()
+        # self._set_reloading_depos_for_each_formation(num_of_reloading_depo_nodes_per_formation)
 
     def match(self) -> DroneDeliveryBoard:
         solution = self._routing_model.SolveWithParameters(self._search_parameters)
@@ -209,3 +211,13 @@ class ORToolsMatcher(Matcher):
                 TimeDeltaExtension(timedelta(minutes=service_time_in_min))),
             until=self._matcher_input.config.zero_time.add_time_delta(
                 TimeDeltaExtension(timedelta(minutes=service_time_in_min))))
+
+    def _set_reloading_depos_for_each_formation(self, num_of_reloading_depo_nodes_per_formation):
+        for formation_index in range(self._matcher_input.empty_board.amount_of_formations()):
+            formation_reloading_depos = self._reloading_virtual_depos_indices[
+                                        formation_index * num_of_reloading_depo_nodes_per_formation:
+                                        (formation_index + 1) * num_of_reloading_depo_nodes_per_formation]
+            for node in [formation_reloading_depos[0]]:
+                index = self._index_manager.NodeToIndex(node)
+                must_have_not_active_option_index = -1
+                self._routing_model.VehicleVar(index).SetValues([must_have_not_active_option_index, formation_index])
