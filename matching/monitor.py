@@ -77,12 +77,15 @@ class Monitor:
     def update_data(self, current_objective_value: int = None, total_priority_value: int = None,
                     total_unmatched_delivery_requests: int = None,
                     unmatched_delivery_requests_total_priority: int = None):
-        self._num_of_iterations += 1
+
         self._prev_objective_value = self._best_objective_value
         self._best_objective_value = current_objective_value
         self.add_monitor(current_objective_value, total_priority_value, total_unmatched_delivery_requests,
                          unmatched_delivery_requests_total_priority, self.num_of_iterations,
                          current_milli_time() - self._start_time)
+
+    def increase_iterations(self):
+        self._num_of_iterations += 1
 
     def __repr__(self):
         return repr(self._data)
