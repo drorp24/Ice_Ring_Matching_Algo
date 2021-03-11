@@ -31,6 +31,13 @@ from geometry.distribution.geo_distribution import UniformPointInBboxDistributio
     NormalPointsInMultiPolygonDistribution
 from geometry.geo_factory import create_point_2d, create_polygon_2d, create_multipolygon_2d
 from matching.matcher_config import MatcherConfig
+from visualization.basic.drawer2d import Drawer2DCoordinateSys
+from visualization.basic.pltdrawer2d import create_drawer_2d, MapImage
+from visualization.basic.pltgantt_drawer import create_gantt_drawer
+from visualization.operational import operational_drawer2d
+from visualization.operational import operational_gantt_drawer
+from common.entities.base_entities.entity_id import EntityID
+from uuid import uuid4
 from visualization.basic.pltdrawer2d import MapImage
 
 ZERO_TIME = DateTimeExtension(dt_date=date(2021, 1, 1), dt_time=time(0, 0, 0))
@@ -142,15 +149,17 @@ def _create_standard_full_day_test_time():
                                   TimeDeltaDistribution([TimeDeltaExtension(timedelta(hours=23, minutes=59))]))
 
 
-def _create_standard_zones(zone_amount: int = 1) -> List[Zone]:
-    return [Zone(create_polygon_2d([create_point_2d(35.03, 31.82),
-                                    create_point_2d(35.03, 32.01),
-                                    create_point_2d(35.3, 32.01),
-                                    create_point_2d(35.3, 31.82)])),
-            Zone(create_polygon_2d([create_point_2d(35.03, 32.01),
-                                    create_point_2d(35.09, 32.18),
-                                    create_point_2d(35.3, 32.18),
-                                    create_point_2d(35.3, 32.01)]))][0:zone_amount]
+def _create_zones(zone_amount: int = 1) -> List[Zone]:
+    return [
+               Zone(create_polygon_2d([create_point_2d(35.03, 31.82),
+                                       create_point_2d(35.03, 32.01),
+                                       create_point_2d(35.3, 32.01),
+                                       create_point_2d(35.3, 31.82)]),id = EntityID.generate_uuid()),
+               Zone(create_polygon_2d([create_point_2d(35.03, 32.01),
+                                       create_point_2d(35.09, 32.18),
+                                       create_point_2d(35.3, 32.18),
+                                       create_point_2d(35.3, 32.01)]),id = EntityID.generate_uuid())
+           ][0:zone_amount]
 
 
 def _create_zone_delivery_request_distribution(sigma_lon: float, sigma_lat: float, lowest_priority: int = 10,
