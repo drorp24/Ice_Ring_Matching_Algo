@@ -22,7 +22,7 @@ from common.entities.base_entities.package import PackageType
 from common.entities.base_entities.temporal import TimeDeltaExtension, DateTimeExtension
 from experiment_space.analyzer.quantitative_analyzer import MatchedDeliveryRequestsAnalyzer, \
     UnmatchedDeliveryRequestsAnalyzer, MatchPercentageDeliveryRequestAnalyzer, TotalWorkTimeAnalyzer, \
-    AmountMatchedPerPackageTypeAnalyzer, MatchingEfficiencyAnalyzer
+    AmountMatchedPerPackageTypeAnalyzer, MatchingEfficiencyAnalyzer, MatchingPriorityEfficiencyAnalyzer
 from experiment_space.distribution.supplier_category_distribution import SupplierCategoryDistribution
 from experiment_space.experiment import Experiment
 from experiment_space.experiment_generator import create_options_class, Options
@@ -49,7 +49,8 @@ class EndToEndMultipleExperimentRun(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.drone_set_properties = EndToEndMultipleExperimentRun._create_regular_drone_set_properties()
+        cls.drone_set_properties_even = EndToEndMultipleExperimentRun._create_even_drone_set_properties()
+        cls.drone_set_properties_heavily_weighted = EndToEndMultipleExperimentRun._create_uneven_drone_set_properties()
         cls.matcher_config = MatcherConfig.dict_to_obj(
             MatcherConfig.json_to_dict(Path('experiment_space/tests/jsons/test_matcher_config.json')))
 
@@ -66,7 +67,7 @@ class EndToEndMultipleExperimentRun(unittest.TestCase):
     def test_calc_center_scenario_visualization(self):
         sampled_supplier_category = self._create_sampled_supplier_category_center()
         experiment = Experiment(supplier_category=sampled_supplier_category,
-                                drone_set_properties=self.drone_set_properties,
+                                drone_set_properties=self.drone_set_properties_even,
                                 matcher_config=self.matcher_config,
                                 graph_creation_algorithm=FullyConnectedGraphAlgorithm())
         EndToEndMultipleExperimentRun._run_end_to_end_visual_experiment(experiment, SHOW_VISUALS)
@@ -75,7 +76,7 @@ class EndToEndMultipleExperimentRun(unittest.TestCase):
     def test_calc_center_scenario_with_different_first_solution_strategies(self):
         sampled_supplier_category = self._create_sampled_supplier_category_center()
         experiment = Experiment(supplier_category=sampled_supplier_category,
-                                drone_set_properties=self.drone_set_properties,
+                                drone_set_properties=self.drone_set_properties_heavily_weighted,
                                 matcher_config=self.matcher_config,
                                 graph_creation_algorithm=FullyConnectedGraphAlgorithm())
         experiment_options = create_options_class(experiment, ['Experiment', 'MatcherConfig', 'ORToolsSolverConfig'])
@@ -85,6 +86,7 @@ class EndToEndMultipleExperimentRun(unittest.TestCase):
                                      'BEST_INSERTION', 'PARALLEL_CHEAPEST_INSERTION', 'SEQUENTIAL_CHEAPEST_INSERTION',
                                      'LOCAL_CHEAPEST_INSERTION', 'GLOBAL_CHEAPEST_ARC', 'LOCAL_CHEAPEST_ARC',
                                      'FIRST_UNBOUND_MIN_VALUE']
+
         experiment_options.matcher_config[0].solver[0].first_solution_strategy = first_solution_strategies
         experiments = Options.calc_cartesian_product(experiment_options)
 
@@ -100,22 +102,22 @@ class EndToEndMultipleExperimentRun(unittest.TestCase):
                            for labeled_experiment in zip(first_solution_strategies, experiments)]
 
         draw_labeled_analysis_bar_chart(labeled_experiment_analysis=labeled_results,
-                                        analyzer=MatchPercentageDeliveryRequestAnalyzer,
+                                        analyzer=MatchingEfficiencyAnalyzer,
                                         title='Match percentage per first solution strategy type',
                                         xlabel='First Solution Strategies',
                                         ylabel='Match Percentage of Delivery Requests')
 
-    @unittest.skip
+    # @unittest.skip
     def test_calc_center_scenario_with_different_fleet_sizes(self):
         sampled_supplier_category = self._create_sampled_supplier_category_north()
         experiment = Experiment(supplier_category=sampled_supplier_category,
-                                drone_set_properties=self.drone_set_properties,
+                                drone_set_properties=self.drone_set_properties_heavily_weighted,
                                 matcher_config=self.matcher_config,
                                 graph_creation_algorithm=FullyConnectedGraphAlgorithm())
 
         experiment_options = create_options_class(experiment, ['Experiment', 'DroneSetProperties'])
 
-        drone_amount_options = list(range(2, 51, 3))
+        drone_amount_options = list(range(2, 80, 2))
         experiment_options.drone_set_properties[0].drone_amount = drone_amount_options
         experiments = Options.calc_cartesian_product(experiment_options)
 
@@ -124,23 +126,24 @@ class EndToEndMultipleExperimentRun(unittest.TestCase):
                             MatchPercentageDeliveryRequestAnalyzer,
                             TotalWorkTimeAnalyzer,
                             AmountMatchedPerPackageTypeAnalyzer,
-                            MatchingEfficiencyAnalyzer]
+                            MatchingEfficiencyAnalyzer,
+                            MatchingPriorityEfficiencyAnalyzer]
 
         labeled_results = [(str(labeled_experiment[0]),
                             Experiment.run_analysis_suite(labeled_experiment[1].run_match(), analyzers_to_run))
                            for labeled_experiment in zip(drone_amount_options, experiments)]
-
-        draw_labeled_analysis_graph(labeled_experiment_analysis=labeled_results,
-                                    analyzer=MatchPercentageDeliveryRequestAnalyzer,
-                                    title='Match percentage per fleet size',
-                                    xlabel='Fleet Size',
-                                    ylabel='Match Percentage of Delivery Requests')
-
+        # EndToEndMultipleExperimentRun._run_end_to_end_visual_experiment(experiments[12], SHOW_VISUALS)
         draw_labeled_analysis_graph(labeled_experiment_analysis=labeled_results,
                                     analyzer=MatchingEfficiencyAnalyzer,
-                                    title='Match percentage per fleet size',
+                                    title='Match Percentage per Fleet Size',
                                     xlabel='Fleet Size',
-                                    ylabel='Match Efficiency')
+                                    ylabel='Match Percentage')
+
+        draw_labeled_analysis_graph(labeled_experiment_analysis=labeled_results,
+                                    analyzer=MatchingPriorityEfficiencyAnalyzer,
+                                    title='Match Percentage per Fleet Size',
+                                    xlabel='Fleet Size',
+                                    ylabel='Match Percentage')
 
     @staticmethod
     def _run_end_to_end_visual_experiment(experiment: Experiment, show_visuals: bool):
@@ -184,10 +187,19 @@ class EndToEndMultipleExperimentRun(unittest.TestCase):
             DeliveryRequest: 25})[0]
 
     @classmethod
-    def _create_regular_drone_set_properties(cls):
+    def _create_even_drone_set_properties(cls):
         return DroneSetProperties(drone_type=DroneType.drone_type_1,
                                   drone_formation_policy=DroneFormationTypePolicy(
-                                      {DroneFormationType.PAIR: 0.9, DroneFormationType.QUAD: 0.1}),
+                                      {DroneFormationType.PAIR: 0.5, DroneFormationType.QUAD: 0.5}),
+                                  package_configuration_policy=PackageConfigurationPolicy(
+                                      {PackageConfiguration.LARGE_X2: 1.0}),
+                                  drone_amount=30)
+
+    @classmethod
+    def _create_uneven_drone_set_properties(cls):
+        return DroneSetProperties(drone_type=DroneType.drone_type_1,
+                                  drone_formation_policy=DroneFormationTypePolicy(
+                                      {DroneFormationType.PAIR: 1.0, DroneFormationType.QUAD: 0.00}),
                                   package_configuration_policy=PackageConfigurationPolicy(
                                       {PackageConfiguration.LARGE_X2: 1.0}),
                                   drone_amount=30)
@@ -196,7 +208,7 @@ class EndToEndMultipleExperimentRun(unittest.TestCase):
     def _create_large_drone_set_properties(cls):
         return DroneSetProperties(drone_type=DroneType.drone_type_1,
                                   drone_formation_policy=DroneFormationTypePolicy(
-                                      {DroneFormationType.PAIR: 0.9, DroneFormationType.QUAD: 0.1}),
+                                      {DroneFormationType.PAIR: 1.0, DroneFormationType.QUAD: 0.0}),
                                   package_configuration_policy=PackageConfigurationPolicy(
                                       {PackageConfiguration.LARGE_X2: 1.0}),
                                   drone_amount=100)

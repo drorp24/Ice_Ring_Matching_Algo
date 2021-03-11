@@ -62,5 +62,5 @@ class Experiment(JsonableBaseEntity):
 
     def __eq__(self, other):
         return self.supplier_category == other.supplier_category \
-               and self.drone_set_properties == other.drone_set_properties \
+               and self.drone_set_properties == other.drone_set_properties_even \
                and self.matcher_config == other.matcher_config

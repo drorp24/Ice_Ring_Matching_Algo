@@ -79,7 +79,6 @@ def create_linear_ring_2d(points: List[Point2D]) -> LinearRing2D:
 
 def calc_centroid(points: [Point2D]) -> Point2D:
     l = (reduce(lambda p, j: p + j, points).to_vector() * (1.0 / points.__len__())).to_point()
-
     return l
 
 

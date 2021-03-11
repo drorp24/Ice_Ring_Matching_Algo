@@ -1,3 +1,4 @@
+from itertools import chain
 from typing import Dict
 
 from common.entities.base_entities.drone import PackageTypeAmountMap
@@ -58,7 +59,7 @@ class AmountMatchedPerPackageTypeAnalyzer(Analyzer):
     def _calc_total_amount_matched_per_package_type(delivery_board: DroneDeliveryBoard) -> Dict:
         amount_matched_per_package_type = PackageTypeAmountMap({package: 0 for package in PackageType})
         for drone_delivery in delivery_board.drone_deliveries:
-            amount_matched_per_package_type.add_to_map(drone_delivery.get_total_package_type_amount_map())
+            amount_matched_per_package_type.add_packages_to_map(drone_delivery.get_total_package_type_amount_map())
         return amount_matched_per_package_type.package_type_to_amounts
 
 
@@ -72,7 +73,7 @@ class MatchingEfficiencyAnalyzer(QuantitativeAnalyzer):
     def _calc_match_efficiency_score(delivery_board: DroneDeliveryBoard) -> float:
         amount_unmatched = UnmatchedDeliveryRequestsAnalyzer.calc_analysis(delivery_board)
         amount_matched = MatchedDeliveryRequestsAnalyzer.calc_analysis(delivery_board)
-        return 100.0 * (1.0 - amount_unmatched / (amount_unmatched + amount_matched))
+        return 100.0 * (amount_matched / (amount_unmatched + amount_matched))
 
 
 class MatchingPriorityEfficiencyAnalyzer(QuantitativeAnalyzer):
@@ -83,7 +84,13 @@ class MatchingPriorityEfficiencyAnalyzer(QuantitativeAnalyzer):
 
     @staticmethod
     def _calc_match_priority_efficiency_score(delivery_board: DroneDeliveryBoard) -> float:
-        # TODO: Define reasonable priority weighted efficiency score - this is the previous calculation:
-        # priority_eff = 100.0 * (1 - (self.lowest_priority * num_unmatched_dr - unmatched_priority) /
-        #                             (self.lowest_priority * delivery_request_amount - total_priority))
-        raise Exception()
+        num_unmatched = UnmatchedDeliveryRequestsAnalyzer.calc_analysis(delivery_board)
+        num_matched = MatchedDeliveryRequestsAnalyzer.calc_analysis(delivery_board)
+        unmatched_priorities = list(map(lambda dr: dr.delivery_request.priority,
+                                        list(delivery_board.unmatched_delivery_requests)))
+        matched_priorities = list(map(lambda mr: mr.delivery_request.priority, list(chain.from_iterable(
+            map(lambda dr: dr.matched_requests, list(delivery_board.drone_deliveries))))))
+        all_priorities = unmatched_priorities + matched_priorities
+        priority_eff = 100.0 * (1 - (min(all_priorities) * num_unmatched - sum(unmatched_priorities)) /
+                                (min(all_priorities) * (num_matched + num_unmatched) - sum(all_priorities)))
+        return priority_eff

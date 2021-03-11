@@ -126,6 +126,10 @@ class DroneDelivery(EmptyDroneDelivery):
     def end_drone_loading_docks(self) -> MatchedDroneLoadingDock:
         return self._end_drone_loading_docks
 
+    @property
+    def drone_formation(self) -> DroneFormation:
+        return super().drone_formation
+
     @lru_cache()
     def get_total_work_time_in_minutes(self) -> float:
         return self._end_drone_loading_docks.delivery_time_window.since.get_time_delta(
@@ -138,7 +142,7 @@ class DroneDelivery(EmptyDroneDelivery):
             dr = matched_request.delivery_request
             delivery_option_of_interest = dr.delivery_options[matched_request.matched_delivery_option_index]
             delivery_option_package_type_amount = delivery_option_of_interest.get_package_type_amount_map()
-            amount_per_package_type.add_to_map(delivery_option_package_type_amount)
+            amount_per_package_type.add_packages_to_map(delivery_option_package_type_amount)
         return amount_per_package_type
 
     @lru_cache()

@@ -64,7 +64,7 @@ class DroneFormation(JsonableBaseEntity):
             package_type_name: package_amount * self.drone_formation_type.get_amount_of_drones() for
             package_type_name, package_amount in
             self._drone_package_configuration.package_type_map.package_type_to_amounts.items()})
-        amount_per_package_type.add_to_map(extracted_package_type_amounts)
+        amount_per_package_type.add_packages_to_map(extracted_package_type_amounts)
         return amount_per_package_type
 
     def get_package_type(self) -> PackageType:

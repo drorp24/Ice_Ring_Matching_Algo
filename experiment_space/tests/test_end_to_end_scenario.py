@@ -3,7 +3,6 @@ from pathlib import Path
 
 from common.entities.base_entities.drone import DroneType, PackageConfiguration
 from common.entities.base_entities.drone_formation import DroneFormationType
-from common.entities.base_entities.fleet.empty_drone_delivery_board_generation import generate_empty_delivery_board
 from common.entities.base_entities.fleet.fleet_property_sets import DroneSetProperties, DroneFormationTypePolicy, \
     PackageConfigurationPolicy
 from common.entities.base_entities.package import PackageType
