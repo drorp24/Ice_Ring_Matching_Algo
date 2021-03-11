@@ -169,7 +169,7 @@ def _create_zone_delivery_request_distribution(sigma_lon: float, sigma_lat: floa
     time_delta_distrib = TimeDeltaDistribution([TimeDeltaExtension(timedelta(hours=dr_timewindow, minutes=0))])
     dt_options = [ZERO_TIME.add_time_delta(TimeDeltaExtension(timedelta(hours=x))) for x in range(24 - dr_timewindow)]
     time_window_distribution = TimeWindowDistribution(DateTimeDistribution(dt_options), time_delta_distrib)
-    zones = _create_standard_zones(zone_amount)
+    zones = _create_zones(zone_amount)
     zones_regions = create_multipolygon_2d([zone.region for zone in zones])
     zone_delivery_request_distribution = build_zone_delivery_request_distribution(
         zones=zones,

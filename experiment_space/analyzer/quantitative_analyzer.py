@@ -91,6 +91,6 @@ class MatchingPriorityEfficiencyAnalyzer(QuantitativeAnalyzer):
         matched_priorities = list(map(lambda mr: mr.delivery_request.priority, list(chain.from_iterable(
             map(lambda dr: dr.matched_requests, list(delivery_board.drone_deliveries))))))
         all_priorities = unmatched_priorities + matched_priorities
-        priority_eff = 100.0 * (1 - (min(all_priorities) * num_unmatched - sum(unmatched_priorities)) /
-                                (min(all_priorities) * (num_matched + num_unmatched) - sum(all_priorities)))
+        priority_eff = 100.0 * (1 - (max(all_priorities) * num_unmatched - sum(unmatched_priorities)) /
+                                (max(all_priorities) * (num_matched + num_unmatched) - sum(all_priorities)))
         return priority_eff

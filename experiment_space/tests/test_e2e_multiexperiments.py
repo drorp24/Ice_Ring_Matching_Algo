@@ -107,7 +107,7 @@ class EndToEndMultipleExperimentRun(unittest.TestCase):
                                         xlabel='First Solution Strategies',
                                         ylabel='Match Percentage of Delivery Requests')
 
-    @unittest.skip
+    # @unittest.skip
     def test_calc_center_scenario_with_different_fleet_sizes(self):
         sampled_supplier_category = self._create_sampled_supplier_category_north()
         experiment = Experiment(supplier_category=sampled_supplier_category,
