@@ -1,3 +1,4 @@
+from random import random, Random
 from typing import List, Dict, Tuple
 
 from experiment_space.analyzer.analyzer import Analyzer
@@ -14,22 +15,34 @@ def draw_matched_scenario(delivery_board, graph, supplier_category, map_image):
     draw_match_gantt(delivery_board, supplier_category, should_block=True)
 
 
+def draw_multianalysis_graph(experiment_analysis_results: List[Dict], analyzers: List[Analyzer],
+                             title: str, xlabel: str, ylabel: str, color: Tuple = (0, 0, 1, 0.5)):
+    indexed_results = [(str(i), result) for i, result in enumerate(experiment_analysis_results)]
+    xlabel = 'index' if xlabel is None else xlabel
+    ylabel = sum([a.__name__ + ' ' for a in analyzers]) if ylabel is None else ylabel
+    title = sum([a.__name__ + ' ' for a in analyzers]) + ' per Experiment' if title is None else title
+    draw_labeled_analysis_graph(indexed_results, analyzers, title, xlabel, ylabel, color)
+
+
 def draw_analysis_graph(experiment_analysis_results: List[Dict], analyzer: Analyzer,
                         title: str, xlabel: str, ylabel: str, color: Tuple = (0, 0, 1, 0.5)):
     indexed_results = [(str(i), result) for i, result in enumerate(experiment_analysis_results)]
     xlabel = 'index' if xlabel is None else xlabel
     ylabel = analyzer.__name__ if ylabel is None else ylabel
     title = analyzer.__name__ + ' per Experiment' if title is None else title
-    draw_labeled_analysis_graph(indexed_results, analyzer, title, xlabel, ylabel, color)
+    draw_labeled_analysis_graph(indexed_results, [analyzer], title, xlabel, ylabel, color)
 
 
-def draw_labeled_analysis_graph(labeled_experiment_analysis: List[Tuple[str, Dict]], analyzer: Analyzer,
-                                title: str, xlabel: str, ylabel: str, color: Tuple = (0, 0, 1, 0.5)):
+def draw_labeled_analysis_graph(experiment_analysis: List[Tuple[str, Dict]], analyzers: List[Analyzer],
+                                title: str, xlabel: str, ylabel: str, color: Tuple = (0, 0, 1, 0.5), seed=42):
     fig, ax = plt.subplots(constrained_layout=True)
-    x_experiment_label, y_analysis_output = _extract_x_y_from_labeled_experiment(analyzer, labeled_experiment_analysis)
-    ax.plot(x_experiment_label, y_analysis_output, 'bo-', linewidth=2, markersize=10, markerfacecolor=color)
+    for i, analyzer in enumerate(analyzers):
+        color = (Random(seed + i).random(), Random(seed + i*100).random(), Random(seed + i*1000).random(), 0.5)
+        x_experiment_label, y_analysis_output = _extract_x_y_from_labeled_experiment(analyzer, experiment_analysis)
+        ax.plot(x_experiment_label, y_analysis_output, 'o', color=color, linestyle='solid', linewidth=2, markersize=10, markerfacecolor=color, label=analyzer.__name__)
     _add_wording_to_plot(ax, title, xlabel, ylabel)
     ax.grid('on')
+    plt.legend()
     plt.show()
 
 

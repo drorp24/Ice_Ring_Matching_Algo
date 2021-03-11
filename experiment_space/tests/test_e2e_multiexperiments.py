@@ -107,7 +107,7 @@ class EndToEndMultipleExperimentRun(unittest.TestCase):
                                         xlabel='First Solution Strategies',
                                         ylabel='Match Percentage of Delivery Requests')
 
-    # @unittest.skip
+    @unittest.skip
     def test_calc_center_scenario_with_different_fleet_sizes(self):
         sampled_supplier_category = self._create_sampled_supplier_category_north()
         experiment = Experiment(supplier_category=sampled_supplier_category,
@@ -117,7 +117,7 @@ class EndToEndMultipleExperimentRun(unittest.TestCase):
 
         experiment_options = create_options_class(experiment, ['Experiment', 'DroneSetProperties'])
 
-        drone_amount_options = list(range(2, 80, 2))
+        drone_amount_options = list(range(2, 60,2))
         experiment_options.drone_set_properties[0].drone_amount = drone_amount_options
         experiments = Options.calc_cartesian_product(experiment_options)
 
@@ -132,15 +132,9 @@ class EndToEndMultipleExperimentRun(unittest.TestCase):
         labeled_results = [(str(labeled_experiment[0]),
                             Experiment.run_analysis_suite(labeled_experiment[1].run_match(), analyzers_to_run))
                            for labeled_experiment in zip(drone_amount_options, experiments)]
-        # EndToEndMultipleExperimentRun._run_end_to_end_visual_experiment(experiments[12], SHOW_VISUALS)
-        draw_labeled_analysis_graph(labeled_experiment_analysis=labeled_results,
-                                    analyzer=MatchingEfficiencyAnalyzer,
-                                    title='Match Percentage per Fleet Size',
-                                    xlabel='Fleet Size',
-                                    ylabel='Match Percentage')
 
-        draw_labeled_analysis_graph(labeled_experiment_analysis=labeled_results,
-                                    analyzer=MatchingPriorityEfficiencyAnalyzer,
+        draw_labeled_analysis_graph(experiment_analysis=labeled_results,
+                                    analyzers=[MatchingEfficiencyAnalyzer, MatchingPriorityEfficiencyAnalyzer],
                                     title='Match Percentage per Fleet Size',
                                     xlabel='Fleet Size',
                                     ylabel='Match Percentage')
