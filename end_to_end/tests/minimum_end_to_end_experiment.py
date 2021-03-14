@@ -129,15 +129,15 @@ class BasicMinimumEnd2EndExperiment:
         supplier_category = self.supplier_category_distribution.choose_rand(random=Random(10),
                                                                             amount={DeliveryRequest: 37,
                                                                                     DroneLoadingDock: 1})
-        fully_connected_graph = create_fully_connected_graph_model(supplier_category, edge_cost_factor=25.0,
+        time_overlapping_dependent_graph = create_time_overlapping_dependent_graph_model(supplier_category, edge_cost_factor=25.0,
                                                                    edge_travel_time_factor=25.0)
 
-        print("--- create_fully_connected_graph_model run time: %s  ---" % (datetime.now() - start_time))
+        print("--- create_time_overlapping_dependent_graph_model run time: %s  ---" % (datetime.now() - start_time))
         start_time = datetime.now()
 
         match_config_file_path = Path('end_to_end/tests/jsons/test_matcher_config.json')
         match_config = MatcherConfig.dict_to_obj(MatcherConfig.json_to_dict(match_config_file_path))
-        matcher_input = MatcherInput(graph=fully_connected_graph, empty_board=empty_drone_delivery_board,
+        matcher_input = MatcherInput(graph=time_overlapping_dependent_graph, empty_board=empty_drone_delivery_board,
                                      config=match_config)
 
         delivery_board = calc_assignment(matcher_input=matcher_input)
@@ -145,7 +145,7 @@ class BasicMinimumEnd2EndExperiment:
 
         print(delivery_board)
 
-        self._draw_matched_scenario(delivery_board, fully_connected_graph, supplier_category, self.mapImage)
+        self._draw_matched_scenario(delivery_board, time_overlapping_dependent_graph, supplier_category, self.mapImage)
 
     @staticmethod
     def _draw_matched_scenario(delivery_board, fully_connected_graph, supplier_category, map_image):

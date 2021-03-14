@@ -243,8 +243,9 @@ class BasicDeliveryRequestGraphTestCases(unittest.TestCase):
             map(lambda item: list(split_delivery_requests_into_clusters(item[1]).values()),
                 sort_delivery_requests_by_zone(region_dataset, deliveries_zones).items()))))
 
-        expected_num_edge_in_graph = 2 * (sum([sum(range(0, len(drs))) for drs in expected_delivery_requests_clusters]) +
-                                          len(region_dataset))
+        expected_num_edge_in_graph = sum(
+            [len(drs) * (len(drs) - 1) for drs in expected_delivery_requests_clusters]) + (
+                                             2 * len(region_dataset))
 
         num_nodes_in_graph = len(graph.nodes)
         self.assertEqual(len(region_dataset) + len(dld_dataset), num_nodes_in_graph)
@@ -274,8 +275,9 @@ class BasicDeliveryRequestGraphTestCases(unittest.TestCase):
             map(lambda item: list(split_delivery_requests_into_clusters(item[1]).values()),
                 sort_delivery_requests_by_zone(region_dataset, deliveries_zones).items()))))
 
-        expected_num_edge_in_graph = 2 * (sum([sum(range(0, len(drs))) for drs in expected_delivery_requests_clusters]) +
-                                          len(region_dataset))
+        expected_num_edge_in_graph = sum(
+            [len(drs) * (len(drs) - 1) for drs in expected_delivery_requests_clusters]) + (
+                                             2 * len(region_dataset))
 
         num_nodes_in_graph = len(graph.nodes)
         self.assertEqual(len(region_dataset) + len(dld_dataset), num_nodes_in_graph)
