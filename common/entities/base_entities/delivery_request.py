@@ -59,7 +59,7 @@ class DeliveryRequest(JsonableBaseEntity, Localizable, Temporal):
                (self.priority == other.priority)
 
     def __hash__(self):
-        return hash((tuple(self.delivery_options), self.time_window, self.priority, self.id))
+        return hash(self.id,(tuple(self.delivery_options), self.time_window, self.priority))
 
 
 def create_default_time_window_for_delivery_request():
