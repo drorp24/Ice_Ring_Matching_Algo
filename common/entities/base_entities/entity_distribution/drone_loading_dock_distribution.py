@@ -4,6 +4,7 @@ from typing import Dict
 from common.entities.base_entities.drone_loading_dock import DroneLoadingDock, \
     create_default_time_window_for_drone_loading_dock
 from common.entities.base_entities.drone_loading_station import DroneLoadingStation
+from common.entities.base_entities.entity_id import EntityID
 from common.entities.base_entities.entity_distribution.drone_distribution import DroneTypeDistribution
 from common.entities.base_entities.entity_distribution.drone_loading_station_distribution import \
     DroneLoadingStationDistribution
@@ -28,6 +29,7 @@ class DroneLoadingDockDistribution(Distribution):
         self._time_window_distributions = time_window_distributions
 
     default_amount = 1
+
     # TODO: make this a HierarchialDistribution that has multiple DroneLoadingStations for each DroneLoadingDock
 
     def choose_rand(self, random: Random, base_location: Point2D = create_point_2d(0, 0),
@@ -37,8 +39,9 @@ class DroneLoadingDockDistribution(Distribution):
                                                                                        amount=amount)
         time_windows = self._time_window_distributions.choose_rand(random=random, amount=amount)
         drone_types = self._drone_type_distributions.choose_rand(random=random, amount=amount)
-        return [DroneLoadingDock(dl, pt, tw)
-                for (dl, pt, tw) in zip(drone_loading_stations, drone_types, time_windows)]
+        dld_ids = [EntityID.generate_uuid() for dls in drone_loading_stations]
+        return [DroneLoadingDock(id, dl, pt, tw)
+                for (id, dl, pt, tw) in zip(dld_ids, drone_loading_stations, drone_types, time_windows)]
 
     @classmethod
     def distribution_class(cls) -> type:
