@@ -71,8 +71,8 @@ def create_single_package_distribution():
 
 def _create_empty_drone_delivery_board(
         drone_formation_policy=DroneFormationTypePolicy({DroneFormationType.PAIR: 1, DroneFormationType.QUAD: 0}),
-        package_configurations_policy=PackageConfigurationPolicy({PackageConfiguration.LARGE_X2: 0.9,
-                                                                  PackageConfiguration.MEDIUM_X4: 0.1,
+        package_configurations_policy=PackageConfigurationPolicy({PackageConfiguration.LARGE_X2: 1,
+                                                                  PackageConfiguration.MEDIUM_X4: 0,
                                                                   PackageConfiguration.SMALL_X8: 0,
                                                                   PackageConfiguration.TINY_X16: 0}),
         drone_type: DroneType = DroneType.drone_type_1,
@@ -92,7 +92,7 @@ class BasicMinimumEnd2EndExperiment:
             self.supplier_category_distribution = SupplierCategoryDistribution(
                 zero_time_distribution=DateTimeDistribution([ZERO_TIME]),
                 delivery_requests_distribution=_create_delivery_request_distribution(
-                    create_point_2d(35.45, 33.4 - 0.5 * 1), 0.05, 0.06, 10, 3),
+                    create_point_2d(35.46, 33.25), 0.2, 0.3, 10, 20),
                 drone_loading_docks_distribution=DroneLoadingDockDistribution(
                     drone_loading_station_distributions=DroneLoadingStationDistribution(
                         drone_station_locations_distribution=UniformPointInBboxDistribution(35.19336,
@@ -121,13 +121,13 @@ class BasicMinimumEnd2EndExperiment:
 
     def test_small_supplier_category(self):
         start_time = datetime.now()
-        empty_drone_delivery_board = _create_empty_drone_delivery_board(amount=80, max_route_time_entire_board=45,
-                                                                        velocity_entire_board=10.0)
+        empty_drone_delivery_board = _create_empty_drone_delivery_board(amount=6, max_route_time_entire_board=45,
+                                                                        velocity_entire_board=10)
         print("--- _create_empty_drone_delivery_board run time: %s  ---" % (datetime.now() - start_time))
         start_time = datetime.now()
 
         supplier_category = self.supplier_category_distribution.choose_rand(random=Random(10),
-                                                                            amount={DeliveryRequest: 100,
+                                                                            amount={DeliveryRequest: 70,
                                                                                     DroneLoadingDock: 1})
         fully_connected_graph = create_fully_connected_graph_model(supplier_category, edge_cost_factor=25.0,
                                                                    edge_travel_time_factor=25.0)
@@ -145,10 +145,10 @@ class BasicMinimumEnd2EndExperiment:
 
         print(delivery_board)
 
-        self._draw_matched_scenario(delivery_board, fully_connected_graph, supplier_category, self.mapImage)
+        self._draw_matched_scenario(delivery_board, fully_connected_graph, supplier_category, self.mapImage, aggregate_by_edd=True)
 
     @staticmethod
-    def _draw_matched_scenario(delivery_board, fully_connected_graph, supplier_category, map_image):
+    def _draw_matched_scenario(delivery_board, fully_connected_graph, supplier_category, map_image, aggregate_by_edd: bool = True):
         dr_drawer = create_drawer_2d(Drawer2DCoordinateSys.GEOGRAPHIC, map_image)
         operational_drawer2d.add_operational_graph(dr_drawer, fully_connected_graph, draw_internal=True,
                                                    draw_edges=False)
@@ -156,16 +156,26 @@ class BasicMinimumEnd2EndExperiment:
         board_map_drawer = create_drawer_2d(Drawer2DCoordinateSys.GEOGRAPHIC, map_image)
         operational_drawer2d.add_delivery_board(board_map_drawer, delivery_board, draw_unmatched=True)
         board_map_drawer.draw(False)
-        row_names = ["Unmatched Out"] + \
-                    ["[" + str(delivery.drone_formation.drone_formation_type.name) + "] * " +
-                     str(delivery.drone_formation.drone_package_configuration.package_type_map)
-                     for delivery in delivery_board.drone_deliveries]
+        if aggregate_by_edd:
+            formations = set((delivery.id, delivery.drone_formation) for delivery in delivery_board.drone_deliveries)
+            row_names = ["Unmatched Out"] + \
+                        [str(formation[0])[-7:-2] + " [" + str(formation[1].drone_formation_type.name) + "] * " +
+                         str(formation[1].drone_package_configuration.package_type_map)
+                         for formation in formations]
+        else:
+            row_names = ["Unmatched Out"] + \
+                        ["[" + str(delivery.drone_formation.drone_formation_type.name) + "] * " +
+                         str(delivery.drone_formation.drone_package_configuration.package_type_map)
+                         for delivery in delivery_board.drone_deliveries]
         board_gantt_drawer = create_gantt_drawer(zero_time=supplier_category.zero_time,
-                                                 hours_period=24,
-                                                 row_names=row_names,
-                                                 rows_title='Formation Type x Package Type Amounts'
-                                                 )
-        operational_gantt_drawer.add_delivery_board(board_gantt_drawer, delivery_board, True)
+                                             hours_period=24,
+                                             row_names=row_names,
+                                             rows_title='Formation Type x Package Type Amounts',
+                                             )
+        if aggregate_by_edd:
+            operational_gantt_drawer.add_delivery_board_with_row_per_edd(board_gantt_drawer, delivery_board, True)
+        else:
+            operational_gantt_drawer.add_delivery_board_with_row_per_drone_delivery(board_gantt_drawer, delivery_board, True)
         board_gantt_drawer.draw(True)
 
 
