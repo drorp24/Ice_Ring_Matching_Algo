@@ -6,6 +6,7 @@ from common.entities.base_entities.base_entity import JsonableBaseEntity
 from common.entities.base_entities.delivery_option import DeliveryOption
 from common.entities.base_entities.entity_distribution.temporal_distribution import TimeDeltaDistribution, \
     DateTimeDistribution, TimeWindowDistribution
+from common.entities.base_entities.entity_id import EntityID
 from common.entities.base_entities.temporal import TimeWindowExtension, Temporal, DateTimeExtension, TimeDeltaExtension
 from geometry.geo2d import Point2D
 from geometry.geo_factory import calc_centroid
@@ -14,10 +15,16 @@ from geometry.utils import Localizable
 
 class DeliveryRequest(JsonableBaseEntity, Localizable, Temporal):
 
-    def __init__(self, delivery_options: [DeliveryOption], time_window: TimeWindowExtension, priority: int):
+    def __init__(self, id: EntityID, delivery_options: [DeliveryOption], time_window: TimeWindowExtension,
+                 priority: int):
+        self._id = id
         self._delivery_options = delivery_options if delivery_options is not None else []
         self._time_window = time_window
         self._priority = priority
+
+    @property
+    def id(self) -> EntityID:
+        return self._id
 
     @property
     def delivery_options(self) -> [DeliveryOption]:
@@ -38,19 +45,21 @@ class DeliveryRequest(JsonableBaseEntity, Localizable, Temporal):
     def dict_to_obj(cls, dict_input):
         assert (dict_input['__class__'] == cls.__name__)
         return DeliveryRequest(
-            delivery_options=[DeliveryOption.dict_to_obj(do_dict) for do_dict in dict_input['delivery_options']],
+            id=EntityID.dict_to_obj(dict_input['id']),
+            delivery_options=[DeliveryOption.dict_to_obj(do_dict) for do_dict in
+                              dict_input['delivery_options']],
             time_window=TimeWindowExtension.dict_to_obj(dict_input['time_window']),
-            priority=dict_input['priority']
-        )
+            priority=dict_input['priority'])
 
     def __eq__(self, other: DeliveryRequest):
         return (self.__class__ == other.__class__) and \
+               (self.id == other.id) and \
                (self.delivery_options == other.delivery_options) and \
                (self.time_window == other.time_window) and \
                (self.priority == other.priority)
 
     def __hash__(self):
-        return hash((tuple(self.delivery_options), self.time_window, self.priority))
+        return hash((self.id,tuple(self.delivery_options), self.time_window, self.priority))
 
 
 def create_default_time_window_for_delivery_request():
