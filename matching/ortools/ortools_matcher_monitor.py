@@ -118,9 +118,9 @@ class ORToolsMatcherMonitor:
         # if self.print_status and self._monitor.num_of_iterations % 1000 == 0:
         #     print(
         #         f"iteration {self._monitor.num_of_iterations} current objective value {best_objective_value}, total priority {total_priority_value}, unmatched delivery requests {total_unmatched_delivery_requests}, unmatched delivery requests total priority {unmatched_delivery_requests_total_priority}")
-        # if self._monitor.num_of_iterations >= self._monitor_config.min_iterations:
-        #     # todo stop search?
-        #     return True
+        if self._monitor.num_of_iterations == self._monitor_config.min_iterations:
+            # todo choose conditions for stopping?
+            return True
         # print (1)
         return False
 
