@@ -27,6 +27,7 @@ from geometry.geo_factory import create_point_2d
 from matching.constraint_config import ConstraintsConfig, CapacityConstraints, TimeConstraints, PriorityConstraints
 from matching.matcher_config import MatcherConfig
 from matching.matcher_input import MatcherInput
+from matching.monitor_config import MonitorConfig
 from matching.ortools.ortools_matcher import ORToolsMatcher
 from matching.ortools.ortools_solver_config import ORToolsSolverConfig
 from matching.solver_config import SolverVendor
@@ -131,7 +132,8 @@ class ORToolsMatcherDropPenaltyTestCase(TestCase):
                                                  max_route_time=300,
                                                  count_time_from_zero=False),
                 priority_constraints=PriorityConstraints(True)),
-            unmatched_penalty=0)
+            unmatched_penalty=0,
+            monitor=MonitorConfig(enabled=False))
 
     @staticmethod
     def _create_unmatched(delivery_requests: List[DeliveryRequest]):

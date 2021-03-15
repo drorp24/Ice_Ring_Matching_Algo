@@ -2,7 +2,7 @@ from common.entities.base_entities.base_entity import JsonableBaseEntity
 
 class MonitorConfig(JsonableBaseEntity):
 
-    def __init__(self, enabled: bool, min_iterations: int, save_data:bool=False, plot_data:bool=False,
+    def __init__(self, enabled: bool, min_iterations: int=0, save_data:bool=False, plot_data:bool=False,
                  output_directory:str=''):
         self._enabled = enabled
         self._min_iterations = min_iterations

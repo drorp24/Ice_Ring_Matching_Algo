@@ -27,6 +27,7 @@ from geometry.geo_factory import create_point_2d
 from matching.constraint_config import ConstraintsConfig, TimeConstraints, PriorityConstraints, CapacityConstraints
 from matching.matcher_config import MatcherConfig
 from matching.matcher_input import MatcherInput
+from matching.monitor_config import MonitorConfig
 from matching.ortools.ortools_matcher import ORToolsMatcher
 from matching.ortools.ortools_solver_config import ORToolsSolverConfig
 from matching.solver_config import SolverVendor
@@ -170,7 +171,8 @@ class ORToolsMatcherDifferentLoadingDockIndexTestCase(TestCase):
                                                  max_route_time=300,
                                                  count_time_from_zero=False),
                 priority_constraints=PriorityConstraints(True)),
-            unmatched_penalty=100)
+            unmatched_penalty=100,
+        monitor=MonitorConfig(enabled=False))
 
     @staticmethod
     def _create_match_input(graph: OperationalGraph, empty_board: EmptyDroneDeliveryBoard,

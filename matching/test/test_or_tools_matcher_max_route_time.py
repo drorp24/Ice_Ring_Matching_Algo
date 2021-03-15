@@ -26,6 +26,7 @@ from geometry.geo_factory import create_point_2d
 from matching.constraint_config import ConstraintsConfig, CapacityConstraints, TimeConstraints, PriorityConstraints
 from matching.matcher_config import MatcherConfig
 from matching.matcher_input import MatcherInput
+from matching.monitor_config import MonitorConfig
 from matching.ortools.ortools_matcher import ORToolsMatcher
 from matching.ortools.ortools_matcher_constraints import MAX_OPERATION_TIME
 from matching.ortools.ortools_solver_config import ORToolsSolverConfig
@@ -105,7 +106,8 @@ class ORToolsMatcherMaxRouteTimeTestCase(TestCase):
                                                  max_route_time=MAX_OPERATION_TIME,
                                                  count_time_from_zero=False),
                 priority_constraints=PriorityConstraints(True)),
-            unmatched_penalty=1000)
+            unmatched_penalty=1000,
+            monitor=MonitorConfig(enabled=False))
 
     def _create_2_delivery_requests_with_big_time_window_difference(self):
         dr1_range = self.edd1_max_range / 10.0

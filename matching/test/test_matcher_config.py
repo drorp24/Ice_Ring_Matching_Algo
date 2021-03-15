@@ -7,6 +7,7 @@ from common.entities.base_entities.temporal import DateTimeExtension
 from matching.constraint_config import CapacityConstraints, TimeConstraints, PriorityConstraints
 from matching.matcher_config import ConstraintsConfig, MatcherConfig
 from matching.matcher_factory import SolverVendor
+from matching.monitor_config import MonitorConfig
 from matching.ortools.ortools_solver_config import ORToolsSolverConfig
 
 
@@ -24,7 +25,8 @@ class MatchConfigTestCase(TestCase):
                                                  max_route_time=300,
                                                  count_time_from_zero=False),
                 priority_constraints=PriorityConstraints(True)),
-            unmatched_penalty=5)
+            unmatched_penalty=5,
+        monitor=MonitorConfig(enabled=False))
 
     def test_match_config_to_dict(self):
         config_dict = self.config_obj.__dict__()
