@@ -2,9 +2,10 @@ from common.entities.base_entities.base_entity import JsonableBaseEntity
 
 class MonitorConfig(JsonableBaseEntity):
 
-    def __init__(self, enabled: bool, min_iterations: int=0, save_data:bool=False, plot_data:bool=False,
+    def __init__(self, enabled: bool, iterations_between_monitoring=1, min_iterations: int=0, save_data:bool=False, plot_data:bool=False,
                  output_directory:str=''):
         self._enabled = enabled
+        self._iterations_between_monitoring = iterations_between_monitoring
         self._min_iterations = min_iterations
         self._save_data = save_data
         self._plot_data = plot_data
@@ -16,6 +17,7 @@ class MonitorConfig(JsonableBaseEntity):
 
         return MonitorConfig(
             enabled=dict_input["enabled"],
+            iterations_between_monitoring=dict_input["iterations_between_monitoring"],
             min_iterations=dict_input["min_iterations"],
             save_data=dict_input["save_data"],
             plot_data=dict_input["plot_data"],
@@ -34,6 +36,10 @@ class MonitorConfig(JsonableBaseEntity):
         return self._plot_data
 
     @property
+    def iterations_between_monitoring(self) -> int:
+        return self._iterations_between_monitoring
+
+    @property
     def min_iterations(self) -> int:
         return self._min_iterations
 
@@ -44,6 +50,7 @@ class MonitorConfig(JsonableBaseEntity):
     def __eq__(self, other):
         return (self.enabled == other.enabled) and \
                (self.min_iterations == other.min_iterations) and \
+               (self.iterations_between_monitoring == other.iterations_between_monitoring) and \
                (self.save_data == other.save_data) and \
                (self.plot_data == other.plot_data) and \
                (self.output_directory == other.output_directory)

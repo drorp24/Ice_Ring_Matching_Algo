@@ -35,7 +35,7 @@ class ORToolsMatcherMonitor:
         self._add_best_solution_collector()
         self._add_unmatched_delivery_requests_monitoring()
         self._add_priority_monitoring()
-        self._add_time_monitoring()
+        # self._add_time_monitoring()
         self._add_vehicle_monitoring()
         self._add_route_monitoring()
         self._routing_model.AddSearchMonitor(self._routing_model.solver().CustomLimit(self.monitor_search))
@@ -109,7 +109,7 @@ class ORToolsMatcherMonitor:
         # current_objective_value = self.best_solution_collector.ObjectiveValue(0) if self.best_solution_collector.SolutionCount() > 0 else last_objective_value
 
 
-        if self._monitor.num_of_iterations % 1000 == 0:
+        if self._monitor.num_of_iterations % self._monitor_config.iterations_between_monitoring == 0:
             # dr = self._solution_handler.create_drone_delivery_board(self.best_solution_collector.Solution(0))
             best_objective_value = self.best_solution_collector.ObjectiveValue(0)
             total_priority_value = self._calc_total_priority()
