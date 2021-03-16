@@ -10,16 +10,15 @@ from matching.ortools.ortools_matcher_constraints import ORToolsMatcherConstrain
 from matching.ortools.ortools_matcher_objective import ORToolsMatcherObjective
 from matching.ortools.ortools_solution_handler import ORToolsSolutionHandler
 
-RELOAD_PER_FORMATION = 5
 NUM_OF_NODES_IN_RELOADING_DEPO = 2 # Reloading depo consists of 2 nodes:
-                                        # arrive node & depart node so we can reset the cumulated time between them.
+                                        # arrive node & depart node so we can reset the cumulated travel_time between them.
 
 
 class ORToolsMatcher(Matcher):
 
     def __init__(self, matcher_input: MatcherInput):
         super().__init__(matcher_input)
-        num_of_reloading_depo_nodes_per_formation = RELOAD_PER_FORMATION * NUM_OF_NODES_IN_RELOADING_DEPO
+        num_of_reloading_depo_nodes_per_formation = matcher_input.config.reload_per_vehicle * NUM_OF_NODES_IN_RELOADING_DEPO
         num_of_reloading_depo_nodes = self._matcher_input.empty_board.amount_of_formations() \
                                       * num_of_reloading_depo_nodes_per_formation
         self._reloading_virtual_depos_indices = list(range(
@@ -82,3 +81,13 @@ class ORToolsMatcher(Matcher):
         matcher_constraints.add_travel_time()
         matcher_constraints.add_session_time()
         matcher_constraints.add_unmatched_penalty()
+
+    def _set_reloading_depos_for_each_formation(self, num_of_reloading_depo_nodes_per_formation):
+        for formation_index in range(self._matcher_input.empty_board.amount_of_formations()):
+            formation_reloading_depos = self._reloading_virtual_depos_indices[
+                                        formation_index * num_of_reloading_depo_nodes_per_formation:
+                                        (formation_index + 1) * num_of_reloading_depo_nodes_per_formation]
+            for node in [formation_reloading_depos[0]]:
+                index = self._index_manager.NodeToIndex(node)
+                must_have_not_active_option_index = -1
+                self._routing_model.VehicleVar(index).SetValues([must_have_not_active_option_index, formation_index])

@@ -121,7 +121,7 @@ class BasicMinimumEnd2EndExperiment:
 
     def test_small_supplier_category(self):
         start_time = datetime.now()
-        empty_drone_delivery_board = _create_empty_drone_delivery_board(amount=6, max_route_time_entire_board=45,
+        empty_drone_delivery_board = _create_empty_drone_delivery_board(amount=6, max_route_time_entire_board=1440,
                                                                         velocity_entire_board=10)
         print("--- _create_empty_drone_delivery_board run time: %s  ---" % (datetime.now() - start_time))
         start_time = datetime.now()

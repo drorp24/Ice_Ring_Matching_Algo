@@ -37,6 +37,7 @@ class ORToolsSolutionHandler:
             return []
         drone_deliveries = []
         for edd_index, empty_drone_delivery in enumerate(self._matcher_input.empty_board.empty_drone_deliveries):
+            # self._print_solution_debug_info(edd_index, solution)
             start_index = self._routing_model.Start(edd_index)
             graph_start_index = self._index_manager.IndexToNode(start_index)
             start_drone_loading_dock = self._create_start_drone_loading_dock(graph_start_index, start_index, solution)
@@ -66,6 +67,32 @@ class ORToolsSolutionHandler:
                     self._create_drone_delivery(edd_index, start_drone_loading_dock, end_drone_loading_dock,
                                                 matched_requests))
         return drone_deliveries
+
+    def _print_solution_debug_info(self, edd_index, solution):
+        time_dimension = self._routing_model.GetDimensionOrDie(OrToolsDimensionDescription.travel_time.value)
+        demand_dimension = self._routing_model.GetDimensionOrDie("capacity_large")
+        index = self._routing_model.Start(edd_index)
+        plan_output = f'DEBUG Route for vehicle {edd_index}:\n'
+        while not self._routing_model.IsEnd(index):
+            time_var = time_dimension.CumulVar(index)
+            time_var_transit = time_dimension.TransitVar(index)
+            time_var_slack = time_dimension.SlackVar(index)
+            demand_var = demand_dimension.CumulVar(index)
+            demand_var_transit = demand_dimension.TransitVar(index)
+            demand_var_slack = demand_dimension.SlackVar(index)
+            plan_output += f' {self._index_manager.IndexToNode(index)} ' \
+                           f'Time({solution.Min(time_var)},{solution.Max(time_var)}) ' \
+                           f'Transit({solution.Min(time_var_transit)},{solution.Max(time_var_transit)}) ' \
+                           f'Slack({solution.Min(time_var_slack)},{solution.Max(time_var_slack)}) ' \
+                           f'Demand({solution.Min(demand_var)},{solution.Max(demand_var)}) ' \
+                           f'Demand_Transit({solution.Min(demand_var_transit)},{solution.Max(demand_var_transit)}) ' \
+                           f'Demand_Slack({solution.Min(demand_var_slack)},{solution.Max(demand_var_slack)}) ' \
+                           ') ->'
+            index = solution.Value(self._routing_model.NextVar(index))
+        time_var = time_dimension.CumulVar(index)
+        plan_output += f' {self._index_manager.IndexToNode(index)} ' \
+                       f'Time({solution.Min(time_var)},{solution.Max(time_var)}) '
+        print(plan_output)
 
     def _extract_unmatched_delivery_requests(self, solution: Assignment) -> List[UnmatchedDeliveryRequest]:
         if solution is None:
@@ -153,13 +180,3 @@ class ORToolsSolutionHandler:
                 TimeDeltaExtension(timedelta(minutes=service_time_in_min))),
             until=self._matcher_input.config.zero_time.add_time_delta(
                 TimeDeltaExtension(timedelta(minutes=service_time_in_min))))
-
-    def _set_reloading_depos_for_each_formation(self, num_of_reloading_depo_nodes_per_formation):
-        for formation_index in range(self._matcher_input.empty_board.amount_of_formations()):
-            formation_reloading_depos = self._reloading_virtual_depos_indices[
-                                        formation_index * num_of_reloading_depo_nodes_per_formation:
-                                        (formation_index + 1) * num_of_reloading_depo_nodes_per_formation]
-            for node in [formation_reloading_depos[0]]:
-                index = self._index_manager.NodeToIndex(node)
-                must_have_not_active_option_index = -1
-                self._routing_model.VehicleVar(index).SetValues([must_have_not_active_option_index, formation_index])

@@ -10,7 +10,7 @@ from common.entities.base_entities.entity_id import EntityID
 from common.entities.base_entities.package import PackageType
 from common.entities.base_entities.temporal import TimeWindowExtension
 
-DEFAULT_MAX_ROUTE_TIME_IN_MINUTES = 400
+DEFAULT_MAX_ROUTE_TIME_IN_MINUTES = 1440
 DEFAULT_VELOCITY_METER_PER_SEC = 10.0
 
 

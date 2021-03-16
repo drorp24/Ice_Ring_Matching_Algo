@@ -23,7 +23,8 @@ from common.graph.operational.graph_creator import build_fully_connected_graph
 from common.graph.operational.operational_graph import OperationalGraph
 from geometry.distribution.geo_distribution import ExactPointLocationDistribution
 from geometry.geo_factory import create_point_2d
-from matching.constraint_config import ConstraintsConfig, CapacityConstraints, TimeConstraints, PriorityConstraints
+from matching.constraint_config import ConstraintsConfig, CapacityConstraints, TravelTimeConstraints, \
+    PriorityConstraints, SessionTimeConstraints
 from matching.matcher_config import MatcherConfig
 from matching.matcher_input import MatcherInput
 from matching.ortools.ortools_matcher import ORToolsMatcher
@@ -52,22 +53,6 @@ class ORToolsMatcherMaxRouteTimeTestCase(TestCase):
         cls.edd2_velocity_per_minute = cls.empty_drone_delivery_2.velocity_meter_per_sec * 60.0
         cls.empty_board_1 = EmptyDroneDeliveryBoard([cls.empty_drone_delivery_1])
         cls.empty_board_2 = EmptyDroneDeliveryBoard([cls.empty_drone_delivery_2])
-
-    def test_when_wait_time_longer_than_max_route_time(self):
-        delivery_requests = self._create_2_delivery_requests_with_big_time_window_difference()
-        match_config = self._create_match_config_with_waiting_time(waiting_time=self.edd2_max_endurance)
-        graph = self._create_graph(delivery_requests, self.loading_dock,
-                                   1 / self.edd2_velocity_per_minute,
-                                   1 / self.edd2_velocity_per_minute)  # Assuming Velocity of edd1 and edd2 is similar
-        match_input_1 = MatcherInput(graph, self.empty_board_1, match_config)
-        match_input_2 = MatcherInput(graph, self.empty_board_2, match_config)
-        matcher_1 = ORToolsMatcher(match_input_1)
-        matcher_2 = ORToolsMatcher(match_input_2)
-        delivery_board_1 = matcher_1.match()
-        delivery_board_2 = matcher_2.match()
-
-        self.assertEqual(1, len(delivery_board_1.drone_deliveries[0].matched_requests))
-        self.assertEqual(2, len(delivery_board_2.drone_deliveries[0].matched_requests))
 
     def test_when_travel_time_is_greater_than_max_route_time(self):
         delivery_requests = self._create_2_delivery_requests_with_big_travel_time_difference()
@@ -100,12 +85,16 @@ class ORToolsMatcherMaxRouteTimeTestCase(TestCase):
             solver=ORToolsSolverConfig(SolverVendor.OR_TOOLS, first_solution_strategy="path_cheapest_arc",
                                        local_search_strategy="automatic", timeout_sec=30),
             constraints=ConstraintsConfig(
-                capacity_constraints=CapacityConstraints(count_capacity_from_zero=True),
-                time_constraints=TimeConstraints(max_waiting_time=waiting_time,
-                                                 max_route_time=MAX_OPERATION_TIME,
-                                                 count_time_from_zero=False),
-                priority_constraints=PriorityConstraints(True)),
-            unmatched_penalty=1000)
+                capacity_constraints=CapacityConstraints(count_capacity_from_zero=True, capacity_cost_coefficient=1),
+                travel_time_constraints=TravelTimeConstraints(max_waiting_time=waiting_time,
+                                                              max_route_time=MAX_OPERATION_TIME,
+                                                              count_time_from_zero=False,
+                                                              reloading_time=0),
+                session_time_constraints=SessionTimeConstraints(max_session_time=MAX_OPERATION_TIME),
+                priority_constraints=PriorityConstraints(True, priority_cost_coefficient=100)),
+            unmatched_penalty=100000,
+            reload_per_vehicle=0
+        )
 
     def _create_2_delivery_requests_with_big_time_window_difference(self):
         dr1_range = self.edd1_max_range / 10.0
@@ -126,7 +115,7 @@ class ORToolsMatcherMaxRouteTimeTestCase(TestCase):
                     until=ZERO_TIME.add_time_delta(
                         TimeDeltaExtension(timedelta(minutes=self.edd1_max_endurance + edd2_travel_time_to_dr2)))),
             ]),
-            package_type_distribution=PackageDistribution({PackageType.LARGE.name: 1}))
+            package_type_distribution=PackageDistribution({PackageType.LARGE: 1}))
         return dist.choose_rand(Random(42), amount={DeliveryRequest: 2})
 
     def _create_2_delivery_requests_with_big_travel_time_difference(self):
@@ -146,7 +135,7 @@ class ORToolsMatcherMaxRouteTimeTestCase(TestCase):
                     since=ZERO_TIME,
                     until=ZERO_TIME.add_time_delta(TimeDeltaExtension(timedelta(minutes=self.edd2_max_endurance)))),
             ]),
-            package_type_distribution=PackageDistribution({PackageType.LARGE.name: 1}))
+            package_type_distribution=PackageDistribution({PackageType.LARGE: 1}))
         return dist.choose_rand(Random(42), amount={DeliveryRequest: 2})
 
     @staticmethod
