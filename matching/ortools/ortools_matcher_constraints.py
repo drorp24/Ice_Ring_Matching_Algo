@@ -40,7 +40,7 @@ class ORToolsMatcherConstraints:
         self._num_of_nodes = len(self._matcher_input.graph.nodes) + len(self._reloading_virtual_depos_indices)
 
     def add_travel_cost(self):
-        travel_cost_callback_index = self._routing_model.RegisterTransitCallback(self.create_travel_cost_evaluator())
+        travel_cost_callback_index = self._routing_model.RegisterTransitCallback(self._create_travel_cost_evaluator())
         self._routing_model.AddDimension(
             travel_cost_callback_index,
             MAX_OPERATION_TIME,
@@ -49,7 +49,7 @@ class ORToolsMatcherConstraints:
             OrToolsDimensionDescription.travel_cost.value)
 
     def add_travel_time(self):
-        travel_time_callback_index = self._routing_model.RegisterTransitCallback(self.create_travel_time_evaluator())
+        travel_time_callback_index = self._routing_model.RegisterTransitCallback(self._create_travel_time_evaluator())
         self._routing_model.AddDimension(
             travel_time_callback_index,
             MAX_OPERATION_TIME,
@@ -80,7 +80,7 @@ class ORToolsMatcherConstraints:
             self._routing_model.AddToAssignment(travel_time_dimension.SlackVar(index))
 
     def add_session_time(self):
-        session_time_callback_index = self._routing_model.RegisterTransitCallback(self.create_session_evaluator())
+        session_time_callback_index = self._routing_model.RegisterTransitCallback(self._create_session_evaluator())
         self._routing_model.AddDimension(
             session_time_callback_index,
             self._matcher_input.config.constraints.session_time.max_session_time,
@@ -104,8 +104,7 @@ class ORToolsMatcherConstraints:
         demand_dimension_name_prefix = OrToolsDimensionDescription.capacity.value + "_"
         for package_type in self._matcher_input.empty_board.package_types():
             demand_dimension_name = demand_dimension_name_prefix + str.lower(package_type.name)
-            callback = getattr(self, "_get_" + str.lower(package_type.name) + "_demand_callback")
-            demand_callback_index = self._routing_model.RegisterUnaryTransitCallback(callback)
+            demand_callback_index = self._routing_model.RegisterUnaryTransitCallback(self._create_demand_evaluator(package_type))
             max_capacity = max(self._matcher_input.empty_board.get_package_type_amount_per_drone_delivery(package_type))
             self._routing_model.AddDimensionWithVehicleCapacity(
                 demand_callback_index,
@@ -143,30 +142,6 @@ class ORToolsMatcherConstraints:
             self._routing_model.AddDisjunction([self._index_manager.NodeToIndex(node)],
                                                0)
 
-    def _get_tiny_demand_callback(self, from_index: np.int64) -> int:
-        return self._get_package_amount_by_type(from_index, PackageType.TINY)
-
-    def _get_small_demand_callback(self, from_index: np.int64) -> int:
-        return self._get_package_amount_by_type(from_index, PackageType.SMALL)
-
-    def _get_medium_demand_callback(self, from_index: np.int64) -> int:
-        return self._get_package_amount_by_type(from_index, PackageType.MEDIUM)
-
-    def _get_large_demand_callback(self, from_index: np.int64) -> int:
-        return self._get_package_amount_by_type(from_index, PackageType.LARGE)
-
-    def _get_package_amount_by_type(self, from_index: np.int64, package_type: PackageType) -> int:
-        from_node = self._index_manager.IndexToNode(from_index)
-        if from_node in self._depart_indices:
-            package_amount_by_type = -1 * max(
-                self._matcher_input.empty_board.get_package_type_amount_per_drone_delivery(package_type))
-        elif from_node in self._arrive_indices:
-            package_amount_by_type = 0
-        else:
-            package_amount_by_type = self._graph_exporter.export_package_type_demands(self._matcher_input.graph,
-                                                                                           package_type)[from_node]
-        return package_amount_by_type
-
     def _add_time_window_constraints_for_each_vehicle_start_node(self, time_dimension: RoutingDimension,
                                                                  time_windows: List[Tuple[int, int]]):
         for i, drone_delivery in enumerate(self._matcher_input.empty_board.empty_drone_deliveries):
@@ -186,7 +161,7 @@ class ORToolsMatcherConstraints:
             index = self._index_manager.NodeToIndex(node)
             time_dimension.CumulVar(index).SetRange(self._time_windows[0][0], self._time_windows[0][1])
 
-    def create_travel_cost_evaluator(self):
+    def _create_travel_cost_evaluator(self):
 
         def travel_cost(_from_node, _to_node):
             if _from_node == _to_node:
@@ -217,13 +192,13 @@ class ORToolsMatcherConstraints:
                         travel_cost(
                             from_node, to_node))
 
-        def travel_cost_evaluator(_from_node, _to_node):
-            return _travel_cost[self._index_manager.IndexToNode(_from_node)][self._index_manager.IndexToNode(
-                _to_node)]
+        def travel_cost_evaluator(_from_index, _to_index):
+            return _travel_cost[self._index_manager.IndexToNode(_from_index)][self._index_manager.IndexToNode(
+                _to_index)]
 
         return travel_cost_evaluator
 
-    def create_travel_time_evaluator(self):
+    def _create_travel_time_evaluator(self):
 
         def travel_time(_from_node, _to_node):
             if _from_node == _to_node:
@@ -254,13 +229,13 @@ class ORToolsMatcherConstraints:
                         travel_time(
                             from_node, to_node))
 
-        def time_evaluator(_from_node, _to_node):
-            return _travel_time[self._index_manager.IndexToNode(_from_node)][self._index_manager.IndexToNode(
-                _to_node)]
+        def time_evaluator(_from_index, _to_index):
+            return _travel_time[self._index_manager.IndexToNode(_from_index)][self._index_manager.IndexToNode(
+                _to_index)]
 
         return time_evaluator
 
-    def create_session_evaluator(self):
+    def _create_session_evaluator(self):
 
         def session_time(_from_node, _to_node):
             if _from_node == _to_node:
@@ -291,11 +266,50 @@ class ORToolsMatcherConstraints:
                         session_time(
                             from_node, to_node))
 
-        def session_evaluator(_from_node, _to_node):
-            return _session_time[self._index_manager.IndexToNode(_from_node)][self._index_manager.IndexToNode(
-                _to_node)]
+        def session_evaluator(_from_index, _to_index):
+            return _session_time[self._index_manager.IndexToNode(_from_index)][self._index_manager.IndexToNode(
+                _to_index)]
 
         return session_evaluator
+
+    def _create_demand_evaluator(self, package_type: PackageType):
+
+        def _get_package_amount_by_type(_from_node: np.int64, package_type: PackageType) -> int:
+            if _from_node in self._depart_indices:
+                package_amount_by_type = -1 * max(
+                    self._matcher_input.empty_board.get_package_type_amount_per_drone_delivery(package_type))
+            elif _from_node in self._arrive_indices:
+                package_amount_by_type = 0
+            else:
+                package_amount_by_type = self._graph_exporter.export_package_type_demands(self._matcher_input.graph,
+                                                                                          package_type)[_from_node]
+            return package_amount_by_type
+
+        setattr(self, "_demands_" + str.lower(package_type.name), {})
+        _demands = getattr(self, "_demands_" + str.lower(package_type.name))
+        for from_node in range(self._num_of_nodes):
+            _demands[from_node] = int(_get_package_amount_by_type(from_node, package_type))
+
+        def _get_tiny_demand_callback(_from_index: np.int64) -> int:
+            return self._demands_tiny[self._index_manager.IndexToNode(_from_index)]
+
+        def _get_small_demand_callback(_from_index: np.int64) -> int:
+            return self._demands_small[self._index_manager.IndexToNode(_from_index)]
+
+        def _get_medium_demand_callback(_from_index: np.int64) -> int:
+            return self._demands_medium[self._index_manager.IndexToNode(_from_index)]
+
+        def _get_large_demand_callback(_from_index: np.int64) -> int:
+            return self._demands_large[self._index_manager.IndexToNode(_from_index)]
+
+        demand_evaluators = {
+            PackageType.TINY: _get_tiny_demand_callback,
+            PackageType.SMALL: _get_small_demand_callback,
+            PackageType.MEDIUM: _get_medium_demand_callback,
+            PackageType.LARGE: _get_large_demand_callback
+        }
+
+        return demand_evaluators[package_type]
 
     def _are_nodes_consecutive_depos(self, from_node, to_node) -> bool:
         return from_node in self._depos and to_node in self._depos

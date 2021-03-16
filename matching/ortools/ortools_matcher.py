@@ -39,6 +39,7 @@ class ORToolsMatcher(Matcher):
 
     def match(self) -> DroneDeliveryBoard:
         solution = self._routing_model.SolveWithParameters(self._search_parameters)
+        print(f'Objective: {solution.ObjectiveValue()}')
         return self._solution_handler.create_drone_delivery_board(solution)
 
     def _set_index_manager(self) -> RoutingIndexManager:

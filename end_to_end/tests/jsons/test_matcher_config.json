@@ -47,7 +47,7 @@
     }
   },
   "unmatched_penalty": 10000,
-  "reload_per_vehicle": 4
+  "reload_per_vehicle": 3
 }
 
 

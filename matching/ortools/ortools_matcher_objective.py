@@ -32,7 +32,7 @@ class ORToolsMatcherObjective:
         for from_node in range(self._num_of_nodes):
             _priorities[from_node] = int(priority(from_node))
 
-        def priority_evaluator(_from_node):
-            return _priorities[self._index_manager.IndexToNode(_from_node)]
+        def priority_evaluator(_from_index):
+            return _priorities[self._index_manager.IndexToNode(_from_index)]
 
         return priority_evaluator
