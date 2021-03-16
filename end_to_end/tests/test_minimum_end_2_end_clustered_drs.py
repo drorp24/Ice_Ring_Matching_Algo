@@ -17,6 +17,7 @@ from common.entities.base_entities.entity_distribution.temporal_distribution imp
     TimeWindowDistribution, DateTimeDistribution
 from common.entities.base_entities.entity_distribution.zone_delivery_request_distribution import \
     ZoneDeliveryRequestDistribution
+from common.entities.base_entities.entity_id import EntityID
 from common.entities.base_entities.fleet.empty_drone_delivery_board_generation import build_empty_drone_delivery_board
 from common.entities.base_entities.fleet.fleet_property_sets import DroneFormationTypePolicy, \
     PackageConfigurationPolicy, DroneSetProperties
@@ -33,8 +34,6 @@ from visualization.basic.pltdrawer2d import create_drawer_2d, MapImage
 from visualization.basic.pltgantt_drawer import create_gantt_drawer
 from visualization.operational import operational_drawer2d
 from visualization.operational import operational_gantt_drawer
-from common.entities.base_entities.entity_id import EntityID
-from uuid import uuid4
 
 ZERO_TIME = DateTimeExtension(dt_date=date(2021, 1, 1), dt_time=time(0, 0, 0))
 
@@ -103,9 +102,9 @@ class BasicMinimumEnd2EndClusteredDrsTest(unittest.TestCase):
                                                       max_clusters=max_clusters_per_zone).values()),
                 sort_delivery_requests_by_zone(supplier_category.delivery_requests, supplier_category.zones).items()))))
 
-        expected_num_edge_in_graph = 2 * (
-                sum([sum(range(0, len(drs))) for drs in expected_delivery_requests_clusters]) +
-                len(supplier_category.delivery_requests))
+        expected_num_edge_in_graph = sum(
+            [len(drs) * (len(drs) - 1) for drs in expected_delivery_requests_clusters]) + (
+                                                   2 * len(supplier_category.delivery_requests))
 
         print("#expected delivery requests clusters", len(expected_delivery_requests_clusters))
         self.assertLessEqual(len(expected_delivery_requests_clusters), max_clusters_per_zone * zone_amount)
@@ -167,11 +166,11 @@ def _create_zones(zone_amount: int = 1) -> List[Zone]:
                Zone(create_polygon_2d([create_point_2d(35.03, 31.82),
                                        create_point_2d(35.03, 32.01),
                                        create_point_2d(35.3, 32.01),
-                                       create_point_2d(35.3, 31.82)]),id = EntityID.generate_uuid()),
+                                       create_point_2d(35.3, 31.82)]), id=EntityID.generate_uuid()),
                Zone(create_polygon_2d([create_point_2d(35.03, 32.01),
                                        create_point_2d(35.09, 32.18),
                                        create_point_2d(35.3, 32.18),
-                                       create_point_2d(35.3, 32.01)]),id = EntityID.generate_uuid())
+                                       create_point_2d(35.3, 32.01)]), id=EntityID.generate_uuid())
            ][0:zone_amount]
 
 
