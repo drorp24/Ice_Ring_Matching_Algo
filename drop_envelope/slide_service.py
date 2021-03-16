@@ -1,11 +1,15 @@
+import math
+from typing import List
+
 from optional import Optional
 from optional.nothing import Nothing
 
 from common.entities.base_entities.package import PackageType
-from common.math.angle import Angle
-from drop_envelope.azimuth_quantization import get_azimuth_quantization_value
+from common.math.angle import Angle, AngleUnit
+from drop_envelope.azimuth_quantization import get_azimuth_quantization_value, get_azimuth_quantization_values
 from drop_envelope.slide import Slide
 from drop_envelope.slide_container_factory import create_slides_container
+from params import MIN_AZIMUTH_DEGREES, MAX_AZIMUTH_DEGREES
 
 
 class _SlidesService:
@@ -28,3 +32,11 @@ class MockSlidesServiceWrapper:
     @staticmethod
     def get_slide(drone_azimuth: Angle, drop_azimuth: Angle, package_type: PackageType) -> Slide:
         return MockSlidesServiceWrapper.service.get_slide(drone_azimuth, drop_azimuth, package_type)
+
+    @classmethod
+    def get_drone_azimuth_level_values(cls) -> List[Angle]:
+        return get_azimuth_quantization_values(cls.drone_azimuth_level_amount)
+
+    @classmethod
+    def get_drop_azimuth_level_values(cls) -> List[Angle]:
+        return get_azimuth_quantization_values(cls.drop_azimuth_level_amount)
