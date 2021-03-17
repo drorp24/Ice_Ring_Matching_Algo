@@ -145,10 +145,12 @@ class BasicMinimumEnd2EndExperiment:
 
         print(delivery_board)
 
-        self._draw_matched_scenario(delivery_board, fully_connected_graph, supplier_category, self.mapImage, aggregate_by_edd=True)
+        self._draw_matched_scenario(delivery_board, fully_connected_graph, supplier_category, self.mapImage,
+                                    aggregate_by_edd=True)
 
     @staticmethod
-    def _draw_matched_scenario(delivery_board, fully_connected_graph, supplier_category, map_image, aggregate_by_edd: bool = True):
+    def _draw_matched_scenario(delivery_board, fully_connected_graph, supplier_category, map_image,
+                               aggregate_by_edd: bool = True):
         dr_drawer = create_drawer_2d(Drawer2DCoordinateSys.GEOGRAPHIC, map_image)
         operational_drawer2d.add_operational_graph(dr_drawer, fully_connected_graph, draw_internal=True,
                                                    draw_edges=False)
@@ -168,14 +170,15 @@ class BasicMinimumEnd2EndExperiment:
                          str(delivery.drone_formation.drone_package_configuration.package_type_map)
                          for delivery in delivery_board.drone_deliveries]
         board_gantt_drawer = create_gantt_drawer(zero_time=supplier_category.zero_time,
-                                             hours_period=24,
-                                             row_names=row_names,
-                                             rows_title='Formation Type x Package Type Amounts',
-                                             )
+                                                 hours_period=24,
+                                                 row_names=row_names,
+                                                 rows_title='Formation Type x Package Type Amounts',
+                                                 )
         if aggregate_by_edd:
             operational_gantt_drawer.add_delivery_board_with_row_per_edd(board_gantt_drawer, delivery_board, True)
         else:
-            operational_gantt_drawer.add_delivery_board_with_row_per_drone_delivery(board_gantt_drawer, delivery_board, True)
+            operational_gantt_drawer.add_delivery_board_with_row_per_drone_delivery(board_gantt_drawer, delivery_board,
+                                                                                    True)
         board_gantt_drawer.draw(True)
 
 

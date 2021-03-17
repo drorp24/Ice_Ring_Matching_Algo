@@ -1,18 +1,18 @@
 from datetime import timedelta
 from typing import List
-
-from ortools.constraint_solver.pywrapcp import Assignment, RoutingIndexManager, RoutingModel
+from ortools.constraint_solver.pywrapcp import Assignment, RoutingModel
 
 from common.entities.base_entities.drone_delivery import DroneDelivery, MatchedDeliveryRequest, MatchedDroneLoadingDock
 from common.entities.base_entities.drone_delivery_board import DroneDeliveryBoard, UnmatchedDeliveryRequest
 from common.entities.base_entities.temporal import TimeWindowExtension, TimeDeltaExtension
 from common.graph.operational.export_ortools_graph import OrtoolsGraphExporter
 from matching.matcher_input import MatcherInput
+from matching.ortools.ortools_index_manager_wrapper import OrToolsIndexManagerWrapper
 from matching.ortools.ortools_matcher_constraints import OrToolsDimensionDescription
 
 
 class ORToolsSolutionHandler:
-    def __init__(self, graph_exporter: OrtoolsGraphExporter, index_manager: RoutingIndexManager,
+    def __init__(self, graph_exporter: OrtoolsGraphExporter, index_manager: OrToolsIndexManagerWrapper,
                  routing_model: RoutingModel, matcher_input: MatcherInput, reloading_depos_arrive_indices: [int],
                  reloading_depos_depart_indices: [int]):
 
@@ -26,6 +26,7 @@ class ORToolsSolutionHandler:
         self._depos = self._graph_exporter.export_basis_nodes_indices(self._matcher_input.graph) \
             + self._reloading_virtual_depos_indices
         self._num_of_nodes = len(self._matcher_input.graph.nodes) + len(self._reloading_virtual_depos_indices)
+        self._travel_time_matrix = self._graph_exporter.export_travel_times(self._matcher_input.graph)
 
     def create_drone_delivery_board(self, solution: Assignment) -> DroneDeliveryBoard:
 
@@ -39,12 +40,12 @@ class ORToolsSolutionHandler:
         for edd_index, empty_drone_delivery in enumerate(self._matcher_input.empty_board.empty_drone_deliveries):
             # self._print_solution_debug_info(edd_index, solution)
             start_index = self._routing_model.Start(edd_index)
-            graph_start_index = self._index_manager.IndexToNode(start_index)
+            graph_start_index = self._index_manager.index_to_node(start_index)
             start_drone_loading_dock = self._create_start_drone_loading_dock(graph_start_index, start_index, solution)
             index = solution.Value(self._routing_model.NextVar(start_index))
             matched_requests = []
             while not self._routing_model.IsEnd(index) and not self._routing_model.IsStart(index):
-                graph_index = self._index_manager.IndexToNode(index)
+                graph_index = self._index_manager.index_to_node(index)
                 if graph_index in self._graph_exporter.export_delivery_request_nodes_indices(self._matcher_input.graph):
                     matched_requests.append(
                         self._create_matched_delivery_request(graph_index, index, solution))
@@ -61,7 +62,7 @@ class ORToolsSolutionHandler:
                         graph_index, index, solution)
                 index = solution.Value(self._routing_model.NextVar(index))
             if self._routing_model.IsEnd(index):
-                graph_index = self._index_manager.IndexToNode(index)
+                graph_index = self._index_manager.index_to_node(index)
                 end_drone_loading_dock = self._create_end_drone_loading_dock(graph_index, index, solution)
                 drone_deliveries.append(
                     self._create_drone_delivery(edd_index, start_drone_loading_dock, end_drone_loading_dock,
@@ -80,7 +81,7 @@ class ORToolsSolutionHandler:
             demand_var = demand_dimension.CumulVar(index)
             demand_var_transit = demand_dimension.TransitVar(index)
             demand_var_slack = demand_dimension.SlackVar(index)
-            plan_output += f' {self._index_manager.IndexToNode(index)} ' \
+            plan_output += f' {self._index_manager.index_to_node(index)} ' \
                            f'Time({solution.Min(time_var)},{solution.Max(time_var)}) ' \
                            f'Transit({solution.Min(time_var_transit)},{solution.Max(time_var_transit)}) ' \
                            f'Slack({solution.Min(time_var_slack)},{solution.Max(time_var_slack)}) ' \
@@ -90,7 +91,7 @@ class ORToolsSolutionHandler:
                            ') ->'
             index = solution.Value(self._routing_model.NextVar(index))
         time_var = time_dimension.CumulVar(index)
-        plan_output += f' {self._index_manager.IndexToNode(index)} ' \
+        plan_output += f' {self._index_manager.index_to_node(index)} ' \
                        f'Time({solution.Min(time_var)},{solution.Max(time_var)}) '
         print(plan_output)
 
@@ -103,7 +104,7 @@ class ORToolsSolutionHandler:
                     index) or index in self._reloading_virtual_depos_indices:
                 continue
             if solution.Value(self._routing_model.NextVar(index)) == index:
-                graph_index = self._index_manager.IndexToNode(index)
+                graph_index = self._index_manager.index_to_node(index)
                 unmatched_delivery_request.append(UnmatchedDeliveryRequest(
                     graph_index=graph_index,
                     delivery_request=self._graph_exporter.get_delivery_request(
@@ -132,7 +133,7 @@ class ORToolsSolutionHandler:
             delivery_time_window=self._get_delivery_time_window(index, solution))
 
     def _create_start_drone_loading_dock(self, graph_index: int, index: int,
-                                   solution: Assignment) -> MatchedDroneLoadingDock:
+                                         solution: Assignment) -> MatchedDroneLoadingDock:
         if solution is None:
             raise ValueError('No Solution!')
 
@@ -144,7 +145,7 @@ class ORToolsSolutionHandler:
             delivery_time_window=delivery_time_window)
 
     def _create_end_drone_loading_dock(self, graph_index: int, index: int,
-                                   solution: Assignment) -> MatchedDroneLoadingDock:
+                                       solution: Assignment) -> MatchedDroneLoadingDock:
         if solution is None:
             raise ValueError('No Solution!')
 
@@ -171,8 +172,8 @@ class ORToolsSolutionHandler:
         first_delivery_index = solution.Value(self._routing_model.NextVar(index))
         travel_time_dimension = self._routing_model.GetDimensionOrDie(OrToolsDimensionDescription.travel_time.value)
         first_delivery_min_arrival_time = solution.Min(travel_time_dimension.CumulVar(first_delivery_index))
-        travel_time_from_dock_to_first_delivery_in_min = self._graph_exporter.export_travel_times(
-            self._matcher_input.graph)[graph_index][self._index_manager.IndexToNode(first_delivery_index)]
+        travel_time_from_dock_to_first_delivery_in_min = \
+            self._travel_time_matrix[graph_index][self._index_manager.index_to_node(first_delivery_index)]
         service_time_in_min = float(first_delivery_min_arrival_time
                                     - travel_time_from_dock_to_first_delivery_in_min)
         return TimeWindowExtension(

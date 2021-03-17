@@ -1,26 +1,29 @@
 from ortools.constraint_solver import pywrapcp
-from ortools.constraint_solver.pywrapcp import RoutingIndexManager, RoutingModel
+from ortools.constraint_solver.pywrapcp import RoutingModel
 from ortools.constraint_solver.routing_parameters_pb2 import RoutingSearchParameters
 
 from common.entities.base_entities.drone_delivery_board import DroneDeliveryBoard
 from common.graph.operational.export_ortools_graph import OrtoolsGraphExporter
 from matching.matcher import Matcher
 from matching.matcher_input import MatcherInput
+from matching.ortools.ortools_index_manager_wrapper import OrToolsIndexManagerWrapper
 from matching.ortools.ortools_matcher_constraints import ORToolsMatcherConstraints
 from matching.ortools.ortools_matcher_objective import ORToolsMatcherObjective
 from matching.ortools.ortools_solution_handler import ORToolsSolutionHandler
 
-NUM_OF_NODES_IN_RELOADING_DEPO = 2 # Reloading depo consists of 2 nodes:
-                                        # arrive node & depart node so we can reset the cumulated travel_time between them.
+''' Reloading depo consists of 2 nodes:
+arrive node & depart node so we can reset the cumulated travel_time between them.'''
+NUM_OF_NODES_IN_RELOADING_DEPO = 2
 
 
 class ORToolsMatcher(Matcher):
 
     def __init__(self, matcher_input: MatcherInput):
         super().__init__(matcher_input)
-        num_of_reloading_depo_nodes_per_formation = matcher_input.config.reload_per_vehicle * NUM_OF_NODES_IN_RELOADING_DEPO
+        num_of_reloading_depo_nodes_per_formation = matcher_input.config.reload_per_vehicle \
+            * NUM_OF_NODES_IN_RELOADING_DEPO
         num_of_reloading_depo_nodes = self._matcher_input.empty_board.amount_of_formations() \
-                                      * num_of_reloading_depo_nodes_per_formation
+            * num_of_reloading_depo_nodes_per_formation
         self._reloading_virtual_depos_indices = list(range(
             len(self._matcher_input.graph.nodes),
             len(self._matcher_input.graph.nodes) + num_of_reloading_depo_nodes))
@@ -39,10 +42,11 @@ class ORToolsMatcher(Matcher):
 
     def match(self) -> DroneDeliveryBoard:
         solution = self._routing_model.SolveWithParameters(self._search_parameters)
-        print(f'Objective: {solution.ObjectiveValue()}')
+        if solution:
+            print(f'Objective: {solution.ObjectiveValue()}')
         return self._solution_handler.create_drone_delivery_board(solution)
 
-    def _set_index_manager(self) -> RoutingIndexManager:
+    def _set_index_manager(self) -> OrToolsIndexManagerWrapper:
         depot_ids_start = self._graph_exporter.export_basis_nodes_indices(self._matcher_input.graph)
         # TODO depot_ids_end = self._graph_exporter.export_basis_nodes_indices(self._match_input.graph)
         manager = pywrapcp.RoutingIndexManager(self._num_of_nodes,
@@ -50,10 +54,10 @@ class ORToolsMatcher(Matcher):
                                                depot_ids_start[0])
         # TODO add depot_ids_end as forth param)
 
-        return manager
+        return OrToolsIndexManagerWrapper(manager)
 
     def _set_routing_model(self) -> RoutingModel:
-        return pywrapcp.RoutingModel(self._index_manager)
+        return pywrapcp.RoutingModel(self._index_manager.get_internal())
 
     def _set_objective(self):
         ORToolsMatcherObjective(self._index_manager, self._routing_model, self.matcher_input,
@@ -89,6 +93,6 @@ class ORToolsMatcher(Matcher):
                                         formation_index * num_of_reloading_depo_nodes_per_formation:
                                         (formation_index + 1) * num_of_reloading_depo_nodes_per_formation]
             for node in [formation_reloading_depos[0]]:
-                index = self._index_manager.NodeToIndex(node)
+                index = self._index_manager.node_to_index(node)
                 must_have_not_active_option_index = -1
                 self._routing_model.VehicleVar(index).SetValues([must_have_not_active_option_index, formation_index])
