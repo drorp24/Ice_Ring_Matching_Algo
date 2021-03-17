@@ -5,12 +5,13 @@ from typing import List
 
 from common.entities.base_entities.delivery_request import DeliveryRequest
 from common.entities.base_entities.drone_loading_dock import DroneLoadingDock
-from common.entities.base_entities.temporal import Temporal
 from common.entities.base_entities.zone import Zone
-from common.graph.operational.graph_utils import sort_delivery_requests_by_zone, split_delivery_requests_into_clusters
+from common.graph.operational.graph_utils import sort_delivery_requests_by_zone, split_delivery_requests_into_clusters, \
+    get_delivery_requests_from_graph, has_overlapping_time_window, calc_travel_time_in_min, calc_cost, \
+    calc_under_distance, filter_nodes_with_at_least_one_identical_package_type, \
+    filter_nodes_with_time_overlapping
 from common.graph.operational.operational_graph import OperationalGraph, OperationalEdge, OperationalEdgeAttribs, \
     OperationalNode
-from geometry.utils import Localizable
 
 
 def create_clustered_delivery_requests_graph(delivery_requests: [DeliveryRequest],
@@ -83,11 +84,43 @@ def build_time_overlapping_dependent_connected_graph(graph: OperationalGraph,
                                                      edge_cost_factor: float = 1.0,
                                                      edge_travel_time_factor: float = 1.0):
     nodes = list(graph.nodes)
-    for i, origin_node in enumerate(nodes):
-        destinations = list(filter(lambda x: x != origin_node and has_overlapping_time_window(origin_node.internal_node,
-                                                                                              x.internal_node),
-                                   nodes[i:]))
+    for selected_node_index, origin_node in enumerate(nodes):
+        destinations = filter_nodes_with_time_overlapping(selected_node=origin_node,
+                                                          optional_nodes=graph.nodes[selected_node_index:])
         edges = _create_directed_from_edges(origin_node, destinations, edge_cost_factor, edge_travel_time_factor)
+        graph.add_operational_edges(edges)
+
+
+def build_package_dependent_connected_graph(graph: OperationalGraph,
+                                            edge_cost_factor: float = 1.0,
+                                            edge_travel_time_factor: float = 1.0,
+                                            delivery_option_index: int = 0):
+    for selected_node_index, selected_node in enumerate(graph.nodes):
+        destinations = filter_nodes_with_at_least_one_identical_package_type(selected_node=selected_node,
+                                                                             optional_nodes=graph.nodes[
+                                                                                            selected_node_index:],
+                                                                             delivery_option_index=delivery_option_index)
+        edges = _create_directed_from_edges(selected_node, destinations, edge_cost_factor, edge_travel_time_factor)
+        graph.add_operational_edges(edges)
+
+
+def build_package_and_time_dependent_connected_graph(graph: OperationalGraph,
+                                                     edge_cost_factor: float = 1.0,
+                                                     edge_travel_time_factor: float = 1.0,
+                                                     delivery_option_index: int = 0):
+    for selected_node_index, selected_node in enumerate(graph.nodes):
+        destinations_by_packages = filter_nodes_with_at_least_one_identical_package_type(selected_node=selected_node,
+                                                                                         optional_nodes=graph.nodes[
+                                                                                                        selected_node_index:],
+                                                                                         delivery_option_index=delivery_option_index)
+        destinations_by_times = filter_nodes_with_time_overlapping(selected_node=selected_node,
+                                                                   optional_nodes=graph.nodes[
+                                                                                  selected_node_index:])
+
+
+        destinations = list(set(destinations_by_packages).intersection(set(destinations_by_times)))
+
+        edges = _create_directed_from_edges(selected_node, destinations, edge_cost_factor, edge_travel_time_factor)
         graph.add_operational_edges(edges)
 
 
@@ -127,33 +160,3 @@ def create_two_way_directed_edges(node_content_1, node_content_2,
                             OperationalEdgeAttribs(calc_cost(node_content_2, node_content_1, edge_cost_factor),
                                                    calc_travel_time_in_min(node_content_1, node_content_2,
                                                                            edge_travel_time_factor)))]
-
-
-def has_overlapping_time_window(start: Temporal, end: Temporal):
-    return start.time_window.overlaps(end.time_window)
-
-
-def get_delivery_requests_from_graph(graph) -> [DeliveryRequest]:
-    return [n.internal_node for n in graph.nodes if n.internal_type is DeliveryRequest]
-
-
-def calc_under_distance(potential: [Localizable], start: Localizable, max_distance_km) -> List:
-    return list(
-        filter(lambda target: is_within_distance_range(start, target, max_distance_km=max_distance_km), potential))
-
-
-def is_within_distance_range(start: Localizable, target: Localizable,
-                             max_distance_km: float = 1.0, min_distance_km: float = 0.0) -> bool:
-    return min_distance_km < calc_distance(start, target) <= max_distance_km
-
-
-def calc_distance(start: Localizable, end: Localizable) -> float:
-    return start.calc_location().calc_distance_to_point(end.calc_location())
-
-
-def calc_cost(start: Localizable, end: Localizable, edge_cost_factor: float = 1.0) -> float:
-    return calc_distance(end, start) * edge_cost_factor
-
-
-def calc_travel_time_in_min(start: Localizable, end: Localizable, edge_travel_time_factor: float = 1.0) -> float:
-    return calc_distance(end, start) * edge_travel_time_factor

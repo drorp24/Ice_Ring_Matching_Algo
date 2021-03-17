@@ -3,6 +3,7 @@ from typing import List
 
 from common.entities.base_entities.base_entity import JsonableBaseEntity
 from common.entities.base_entities.drone import DroneType
+from common.entities.base_entities.entity_id import EntityID
 from common.entities.base_entities.drone_loading_station import DroneLoadingStation
 from common.entities.base_entities.entity_distribution.temporal_distribution import TimeDeltaDistribution, \
     DateTimeDistribution, TimeWindowDistribution
@@ -14,12 +15,17 @@ from geometry.utils import Localizable, Shapeable
 
 class DroneLoadingDock(JsonableBaseEntity, Localizable, Temporal, ShapeableCollection):
 
-    def __init__(self, drone_loading_station: DroneLoadingStation,
+    def __init__(self, id: EntityID, drone_loading_station: DroneLoadingStation,
                  drone_type: DroneType,
                  time_window: TimeWindowExtension):
+        self._id = id
         self._drone_loading_station = drone_loading_station
         self._drone_type = drone_type
         self._time_window = time_window
+
+    @property
+    def id(self) -> EntityID:
+        return self._id
 
     @property
     def drone_loading_station(self) -> DroneLoadingStation:
@@ -44,6 +50,7 @@ class DroneLoadingDock(JsonableBaseEntity, Localizable, Temporal, ShapeableColle
     def dict_to_obj(cls, dict_input):
         assert (dict_input['__class__'] == cls.__name__)
         return DroneLoadingDock(
+            id=EntityID.dict_to_obj(dict_input['id']),
             drone_loading_station=DroneLoadingStation.dict_to_obj(dict_input['drone_loading_station']),
             drone_type=DroneType.dict_to_obj(dict_input['drone_type']),
             time_window=TimeWindowExtension.dict_to_obj(dict_input['time_window'])
@@ -51,18 +58,13 @@ class DroneLoadingDock(JsonableBaseEntity, Localizable, Temporal, ShapeableColle
 
     def __eq__(self, other):
         return self.__class__ == other.__class__ and \
+               self.id == other.id and \
                self.time_window == other.time_window and \
                self.drone_type == other.drone_type and \
                self.drone_loading_station == other.drone_loading_station
 
     def __hash__(self):
-        return hash((self._drone_loading_station, self._drone_type, self._time_window))
-
-    @classmethod
-    def dict_to_obj(cls, dict_input):
-        return DroneLoadingDock(drone_loading_station=DroneLoadingStation.dict_to_obj(dict_input['drone_loading_station']),
-                                drone_type=DroneType.dict_to_obj(dict_input['drone_type']),
-                                time_window=TimeWindowExtension.dict_to_obj(dict_input['time_window']))
+        return hash((self.id, self._drone_loading_station, self._drone_type, self._time_window))
 
     def get_shapeabls(self) -> List[Shapeable]:
         return [self.drone_loading_station]

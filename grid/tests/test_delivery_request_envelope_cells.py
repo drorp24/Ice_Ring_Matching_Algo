@@ -67,7 +67,7 @@ class BasicDeliveryRequestEnvelopeCellsTestCase(unittest.TestCase):
                                    time_window=TimeWindowExtension(
                                        DateTimeExtension(dt_date=date(2021, 1, 1), dt_time=time(6, 0, 0)),
                                        DateTimeExtension(dt_date=date(2021, 1, 1), dt_time=time(6, 0, 0))),
-                                   priority=1)
+                                   priority=1,id=EntityID.generate_uuid())
 
         cls.delivery_requests_envelope_cells = DeliveryRequestPotentialEnvelopes(cls.slides_container, cls.dr_1)
         cls.delivery_requests_envelope_cells_dict_do_1 = cls.delivery_requests_envelope_cells.delivery_options_cells[0]
