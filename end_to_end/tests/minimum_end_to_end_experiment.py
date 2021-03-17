@@ -87,7 +87,7 @@ def _create_empty_drone_delivery_board(
 class BasicMinimumEnd2EndExperiment:
 
     def __init__(self, scene: str):
-        self.matcher_config = Path("end_to_end/tests/jsons/test_matcher_config.json")
+        self.matcher_config = Path("end_to_end/tests/jsons/e2e_experiment_config.json")
         if scene == 'north':
             self.supplier_category_distribution = SupplierCategoryDistribution(
                 zero_time_distribution=DateTimeDistribution([ZERO_TIME]),
@@ -115,7 +115,7 @@ class BasicMinimumEnd2EndExperiment:
                                                                                             31.79, 31.79
                                                                                             )),
                     time_window_distributions=create_standard_full_day_test_time()))
-            self.matcher_config = Path("end_to_end/tests/jsons/test_matcher_config.json")
+            self.matcher_config = Path("end_to_end/tests/jsons/e2e_experiment_config.json")
             self.mapImage = MapImage(map_background_path=Path("visualization/basic/gush_dan_background.Png"),
                                      west_lon=34.83927, east_lon=35.32341, south_lat=31.77279, north_lat=32.19276)
 
@@ -135,7 +135,7 @@ class BasicMinimumEnd2EndExperiment:
         print("--- create_fully_connected_graph_model run time: %s  ---" % (datetime.now() - start_time))
         start_time = datetime.now()
 
-        match_config_file_path = Path('end_to_end/tests/jsons/test_matcher_config.json')
+        match_config_file_path = Path('end_to_end/tests/jsons/e2e_experiment_config.json')
         match_config = MatcherConfig.dict_to_obj(MatcherConfig.json_to_dict(match_config_file_path))
         matcher_input = MatcherInput(graph=fully_connected_graph, empty_board=empty_drone_delivery_board,
                                      config=match_config)

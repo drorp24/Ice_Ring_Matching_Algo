@@ -24,7 +24,7 @@ class BasicMinimumEnd2End(unittest.TestCase):
                                           max_route_time_entire_board=400,
                                           velocity_entire_board=10)
         cls.matcher_config = MatcherConfig.dict_to_obj(
-            MatcherConfig.json_to_dict(Path('end_to_end/tests/jsons/test_matcher_config.json')))
+            MatcherConfig.json_to_dict(Path('end_to_end/tests/jsons/test_min_e2e_config.json')))
 
     @classmethod
     def _create_simple_drone_set_properties(cls):
@@ -48,7 +48,7 @@ class BasicMinimumEnd2End(unittest.TestCase):
                                      config=self.matcher_config)
 
         delivery_board = calc_assignment(matcher_input=matcher_input)
-        self.assertEqual(len(delivery_board.unmatched_delivery_requests), 4)
+        self.assertEqual(4, len(delivery_board.unmatched_delivery_requests))
         amount_per_package_type = delivery_board.get_total_amount_per_package_type()
         self.assertEqual(amount_per_package_type.get_package_type_amount(PackageType.TINY), 1)
         self.assertEqual(amount_per_package_type.get_package_type_amount(PackageType.MEDIUM), 1)
