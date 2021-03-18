@@ -5,6 +5,7 @@ from common.entities.base_entities.base_entity import JsonableBaseEntity
 from common.entities.base_entities.drone import DronePackageConfiguration, PackageConfiguration, PackageTypeAmountMap
 from common.entities.base_entities.drone import DroneType, DroneConfigurations
 from common.entities.base_entities.package import PackageType
+from common.entities.base_entities.package_holder import PackageHolder
 
 
 class DroneFormationType(Enum):
@@ -36,7 +37,7 @@ class DroneFormationType(Enum):
         return self.value < other.value
 
 
-class DroneFormation(JsonableBaseEntity):
+class DroneFormation(JsonableBaseEntity, PackageHolder):
 
     def __init__(self, drone_formation_type: DroneFormationType,
                  drone_package_configuration: DronePackageConfiguration):

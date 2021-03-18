@@ -48,6 +48,9 @@ class PackageTypeAmountMap(JsonableBaseEntity):
     def get_package_types(self) -> [PackageType]:
         return list(self._package_type_to_amounts.keys())
 
+    def get_active_package_types(self) -> [PackageType]:
+        return dict(filter(lambda elem: elem[1] != 0, self._package_type_to_amounts.items()))
+
     def get_package_type_amount(self, package_type: PackageType) -> int:
         return self.package_type_to_amounts.get(package_type, 0)
 
