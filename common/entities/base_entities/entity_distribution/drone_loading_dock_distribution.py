@@ -39,9 +39,8 @@ class DroneLoadingDockDistribution(Distribution):
                                                                                        amount=amount)
         time_windows = self._time_window_distributions.choose_rand(random=random, amount=amount)
         drone_types = self._drone_type_distributions.choose_rand(random=random, amount=amount)
-        dld_ids = [EntityID.generate_uuid() for dls in drone_loading_stations]
-        return [DroneLoadingDock(id, dl, pt, tw)
-                for (id, dl, pt, tw) in zip(dld_ids, drone_loading_stations, drone_types, time_windows)]
+        return [DroneLoadingDock(EntityID.generate_uuid(), dl, pt, tw)
+                for (dl, pt, tw) in zip(drone_loading_stations, drone_types, time_windows)]
 
     @classmethod
     def distribution_class(cls) -> type:

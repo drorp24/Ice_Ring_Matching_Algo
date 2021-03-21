@@ -24,18 +24,11 @@ class PotentialDropEnvelopes(ShapeableCollection):
                                       drop_point: Point2D):
 
         drone_azimuths = get_azimuth_quantization_values(MockSlidesServiceWrapper.drone_azimuth_level_amount)
-        if drop_azimuth.is_empty():
-            drop_envelopes = list(map(lambda drone_azimuth: DropEnvelope(DropEnvelopeProperties(
+        drop_envelopes = [DropEnvelope(DropEnvelopeProperties(
                 package_type=package_type,
-                drop_azimuth=drone_azimuth,
+                drop_azimuth=drone_azimuth if drop_azimuth.is_empty() else drop_azimuth.get(),
                 drop_point=drop_point,
-                drone_azimuth=drone_azimuth)), drone_azimuths))
-        else:
-            drop_envelopes = list(map(lambda drone_azimuth: DropEnvelope(DropEnvelopeProperties(
-                package_type=package_type,
-                drop_azimuth=drop_azimuth.get(),
-                drop_point=drop_point,
-                drone_azimuth=drone_azimuth)), drone_azimuths))
+                drone_azimuth=drone_azimuth)) for drone_azimuth in drone_azimuths]
         drop_envelopes = list(filter(lambda drop_envelope: isinstance(drop_envelope.internal_envelope, Polygon2D),
                                      drop_envelopes))
         return PotentialDropEnvelopes(drop_point=drop_point,
@@ -54,7 +47,7 @@ class PotentialDropEnvelopes(ShapeableCollection):
     def envelopes(self) -> List[DropEnvelope]:
         return self._internal_envelopes
 
-    def get_shapeabls(self) -> List[Shapeable]:
+    def get_shapeables(self) -> List[Shapeable]:
         return self.envelopes
 
     def get_centroid(self) -> Point2D:
