@@ -71,8 +71,8 @@ def create_single_package_distribution():
 
 def _create_empty_drone_delivery_board(
         drone_formation_policy=DroneFormationTypePolicy({DroneFormationType.PAIR: 1, DroneFormationType.QUAD: 0}),
-        package_configurations_policy=PackageConfigurationPolicy({PackageConfiguration.LARGE_X2: 1,
-                                                                  PackageConfiguration.MEDIUM_X4: 0,
+        package_configurations_policy=PackageConfigurationPolicy({PackageConfiguration.LARGE_X2: 0.9,
+                                                                  PackageConfiguration.MEDIUM_X4: 0.1,
                                                                   PackageConfiguration.SMALL_X8: 0,
                                                                   PackageConfiguration.TINY_X16: 0}),
         drone_type: DroneType = DroneType.drone_type_1,
@@ -92,7 +92,7 @@ class BasicMinimumEnd2EndExperiment:
             self.supplier_category_distribution = SupplierCategoryDistribution(
                 zero_time_distribution=DateTimeDistribution([ZERO_TIME]),
                 delivery_requests_distribution=_create_delivery_request_distribution(
-                    create_point_2d(35.46, 33.25), 0.2, 0.3, 10, 20),
+                    create_point_2d(35.45, 33.4 - 0.5 * 1), 0.05, 0.06, 10, 3),
                 drone_loading_docks_distribution=DroneLoadingDockDistribution(
                     drone_loading_station_distributions=DroneLoadingStationDistribution(
                         drone_station_locations_distribution=UniformPointInBboxDistribution(35.19336,
@@ -122,22 +122,22 @@ class BasicMinimumEnd2EndExperiment:
     def test_small_supplier_category(self):
         start_time = datetime.now()
         empty_drone_delivery_board = _create_empty_drone_delivery_board(amount=10, max_route_time_entire_board=1440,
-                                                                        velocity_entire_board=10)
+                                                                        velocity_entire_board=10.0)
         print("--- _create_empty_drone_delivery_board run time: %s  ---" % (datetime.now() - start_time))
         start_time = datetime.now()
 
         supplier_category = self.supplier_category_distribution.choose_rand(random=Random(10),
                                                                             amount={DeliveryRequest: 60,
                                                                                     DroneLoadingDock: 1})
-        fully_connected_graph = create_fully_connected_graph_model(supplier_category, edge_cost_factor=25.0,
+        time_overlapping_dependent_graph = create_time_overlapping_dependent_graph_model(supplier_category, edge_cost_factor=25.0,
                                                                    edge_travel_time_factor=25.0)
 
-        print("--- create_fully_connected_graph_model run time: %s  ---" % (datetime.now() - start_time))
+        print("--- create_time_overlapping_dependent_graph_model run time: %s  ---" % (datetime.now() - start_time))
         start_time = datetime.now()
 
         match_config_file_path = Path('end_to_end/tests/jsons/e2e_experiment_config.json')
         match_config = MatcherConfig.dict_to_obj(MatcherConfig.json_to_dict(match_config_file_path))
-        matcher_input = MatcherInput(graph=fully_connected_graph, empty_board=empty_drone_delivery_board,
+        matcher_input = MatcherInput(graph=time_overlapping_dependent_graph, empty_board=empty_drone_delivery_board,
                                      config=match_config)
 
         delivery_board = calc_assignment(matcher_input=matcher_input)
@@ -145,7 +145,7 @@ class BasicMinimumEnd2EndExperiment:
 
         print(delivery_board)
 
-        self._draw_matched_scenario(delivery_board, fully_connected_graph, supplier_category, self.mapImage,
+        self._draw_matched_scenario(delivery_board, time_overlapping_dependent_graph, supplier_category, self.mapImage,
                                     aggregate_by_edd=True)
 
     @staticmethod
