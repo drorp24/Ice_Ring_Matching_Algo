@@ -1,4 +1,4 @@
-from typing import List, Dict
+from typing import List, Dict, Union
 
 import numpy as np
 
@@ -9,9 +9,11 @@ from common.entities.base_entities.temporal import Temporal
 from common.entities.base_entities.zone import Zone
 from common.graph.operational.operational_graph import OperationalNode
 from common.tools.clustering_alg import fit_k_means
+from drop_envelope.arrival_envelope_service import MockPotentialEnvelopeService
 from geometry.utils import Localizable
 from visualization.basic.pltdrawer2d import create_drawer_2d
 from visualization.operational.operational_drawer2d import add_operational_graph
+from drop_envelope.arrival_envelope import calc_cost as arrival_envelope_cost
 
 
 def has_at_least_one_identical_package_type(ph_1: PackageHolder, ph_2: PackageHolder):
@@ -69,10 +71,29 @@ def calc_travel_time_in_min(start: Localizable, end: Localizable, edge_travel_ti
     return calc_distance(end, start) * edge_travel_time_factor
 
 
+def calc_arrival_envelope_cost(arrival_envelope_service: MockPotentialEnvelopeService,
+                               start: Union[DeliveryRequest, DroneLoadingDock],
+                               end: Union[DeliveryRequest, DroneLoadingDock],
+                               edge_cost_factor: float = 1.0) -> float:
+    arrival_envelope_start = arrival_envelope_service.get_potential_arrival_envelope(start)
+    arrival_envelope_end = arrival_envelope_service.get_potential_arrival_envelope(end)
+    return edge_cost_factor * arrival_envelope_cost(arrival_envelope_start, arrival_envelope_end)
+
+
+def calc_arrival_envelope_travel_time(arrival_envelope_service: MockPotentialEnvelopeService,
+                                      start: Union[DeliveryRequest, DroneLoadingDock],
+                                      end: Union[DeliveryRequest, DroneLoadingDock],
+                                      edge_travel_time_factor: float = 1.0) -> float:
+    arrival_envelope_start = arrival_envelope_service.get_potential_arrival_envelope(start)
+    arrival_envelope_end = arrival_envelope_service.get_potential_arrival_envelope(end)
+    return edge_travel_time_factor * arrival_envelope_cost(arrival_envelope_start, arrival_envelope_end)
+
+
 def sort_delivery_requests_by_zone(delivery_requests: [DeliveryRequest], zones: [Zone]) -> Dict[
     int, List[DeliveryRequest]]:
     return {zone_index: [dr for dr in delivery_requests if dr.calc_location() in zone.region] for
             zone_index, zone in enumerate(zones)}
+
 
 def split_delivery_requests_into_clusters(delivery_requests: List[DeliveryRequest], max_clusters: int = 10) -> \
         Dict[int, List[DeliveryRequest]]:

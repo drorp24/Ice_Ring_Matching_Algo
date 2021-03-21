@@ -82,6 +82,9 @@ class PotentialArrivalEnvelope:
     def centroid(self) -> Point2D:
         return self._centroid
 
+    def __eq__(self, other):
+        return self.arrival_envelopes == other.arrival_envelopes and self.centroid == other.centroid
+
     def get_arrival_envelope(self, arrival_azimuth: Angle) -> ArrivalEnvelope:
         return self.arrival_envelopes[arrival_azimuth]
 

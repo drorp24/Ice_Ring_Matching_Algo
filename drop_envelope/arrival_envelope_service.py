@@ -16,14 +16,29 @@ class MockPotentialEnvelopeService:
         self._potential_envelopes = potential_envelopes
 
     @classmethod
+    def from_internal_nodes(cls, internal_operational_nodes: List[Union[DeliveryRequest, DroneLoadingDock]]):
+        dr_potential_envelopes = {internal_node: DeliveryRequestPotentialEnvelope.from_delivery_request(internal_node)
+                                  for internal_node in
+                                  list(filter(lambda node: isinstance(node, DeliveryRequest),
+                                              internal_operational_nodes))}
+        ld_potential_envelopes = {internal_node: LoadingDockPotentialEnvelope(internal_node)
+                                  for internal_node in list(
+                filter(lambda node: isinstance(node.internal_node, DroneLoadingDock), internal_operational_nodes))}
+        potential_envelopes = dr_potential_envelopes.copy()
+        potential_envelopes.update(ld_potential_envelopes)
+        return MockPotentialEnvelopeService(potential_envelopes=potential_envelopes)
+
+    @classmethod
     def from_operational_nodes(cls, operational_nodes: List[OperationalNode]):
-        dr_potential_envelopes = {operational_node.internal_node: DeliveryRequestPotentialEnvelope.from_delivery_request(
-            operational_node.internal_node)
-                                for operational_node in
-                                list(filter(lambda node: isinstance(node, DeliveryRequest), operational_nodes))}
+        dr_potential_envelopes = {
+            operational_node.internal_node: DeliveryRequestPotentialEnvelope.from_delivery_request(
+                operational_node.internal_node)
+            for operational_node in
+            list(filter(lambda node: isinstance(node.internal_node, DeliveryRequest), operational_nodes))}
         ld_potential_envelopes = {operational_node.internal_node: LoadingDockPotentialEnvelope(
             operational_node.internal_node)
-            for operational_node in list(filter(lambda node: isinstance(node, DroneLoadingDock), operational_nodes))}
+            for operational_node in
+            list(filter(lambda node: isinstance(node.internal_node, DroneLoadingDock), operational_nodes))}
         potential_envelopes = dr_potential_envelopes.copy()
         potential_envelopes.update(ld_potential_envelopes)
         return MockPotentialEnvelopeService(potential_envelopes=potential_envelopes)
