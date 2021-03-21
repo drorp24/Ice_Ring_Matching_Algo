@@ -12,7 +12,7 @@ if os.path.isfile(full_path):
         install_requires = f.read().splitlines()
 
 setup(name='MatchingAlgorithms',
-      version='0.0.1',
+      version='0.1.0',
       description='',
       install_requires=install_requires,
       build_requires=['Cython'],
