@@ -37,7 +37,7 @@ class DeliveryOption(JsonableBaseEntity, Localizable, PackageHolder):
 
     def get_package_type_amount(self, package_type: PackageType) -> int:
         customer_deliveries = self.customer_deliveries
-        demands = list(map(lambda x: x.get_package_type_amount(package_type), customer_deliveries))
+        demands = [customer_delivery.get_package_type_amount(package_type) for customer_delivery in customer_deliveries ]
         return sum(demands)
 
     def get_package_type_amount_map(self) -> PackageTypeAmountMap:
