@@ -27,7 +27,7 @@
     "capacity": {
       "__class__": "CapacityConstraints",
       "count_capacity_from_zero": true,
-      "capacity_cost_coefficient": 1
+      "capacity_cost_coefficient": 10000
     },
     "travel_time": {
       "__class__": "TravelTimeConstraints",
@@ -43,7 +43,7 @@
     "priority": {
       "__class__": "PriorityConstraints",
       "count_priority_from_zero": true,
-      "priority_cost_coefficient": 100
+      "priority_cost_coefficient": 1000
     }
   },
   "unmatched_penalty": 10000,

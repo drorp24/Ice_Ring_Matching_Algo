@@ -71,8 +71,8 @@ def create_single_package_distribution():
 
 def _create_empty_drone_delivery_board(
         drone_formation_policy=DroneFormationTypePolicy({DroneFormationType.PAIR: 1, DroneFormationType.QUAD: 0}),
-        package_configurations_policy=PackageConfigurationPolicy({PackageConfiguration.LARGE_X2: 0.9,
-                                                                  PackageConfiguration.MEDIUM_X4: 0.1,
+        package_configurations_policy=PackageConfigurationPolicy({PackageConfiguration.LARGE_X2: 1,
+                                                                  PackageConfiguration.MEDIUM_X4: 0,
                                                                   PackageConfiguration.SMALL_X8: 0,
                                                                   PackageConfiguration.TINY_X16: 0}),
         drone_type: DroneType = DroneType.drone_type_1,
@@ -92,7 +92,7 @@ class BasicMinimumEnd2EndExperiment:
             self.supplier_category_distribution = SupplierCategoryDistribution(
                 zero_time_distribution=DateTimeDistribution([ZERO_TIME]),
                 delivery_requests_distribution=_create_delivery_request_distribution(
-                    create_point_2d(35.45, 33.4 - 0.5 * 1), 0.05, 0.06, 10, 3),
+                    create_point_2d(35.46, 33.25), 0.2, 0.3, 10, 20),
                 drone_loading_docks_distribution=DroneLoadingDockDistribution(
                     drone_loading_station_distributions=DroneLoadingStationDistribution(
                         drone_station_locations_distribution=UniformPointInBboxDistribution(35.19336,
@@ -106,8 +106,8 @@ class BasicMinimumEnd2EndExperiment:
         elif scene == 'center':
             self.supplier_category_distribution = SupplierCategoryDistribution(
                 zero_time_distribution=DateTimeDistribution([ZERO_TIME]),
-                delivery_requests_distribution=_create_delivery_request_distribution(create_point_2d(35.11, 32.0), 0.03,
-                                                                                     0.05, 10, 3),
+                delivery_requests_distribution=_create_delivery_request_distribution(create_point_2d(35.11, 32.0), 0.1,
+                                                                                     0.1, 10, 20),
                 drone_loading_docks_distribution=DroneLoadingDockDistribution(
                     drone_loading_station_distributions=DroneLoadingStationDistribution(
                         drone_station_locations_distribution=UniformPointInBboxDistribution(35.11,
@@ -121,13 +121,13 @@ class BasicMinimumEnd2EndExperiment:
 
     def test_small_supplier_category(self):
         start_time = datetime.now()
-        empty_drone_delivery_board = _create_empty_drone_delivery_board(amount=10, max_route_time_entire_board=1440,
+        empty_drone_delivery_board = _create_empty_drone_delivery_board(amount=6, max_route_time_entire_board=1440,
                                                                         velocity_entire_board=10.0)
         print("--- _create_empty_drone_delivery_board run time: %s  ---" % (datetime.now() - start_time))
         start_time = datetime.now()
 
         supplier_category = self.supplier_category_distribution.choose_rand(random=Random(10),
-                                                                            amount={DeliveryRequest: 60,
+                                                                            amount={DeliveryRequest: 50,
                                                                                     DroneLoadingDock: 1})
         time_overlapping_dependent_graph = create_time_overlapping_dependent_graph_model(supplier_category, edge_cost_factor=25.0,
                                                                    edge_travel_time_factor=25.0)
@@ -149,10 +149,10 @@ class BasicMinimumEnd2EndExperiment:
                                     aggregate_by_edd=True)
 
     @staticmethod
-    def _draw_matched_scenario(delivery_board, fully_connected_graph, supplier_category, map_image,
+    def _draw_matched_scenario(delivery_board, graph, supplier_category, map_image,
                                aggregate_by_edd: bool = True):
         dr_drawer = create_drawer_2d(Drawer2DCoordinateSys.GEOGRAPHIC, map_image)
-        operational_drawer2d.add_operational_graph(dr_drawer, fully_connected_graph, draw_internal=True,
+        operational_drawer2d.add_operational_graph(dr_drawer, graph, draw_internal=True,
                                                    draw_edges=False)
         dr_drawer.draw(False)
         board_map_drawer = create_drawer_2d(Drawer2DCoordinateSys.GEOGRAPHIC, map_image)
