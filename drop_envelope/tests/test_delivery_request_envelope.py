@@ -108,12 +108,12 @@ class BasicDeliveryRequestEnvelope(unittest.TestCase):
         potential_arrival_envelope = dr_potential_envelope.get_potential_arrival_envelope(
             get_azimuth_quantization_values(MockSlidesServiceWrapper.drone_azimuth_level_amount),
             maneuver_angle=maneuver_angle)
-        self.assertEqual(len(potential_arrival_envelope.potential_envelopes), 2)
-        self.assertAlmostEqual(list(potential_arrival_envelope.potential_envelopes.values())[0].repr_point.x, -92.147071,
+        self.assertEqual(len(potential_arrival_envelope.arrival_envelopes), 2)
+        self.assertAlmostEqual(list(potential_arrival_envelope.arrival_envelopes.values())[0].repr_point.x, -92.147071,
                                delta=0.1)
-        self.assertAlmostEqual(list(potential_arrival_envelope.potential_envelopes.values())[0].repr_point.y, -108.24997,
+        self.assertAlmostEqual(list(potential_arrival_envelope.arrival_envelopes.values())[0].repr_point.y, -108.24997,
                                delta=0.1)
-        self.assertAlmostEqual(list(potential_arrival_envelope.potential_envelopes.values())[1].repr_point.x, -4.52819,
+        self.assertAlmostEqual(list(potential_arrival_envelope.arrival_envelopes.values())[1].repr_point.x, -4.52819,
                                delta=0.1)
-        self.assertAlmostEqual(list(potential_arrival_envelope.potential_envelopes.values())[1].repr_point.y, -144.542896,
+        self.assertAlmostEqual(list(potential_arrival_envelope.arrival_envelopes.values())[1].repr_point.y, -144.542896,
                                delta=0.1)
