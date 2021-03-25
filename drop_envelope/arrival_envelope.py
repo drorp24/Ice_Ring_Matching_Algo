@@ -1,3 +1,4 @@
+import sys
 from math import cos, sin
 from typing import List, Dict, Union
 from common.math.angle import Angle, AngleUnit
@@ -96,4 +97,6 @@ def calc_cost(potential_arrival_envelope_1: PotentialArrivalEnvelope,
     costs = list(map(lambda ar_tuple: ar_tuple[0].calc_cost(ar_tuple[1]) *
                                       (2 - cos(ar_tuple[0].arrival_azimuth.radians -
                                                ar_tuple[1].arrival_azimuth.radians)), arrival_envelopes_tuples))
+    if len(costs) == 0:
+        return sys.maxsize
     return min(costs)

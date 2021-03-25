@@ -89,8 +89,8 @@ class BasicMinimumEnd2EndClusteredDrsTest(unittest.TestCase):
                 DroneLoadingDock: docks_amount})
 
         clustered_connected_graph = create_clustered_delivery_requests_graph_model(supplier_category,
-                                                                                   edge_cost_factor=25.0,
-                                                                                   edge_travel_time_factor=25.0,
+                                                                                   edge_cost_factor=0.1,
+                                                                                   edge_travel_time_factor=0.1,
                                                                                    max_clusters_per_zone=max_clusters_per_zone)
 
         print("--- clustered_connected_graph run time: %s  ---" % (datetime.now() - start_time))
