@@ -1,5 +1,6 @@
-from typing import Union, List
+from __future__ import annotations
 
+from typing import List, Dict
 from common.entities.base_entities.delivery_request import DeliveryRequest
 from common.entities.base_entities.drone_loading_dock import DroneLoadingDock
 from common.graph.operational.operational_graph import OperationalNode
@@ -12,11 +13,11 @@ from drop_envelope.slide_service import MockSlidesServiceWrapper
 
 
 class MockPotentialEnvelopeService:
-    def __init__(self, potential_envelopes):
+    def __init__(self, potential_envelopes: Dict[DeliveryRequest | DroneLoadingDock, PotentialEnvelopeCollection]):
         self._potential_envelopes = potential_envelopes
 
     @classmethod
-    def from_internal_nodes(cls, internal_operational_nodes: List[Union[DeliveryRequest, DroneLoadingDock]]):
+    def from_internal_nodes(cls, internal_operational_nodes: List[DeliveryRequest | DroneLoadingDock]):
         dr_potential_envelopes = {internal_node: DeliveryRequestPotentialEnvelope.from_delivery_request(internal_node)
                                   for internal_node in
                                   list(filter(lambda node: isinstance(node, DeliveryRequest),
@@ -44,11 +45,11 @@ class MockPotentialEnvelopeService:
         return MockPotentialEnvelopeService(potential_envelopes=potential_envelopes)
 
     @property
-    def potential_envelopes(self):
+    def potential_envelopes(self) -> Dict[DeliveryRequest | DroneLoadingDock, PotentialEnvelopeCollection]:
         return self._potential_envelopes
 
     def get_potential_arrival_envelope(self,
-                                       node: Union[DeliveryRequest, DroneLoadingDock],
+                                       node: DeliveryRequest | DroneLoadingDock,
                                        maneuver_angle=Angle(value=90, unit=AngleUnit.DEGREE)) \
             -> PotentialArrivalEnvelope:
         return self.potential_envelopes[node].get_potential_arrival_envelope(

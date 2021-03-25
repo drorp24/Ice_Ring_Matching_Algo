@@ -84,9 +84,8 @@ def calc_arrival_envelope_travel_time(arrival_envelope_service: MockPotentialEnv
                                       start: Union[DeliveryRequest, DroneLoadingDock],
                                       end: Union[DeliveryRequest, DroneLoadingDock],
                                       edge_travel_time_factor: float = 1.0) -> float:
-    arrival_envelope_start = arrival_envelope_service.get_potential_arrival_envelope(start)
-    arrival_envelope_end = arrival_envelope_service.get_potential_arrival_envelope(end)
-    return edge_travel_time_factor * arrival_envelope_cost(arrival_envelope_start, arrival_envelope_end)
+    return calc_arrival_envelope_cost(arrival_envelope_service=arrival_envelope_service,
+                                      start=start, end=end, edge_cost_factor=edge_travel_time_factor)
 
 
 def sort_delivery_requests_by_zone(delivery_requests: [DeliveryRequest], zones: [Zone]) -> Dict[
