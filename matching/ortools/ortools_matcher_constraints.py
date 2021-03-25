@@ -57,7 +57,7 @@ class ORToolsMatcherConstraints:
     def add_demand(self):
         demand_dimension_name_prefix = OrToolsDimensionDescription.capacity.value + "_"
         demand_slack = 0
-        for package_type in self._matcher_input.empty_board.package_types():
+        for package_type in PackageType:
             callback = getattr(self, "_get_" + str.lower(package_type.name) + "_demand_callback")
             demand_callback_index = self._routing_model.RegisterPositiveUnaryTransitCallback(callback)
             self._routing_model.AddDimensionWithVehicleCapacity(
