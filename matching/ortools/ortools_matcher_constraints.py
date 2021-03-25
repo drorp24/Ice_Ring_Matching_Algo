@@ -104,7 +104,7 @@ class ORToolsMatcherConstraints:
 
     def add_demand(self):
         demand_dimension_name_prefix = OrToolsDimensionDescription.capacity.value + "_"
-        for package_type in self._matcher_input.empty_board.package_types():
+        for package_type in PackageType:
             demand_dimension_name = demand_dimension_name_prefix + str.lower(package_type.name)
             demand_callback_index = self._routing_model.RegisterUnaryTransitCallback(
                 self._create_demand_evaluator(package_type))
