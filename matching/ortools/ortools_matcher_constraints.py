@@ -74,7 +74,7 @@ class ORToolsMatcherConstraints:
         for node in self._graph_exporter.export_delivery_request_nodes_indices(self._matcher_input.graph):
             index = self._index_manager.node_to_index(node)
             coefficient = max(self._graph_exporter.export_priorities(self._matcher_input.graph)) \
-                / self._graph_exporter.export_priorities(self._matcher_input.graph)[node]
+                / (self._graph_exporter.export_priorities(self._matcher_input.graph)[node] + 1)
             travel_time_dimension.SetCumulVarSoftUpperBound(index, 0, int(coefficient))
         for vehicle_id in range(self._matcher_input.empty_board.amount_of_formations()):
             index = self._routing_model.Start(vehicle_id)
