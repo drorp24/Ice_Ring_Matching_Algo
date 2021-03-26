@@ -1,3 +1,4 @@
+import os
 import unittest
 from datetime import time, date, timedelta, datetime
 from pathlib import Path
@@ -42,32 +43,38 @@ class BasicMinimumEnd2EndClusteredDrsTest(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        match_config_file_path = Path('end_to_end/tests/jsons/test_matcher_config.json')
+        match_config_file_path = Path('end_to_end/tests/jsons/test_min_e2e_config.json')
         cls.match_config = MatcherConfig.dict_to_obj(MatcherConfig.json_to_dict(match_config_file_path))
 
         cls.mapImage = MapImage(map_background_path=Path(r"visualization/basic/gush_dan_background.Png"),
                                 west_lon=34.83927, east_lon=35.32341, south_lat=31.77279, north_lat=32.19276)
 
+    @unittest.skipIf(os.environ.get('NO_SLOW_TESTS', False), 'slow tests')
     def test_1_zone_1_centroid(self):
         self._test_clustered_drs(zone_amount=1, max_centroids_per_zone=1, drs_amount=37, docks_amount=1,
                                  max_clusters_per_zone=5, dr_timewindow=18, draw_match=False)
 
+    @unittest.skipIf(os.environ.get('NO_SLOW_TESTS', False), 'slow tests')
     def test_1_zone_2_centroids(self):
         self._test_clustered_drs(zone_amount=1, max_centroids_per_zone=2, drs_amount=37, docks_amount=1,
                                  max_clusters_per_zone=5, dr_timewindow=18, draw_match=False)
 
+    @unittest.skipIf(os.environ.get('NO_SLOW_TESTS', False), 'slow tests')
     def test_1_zone_3_centroids(self):
         self._test_clustered_drs(zone_amount=1, max_centroids_per_zone=3, drs_amount=37, docks_amount=1,
                                  max_clusters_per_zone=5, dr_timewindow=18, draw_match=False)
 
+    @unittest.skipIf(os.environ.get('NO_SLOW_TESTS', False), 'slow tests')
     def test_2_zones_1_centroid(self):
         self._test_clustered_drs(zone_amount=2, max_centroids_per_zone=1, drs_amount=37, docks_amount=1,
                                  max_clusters_per_zone=3, dr_timewindow=23, draw_match=False)
 
+    @unittest.skipIf(os.environ.get('NO_SLOW_TESTS', False), 'slow tests')
     def test_2_zones_2_centroids(self):
         self._test_clustered_drs(zone_amount=2, max_centroids_per_zone=2, drs_amount=37, docks_amount=1,
                                  max_clusters_per_zone=3, dr_timewindow=18, draw_match=False)
 
+    @unittest.skipIf(os.environ.get('NO_SLOW_TESTS', False), 'slow tests')
     def test_2_zones_3_centroids(self):
         self._test_clustered_drs(zone_amount=2, max_centroids_per_zone=3, drs_amount=37, docks_amount=1,
                                  max_clusters_per_zone=3, dr_timewindow=18, draw_match=False)

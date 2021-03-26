@@ -70,6 +70,8 @@ class ORToolsSolutionHandler:
         return drone_deliveries
 
     def _print_solution_debug_info(self, edd_index, solution):
+        if solution:
+            print(f'Objective: {solution.ObjectiveValue()}')
         time_dimension = self._routing_model.GetDimensionOrDie(OrToolsDimensionDescription.travel_time.value)
         demand_dimension = self._routing_model.GetDimensionOrDie("capacity_large")
         index = self._routing_model.Start(edd_index)

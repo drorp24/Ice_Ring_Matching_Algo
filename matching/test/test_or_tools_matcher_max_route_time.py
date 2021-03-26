@@ -135,7 +135,7 @@ class ORToolsMatcherMaxRouteTimeTestCase(TestCase):
                     since=ZERO_TIME,
                     until=ZERO_TIME.add_time_delta(TimeDeltaExtension(timedelta(minutes=self.edd2_max_endurance)))),
             ]),
-            package_type_distribution=PackageDistribution({PackageType.LARGE: 1}))
+            package_type_distribution=PackageDistribution({PackageType.TINY: 2}))
         return dist.choose_rand(Random(42), amount={DeliveryRequest: 2})
 
     @staticmethod

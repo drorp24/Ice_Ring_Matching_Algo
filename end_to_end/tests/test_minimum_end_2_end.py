@@ -1,3 +1,4 @@
+import os
 import unittest
 from pathlib import Path
 
@@ -41,6 +42,7 @@ class BasicMinimumEnd2End(unittest.TestCase):
         self.assertEqual(len(operational_graph.nodes), 11)
         self.assertEqual(len(operational_graph.edges), 60)
 
+    @unittest.skipIf(os.environ.get('NO_SLOW_TESTS', False), 'slow tests')
     def test_calc_assignment(self):
         operational_graph = create_time_overlapping_dependent_graph_model(self.supplier_category)
         matcher_input = MatcherInput(graph=operational_graph,
