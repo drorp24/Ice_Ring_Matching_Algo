@@ -13,11 +13,11 @@ class BasicExperimentGeneratorTest(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        supplier_category_path = '/Users/gilbaz/Code/Ice_Ring/experiment_space/tests/jsons/test_supplier_category.json'
+        supplier_category_path = 'experiment_space/tests/jsons/test_supplier_category.json'
         supplier_category = SupplierCategory.from_json(SupplierCategory, supplier_category_path)
-        matcher_config_path = '/Users/gilbaz/Code/Ice_Ring/experiment_space/tests/jsons/test_matcher_config.json'
+        matcher_config_path = 'experiment_space/tests/jsons/test_matcher_config.json'
         matcher_config = MatcherConfig.from_json(MatcherConfig, matcher_config_path)
-        drone_set_properties_path = '/Users/gilbaz/Code/Ice_Ring/experiment_space/tests/jsons/test_drone_set_properties.json'
+        drone_set_properties_path = 'experiment_space/tests/jsons/test_drone_set_properties.json'
         drone_set_properties = DroneSetProperties.from_json(DroneSetProperties, drone_set_properties_path)
         default_graph_creation_algorithm = FullyConnectedGraphAlgorithm()
         cls.base_experiment = Experiment(supplier_category=supplier_category,
@@ -42,7 +42,7 @@ class BasicExperimentGeneratorTest(unittest.TestCase):
             self.assertEqual(sample, self.base_experiment)
 
     def test_experiment_generator_cartesian_product_with_added_zones_and_unmatched_penalty(self):
-        base_experiment_options =  create_options_class(self.base_experiment, ['SupplierCategory', 'MatcherConfig'])
+        base_experiment_options = create_options_class(self.base_experiment, ['SupplierCategory', 'MatcherConfig'])
         base_experiment_options.supplier_category[0].zones.append('a')
         base_experiment_options.supplier_category[0].zones.append('b')
         base_experiment_options.matcher_config[0].unmatched_penalty.append(1000)

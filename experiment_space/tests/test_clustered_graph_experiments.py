@@ -18,11 +18,12 @@ from common.entities.base_entities.entity_distribution.temporal_distribution imp
     TimeWindowDistribution, DateTimeDistribution
 from common.entities.base_entities.entity_distribution.zone_delivery_request_distribution import \
     ZoneDeliveryRequestDistribution
+from common.entities.base_entities.entity_id import EntityID
 from common.entities.base_entities.fleet.fleet_property_sets import DroneFormationTypePolicy, \
     PackageConfigurationPolicy, DroneSetProperties
 from common.entities.base_entities.package import PackageType
 from common.entities.base_entities.temporal import DateTimeExtension, TimeDeltaExtension
-from experiment_space.analyzer.quantitative_analyzer import MatchedDeliveryRequestsAnalyzer
+from experiment_space.analyzer.quantitative_analyzers import MatchedDeliveryRequestsAnalyzer
 from experiment_space.distribution.supplier_category_distribution import SupplierCategoryDistribution
 from experiment_space.experiment import Experiment
 from experiment_space.graph_creation_algorithm import *
@@ -31,13 +32,6 @@ from geometry.distribution.geo_distribution import UniformPointInBboxDistributio
     NormalPointsInMultiPolygonDistribution
 from geometry.geo_factory import create_point_2d, create_polygon_2d, create_multipolygon_2d
 from matching.matcher_config import MatcherConfig
-from visualization.basic.drawer2d import Drawer2DCoordinateSys
-from visualization.basic.pltdrawer2d import create_drawer_2d, MapImage
-from visualization.basic.pltgantt_drawer import create_gantt_drawer
-from visualization.operational import operational_drawer2d
-from visualization.operational import operational_gantt_drawer
-from common.entities.base_entities.entity_id import EntityID
-from uuid import uuid4
 from visualization.basic.pltdrawer2d import MapImage
 
 ZERO_TIME = DateTimeExtension(dt_date=date(2021, 1, 1), dt_time=time(0, 0, 0))

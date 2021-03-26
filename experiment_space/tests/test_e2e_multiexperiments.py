@@ -3,6 +3,8 @@ from datetime import timedelta, date, time
 from pathlib import Path
 from random import Random
 
+from ortools.constraint_solver.routing_enums_pb2 import FirstSolutionStrategy
+
 from common.entities.base_entities.drone import DroneType, PackageConfiguration
 from common.entities.base_entities.drone_formation import DroneFormationType
 from common.entities.base_entities.entity_distribution.delivery_requestion_dataset_builder import \
@@ -20,7 +22,7 @@ from common.entities.base_entities.fleet.fleet_property_sets import DroneSetProp
     PackageConfigurationPolicy, BoardLevelProperties
 from common.entities.base_entities.package import PackageType
 from common.entities.base_entities.temporal import TimeDeltaExtension, DateTimeExtension
-from experiment_space.analyzer.quantitative_analyzer import MatchedDeliveryRequestsAnalyzer, \
+from experiment_space.analyzer.quantitative_analyzers import MatchedDeliveryRequestsAnalyzer, \
     UnmatchedDeliveryRequestsAnalyzer, MatchPercentageDeliveryRequestAnalyzer, TotalWorkTimeAnalyzer, \
     AmountMatchedPerPackageTypeAnalyzer, MatchingEfficiencyAnalyzer, MatchingPriorityEfficiencyAnalyzer
 from experiment_space.distribution.supplier_category_distribution import SupplierCategoryDistribution
@@ -50,7 +52,7 @@ class EndToEndMultipleExperimentRun(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.drone_set_properties_even = EndToEndMultipleExperimentRun._create_even_drone_set_properties()
-        cls.drone_set_properties_heavily_weighted = EndToEndMultipleExperimentRun._create_uneven_drone_set_properties()
+        cls.drone_set_properties_heavily_weighted = EndToEndMultipleExperimentRun._create_even_drone_set_properties()
         cls.matcher_config = MatcherConfig.dict_to_obj(
             MatcherConfig.json_to_dict(Path('experiment_space/tests/jsons/test_matcher_config.json')))
 
@@ -61,7 +63,7 @@ class EndToEndMultipleExperimentRun(unittest.TestCase):
                                 drone_set_properties=EndToEndMultipleExperimentRun._create_large_drone_set_properties(),
                                 matcher_config=self.matcher_config,
                                 graph_creation_algorithm=FullyConnectedGraphAlgorithm())
-        EndToEndMultipleExperimentRun._run_end_to_end_visual_experiment(experiment, SHOW_VISUALS)
+        self._run_end_to_end_visual_experiment(experiment, SHOW_VISUALS)
 
     @unittest.skip
     def test_calc_center_scenario_visualization(self):
@@ -70,39 +72,37 @@ class EndToEndMultipleExperimentRun(unittest.TestCase):
                                 drone_set_properties=self.drone_set_properties_even,
                                 matcher_config=self.matcher_config,
                                 graph_creation_algorithm=FullyConnectedGraphAlgorithm())
-        EndToEndMultipleExperimentRun._run_end_to_end_visual_experiment(experiment, SHOW_VISUALS)
+        self._run_end_to_end_visual_experiment(experiment, SHOW_VISUALS)
 
     @unittest.skip
     def test_calc_center_scenario_with_different_first_solution_strategies(self):
-        sampled_supplier_category = self._create_sampled_supplier_category_center()
-        experiment = Experiment(supplier_category=sampled_supplier_category,
-                                drone_set_properties=self.drone_set_properties_heavily_weighted,
-                                matcher_config=self.matcher_config,
-                                graph_creation_algorithm=FullyConnectedGraphAlgorithm())
-        experiment_options = create_options_class(experiment, ['Experiment', 'MatcherConfig', 'ORToolsSolverConfig'])
+        sampled_supplier_category = self._create_sampled_supplier_category_north()
+        base_experiment = Experiment(supplier_category=sampled_supplier_category,
+                                     drone_set_properties=self.drone_set_properties_heavily_weighted,
+                                     matcher_config=self.matcher_config,
+                                     graph_creation_algorithm=FullyConnectedGraphAlgorithm())
+        experiment_options = create_options_class(base_experiment,
+                                                  ['Experiment', 'MatcherConfig', 'ORToolsSolverConfig'])
 
-        first_solution_strategies = ['UNSET', 'AUTOMATIC', 'PATH_CHEAPEST_ARC', 'PATH_MOST_CONSTRAINED_ARC',
-                                     'EVALUATOR_STRATEGY', 'SAVINGS', 'SWEEP', 'CHRISTOFIDES', 'ALL_UNPERFORMED',
-                                     'BEST_INSERTION', 'PARALLEL_CHEAPEST_INSERTION', 'SEQUENTIAL_CHEAPEST_INSERTION',
-                                     'LOCAL_CHEAPEST_INSERTION', 'GLOBAL_CHEAPEST_ARC', 'LOCAL_CHEAPEST_ARC',
-                                     'FIRST_UNBOUND_MIN_VALUE']
+        first_solution_strategies = FirstSolutionStrategy.DESCRIPTOR.enum_values_by_name.keys()
 
         experiment_options.matcher_config[0].solver[0].first_solution_strategy = first_solution_strategies
         experiments = Options.calc_cartesian_product(experiment_options)
 
-        analyzers_to_run = [MatchedDeliveryRequestsAnalyzer,
-                            UnmatchedDeliveryRequestsAnalyzer,
-                            MatchPercentageDeliveryRequestAnalyzer,
-                            TotalWorkTimeAnalyzer,
-                            AmountMatchedPerPackageTypeAnalyzer,
-                            MatchingEfficiencyAnalyzer]
+        analyzers = [MatchedDeliveryRequestsAnalyzer,
+                     UnmatchedDeliveryRequestsAnalyzer,
+                     MatchPercentageDeliveryRequestAnalyzer,
+                     TotalWorkTimeAnalyzer,
+                     AmountMatchedPerPackageTypeAnalyzer,
+                     MatchingEfficiencyAnalyzer]
 
-        labeled_results = [(str(labeled_experiment[0]),
-                            Experiment.run_analysis_suite(labeled_experiment[1].run_match(), analyzers_to_run))
-                           for labeled_experiment in zip(first_solution_strategies, experiments)]
+        results = Experiment.run_multi_match_analysis_pipeline(experiments, analyzers)
 
-        draw_labeled_analysis_bar_chart(labeled_experiment_analysis=labeled_results,
-                                        analyzer=MatchingEfficiencyAnalyzer,
+        labeled_experiment_analysis = [(str(res[0].matcher_config.solver.first_solution_strategy), res[1])
+                                       for res in results]
+
+        draw_labeled_analysis_bar_chart(labeled_experiment_analysis=labeled_experiment_analysis,
+                                        analyzer=MatchedDeliveryRequestsAnalyzer,
                                         title='Match percentage per first solution strategy type',
                                         xlabel='First Solution Strategies',
                                         ylabel='Match Percentage of Delivery Requests')
@@ -110,30 +110,31 @@ class EndToEndMultipleExperimentRun(unittest.TestCase):
     @unittest.skip
     def test_calc_center_scenario_with_different_fleet_sizes(self):
         sampled_supplier_category = self._create_sampled_supplier_category_north()
-        experiment = Experiment(supplier_category=sampled_supplier_category,
-                                drone_set_properties=self.drone_set_properties_heavily_weighted,
-                                matcher_config=self.matcher_config,
-                                graph_creation_algorithm=FullyConnectedGraphAlgorithm())
+        base_experiment = Experiment(supplier_category=sampled_supplier_category,
+                                     drone_set_properties=self.drone_set_properties_heavily_weighted,
+                                     matcher_config=self.matcher_config,
+                                     graph_creation_algorithm=FullyConnectedGraphAlgorithm())
 
-        experiment_options = create_options_class(experiment, ['Experiment', 'DroneSetProperties'])
+        experiment_options = create_options_class(base_experiment, ['Experiment', 'DroneSetProperties'])
 
-        drone_amount_options = list(range(2, 60,2))
+        drone_amount_options = list(range(2, 60, 2))
         experiment_options.drone_set_properties[0].drone_amount = drone_amount_options
         experiments = Options.calc_cartesian_product(experiment_options)
 
-        analyzers_to_run = [MatchedDeliveryRequestsAnalyzer,
-                            UnmatchedDeliveryRequestsAnalyzer,
-                            MatchPercentageDeliveryRequestAnalyzer,
-                            TotalWorkTimeAnalyzer,
-                            AmountMatchedPerPackageTypeAnalyzer,
-                            MatchingEfficiencyAnalyzer,
-                            MatchingPriorityEfficiencyAnalyzer]
+        analyzers = [MatchedDeliveryRequestsAnalyzer,
+                     UnmatchedDeliveryRequestsAnalyzer,
+                     MatchPercentageDeliveryRequestAnalyzer,
+                     TotalWorkTimeAnalyzer,
+                     AmountMatchedPerPackageTypeAnalyzer,
+                     MatchingEfficiencyAnalyzer,
+                     MatchingPriorityEfficiencyAnalyzer]
 
-        labeled_results = [(str(labeled_experiment[0]),
-                            Experiment.run_analysis_suite(labeled_experiment[1].run_match(), analyzers_to_run))
-                           for labeled_experiment in zip(drone_amount_options, experiments)]
+        results = Experiment.run_multi_match_analysis_pipeline(experiments, analyzers)
 
-        draw_labeled_analysis_graph(experiment_analysis=labeled_results,
+        labeled_experiment_analysis = [(str(res[0].drone_set_properties.drone_amount), res[1])
+                                       for res in results]
+
+        draw_labeled_analysis_graph(experiment_analysis=labeled_experiment_analysis,
                                     analyzers=[MatchingEfficiencyAnalyzer, MatchingPriorityEfficiencyAnalyzer],
                                     title='Match Percentage per Fleet Size',
                                     xlabel='Fleet Size',
@@ -167,7 +168,7 @@ class EndToEndMultipleExperimentRun(unittest.TestCase):
                 drone_loading_station_distributions=DroneLoadingStationDistribution(
                     drone_station_locations_distribution=UniformPointInBboxDistribution(35.11, 35.11, 31.79, 31.79)),
                 time_window_distributions=_create_standard_full_day_test_time())).choose_rand(Random(42), amount={
-            DeliveryRequest: 50})[0]
+            DeliveryRequest: 30})[0]
 
     @classmethod
     def _create_sampled_supplier_category_center(cls):
@@ -193,7 +194,7 @@ class EndToEndMultipleExperimentRun(unittest.TestCase):
     def _create_uneven_drone_set_properties(cls):
         return DroneSetProperties(drone_type=DroneType.drone_type_1,
                                   drone_formation_policy=DroneFormationTypePolicy(
-                                      {DroneFormationType.PAIR: 1.0, DroneFormationType.QUAD: 0.00}),
+                                      {DroneFormationType.PAIR: 0.95, DroneFormationType.QUAD: 0.05}),
                                   package_configuration_policy=PackageConfigurationPolicy(
                                       {PackageConfiguration.LARGE_X2: 1.0}),
                                   drone_amount=30)
@@ -205,7 +206,7 @@ class EndToEndMultipleExperimentRun(unittest.TestCase):
                                       {DroneFormationType.PAIR: 1.0, DroneFormationType.QUAD: 0.0}),
                                   package_configuration_policy=PackageConfigurationPolicy(
                                       {PackageConfiguration.LARGE_X2: 1.0}),
-                                  drone_amount=100)
+                                  drone_amount=50)
 
     @staticmethod
     def _create_custom_drone_loading_dock_distribution(drone_station_location):

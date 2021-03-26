@@ -7,10 +7,19 @@ DEFAULT_TIMEOUT_FOR_META_HEURISTICS = 30
 
 
 class ORToolsSolverConfig(SolverConfig, JsonableBaseEntity):
-    def __init__(self, vendor: SolverVendor, first_solution_strategy: str, local_search_strategy: str,
-                 timeout_sec: int):
-        super().__init__(vendor, first_solution_strategy, local_search_strategy, timeout_sec)
 
+    # The first solution strategies include:
+    # ['UNSET', 'AUTOMATIC', 'PATH_CHEAPEST_ARC', 'PATH_MOST_CONSTRAINED_ARC', 'EVALUATOR_STRATEGY', 'SAVINGS', 'SWEEP',
+    # 'CHRISTOFIDES', 'ALL_UNPERFORMED', 'BEST_INSERTION', 'PARALLEL_CHEAPEST_INSERTION',
+    # 'SEQUENTIAL_CHEAPEST_INSERTION', 'LOCAL_CHEAPEST_INSERTION', 'GLOBAL_CHEAPEST_ARC',
+    # 'LOCAL_CHEAPEST_ARC', 'FIRST_UNBOUND_MIN_VALUE']",
+
+    # The Local Search Strategies include:
+    # ['UNSET', 'AUTOMATIC', 'GREEDY_DESCENT', 'GUIDED_LOCAL_SEARCH', 'SIMULATED_ANNEALING', 'TABU_SEARCH',
+    # 'GENERIC_TABU_SEARCH']
+
+    def __init__(self, first_solution_strategy: str, local_search_strategy: str, timeout_sec: int):
+        super().__init__(SolverVendor.OR_TOOLS, first_solution_strategy, local_search_strategy, timeout_sec)
         self._timeout_sec = self.validate_timeout_sec(timeout_sec)
 
     @property
@@ -20,10 +29,6 @@ class ORToolsSolverConfig(SolverConfig, JsonableBaseEntity):
     @property
     def local_search_strategy(self) -> str:
         return super().local_search_strategy
-
-    @property
-    def vendor(self) -> SolverVendor:
-        return super().vendor
 
     @property
     def timeout_sec(self) -> int:
@@ -57,7 +62,6 @@ class ORToolsSolverConfig(SolverConfig, JsonableBaseEntity):
         assert (dict_input['__class__'] == cls.__name__)
 
         return ORToolsSolverConfig(
-            vendor=SolverVendor.dict_to_obj(dict_input["vendor"]),
             first_solution_strategy=dict_input["first_solution_strategy"],
             local_search_strategy=dict_input["local_search_strategy"],
             timeout_sec=dict_input["timeout_sec"])

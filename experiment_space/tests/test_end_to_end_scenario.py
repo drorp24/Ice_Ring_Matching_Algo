@@ -6,7 +6,7 @@ from common.entities.base_entities.drone_formation import DroneFormationType
 from common.entities.base_entities.fleet.fleet_property_sets import DroneSetProperties, DroneFormationTypePolicy, \
     PackageConfigurationPolicy
 from common.entities.base_entities.package import PackageType
-from experiment_space.analyzer.quantitative_analyzer import AmountMatchedPerPackageTypeAnalyzer, \
+from experiment_space.analyzer.quantitative_analyzers import AmountMatchedPerPackageTypeAnalyzer, \
     UnmatchedDeliveryRequestsAnalyzer
 from experiment_space.experiment import Experiment
 from experiment_space.graph_creation_algorithm import FullyConnectedGraphAlgorithm

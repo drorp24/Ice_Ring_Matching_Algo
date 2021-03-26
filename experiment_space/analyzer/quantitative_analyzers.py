@@ -26,7 +26,7 @@ class MatchedDeliveryRequestsAnalyzer(QuantitativeAnalyzer):
 
     @staticmethod
     def _calc_amount_of_matched_delivery_request(delivery_board):
-        return sum(list(map(lambda delivery: len(delivery.matched_requests), list(delivery_board.drone_deliveries))))
+        return sum(list(map(lambda delivery: len(delivery.matched_requests), list(delivery_board.drone_deliveries))), 0)
 
 
 class MatchPercentageDeliveryRequestAnalyzer(QuantitativeAnalyzer):

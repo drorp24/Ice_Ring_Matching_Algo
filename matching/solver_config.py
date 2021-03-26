@@ -25,11 +25,6 @@ class SolverConfig(JsonableBaseEntity):
         self._local_search_strategy = local_search_strategy
         self._timeout_sec = timeout_sec
 
-        # "_comment1": "['UNSET', 'AUTOMATIC', 'PATH_CHEAPEST_ARC', 'PATH_MOST_CONSTRAINED_ARC', 'EVALUATOR_STRATEGY', 'SAVINGS', 'SWEEP', 'CHRISTOFIDES', 'ALL_UNPERFORMED', 'BEST_INSERTION', 'PARALLEL_CHEAPEST_INSERTION', 'SEQUENTIAL_CHEAPEST_INSERTION', 'LOCAL_CHEAPEST_INSERTION', 'GLOBAL_CHEAPEST_ARC', 'LOCAL_CHEAPEST_ARC', 'FIRST_UNBOUND_MIN_VALUE']",
-        # "first_solution_strategy": "LOCAL_CHEAPEST_ARC",
-        # "_comment2": "['UNSET', 'AUTOMATIC', 'GREEDY_DESCENT', 'GUIDED_LOCAL_SEARCH', 'SIMULATED_ANNEALING', 'TABU_SEARCH', 'GENERIC_TABU_SEARCH']",
-        # "local_search_strategy": "TABU_SEARCH",
-
     @classmethod
     def dict_to_obj(cls, dict_input):
         assert (dict_input['__class__'] == cls.__name__)

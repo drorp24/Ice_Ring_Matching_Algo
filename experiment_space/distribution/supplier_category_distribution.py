@@ -36,12 +36,12 @@ class SupplierCategoryDistribution(HierarchialDistribution):
         internal_amount = get_updated_internal_amount(SupplierCategoryDistribution, amount)
         sc_amount = extract_amount_in_range(internal_amount.pop(SupplierCategory), random)
         dld_amount = extract_amount_in_range(internal_amount.pop(DroneLoadingDock), random)
-        zero_time = self.zero_time_distribution.choose_rand(random=random, amount=sc_amount)
+        zero_times = self.zero_time_distribution.choose_rand(random=random, amount=sc_amount)
         zones = self.delivery_requests_distribution.zones if isinstance(self.delivery_requests_distribution,
                                                                         ZoneDeliveryRequestDistribution) else []
         return [SupplierCategory(self.delivery_requests_distribution.choose_rand(random=random, amount=internal_amount),
                                  self.drone_loading_docks_distribution.choose_rand(random=random, amount=dld_amount),
-                                 zt, zones=zones) for zt in zero_time]
+                                 zero_time, zones=zones) for zero_time in zero_times]
 
     @classmethod
     def distribution_class(cls) -> type:

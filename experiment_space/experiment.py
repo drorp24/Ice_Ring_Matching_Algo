@@ -1,9 +1,10 @@
+from __future__ import annotations
 from common.entities.base_entities.base_entity import JsonableBaseEntity
 from common.entities.base_entities.drone_delivery_board import EmptyDroneDeliveryBoard, DroneDeliveryBoard
 from common.entities.base_entities.fleet.empty_drone_delivery_board_generation import generate_empty_delivery_board
 from common.entities.base_entities.fleet.fleet_property_sets import DroneSetProperties, BoardLevelProperties
 from experiment_space.analyzer.analyzer import Analyzer
-from experiment_space.graph_creation_algorithm import GraphCreationAlgorithm
+from experiment_space.graph_creation_algorithm import GraphCreationAlgorithm, List
 from experiment_space.supplier_category import SupplierCategory
 from matching.matcher_config import MatcherConfig
 from matching.matcher_factory import create_matcher
@@ -45,7 +46,8 @@ class Experiment(JsonableBaseEntity):
 
     def run_match(self) -> DroneDeliveryBoard:
         graph = self._graph_creation_algorithm.create(supplier_category=self._supplier_category)
-        empty_drone_delivery_board = generate_empty_delivery_board([self._drone_set_properties], self._board_level_properties)
+        empty_drone_delivery_board = generate_empty_delivery_board([self._drone_set_properties],
+                                                                   self._board_level_properties)
         matcher_input = MatcherInput(graph=graph, empty_board=empty_drone_delivery_board, config=self._matcher_config)
         delivery_board = create_matcher(matcher_input=matcher_input).match()
         return delivery_board
@@ -53,6 +55,10 @@ class Experiment(JsonableBaseEntity):
     @staticmethod
     def run_analysis_suite(droneDeliveryBoard: DroneDeliveryBoard, analyzers: [Analyzer]):
         return {analyzer.__name__: analyzer.calc_analysis(droneDeliveryBoard) for analyzer in analyzers}
+
+    @staticmethod
+    def run_multi_match_analysis_pipeline(experiments: List[Experiment], analyzers: [Analyzer]):
+        return [(e, Experiment.run_analysis_suite(e.run_match(), analyzers)) for e in experiments]
 
     def __str__(self):
         return str((self._supplier_category, self._drone_set_properties, self._matcher_config))

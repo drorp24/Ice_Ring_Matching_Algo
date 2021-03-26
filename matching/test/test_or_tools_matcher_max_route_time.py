@@ -30,7 +30,6 @@ from matching.matcher_input import MatcherInput
 from matching.ortools.ortools_matcher import ORToolsMatcher
 from matching.ortools.ortools_matcher_constraints import MAX_OPERATION_TIME
 from matching.ortools.ortools_solver_config import ORToolsSolverConfig
-from matching.solver_config import SolverVendor
 
 ZERO_TIME = DateTimeExtension.from_dt(datetime(2020, 1, 23, 11, 30, 00))
 
@@ -98,7 +97,7 @@ class ORToolsMatcherMaxRouteTimeTestCase(TestCase):
     def _create_match_config_with_waiting_time(waiting_time: int = 0):
         return MatcherConfig(
             zero_time=ZERO_TIME,
-            solver=ORToolsSolverConfig(SolverVendor.OR_TOOLS, first_solution_strategy="path_cheapest_arc",
+            solver=ORToolsSolverConfig(first_solution_strategy="path_cheapest_arc",
                                        local_search_strategy="automatic", timeout_sec=30),
             constraints=ConstraintsConfig(
                 capacity=CapacityConstraints(count_capacity_from_zero=True),
