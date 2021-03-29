@@ -62,24 +62,9 @@ class ORToolsMatcherConstraints:
         self._add_time_window_constraints_for_each_delivery_except_depot(travel_time_dimension, self._time_windows)
         self._add_time_window_constraints_for_each_vehicle_start_node(travel_time_dimension, self._time_windows)
         self._set_max_route_time_for_each_vehicle(travel_time_dimension)
-        for node in range(self._num_of_nodes):
-            index = self._index_manager.node_to_index(node)
-            if node in self._depart_indices:
-                travel_time_dimension.SlackVar(index).SetMin(
-                    self._matcher_input.config.constraints.travel_time.reloading_time)
-            else:
-                travel_time_dimension.SlackVar(index).SetMax(0)
-            self._routing_model.AddToAssignment(travel_time_dimension.TransitVar(index))
-            self._routing_model.AddToAssignment(travel_time_dimension.SlackVar(index))
-        for node in self._graph_exporter.export_delivery_request_nodes_indices(self._matcher_input.graph):
-            index = self._index_manager.node_to_index(node)
-            coefficient = max(self._graph_exporter.export_priorities(self._matcher_input.graph)) \
-                / (self._graph_exporter.export_priorities(self._matcher_input.graph)[node] + 1)
-            travel_time_dimension.SetCumulVarSoftUpperBound(index, 0, int(coefficient))
-        for vehicle_id in range(self._matcher_input.empty_board.amount_of_formations()):
-            index = self._routing_model.Start(vehicle_id)
-            self._routing_model.AddToAssignment(travel_time_dimension.TransitVar(index))
-            self._routing_model.AddToAssignment(travel_time_dimension.SlackVar(index))
+        self._set_waiting_time_for_each_node(travel_time_dimension)
+        self._add_to_objective_minimize_delivery_time_of_high_priority(travel_time_dimension)
+        self._add_vehicle_start_node_index_transit_and_slack_vars_to_solution(travel_time_dimension)
 
     def add_session_time(self):
         session_time_callback_index = self._routing_model.RegisterTransitCallback(self._create_session_evaluator())
@@ -91,16 +76,8 @@ class ORToolsMatcherConstraints:
             OrToolsDimensionDescription.session_time.value)
 
         session_time_dimension = self._routing_model.GetDimensionOrDie(OrToolsDimensionDescription.session_time.value)
-        for node_index in range(self._num_of_nodes):
-            index = self._index_manager.node_to_index(node_index)
-            if node_index not in self._depos:
-                session_time_dimension.SlackVar(index).SetValue(0)
-            self._routing_model.AddToAssignment(session_time_dimension.TransitVar(index))
-            self._routing_model.AddToAssignment(session_time_dimension.SlackVar(index))
-        for vehicle_id in range(self._matcher_input.empty_board.amount_of_formations()):
-            index = self._routing_model.Start(vehicle_id)
-            self._routing_model.AddToAssignment(session_time_dimension.TransitVar(index))
-            self._routing_model.AddToAssignment(session_time_dimension.SlackVar(index))
+        self._allow_only_depos_to_have_waiting_time(session_time_dimension)
+        self._add_vehicle_start_node_index_transit_and_slack_vars_to_solution(session_time_dimension)
 
     def add_demand(self):
         demand_dimension_name_prefix = OrToolsDimensionDescription.capacity.value + "_"
@@ -116,26 +93,7 @@ class ORToolsMatcherConstraints:
                 self._matcher_input.config.constraints.capacity.count_capacity_from_zero,
                 demand_dimension_name)
             demand_dimension = self._routing_model.GetDimensionOrDie(demand_dimension_name)
-            for node_index in self._graph_exporter.export_delivery_request_nodes_indices(self._matcher_input.graph):
-                index = self._index_manager.node_to_index(node_index)
-                demand_dimension.SlackVar(index).SetValue(0)
-            for node_index in self._arrive_indices:
-                index = self._index_manager.node_to_index(node_index)
-                demand_dimension.SetCumulVarSoftLowerBound(index, max_capacity,
-                                                           self._matcher_input.config.constraints
-                                                           .capacity.capacity_cost_coefficient)
-            for node_index in range(self._num_of_nodes):
-                index = self._index_manager.node_to_index(node_index)
-                self._routing_model.AddToAssignment(demand_dimension.TransitVar(index))
-                self._routing_model.AddToAssignment(demand_dimension.SlackVar(index))
-            for vehicle_id in range(self._matcher_input.empty_board.amount_of_formations()):
-                end_index = self._routing_model.End(vehicle_id)
-                demand_dimension.SetCumulVarSoftLowerBound(end_index, max_capacity,
-                                                           self._matcher_input.config.constraints
-                                                           .capacity.capacity_cost_coefficient)
-                index = self._routing_model.Start(vehicle_id)
-                self._routing_model.AddToAssignment(demand_dimension.TransitVar(index))
-                self._routing_model.AddToAssignment(demand_dimension.SlackVar(index))
+            self._add_to_objective_minimize_return_not_empty(demand_dimension, max_capacity)
 
     def add_unmatched_penalty(self):
         for node in self._graph_exporter.export_delivery_request_nodes_indices(self._matcher_input.graph):
@@ -144,6 +102,57 @@ class ORToolsMatcherConstraints:
         for node in self._reloading_virtual_depos_indices[1:]:
             self._routing_model.AddDisjunction([self._index_manager.node_to_index(node)],
                                                0)
+
+    def _add_vehicle_start_node_index_transit_and_slack_vars_to_solution(self, travel_time_dimension):
+        for vehicle_id in range(self._matcher_input.empty_board.amount_of_formations()):
+            index = self._routing_model.Start(vehicle_id)
+            self._routing_model.AddToAssignment(travel_time_dimension.TransitVar(index))
+            self._routing_model.AddToAssignment(travel_time_dimension.SlackVar(index))
+
+    def _add_to_objective_minimize_delivery_time_of_high_priority(self, travel_time_dimension):
+        for node in self._graph_exporter.export_delivery_request_nodes_indices(self._matcher_input.graph):
+            index = self._index_manager.node_to_index(node)
+            coefficient = max(self._graph_exporter.export_priorities(self._matcher_input.graph)) \
+                          / (self._graph_exporter.export_priorities(self._matcher_input.graph)[node] + 1)
+            travel_time_dimension.SetCumulVarSoftUpperBound(index, 0, int(coefficient))
+
+    def _set_waiting_time_for_each_node(self, travel_time_dimension):
+        for node in range(self._num_of_nodes):
+            index = self._index_manager.node_to_index(node)
+            if node in self._depart_indices:
+                travel_time_dimension.SlackVar(index).SetMin(
+                    self._matcher_input.config.constraints.travel_time.reloading_time)
+            else:
+                travel_time_dimension.SlackVar(index).SetMax(0)
+            self._routing_model.AddToAssignment(travel_time_dimension.TransitVar(index))
+            self._routing_model.AddToAssignment(travel_time_dimension.SlackVar(index))
+
+    def _allow_only_depos_to_have_waiting_time(self, session_time_dimension):
+        for node_index in range(self._num_of_nodes):
+            index = self._index_manager.node_to_index(node_index)
+            if node_index not in self._depos:
+                session_time_dimension.SlackVar(index).SetValue(0)
+            self._routing_model.AddToAssignment(session_time_dimension.TransitVar(index))
+            self._routing_model.AddToAssignment(session_time_dimension.SlackVar(index))
+
+    def _add_to_objective_minimize_return_not_empty(self, demand_dimension, max_capacity):
+        for node_index in self._arrive_indices:
+            index = self._index_manager.node_to_index(node_index)
+            demand_dimension.SetCumulVarSoftLowerBound(index, max_capacity,
+                                                       self._matcher_input.config.constraints
+                                                       .capacity.capacity_cost_coefficient)
+        for node_index in range(self._num_of_nodes):
+            index = self._index_manager.node_to_index(node_index)
+            self._routing_model.AddToAssignment(demand_dimension.TransitVar(index))
+            self._routing_model.AddToAssignment(demand_dimension.SlackVar(index))
+        for vehicle_id in range(self._matcher_input.empty_board.amount_of_formations()):
+            end_index = self._routing_model.End(vehicle_id)
+            demand_dimension.SetCumulVarSoftLowerBound(end_index, max_capacity,
+                                                       self._matcher_input.config.constraints
+                                                       .capacity.capacity_cost_coefficient)
+            index = self._routing_model.Start(vehicle_id)
+            self._routing_model.AddToAssignment(demand_dimension.TransitVar(index))
+            self._routing_model.AddToAssignment(demand_dimension.SlackVar(index))
 
     def _add_time_window_constraints_for_each_vehicle_start_node(self, time_dimension: RoutingDimension,
                                                                  time_windows: List[Tuple[int, int]]):
