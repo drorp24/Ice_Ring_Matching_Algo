@@ -27,8 +27,8 @@ class ORToolsMatcher(Matcher):
         self._reloading_virtual_depos_indices = list(range(
             len(self._matcher_input.graph.nodes),
             len(self._matcher_input.graph.nodes) + num_of_reloading_depo_nodes))
-        self._arrive_indices = self._reloading_virtual_depos_indices[0::2]
-        self._depart_indices = self._reloading_virtual_depos_indices[1::2]
+        self._arrive_indices = self._calc_reload_arriving_nodes()
+        self._depart_indices = self._calc_reload_departing_nodes()
         self._num_of_nodes = len(self._matcher_input.graph.nodes) + len(self._reloading_virtual_depos_indices)
         self._graph_exporter = OrtoolsGraphExporter()
         self._index_manager = self._set_index_manager()
@@ -39,6 +39,14 @@ class ORToolsMatcher(Matcher):
         self._set_objective()
         self._set_constraints()
         # self._set_reloading_depos_for_each_formation(num_of_reloading_depo_nodes_per_formation)
+
+    def _calc_reload_arriving_nodes(self):
+        starting_index = 0
+        return self._reloading_virtual_depos_indices[starting_index::NUM_OF_NODES_IN_RELOADING_DEPO]
+
+    def _calc_reload_departing_nodes(self):
+        starting_index = 1
+        return self._reloading_virtual_depos_indices[starting_index::NUM_OF_NODES_IN_RELOADING_DEPO]
 
     def match(self) -> DroneDeliveryBoard:
         solution = self._routing_model.SolveWithParameters(self._search_parameters)
