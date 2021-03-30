@@ -49,6 +49,7 @@
   "monitor": {
     "__class__": "MonitorConfig",
     "enabled": true,
+    "iterations_between_monitoring": 1,
     "min_iterations": 100000,
     "save_data": true,
     "plot_data": true,

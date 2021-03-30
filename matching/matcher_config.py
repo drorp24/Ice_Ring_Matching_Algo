@@ -26,7 +26,6 @@ class MatcherConfig(JsonableBaseEntity):
             constraints=ConstraintsConfig.dict_to_obj(dict_input["constraints"]),
             unmatched_penalty=dict_input["unmatched_penalty"],
             reload_per_vehicle=dict_input["reload_per_vehicle"],
-            unmatched_penalty=dict_input["unmatched_penalty"],
             monitor=MonitorConfig.dict_to_obj(dict_input["monitor"]))
 
     @property

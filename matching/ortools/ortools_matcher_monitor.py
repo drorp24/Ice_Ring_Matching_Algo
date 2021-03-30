@@ -1,15 +1,16 @@
-from ortools.constraint_solver.pywrapcp import RoutingModel, RoutingIndexManager
+from ortools.constraint_solver.pywrapcp import RoutingModel
 from ortools.constraint_solver.routing_parameters_pb2 import RoutingSearchParameters
 
 from common.graph.operational.export_ortools_graph import OrtoolsGraphExporter
 from matching.matcher_input import MatcherInput
 from matching.monitor import Monitor
+from matching.ortools.ortools_index_manager_wrapper import OrToolsIndexManagerWrapper
 from matching.ortools.ortools_matcher_constraints import OrToolsDimensionDescription
 from matching.ortools.ortools_solution_handler import ORToolsSolutionHandler
 
 
 class ORToolsMatcherMonitor:
-    def __init__(self, graph_exporter: OrtoolsGraphExporter, index_manager: RoutingIndexManager,
+    def __init__(self, graph_exporter: OrtoolsGraphExporter, index_manager: OrToolsIndexManagerWrapper,
                  routing_model: RoutingModel, search_parameters: RoutingSearchParameters, matcher_input: MatcherInput,
                  solution_handler: ORToolsSolutionHandler):
 
@@ -46,31 +47,31 @@ class ORToolsMatcherMonitor:
         self._routing_model.AddSearchMonitor(self.best_solution_collector)
 
     def _add_unmatched_delivery_requests_monitoring(self):
-        for i in range(self._index_manager.GetNumberOfNodes()):
+        for i in range(self._index_manager.get_number_of_nodes()):
             self.best_solution_collector.Add(self._routing_model.ActiveVar(i))
 
     def _add_vehicle_monitoring(self):
-        for i in range(self._index_manager.GetNumberOfVehicles()):
+        for i in range(self._index_manager.get_number_of_vehicles()):
             self.best_solution_collector.Add(self._routing_model.ActiveVehicleVar(i))
 
     def _add_route_monitoring(self):
-        for i in range(self._index_manager.GetNumberOfNodes()+ self._index_manager.GetNumberOfVehicles() - 1):
+        for i in range(self._index_manager.get_number_of_nodes()+ self._index_manager.get_number_of_vehicles() - 1):
             self.best_solution_collector.Add(self._routing_model.NextVar(i))
 
     def _add_priority_monitoring(self):
-        for index in range(self._index_manager.GetNumberOfIndices()):
+        for index in range(self._index_manager.get_number_of_indices()):
             cum_var = self._priority_dimension.CumulVar(index)
             self.best_solution_collector.Add(cum_var)
 
     def _add_time_monitoring(self):
         time_dimension = self._routing_model.GetDimensionOrDie(OrToolsDimensionDescription.time.value)
-        for index in range(self._index_manager.GetNumberOfIndices()):
+        for index in range(self._index_manager.get_number_of_indices()):
             cum_var = time_dimension.CumulVar(index)
             self.best_solution_collector.Add(cum_var)
 
     def _add_best_priority_solution_collector(self):
         self.best_priority_solution_collector = self._routing_model.solver().BestValueSolutionCollector(False)
-        for i in range(self._index_manager.GetNumberOfIndices()):
+        for i in range(self._index_manager.get_number_of_indices()):
             cum_var = self._priority_dimension.CumulVar(i)
             self.best_priority_solution_collector.Add(cum_var)
         self.best_priority_solution_collector.AddObjective(self._routing_model.CostVar())
@@ -79,7 +80,7 @@ class ORToolsMatcherMonitor:
     def _add_unmatched_delivery_requests_collector(self):
         self.unmatched_delivery_requests_solution_collector = self._routing_model.solver().BestValueSolutionCollector(
             False)
-        for i in range(self._index_manager.GetNumberOfNodes()):
+        for i in range(self._index_manager.get_number_of_nodes()):
             self.unmatched_delivery_requests_solution_collector.Add(self._routing_model.ActiveVar(i))
         self.unmatched_delivery_requests_solution_collector.AddObjective(self._routing_model.CostVar())
         self._routing_model.AddSearchMonitor(self.unmatched_delivery_requests_solution_collector)
@@ -145,5 +146,5 @@ class ORToolsMatcherMonitor:
         return unmatched_delivery_requests, unmatched_delivery_requests_total_priority
 
     def _get_priority(self, from_index):
-        from_node = self._index_manager.IndexToNode(from_index)
+        from_node = self._index_manager.index_to_node(from_index)
         return self._graph_exporter.export_priorities(self._graph)[from_node]

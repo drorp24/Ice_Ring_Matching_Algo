@@ -26,7 +26,8 @@ from common.graph.operational.graph_creator import build_fully_connected_graph
 from common.graph.operational.operational_graph import OperationalGraph
 from geometry.distribution.geo_distribution import ExactPointLocationDistribution
 from geometry.geo_factory import create_point_2d
-from matching.constraint_config import ConstraintsConfig, TimeConstraints, PriorityConstraints, CapacityConstraints
+from matching.constraint_config import ConstraintsConfig, PriorityConstraints, CapacityConstraints, \
+    SessionTimeConstraints, TravelTimeConstraints
 from matching.matcher_config import MatcherConfig
 from matching.matcher_input import MatcherInput
 from matching.monitor_config import MonitorConfig
@@ -126,7 +127,8 @@ class ORToolsMatcherMonitorTestCase(TestCase):
 
     @staticmethod
     def _create_loading_dock() -> DroneLoadingDock:
-        return DroneLoadingDock(EntityID.generate_uuid(),DroneLoadingStation(EntityID.generate_uuid(),create_point_2d(0, 0)),
+        return DroneLoadingDock(EntityID.generate_uuid(),
+                                DroneLoadingStation(EntityID.generate_uuid(), create_point_2d(0, 0)),
                                 DroneType.drone_type_1,
                                 TimeWindowExtension(
                                     since=ZERO_TIME,
@@ -152,14 +154,17 @@ class ORToolsMatcherMonitorTestCase(TestCase):
         return MatcherConfig(
             zero_time=ZERO_TIME,
             solver=ORToolsSolverConfig(SolverVendor.OR_TOOLS, first_solution_strategy="path_cheapest_arc",
-                                       local_search_strategy="automatic", timeout_sec=10),
+                                       local_search_strategy="automatic", timeout_sec=30),
             constraints=ConstraintsConfig(
-                capacity_constraints=CapacityConstraints(count_capacity_from_zero=True),
-                time_constraints=TimeConstraints(max_waiting_time=10,
-                                                 max_route_time=300,
-                                                 count_time_from_zero=False),
-                priority_constraints=PriorityConstraints(True)),
-            unmatched_penalty=5,
+                capacity_constraints=CapacityConstraints(count_capacity_from_zero=True, capacity_cost_coefficient=1),
+                travel_time_constraints=TravelTimeConstraints(max_waiting_time=0,
+                                                              max_route_time=300,
+                                                              count_time_from_zero=False,
+                                                              reloading_time=0),
+                session_time_constraints=SessionTimeConstraints(max_session_time=300),
+                priority_constraints=PriorityConstraints(True, priority_cost_coefficient=100)),
+            unmatched_penalty=100000,
+            reload_per_vehicle=0,
             monitor=MonitorConfig(enabled=enabled, min_iterations=min_iterations))
 
     @staticmethod
