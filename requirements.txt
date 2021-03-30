@@ -1,14 +1,14 @@
 attrs==20.2.0
 Babel==2.9.0
 brotlipy==0.7.0
-Cartopy @ file:///tmp/build/80754af9/cartopy_1594325421079/work
+Cartopy==0.18.0
 certifi==2020.12.5
-cffi @ file:///tmp/build/80754af9/cffi_1606255081583/work
-chardet @ file:///tmp/build/80754af9/chardet_1607706746162/work
+cffi==1.14.4
+chardet==4.0.0
 click==7.1.2
 click-plugins==1.1.1
 cligj==0.5.0
-cryptography @ file:///tmp/build/80754af9/cryptography_1607635341180/work
+cryptography==3.3.1
 cycler==0.10.0
 Cython==0.29.21
 decorator==4.4.2
@@ -16,10 +16,10 @@ descartes==1.1.0
 Fiona==1.8.18
 flatten-dict==0.3.0
 freetype-py==2.2.0
-idna @ file:///home/linux1/recipes/ci/idna_1610986105248/work
+idna==2.10
 joblib==1.0.1
-kiwisolver @ file:///tmp/build/80754af9/kiwisolver_1612282420641/work
-matplotlib @ file:///tmp/build/80754af9/matplotlib-base_1603378225747/work
+kiwisolver==1.3.1
+matplotlib==3.3.2
 mkl-fft==1.2.0
 mkl-random==1.1.1
 mkl-service==2.3.0
@@ -29,31 +29,34 @@ numpy==1.19.5
 olefile==0.46
 optional.py==1.1.0
 ortools==8.0.8283
-OWSLib @ file:///tmp/build/80754af9/owslib_1611257470365/work
+OWSLib==0.22.0
 pandas==1.1.2
 params==0.9.0
 pathlib2==2.3.5
-Pillow @ file:///tmp/build/80754af9/pillow_1615224089586/work
+Pillow==8.1.2
+pip==20.3.3
 protobuf==3.14.0
-pycparser @ file:///tmp/build/80754af9/pycparser_1594388511720/work
+pycparser==2.20
 pyepsg==0.4.0
-pykdtree @ file:///tmp/build/80754af9/pykdtree_1612299290877/work
-pyOpenSSL @ file:///tmp/build/80754af9/pyopenssl_1608057966937/work
-pyparsing @ file:///home/linux1/recipes/ci/pyparsing_1610983426697/work
+pykdtree==1.3.4
+pyOpenSSL==20.0.1
+pyparsing==2.4.7
 pyproj==2.6.1.post1
-pyshp @ file:///tmp/build/80754af9/pyshp_1610641829514/work
-PySocks @ file:///tmp/build/80754af9/pysocks_1605305779399/work
-python-dateutil @ file:///home/ktietz/src/ci/python-dateutil_1611928101742/work
-pytz @ file:///tmp/build/80754af9/pytz_1612215392582/work
+pyshp==2.1.3
+PySocks==1.7.1
+python-dateutil==2.8.1
+pytz==2021.1
 PyYAML==5.4.1
-requests @ file:///tmp/build/80754af9/requests_1608241421344/work
+requests==2.25.1
 scikit-learn==0.24.1
-scipy @ file:///tmp/build/80754af9/scipy_1614022789989/work
-Shapely @ file:///tmp/build/80754af9/shapely_1599817083863/work
+scipy==1.6.1
+setuptools==50.3.2
+Shapely==1.7.1
 sip==4.19.13
-six @ file:///tmp/build/80754af9/six_1605205327372/work
+six==1.15.0
 threadpoolctl==2.1.0
 time-window==0.1.0
-tornado @ file:///tmp/build/80754af9/tornado_1606942300299/work
-urllib3 @ file:///tmp/build/80754af9/urllib3_1611694770489/work
+tornado==6.1
+urllib3==1.26.3
 vispy==0.6.4
+wheel==0.36.2
