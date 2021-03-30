@@ -10,7 +10,7 @@ from common.entities.base_entities.entity_id import EntityID
 from common.entities.base_entities.package import PackageType
 from common.entities.base_entities.temporal import TimeWindowExtension
 
-DEFAULT_MAX_ROUTE_TIME_IN_MINUTES = 400
+DEFAULT_MAX_ROUTE_TIME_IN_MINUTES = 1440
 DEFAULT_VELOCITY_METER_PER_SEC = 10.0
 
 
@@ -22,6 +22,7 @@ class EmptyDroneDelivery(JsonableBaseEntity):
         self._drone_formation = drone_formation
         self._max_route_times_in_minutes = max_route_time_in_minutes  # TODO: Change to real endurance
         self._velocity_meter_per_sec = velocity_meter_per_sec  # TODO: Change to real velocity
+        self._reload_time_in_minutes = 60  # TODO: Change to real reload_time
 
     def __eq__(self, other):
         return self._id == other.id and self._drone_formation == other.drone_formation
@@ -40,6 +41,10 @@ class EmptyDroneDelivery(JsonableBaseEntity):
     @property
     def max_route_time_in_minutes(self) -> int:
         return self._max_route_times_in_minutes
+
+    @property
+    def reload_time_in_minutes(self) -> int:
+        return self._reload_time_in_minutes
 
     @property
     def velocity_meter_per_sec(self) -> float:
@@ -161,7 +166,8 @@ class DroneDelivery(EmptyDroneDelivery):
             .format(id=self.id,
                     origin_capacity=self.drone_formation.get_package_type_amount_map(),
                     total_amount_per_package_type=str(self.get_total_package_type_amount_map()),
-                    priority=str(self.get_total_priority()), total_time=str(self.get_total_work_time_in_minutes()),
+                    priority=str(self.get_total_priority()),
+                    total_time=str(self.get_total_work_time_in_minutes()),
                     start_drone_loading_docks=str(self.start_drone_loading_docks),
                     matched_requests='\n'.join(map(str, self._matched_requests)),
                     end_drone_loading_docks=str(self.end_drone_loading_docks))
