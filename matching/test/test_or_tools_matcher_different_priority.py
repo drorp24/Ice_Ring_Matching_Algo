@@ -52,10 +52,11 @@ class ORToolsMatcherDifferentPriorityTestCase(TestCase):
         expected_drone_deliveries = self._create_drone_deliveries(delivery_requests=self.delivery_requests,
                                                                   empty_board=self.empty_board,
                                                                   loading_dock=self.loading_dock)
-        unmatched_delivery_request = UnmatchedDeliveryRequest(graph_index=2, delivery_request=self.delivery_requests[1])
+        unmatched_delivery_requests = [UnmatchedDeliveryRequest(graph_index=1, delivery_request=self.delivery_requests[0]),
+                                       UnmatchedDeliveryRequest(graph_index=2, delivery_request=self.delivery_requests[1])]
         expected_matched_board = DroneDeliveryBoard(
             drone_deliveries=expected_drone_deliveries,
-            unmatched_delivery_requests=[unmatched_delivery_request])
+            unmatched_delivery_requests=unmatched_delivery_requests)
 
         self.assertEqual(expected_matched_board, actual_delivery_board)
 
@@ -134,15 +135,6 @@ class ORToolsMatcherDifferentPriorityTestCase(TestCase):
                                                      TimeDeltaExtension(timedelta(minutes=15))),
                                                  until=ZERO_TIME.add_time_delta(
                                                      TimeDeltaExtension(timedelta(minutes=15))))),
-                                             MatchedDeliveryRequest(
-                                                 graph_index=1,
-                                                 delivery_request=delivery_requests[0],
-                                                 matched_delivery_option_index=0,
-                                                 delivery_time_window=TimeWindowExtension(
-                                                     since=ZERO_TIME.add_time_delta(
-                                                         TimeDeltaExtension(timedelta(minutes=25))),
-                                                     until=ZERO_TIME.add_time_delta(
-                                                         TimeDeltaExtension(timedelta(minutes=25))))),
                                          ],
                                          start_drone_loading_docks=MatchedDroneLoadingDock(
                                              graph_index=0,

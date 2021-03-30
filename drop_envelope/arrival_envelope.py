@@ -1,3 +1,4 @@
+import sys
 from math import cos, sin
 from typing import List, Dict, Union
 from common.math.angle import Angle, AngleUnit
@@ -83,6 +84,9 @@ class PotentialArrivalEnvelope:
     def centroid(self) -> Point2D:
         return self._centroid
 
+    def __eq__(self, other):
+        return self.arrival_envelopes == other.arrival_envelopes and self.centroid == other.centroid
+
     def get_arrival_envelope(self, arrival_azimuth: Angle) -> ArrivalEnvelope:
         return self.arrival_envelopes[arrival_azimuth]
 
@@ -98,4 +102,6 @@ def calc_cost(potential_arrival_envelope_1: PotentialArrivalEnvelope,
     arrival_envelopes_tuples = itertools.product(potential_arrival_envelope_1.arrival_envelopes.values(),
                                                  potential_arrival_envelope_2.arrival_envelopes.values())
     costs = [inner_calc(ar_tuple) for ar_tuple in arrival_envelopes_tuples]
+    if len(costs) == 0:
+        return sys.maxsize
     return min(costs)
