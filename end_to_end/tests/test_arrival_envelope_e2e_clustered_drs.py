@@ -25,7 +25,7 @@ from common.entities.base_entities.fleet.fleet_property_sets import DroneFormati
 from common.entities.base_entities.package import PackageType
 from common.entities.base_entities.temporal import DateTimeExtension, TimeDeltaExtension
 from end_to_end.distribution.supplier_category_distribution import SupplierCategoryDistribution
-from end_to_end.minimum_end_to_end import *
+from end_to_end.arrival_envelope_minimum_end_to_end import *
 from geometry.distribution.geo_distribution import UniformPointInBboxDistribution, \
     NormalPointsInMultiPolygonDistribution
 from geometry.geo_factory import create_point_2d, create_polygon_2d, create_multipolygon_2d
@@ -96,8 +96,8 @@ class BasicMinimumEnd2EndClusteredDrsTest(unittest.TestCase):
                 DroneLoadingDock: docks_amount})
 
         clustered_connected_graph = create_clustered_delivery_requests_graph_model(supplier_category,
-                                                                                   edge_cost_factor=25.0,
-                                                                                   edge_travel_time_factor=25.0,
+                                                                                   edge_cost_factor=0.1,
+                                                                                   edge_travel_time_factor=0.1,
                                                                                    max_clusters_per_zone=max_clusters_per_zone)
 
         print("--- clustered_connected_graph run time: %s  ---" % (datetime.now() - start_time))

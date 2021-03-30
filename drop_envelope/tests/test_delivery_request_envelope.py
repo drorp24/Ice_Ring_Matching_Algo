@@ -77,7 +77,7 @@ class BasicDeliveryRequestEnvelope(unittest.TestCase):
             get_azimuth_quantization_values(MockSlidesServiceWrapper.drone_azimuth_level_amount),
             maneuver_angle=maneuver_angle)
         drawer.add_point2d(potential_arrival_envelope.get_centroid)
-        arrival_envelopes = list(potential_arrival_envelope.arrival_envelopes.values())
+        arrival_envelopes = list(potential_arrival_envelope.potential_envelopes.values())
         for arrival_envelope in arrival_envelopes:
             arrival_direction = arrival_envelope.arrival_azimuth.calc_reverse().to_direction().__mul__(20)
             drawer.add_polygon2d(arrival_envelope.maneuver_polygon, edgecolor=Color.Red, facecolor=Color.White,
@@ -108,7 +108,7 @@ class BasicDeliveryRequestEnvelope(unittest.TestCase):
         potential_arrival_envelope = dr_potential_envelope.get_potential_arrival_envelope(
             get_azimuth_quantization_values(MockSlidesServiceWrapper.drone_azimuth_level_amount),
             maneuver_angle=maneuver_angle)
-        self.assertEqual(len(potential_arrival_envelope.arrival_envelopes),2)
+        self.assertEqual(len(potential_arrival_envelope.arrival_envelopes), 2)
         self.assertAlmostEqual(list(potential_arrival_envelope.arrival_envelopes.values())[0].repr_point.x, -92.147071,
                                delta=0.1)
         self.assertAlmostEqual(list(potential_arrival_envelope.arrival_envelopes.values())[0].repr_point.y, -108.24997,

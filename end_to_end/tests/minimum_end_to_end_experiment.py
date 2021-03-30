@@ -87,7 +87,7 @@ def _create_empty_drone_delivery_board(
 class BasicMinimumEnd2EndExperiment:
 
     def __init__(self, scene: str):
-        self.matcher_config = Path("end_to_end/tests/jsons/test_matcher_config.json")
+        self.matcher_config = Path("end_to_end/tests/jsons/e2e_experiment_config.json")
         if scene == 'north':
             self.supplier_category_distribution = SupplierCategoryDistribution(
                 zero_time_distribution=DateTimeDistribution([ZERO_TIME]),
@@ -106,8 +106,8 @@ class BasicMinimumEnd2EndExperiment:
         elif scene == 'center':
             self.supplier_category_distribution = SupplierCategoryDistribution(
                 zero_time_distribution=DateTimeDistribution([ZERO_TIME]),
-                delivery_requests_distribution=_create_delivery_request_distribution(create_point_2d(35.11, 32.0), 0.03,
-                                                                                     0.05, 10, 3),
+                delivery_requests_distribution=_create_delivery_request_distribution(create_point_2d(35.11, 32.0), 0.1,
+                                                                                     0.1, 10, 20),
                 drone_loading_docks_distribution=DroneLoadingDockDistribution(
                     drone_loading_station_distributions=DroneLoadingStationDistribution(
                         drone_station_locations_distribution=UniformPointInBboxDistribution(35.11,
@@ -115,29 +115,29 @@ class BasicMinimumEnd2EndExperiment:
                                                                                             31.79, 31.79
                                                                                             )),
                     time_window_distributions=create_standard_full_day_test_time()))
-            self.matcher_config = Path("end_to_end/tests/jsons/test_matcher_config.json")
+            self.matcher_config = Path("end_to_end/tests/jsons/e2e_experiment_config.json")
             self.mapImage = MapImage(map_background_path=Path("visualization/basic/gush_dan_background.Png"),
                                      west_lon=34.83927, east_lon=35.32341, south_lat=31.77279, north_lat=32.19276)
 
     def test_small_supplier_category(self):
         start_time = datetime.now()
-        empty_drone_delivery_board = _create_empty_drone_delivery_board(amount=10, max_route_time_entire_board=45,
-                                                                        velocity_entire_board=10)
+        empty_drone_delivery_board = _create_empty_drone_delivery_board(amount=6, max_route_time_entire_board=1440,
+                                                                        velocity_entire_board=10.0)
         print("--- _create_empty_drone_delivery_board run time: %s  ---" % (datetime.now() - start_time))
         start_time = datetime.now()
 
         supplier_category = self.supplier_category_distribution.choose_rand(random=Random(10),
-                                                                            amount={DeliveryRequest: 40,
+                                                                            amount={DeliveryRequest: 50,
                                                                                     DroneLoadingDock: 1})
-        fully_connected_graph = create_fully_connected_graph_model(supplier_category, edge_cost_factor=25.0,
+        time_overlapping_dependent_graph = create_time_overlapping_dependent_graph_model(supplier_category, edge_cost_factor=25.0,
                                                                    edge_travel_time_factor=25.0)
 
-        print("--- create_fully_connected_graph_model run time: %s  ---" % (datetime.now() - start_time))
+        print("--- create_time_overlapping_dependent_graph_model run time: %s  ---" % (datetime.now() - start_time))
         start_time = datetime.now()
 
-        match_config_file_path = Path('end_to_end/tests/jsons/test_matcher_config.json')
+        match_config_file_path = Path('end_to_end/tests/jsons/e2e_experiment_config.json')
         match_config = MatcherConfig.dict_to_obj(MatcherConfig.json_to_dict(match_config_file_path))
-        matcher_input = MatcherInput(graph=fully_connected_graph, empty_board=empty_drone_delivery_board,
+        matcher_input = MatcherInput(graph=time_overlapping_dependent_graph, empty_board=empty_drone_delivery_board,
                                      config=match_config)
 
         delivery_board = calc_assignment(matcher_input=matcher_input)
@@ -145,12 +145,14 @@ class BasicMinimumEnd2EndExperiment:
 
         print(delivery_board)
 
-        self._draw_matched_scenario(delivery_board, fully_connected_graph, supplier_category, self.mapImage, aggregate_by_edd=True)
+        self._draw_matched_scenario(delivery_board, time_overlapping_dependent_graph, supplier_category, self.mapImage,
+                                    aggregate_by_edd=True)
 
     @staticmethod
-    def _draw_matched_scenario(delivery_board, fully_connected_graph, supplier_category, map_image, aggregate_by_edd: bool = True):
+    def _draw_matched_scenario(delivery_board, graph, supplier_category, map_image,
+                               aggregate_by_edd: bool = True):
         dr_drawer = create_drawer_2d(Drawer2DCoordinateSys.GEOGRAPHIC, map_image)
-        operational_drawer2d.add_operational_graph(dr_drawer, fully_connected_graph, draw_internal=True,
+        operational_drawer2d.add_operational_graph(dr_drawer, graph, draw_internal=True,
                                                    draw_edges=False)
         dr_drawer.draw(False)
         board_map_drawer = create_drawer_2d(Drawer2DCoordinateSys.GEOGRAPHIC, map_image)
@@ -168,14 +170,15 @@ class BasicMinimumEnd2EndExperiment:
                          str(delivery.drone_formation.drone_package_configuration.package_type_map)
                          for delivery in delivery_board.drone_deliveries]
         board_gantt_drawer = create_gantt_drawer(zero_time=supplier_category.zero_time,
-                                             hours_period=24,
-                                             row_names=row_names,
-                                             rows_title='Formation Type x Package Type Amounts',
-                                             )
+                                                 hours_period=24,
+                                                 row_names=row_names,
+                                                 rows_title='Formation Type x Package Type Amounts',
+                                                 )
         if aggregate_by_edd:
             operational_gantt_drawer.add_delivery_board_with_row_per_edd(board_gantt_drawer, delivery_board, True)
         else:
-            operational_gantt_drawer.add_delivery_board_with_row_per_drone_delivery(board_gantt_drawer, delivery_board, True)
+            operational_gantt_drawer.add_delivery_board_with_row_per_drone_delivery(board_gantt_drawer, delivery_board,
+                                                                                    True)
         board_gantt_drawer.draw(True)
 
 

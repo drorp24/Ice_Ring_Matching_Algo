@@ -151,6 +151,7 @@ class BasicDeliveryRequestGraphTestCases(unittest.TestCase):
         self.assertEqual(_get_dr_from_dr_graph(drg), list(self.dr_dataset_morning) + list(self.dr_dataset_afternoon)
                          + list(self.dld_dataset_random))
 
+    @unittest.skipIf(os.environ.get('NO_SLOW_TESTS', False), 'slow tests')
     def test_graph_creation_with_edges(self):
         drg = OperationalGraph()
         drg.add_delivery_requests(self.dr_dataset_morning)
@@ -243,8 +244,9 @@ class BasicDeliveryRequestGraphTestCases(unittest.TestCase):
             map(lambda item: list(split_delivery_requests_into_clusters(item[1]).values()),
                 sort_delivery_requests_by_zone(region_dataset, deliveries_zones).items()))))
 
-        expected_num_edge_in_graph = 2 * (sum([sum(range(0, len(drs))) for drs in expected_delivery_requests_clusters]) +
-                                          len(region_dataset))
+        expected_num_edge_in_graph = sum(
+            [len(drs) * (len(drs) - 1) for drs in expected_delivery_requests_clusters]) + (
+                                             2 * len(region_dataset))
 
         num_nodes_in_graph = len(graph.nodes)
         self.assertEqual(len(region_dataset) + len(dld_dataset), num_nodes_in_graph)
@@ -274,8 +276,9 @@ class BasicDeliveryRequestGraphTestCases(unittest.TestCase):
             map(lambda item: list(split_delivery_requests_into_clusters(item[1]).values()),
                 sort_delivery_requests_by_zone(region_dataset, deliveries_zones).items()))))
 
-        expected_num_edge_in_graph = 2 * (sum([sum(range(0, len(drs))) for drs in expected_delivery_requests_clusters]) +
-                                          len(region_dataset))
+        expected_num_edge_in_graph = sum(
+            [len(drs) * (len(drs) - 1) for drs in expected_delivery_requests_clusters]) + (
+                                             2 * len(region_dataset))
 
         num_nodes_in_graph = len(graph.nodes)
         self.assertEqual(len(region_dataset) + len(dld_dataset), num_nodes_in_graph)

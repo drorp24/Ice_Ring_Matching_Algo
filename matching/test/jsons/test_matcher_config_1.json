@@ -24,20 +24,28 @@
       "__class__": "ConstraintsConfig",
       "capacity": {
         "__class__": "CapacityConstraints",
-        "count_capacity_from_zero": true
+        "count_capacity_from_zero": true,
+        "capacity_cost_coefficient": 1000
       },
-      "time": {
-        "__class__": "TimeConstraints",
+      "travel_time": {
+        "__class__": "TravelTimeConstraints",
         "max_waiting_time": 10,
-        "max_route_time": 300,
-        "count_time_from_zero": false
+        "max_route_time": 1440,
+        "count_time_from_zero": false,
+        "reloading_time": 0
+    },
+      "session_time": {
+        "__class__": "SessionTimeConstraints",
+        "max_session_time": 300
       },
       "priority": {
         "__class__": "PriorityConstraints",
-        "count_priority_from_zero": true
+        "count_priority_from_zero": true,
+        "priority_cost_coefficient": 1000
       }
-    },
-    "unmatched_penalty": 5,
+  },
+  "unmatched_penalty": 100000,
+  "reload_per_vehicle": 0,
   "monitor": {
     "__class__": "MonitorConfig",
     "enabled": true,
@@ -46,6 +54,6 @@
     "plot_data": true,
     "output_directory" : "outputs"
   }
- }
+}
 
 
