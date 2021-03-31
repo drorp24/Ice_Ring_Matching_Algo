@@ -151,6 +151,7 @@ class BasicDeliveryRequestGraphTestCases(unittest.TestCase):
         self.assertEqual(_get_dr_from_dr_graph(drg), list(self.dr_dataset_morning) + list(self.dr_dataset_afternoon)
                          + list(self.dld_dataset_random))
 
+    @unittest.skipIf(os.environ.get('NO_SLOW_TESTS', False), 'slow tests')
     def test_graph_creation_with_edges(self):
         drg = OperationalGraph()
         drg.add_delivery_requests(self.dr_dataset_morning)

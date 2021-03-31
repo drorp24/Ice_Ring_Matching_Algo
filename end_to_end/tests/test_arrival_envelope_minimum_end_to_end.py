@@ -1,3 +1,4 @@
+import os
 import unittest
 from pathlib import Path
 
@@ -24,7 +25,7 @@ class BasicArrivalEnvelopeMinimumEnd2End(unittest.TestCase):
                                           max_route_time_entire_board=400,
                                           velocity_entire_board=10)
         cls.matcher_config = MatcherConfig.dict_to_obj(
-            MatcherConfig.json_to_dict(Path('end_to_end/tests/jsons/test_matcher_config.json')))
+            MatcherConfig.json_to_dict(Path('end_to_end/tests/jsons/test_min_e2e_config.json')))
 
     @classmethod
     def _create_simple_drone_set_properties(cls):
@@ -41,6 +42,7 @@ class BasicArrivalEnvelopeMinimumEnd2End(unittest.TestCase):
         self.assertEqual(len(operational_graph.nodes), 11)
         self.assertEqual(len(operational_graph.edges), 60)
 
+    @unittest.skipIf(os.environ.get('NO_SLOW_TESTS', False), 'slow tests')
     def test_calc_assignment(self):
         operational_graph = create_time_overlapping_dependent_graph_model(supplier_category=self.supplier_category,
                                                                           edge_cost_factor=0.1,
