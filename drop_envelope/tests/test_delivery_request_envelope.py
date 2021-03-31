@@ -38,7 +38,7 @@ def create_single_package_distribution() -> PackageDistribution:
 
 def create_azimuth_choice_distribution() -> ChoicesAngleDistribution:
     azimuths_choices = [Angle(value=value, unit=AngleUnit.DEGREE)
-                        for value in range(0, 210, 30)]
+                        for value in [0, 30, 60, 90, 180]]
     return ChoicesAngleDistribution(angles=azimuths_choices)
 
 
