@@ -20,12 +20,12 @@ class DroneLoadingStation(JsonableBaseEntity, Shapeable):
         return self._location
 
     def __eq__(self, other):
-        return self.__class__ == other.__class__ and \
-               self.id == other.id and \
-               self.location == other.location
+        return all([self.__class__ == other.__class__,
+                   self.id == other.id,
+                   self.location == other.location])
 
     def __hash__(self):
-        return hash((self.id,self._location))
+        return hash((self.id, self._location))
 
     @classmethod
     def dict_to_obj(cls, dict_input):

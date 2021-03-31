@@ -23,10 +23,14 @@ class BasicLoadingDockEnvelope(unittest.TestCase):
             get_azimuth_quantization_values(MockSlidesServiceWrapper.drone_azimuth_level_amount),
             maneuver_angle=Angle(value=90, unit=AngleUnit.DEGREE))
         for arrival_angle in (potential_arrival_envelope.arrival_envelopes.keys()):
-            arrival_direction = arrival_angle.calc_reverse().to_direction().__mul__(5)
-            drawer.add_arrow2d(tail=potential_arrival_envelope.get_arrival_envelope(arrival_angle).repr_point.add_vector(arrival_direction),
-                               head=potential_arrival_envelope.get_arrival_envelope(arrival_angle).repr_point, facecolor=Color.Red, edgecolor=Color.Red)
-            drawer.add_point2d(point2d=potential_arrival_envelope.get_arrival_envelope(arrival_angle).repr_point, facecolor=Color.Red, edgecolor=Color.Red)
+            arrival_direction = arrival_angle.calc_reverse().to_direction() * 5
+            drawer.add_arrow2d(
+                tail=potential_arrival_envelope.get_arrival_envelope(arrival_angle).repr_point.add_vector(
+                    arrival_direction),
+                head=potential_arrival_envelope.get_arrival_envelope(arrival_angle).repr_point, facecolor=Color.Red,
+                edgecolor=Color.Red)
+            drawer.add_point2d(point2d=potential_arrival_envelope.get_arrival_envelope(arrival_angle).repr_point,
+                               facecolor=Color.Red, edgecolor=Color.Red)
         drawer.draw()
         self.assertLess(loading_dock_potential_envelope.loading_dock.drone_loading_station.location.x, 100)
         self.assertLess(loading_dock_potential_envelope.loading_dock.drone_loading_station.location.y, 100)
@@ -48,5 +52,3 @@ class BasicLoadingDockEnvelope(unittest.TestCase):
                                delta=0.01)
         self.assertAlmostEqual(list(potential_arrival_envelope.arrival_envelopes.values())[0].repr_point.y, 65.74725,
                                delta=0.01)
-
-

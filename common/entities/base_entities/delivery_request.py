@@ -52,11 +52,11 @@ class DeliveryRequest(JsonableBaseEntity, Localizable, Temporal):
             priority=dict_input['priority'])
 
     def __eq__(self, other: DeliveryRequest):
-        return (self.__class__ == other.__class__) and \
-               (self.id == other.id) and \
-               (self.delivery_options == other.delivery_options) and \
-               (self.time_window == other.time_window) and \
-               (self.priority == other.priority)
+        return all([self.__class__ == other.__class__,
+                    self.id == other.id,
+                    self.time_window == other.time_window,
+                    self.priority == other.priority]) \
+               and (self.delivery_options == other.delivery_options)
 
     def __hash__(self):
         return hash((self.id,tuple(self.delivery_options), self.time_window, self.priority))

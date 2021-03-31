@@ -41,6 +41,6 @@ class BasicSlideTestCase(unittest.TestCase):
         self.assertEqual(potential_drop_envelope_without_drop_azimuth.drop_point, self.drop_point)
         self.assertEqual(potential_drop_envelope_with_drop_azimuth.get_centroid(),
                          potential_drop_envelope_without_drop_azimuth.get_centroid())
-        self.assertEqual(len(potential_drop_envelope_with_drop_azimuth.get_shapeabls()), 3)
-        self.assertEqual(len(potential_drop_envelope_without_drop_azimuth.get_shapeabls()), 8)
+        self.assertEqual(len(potential_drop_envelope_with_drop_azimuth.get_shapeables()), 3)
+        self.assertEqual(len(potential_drop_envelope_without_drop_azimuth.get_shapeables()), 8)
         self.assertIsInstance(obj=potential_drop_envelope_with_drop_azimuth.drop_azimuth.get(), cls=Angle)
