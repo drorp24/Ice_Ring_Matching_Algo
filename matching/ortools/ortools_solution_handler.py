@@ -117,9 +117,7 @@ class ORToolsSolutionHandler:
     def _create_drone_delivery(self, edd_index: int, start_drone_loading_dock: MatchedDroneLoadingDock,
                                end_drone_loading_dock: MatchedDroneLoadingDock,
                                matched_requests: List[MatchedDeliveryRequest]) -> DroneDelivery:
-        return DroneDelivery(self._matcher_input.empty_board.empty_drone_deliveries[edd_index].id,
-                             self._matcher_input.empty_board.empty_drone_deliveries[
-                                 edd_index].drone_formation,
+        return DroneDelivery(self._matcher_input.empty_board.empty_drone_deliveries[edd_index],
                              matched_requests, start_drone_loading_dock, end_drone_loading_dock)
 
     def _create_matched_delivery_request(self, graph_index: int, index: int,

@@ -6,6 +6,7 @@ from random import Random
 
 from common.entities.base_entities.drone import PackageConfiguration, DroneType
 from common.entities.base_entities.drone_formation import DroneFormationType
+from common.entities.base_entities.drone_loading_station import DroneLoadingStation
 from common.entities.base_entities.entity_distribution.delivery_requestion_dataset_builder import \
     build_zone_delivery_request_distribution
 from common.entities.base_entities.entity_distribution.drone_loading_dock_distribution import \
@@ -23,7 +24,7 @@ from common.entities.base_entities.fleet.empty_drone_delivery_board_generation i
 from common.entities.base_entities.fleet.fleet_property_sets import DroneFormationTypePolicy, \
     PackageConfigurationPolicy, DroneSetProperties
 from common.entities.base_entities.package import PackageType
-from common.entities.base_entities.temporal import DateTimeExtension, TimeDeltaExtension
+from common.entities.base_entities.temporal import DateTimeExtension, TimeDeltaExtension, TimeWindowExtension
 from end_to_end.distribution.supplier_category_distribution import SupplierCategoryDistribution
 from end_to_end.arrival_envelope_minimum_end_to_end import *
 from geometry.distribution.geo_distribution import UniformPointInBboxDistribution, \
@@ -221,9 +222,18 @@ def _create_empty_drone_delivery_board(
                                                                   PackageConfiguration.TINY_X16: 0}),
         drone_type: DroneType = DroneType.drone_type_1,
         amount: int = 30, max_route_time_entire_board: int = 400, velocity_entire_board: float = 10.0):
+    loading_dock = DroneLoadingDock(EntityID.generate_uuid(),
+                                    DroneLoadingStation(EntityID.generate_uuid(), create_point_2d(0, 0)),
+                                    DroneType.drone_type_1,
+                                    TimeWindowExtension(
+                                        since=ZERO_TIME,
+                                        until=ZERO_TIME.add_time_delta(
+                                            TimeDeltaExtension(timedelta(hours=5)))))
     drone_set_properties = DroneSetProperties(drone_type=drone_type,
                                               package_configuration_policy=package_configurations_policy,
                                               drone_formation_policy=drone_formation_policy,
+                                              start_loading_dock=loading_dock,
+                                              end_loading_dock=loading_dock,
                                               drone_amount=amount)
     return build_empty_drone_delivery_board(drone_set_properties, max_route_time_entire_board,
                                             velocity_entire_board)

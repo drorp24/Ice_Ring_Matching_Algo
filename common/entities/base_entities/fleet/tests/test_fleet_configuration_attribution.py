@@ -25,15 +25,22 @@ class TestFleetConfigurationAttribution(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.loading_dock = DroneLoadingDock(EntityID.generate_uuid(),
+        cls.loading_dock_1 = DroneLoadingDock(EntityID.generate_uuid(),
                                 DroneLoadingStation(EntityID.generate_uuid(), create_point_2d(0, 0)),
                                 DroneType.drone_type_1,
                                 TimeWindowExtension(
                                     since=ZERO_TIME,
                                     until=ZERO_TIME.add_time_delta(
                                         TimeDeltaExtension(timedelta(hours=5)))))
-        cls.drone_set_properties_1 = TestFleetConfigurationAttribution.define_drone_set_properties_1()
-        cls.drone_set_properties_2 = TestFleetConfigurationAttribution.define_drone_set_properties_2()
+        cls.loading_dock_2 = DroneLoadingDock(EntityID.generate_uuid(),
+                                DroneLoadingStation(EntityID.generate_uuid(), create_point_2d(0, 0)),
+                                DroneType.drone_type_2,
+                                TimeWindowExtension(
+                                    since=ZERO_TIME,
+                                    until=ZERO_TIME.add_time_delta(
+                                        TimeDeltaExtension(timedelta(hours=5)))))
+        cls.drone_set_properties_1 = TestFleetConfigurationAttribution.define_drone_set_properties_1(cls.loading_dock_1)
+        cls.drone_set_properties_2 = TestFleetConfigurationAttribution.define_drone_set_properties_2(cls.loading_dock_2)
         cls.formation_size_policy = DroneFormationTypePolicy({DroneFormationType.PAIR: 1.0,
                                                               DroneFormationType.QUAD: 0.0})
 

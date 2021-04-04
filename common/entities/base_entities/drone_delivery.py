@@ -88,28 +88,28 @@ class DeliveringDrones(JsonableBaseEntity):
                                 )
 
 
-# @dataclass
-# class MatchedDroneLoadingDock(JsonableBaseEntity):
-#     graph_index: int  # TODO: replace to DeliveryRequestUUID
-#     drone_loading_dock: DroneLoadingDock
-#     delivery_time_window: TimeWindowExtension
-#
-#     def __str__(self):
-#         return '[MatchedDroneLoadingDock(graph_index=' + str(
-#             self.graph_index) + ', min_time=' + self.delivery_time_window.since.str_format_time() + \
-#                ', max_time=' + self.delivery_time_window.until.str_format_time() + ')]'
-#
-#     def __hash__(self):
-#         return hash((self.graph_index, self.drone_loading_dock,
-#                      self.delivery_time_window.since, self.delivery_time_window.until))
-#
-#     @classmethod
-#     def dict_to_obj(cls, dict_input):
-#         assert (dict_input['__class__'] == cls.__name__)
-#         return MatchedDroneLoadingDock(
-#             graph_index=dict_input['graph_index'],
-#             drone_loading_dock=DroneLoadingDock.dict_to_obj(dict_input['drone_loading_dock']),
-#             delivery_time_window=TimeWindowExtension.dict_to_obj(dict_input['delivery_time_window']))
+@dataclass
+class MatchedDroneLoadingDock(JsonableBaseEntity):
+    graph_index: int  # TODO: replace to DeliveryRequestUUID
+    drone_loading_dock: DroneLoadingDock
+    delivery_time_window: TimeWindowExtension
+
+    def __str__(self):
+        return '[MatchedDroneLoadingDock(graph_index=' + str(
+            self.graph_index) + ', min_time=' + self.delivery_time_window.since.str_format_time() + \
+               ', max_time=' + self.delivery_time_window.until.str_format_time() + ')]'
+
+    def __hash__(self):
+        return hash((self.graph_index, self.drone_loading_dock,
+                     self.delivery_time_window.since, self.delivery_time_window.until))
+
+    @classmethod
+    def dict_to_obj(cls, dict_input):
+        assert (dict_input['__class__'] == cls.__name__)
+        return MatchedDroneLoadingDock(
+            graph_index=dict_input['graph_index'],
+            drone_loading_dock=DroneLoadingDock.dict_to_obj(dict_input['drone_loading_dock']),
+            delivery_time_window=TimeWindowExtension.dict_to_obj(dict_input['delivery_time_window']))
 
 
 @dataclass
@@ -140,7 +140,7 @@ class MatchedDeliveryRequest(JsonableBaseEntity):
             delivery_time_window=TimeWindowExtension.dict_to_obj(dict_input['delivery_time_window']))
 
 
-class MatchedDelivery(JsonableBaseEntity):
+class DroneDelivery(JsonableBaseEntity):
     def __init__(self, delivering_drones: DeliveringDrones,
                  matched_requests: [MatchedDeliveryRequest],
                  start_drone_loading_docks: MatchedDroneLoadingDock,

@@ -29,8 +29,12 @@ def calc_drone_deliveries(drone_set_properties: DroneSetProperties,
     drone_formations_per_type_amounts = _calc_drone_formation_amounts(formation_type_amounts, drone_set_properties)
     for drone_formation, amount in drone_formations_per_type_amounts.amounts.items():
         for i in range(amount):
-            empty_deliveries.append(DeliveringDrones(EntityID(uuid.uuid4()), drone_formation,
-                                                     max_route_time_entire_board, velocity_entire_board))
+            empty_deliveries.append(DeliveringDrones(id_=EntityID(uuid.uuid4()),
+                                                     drone_formation=drone_formation,
+                                                     start_loading_dock=drone_set_properties.start_loading_dock,
+                                                     end_loading_dock=drone_set_properties.end_loading_dock,
+                                                     max_route_time_in_minutes=max_route_time_entire_board,
+                                                     velocity_meter_per_sec=velocity_entire_board))
     return empty_deliveries
 
 def generate_empty_delivery_board(drone_set_properties: [DroneSetProperties],max_route_time_entire_board: int,

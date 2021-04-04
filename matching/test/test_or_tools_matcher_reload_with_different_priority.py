@@ -41,7 +41,7 @@ class ORToolsMatcherReloadWithDifferentPriorityTestCase(TestCase):
         cls.delivery_requests = cls._create_delivery_requests()
         cls.loading_dock = cls._create_loading_dock()
         cls.graph = cls._create_graph(cls.delivery_requests, cls.loading_dock)
-        cls.empty_board = cls._create_empty_board()
+        cls.empty_board = cls._create_empty_board(cls.loading_dock)
         cls.match_input = MatcherInput(cls.graph, cls.empty_board, cls._create_match_config())
         matcher = ORToolsMatcher(cls.match_input)
         cls.actual_delivery_board = matcher.match()
@@ -119,11 +119,17 @@ class ORToolsMatcherReloadWithDifferentPriorityTestCase(TestCase):
         return graph
 
     @staticmethod
-    def _create_empty_board() -> EmptyDroneDeliveryBoard:
-        empty_drone_delivery_1 = DeliveringDrones(EntityID(uuid.uuid4()), DroneFormations.get_drone_formation(
-            DroneFormationType.PAIR, PackageConfigurationOption.LARGE_PACKAGES, DroneType.drone_type_1))
-        empty_drone_delivery_2 = DeliveringDrones(EntityID(uuid.uuid4()), DroneFormations.get_drone_formation(
-            DroneFormationType.PAIR, PackageConfigurationOption.LARGE_PACKAGES, DroneType.drone_type_1))
+    def _create_empty_board(loading_dock: DroneLoadingDock) -> EmptyDroneDeliveryBoard:
+        empty_drone_delivery_1 = DeliveringDrones(id_=EntityID(uuid.uuid4()),
+                                                  drone_formation=DroneFormations.get_drone_formation(
+            DroneFormationType.PAIR, PackageConfigurationOption.LARGE_PACKAGES, DroneType.drone_type_1),
+                                                  start_loading_dock=loading_dock,
+                                                  end_loading_dock=loading_dock)
+        empty_drone_delivery_2 = DeliveringDrones(id_=EntityID(uuid.uuid4()),
+                                                  drone_formation=DroneFormations.get_drone_formation(
+            DroneFormationType.PAIR, PackageConfigurationOption.LARGE_PACKAGES, DroneType.drone_type_1),
+                                                  start_loading_dock=loading_dock,
+                                                  end_loading_dock=loading_dock)
         return EmptyDroneDeliveryBoard([empty_drone_delivery_1, empty_drone_delivery_2])
 
     @staticmethod
