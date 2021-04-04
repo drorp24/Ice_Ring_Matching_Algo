@@ -2,7 +2,7 @@ from datetime import timedelta
 from typing import List
 from ortools.constraint_solver.pywrapcp import Assignment, RoutingModel
 
-from common.entities.base_entities.drone_delivery import MatchedDelivery, MatchedDeliveryRequest, MatchedDroneLoadingDock
+from common.entities.base_entities.drone_delivery import DroneDelivery, MatchedDeliveryRequest, MatchedDroneLoadingDock
 from common.entities.base_entities.drone_delivery_board import DroneDeliveryBoard, UnmatchedDeliveryRequest
 from common.entities.base_entities.temporal import TimeWindowExtension, TimeDeltaExtension
 from common.graph.operational.export_ortools_graph import OrtoolsGraphExporter
@@ -33,7 +33,7 @@ class ORToolsSolutionHandler:
         return DroneDeliveryBoard(drone_deliveries=self._create_drone_deliveries(solution),
                                   unmatched_delivery_requests=self._extract_unmatched_delivery_requests(solution))
 
-    def _create_drone_deliveries(self, solution: Assignment) -> List[MatchedDelivery]:
+    def _create_drone_deliveries(self, solution: Assignment) -> List[DroneDelivery]:
         if solution is None:
             return []
         drone_deliveries = []
@@ -116,11 +116,11 @@ class ORToolsSolutionHandler:
 
     def _create_drone_delivery(self, edd_index: int, start_drone_loading_dock: MatchedDroneLoadingDock,
                                end_drone_loading_dock: MatchedDroneLoadingDock,
-                               matched_requests: List[MatchedDeliveryRequest]) -> MatchedDelivery:
-        return MatchedDelivery(self._matcher_input.empty_board.empty_drone_deliveries[edd_index].id,
-                               self._matcher_input.empty_board.empty_drone_deliveries[
+                               matched_requests: List[MatchedDeliveryRequest]) -> DroneDelivery:
+        return DroneDelivery(self._matcher_input.empty_board.empty_drone_deliveries[edd_index].id,
+                             self._matcher_input.empty_board.empty_drone_deliveries[
                                  edd_index].drone_formation,
-                               matched_requests, start_drone_loading_dock, end_drone_loading_dock)
+                             matched_requests, start_drone_loading_dock, end_drone_loading_dock)
 
     def _create_matched_delivery_request(self, graph_index: int, index: int,
                                          solution: Assignment) -> MatchedDeliveryRequest:

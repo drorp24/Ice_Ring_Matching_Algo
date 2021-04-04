@@ -3,7 +3,7 @@ import random
 from common.entities.base_entities.customer_delivery import CustomerDelivery
 from common.entities.base_entities.delivery_option import DeliveryOption
 from common.entities.base_entities.delivery_request import DeliveryRequest
-from common.entities.base_entities.drone_delivery import MatchedDelivery
+from common.entities.base_entities.drone_delivery import DroneDelivery
 from common.entities.base_entities.drone_delivery_board import DroneDeliveryBoard, UnmatchedDeliveryRequest
 from common.entities.base_entities.drone_loading_dock import DroneLoadingDock
 from common.entities.base_entities.package_delivery_plan import PackageDeliveryPlan
@@ -80,10 +80,10 @@ def _get_color_of_graph_edge(edge: OperationalEdge):
             return cond_color_map[cond]
 
 
-def add_drone_delivery(drawer: Drawer2D, delivery: MatchedDelivery, delivery_color: Color):
+def add_drone_delivery(drawer: Drawer2D, delivery: DroneDelivery, delivery_color: Color):
     locations = []
-    add_drone_loading_dock(drawer, delivery.start_time_window.drone_loading_dock)
-    locations.append(delivery.start_time_window.drone_loading_dock.calc_location())
+    add_drone_loading_dock(drawer, delivery.start_drone_loading_docks.drone_loading_dock)
+    locations.append(delivery.start_drone_loading_docks.drone_loading_dock.calc_location())
     for request in delivery.matched_requests:
         matched_delivery_option = request.delivery_request.delivery_options[request.matched_delivery_option_index]
         add_delivery_option(drawer, matched_delivery_option,
@@ -91,8 +91,8 @@ def add_drone_delivery(drawer: Drawer2D, delivery: MatchedDelivery, delivery_col
                             color=delivery_color)
         current_location = matched_delivery_option.calc_location()
         locations.append(current_location)
-    add_drone_loading_dock(drawer, delivery.end_time_window.drone_loading_dock)
-    locations.append(delivery.end_time_window.drone_loading_dock.calc_location())
+    add_drone_loading_dock(drawer, delivery.end_drone_loading_docks.drone_loading_dock)
+    locations.append(delivery.end_drone_loading_docks.drone_loading_dock.calc_location())
 
 
 class _MatchedDeliveryLabelsHandler:
@@ -103,7 +103,7 @@ class _MatchedDeliveryLabelsHandler:
         self.selected_delivery_colors = []
         self.matched_delivery_labels = []
 
-    def add_matched_delivery(self, delivery: MatchedDelivery) -> Color:
+    def add_matched_delivery(self, delivery: DroneDelivery) -> Color:
         self.matched_delivery_labels.append("[" +
                                             str(delivery.drone_formation.drone_formation_type.name) + "] * " +
                                             str(delivery.drone_formation.drone_package_configuration.package_type_map))
@@ -118,7 +118,7 @@ def add_unmatched_delivery_requests(drawer: Drawer2D, unmatched_requests: [Unmat
         add_delivery_request(drawer, unmatched.delivery_request, draw_internal=False, color=Color.Red)
 
 
-def add_drone_deliveries(drawer: Drawer2D, drone_deliveries: [MatchedDelivery]):
+def add_drone_deliveries(drawer: Drawer2D, drone_deliveries: [DroneDelivery]):
     labels_handler = _MatchedDeliveryLabelsHandler()
     for i, delivery in enumerate(drone_deliveries):
         if len(delivery.matched_requests) == 0:

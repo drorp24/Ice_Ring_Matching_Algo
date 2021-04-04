@@ -76,7 +76,7 @@ class ORToolsMatcherMaxRouteTimeTestCase(TestCase):
     def _create_limited_route_time_empty_drone_delivery(max_route_times_in_minutes: int, velocity_meter_per_sec: float):
         return DeliveringDrones(EntityID(uuid.uuid4()), DroneFormations.get_drone_formation(
             DroneFormationType.PAIR, PackageConfigurationOption.TINY_PACKAGES, DroneType.drone_type_1),
-                                max_route_times_in_minutes, velocity_meter_per_sec)
+                                  max_route_times_in_minutes, velocity_meter_per_sec)
 
     @staticmethod
     def _create_match_config_with_waiting_time(waiting_time: int = 0):
@@ -143,7 +143,7 @@ class ORToolsMatcherMaxRouteTimeTestCase(TestCase):
                                                            velocity_meter_per_sec: float):
         return DeliveringDrones(EntityID(uuid.uuid4()), DroneFormations.get_drone_formation(
             DroneFormationType.PAIR, PackageConfigurationOption.TINY_PACKAGES, DroneType.drone_type_2),
-                                max_route_times_in_minutes, velocity_meter_per_sec)
+                                  max_route_times_in_minutes, velocity_meter_per_sec)
 
     @staticmethod
     def _create_loading_dock() -> DroneLoadingDock:

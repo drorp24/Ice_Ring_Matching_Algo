@@ -143,12 +143,12 @@ class MatchedDeliveryRequest(JsonableBaseEntity):
 class MatchedDelivery(JsonableBaseEntity):
     def __init__(self, delivering_drones: DeliveringDrones,
                  matched_requests: [MatchedDeliveryRequest],
-                 start_time_window: TimeWindowExtension,
-                 end_time_window: TimeWindowExtension):
+                 start_drone_loading_docks: MatchedDroneLoadingDock,
+                 end_drone_loading_docks: MatchedDroneLoadingDock):
         self._delivering_drones = delivering_drones
         self._matched_requests = matched_requests
-        self._start_time_window = start_time_window
-        self._end_time_window = end_time_window
+        self._start_drone_loading_docks = start_drone_loading_docks
+        self._end_drone_loading_docks = end_drone_loading_docks
 
     @property
     def delivering_drones(self) -> DeliveringDrones:
@@ -159,17 +159,17 @@ class MatchedDelivery(JsonableBaseEntity):
         return self._matched_requests
 
     @property
-    def start_time_window(self) -> TimeWindowExtension:
-        return self._start_time_window
+    def start_drone_loading_docks(self) -> MatchedDroneLoadingDock:
+        return self._start_drone_loading_docks
 
     @property
-    def end_time_window(self) -> TimeWindowExtension:
-        return self._end_time_window
+    def end_drone_loading_docks(self) -> MatchedDroneLoadingDock:
+        return self._end_drone_loading_docks
 
     @lru_cache()
     def get_total_work_time_in_minutes(self) -> float:
-        return self._end_time_window.since.get_time_delta(
-            self._start_time_window.since).in_minutes()
+        return self._end_drone_loading_docks.delivery_time_window.since.get_time_delta(
+            self._start_drone_loading_docks.delivery_time_window.since).in_minutes()
 
     @lru_cache()
     def get_total_package_type_amount_map(self) -> PackageTypeAmountMap:
@@ -187,33 +187,38 @@ class MatchedDelivery(JsonableBaseEntity):
 
     def __str__(self):
         if len(self._matched_requests) == 0:
-            return f"\n[MatchedDelivery delivering_drones={self.delivering_drones} - No match found]"
+            return "\n[DroneDelivery id={id} - origin {origin_capacity} No match found]".format(
+                id=self.delivering_drones.id,
+                origin_capacity=self.delivering_drones.drone_formation.get_package_type_amount_map(), )
 
-        matched_requests_str = '\n'.join(map(str, self._matched_requests))
-        return f"\n[MatchedDelivery delivering_drones={self.delivering_drones} matched " \
-               f"{str(self.get_total_package_type_amount_map())} "\
-               f"total priority={str(self.get_total_work_time_in_minutes())} "\
-               f"total time in minutes={str(self.get_total_work_time_in_minutes())}]\n"\
-               f"{str(self.start_time_window)}\n" \
-               f"{matched_requests_str}\n"\
-               f"{str(self.end_time_window)}"
+        return "\n[DroneDelivery id={id} origin {origin_capacity} matched " \
+               "{total_amount_per_package_type} total priority={priority} total time in " \
+               "minutes={total_time}]\n{start_drone_loading_docks}\n{matched_requests}\n{end_drone_loading_docks}" \
+            .format(id=self.delivering_drones.id,
+                    origin_capacity=self.delivering_drones.drone_formation.get_package_type_amount_map(),
+                    total_amount_per_package_type=str(self.get_total_package_type_amount_map()),
+                    priority=str(self.get_total_priority()),
+                    total_time=str(self.get_total_work_time_in_minutes()),
+                    start_drone_loading_docks=str(self.start_drone_loading_docks),
+                    matched_requests='\n'.join(map(str, self._matched_requests)),
+                    end_drone_loading_docks=str(self.end_drone_loading_docks))
 
     def __hash__(self):
         return hash((self._delivering_drones, tuple(self._matched_requests),
-                     self._start_time_window, self._end_time_window))
+                     self._start_drone_loading_docks, self._end_drone_loading_docks))
 
     def __eq__(self, other):
         return all([self.delivering_drones == other.delivering_drones,
-                   self.matched_requests == other.matched_requests,
-                   self.start_time_window == other.start_time_window,
-                   self.end_time_window == other.end_time_window])
+                    self._matched_requests == other.matched_requests,
+                    self.start_drone_loading_docks == other.start_drone_loading_docks,
+                    self.end_drone_loading_docks == other.end_drone_loading_docks])
 
     @classmethod
     def dict_to_obj(cls, dict_input):
         assert (dict_input['__class__'] == cls.__name__)
-        return MatchedDelivery(
+        return DroneDelivery(
             delivering_drones=DeliveringDrones.dict_to_obj(dict_input['delivering_drones']),
             matched_requests=[MatchedDeliveryRequest.dict_to_obj(matched_request_dict) for matched_request_dict in
                               dict_input['matched_requests']],
-            start_time_window=TimeWindowExtension.dict_to_obj(dict_input['start_time_window']),
-            end_time_window=TimeWindowExtension.dict_to_obj(dict_input['end_time_window']))
+            start_drone_loading_docks=MatchedDroneLoadingDock.dict_to_obj(dict_input['start_drone_loading_docks']),
+            end_drone_loading_docks=MatchedDroneLoadingDock.dict_to_obj(dict_input['end_drone_loading_docks']))

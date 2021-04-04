@@ -6,7 +6,7 @@ from unittest import TestCase
 
 from common.entities.base_entities.delivery_request import DeliveryRequest
 from common.entities.base_entities.drone import DroneType
-from common.entities.base_entities.drone_delivery import MatchedDelivery, MatchedDroneLoadingDock, DeliveringDrones
+from common.entities.base_entities.drone_delivery import DroneDelivery, MatchedDroneLoadingDock, DeliveringDrones
 from common.entities.base_entities.drone_delivery_board import DroneDeliveryBoard, EmptyDroneDeliveryBoard, \
     UnmatchedDeliveryRequest
 from common.entities.base_entities.drone_formation import DroneFormations, PackageConfigurationOption, \
@@ -50,17 +50,17 @@ class ORToolsMatcherDropPenaltyTestCase(TestCase):
         matcher = ORToolsMatcher(self.match_input)
         actual_delivery_board = matcher.match()
 
-        drone_delivery = MatchedDelivery(id_=self.empty_board.empty_drone_deliveries[0].id,
-                                         drone_formation=self.empty_board.empty_drone_deliveries[
+        drone_delivery = DroneDelivery(id_=self.empty_board.empty_drone_deliveries[0].id,
+                                       drone_formation=self.empty_board.empty_drone_deliveries[
                                            0].drone_formation,
-                                         matched_requests=[],
-                                         start_matched_loading_dock=MatchedDroneLoadingDock(
+                                       matched_requests=[],
+                                       start_drone_loading_docks=MatchedDroneLoadingDock(
                                            graph_index=0,
                                            drone_loading_dock=self.loading_dock,
                                            delivery_time_window=TimeWindowExtension(
                                                since=ZERO_TIME,
                                                until=ZERO_TIME)),
-                                         end_matched_loading_dock=MatchedDroneLoadingDock(
+                                       end_drone_loading_docks=MatchedDroneLoadingDock(
                                            graph_index=0,
                                            drone_loading_dock=self.loading_dock,
                                            delivery_time_window=TimeWindowExtension(

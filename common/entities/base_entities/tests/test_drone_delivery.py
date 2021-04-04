@@ -7,7 +7,7 @@ from typing import List
 
 from common.entities.base_entities.delivery_request import DeliveryRequest
 from common.entities.base_entities.drone import DroneType
-from common.entities.base_entities.drone_delivery import MatchedDelivery, DeliveringDrones, MatchedDroneLoadingDock, \
+from common.entities.base_entities.drone_delivery import DroneDelivery, DeliveringDrones, MatchedDroneLoadingDock, \
     MatchedDeliveryRequest
 from common.entities.base_entities.drone_delivery_board import EmptyDroneDeliveryBoard, DroneDeliveryBoard, \
     UnmatchedDeliveryRequest
@@ -103,11 +103,11 @@ class BasicDroneDeliveryGenerationTests(unittest.TestCase):
         self.assertEqual(self.empty_drone_delivery_1, actual_empty_drone_delivery)
 
     def test_2_drone_deliveries_are_equal(self):
-        actual_drone_delivery = MatchedDelivery(self.empty_drone_delivery_1.id,
-                                                self.empty_drone_delivery_1.drone_formation,
-                                                [self.matched_delivery_request_1, self.matched_delivery_request_2],
-                                                self.matched_drone_loading_dock,
-                                                self.matched_drone_loading_dock)
+        actual_drone_delivery = DroneDelivery(self.empty_drone_delivery_1.id,
+                                              self.empty_drone_delivery_1.drone_formation,
+                                              [self.matched_delivery_request_1, self.matched_delivery_request_2],
+                                              self.matched_drone_loading_dock,
+                                              self.matched_drone_loading_dock)
         self.assertEqual(self.drone_delivery_1, actual_drone_delivery)
 
     def test_2_drone_delivery_boards_are_equal(self):
@@ -174,13 +174,13 @@ class BasicDroneDeliveryGenerationTests(unittest.TestCase):
                 until=ZERO_TIME.add_time_delta(TimeDeltaExtension(timedelta(minutes=60)))))
         self.unmatched_delivery_request = UnmatchedDeliveryRequest(graph_index=4,
                                                                    delivery_request=delivery_requests[2])
-        self.drone_delivery_1 = MatchedDelivery(drone_deliveries[0].id,
-                                                drone_deliveries[0].drone_formation,
-                                                [self.matched_delivery_request_1, self.matched_delivery_request_2],
-                                                matched_drone_loading_dock, matched_drone_loading_dock)
-        self.drone_delivery_2 = MatchedDelivery(drone_deliveries[1].id,
-                                                drone_deliveries[1].drone_formation,
-                                                [self.matched_delivery_request_3],
-                                                matched_drone_loading_dock, matched_drone_loading_dock)
+        self.drone_delivery_1 = DroneDelivery(drone_deliveries[0].id,
+                                              drone_deliveries[0].drone_formation,
+                                              [self.matched_delivery_request_1, self.matched_delivery_request_2],
+                                              matched_drone_loading_dock, matched_drone_loading_dock)
+        self.drone_delivery_2 = DroneDelivery(drone_deliveries[1].id,
+                                              drone_deliveries[1].drone_formation,
+                                              [self.matched_delivery_request_3],
+                                              matched_drone_loading_dock, matched_drone_loading_dock)
         return DroneDeliveryBoard(drone_deliveries=[self.drone_delivery_1, self.drone_delivery_2],
                                   unmatched_delivery_requests=[self.unmatched_delivery_request])

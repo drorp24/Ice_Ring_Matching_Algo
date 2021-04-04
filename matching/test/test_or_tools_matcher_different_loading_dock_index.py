@@ -6,7 +6,7 @@ from unittest import TestCase
 
 from common.entities.base_entities.delivery_request import DeliveryRequest
 from common.entities.base_entities.drone import DroneType
-from common.entities.base_entities.drone_delivery import DeliveringDrones, MatchedDelivery, MatchedDeliveryRequest, \
+from common.entities.base_entities.drone_delivery import DeliveringDrones, DroneDelivery, MatchedDeliveryRequest, \
     MatchedDroneLoadingDock
 from common.entities.base_entities.drone_delivery_board import DroneDeliveryBoard, EmptyDroneDeliveryBoard
 from common.entities.base_entities.drone_formation import DroneFormations, PackageConfigurationOption, \
@@ -185,10 +185,10 @@ class ORToolsMatcherDifferentLoadingDockIndexTestCase(TestCase):
     @staticmethod
     def _create_drone_deliveries_dock_start(delivery_requests: List[DeliveryRequest],
                                             empty_board: EmptyDroneDeliveryBoard,
-                                            loading_dock: DroneLoadingDock) -> List[MatchedDelivery]:
-        drone_delivery_1 = MatchedDelivery(id_=empty_board.empty_drone_deliveries[0].id,
-                                           drone_formation=empty_board.empty_drone_deliveries[0].drone_formation,
-                                           matched_requests=[
+                                            loading_dock: DroneLoadingDock) -> List[DroneDelivery]:
+        drone_delivery_1 = DroneDelivery(id_=empty_board.empty_drone_deliveries[0].id,
+                                         drone_formation=empty_board.empty_drone_deliveries[0].drone_formation,
+                                         matched_requests=[
                                              MatchedDeliveryRequest(
                                                  graph_index=2,
                                                  delivery_request=delivery_requests[1],
@@ -208,7 +208,7 @@ class ORToolsMatcherDifferentLoadingDockIndexTestCase(TestCase):
                                                      until=ZERO_TIME.add_time_delta(
                                                          TimeDeltaExtension(timedelta(minutes=50))))),
                                          ],
-                                           start_matched_loading_dock=MatchedDroneLoadingDock(
+                                         start_drone_loading_docks=MatchedDroneLoadingDock(
                                              graph_index=0,
                                              drone_loading_dock=loading_dock,
                                              delivery_time_window=TimeWindowExtension(
@@ -216,7 +216,7 @@ class ORToolsMatcherDifferentLoadingDockIndexTestCase(TestCase):
                                                      TimeDeltaExtension(timedelta(minutes=35))),
                                                  until=loading_dock.time_window.since.add_time_delta(
                                                      TimeDeltaExtension(timedelta(minutes=35))))),
-                                           end_matched_loading_dock=MatchedDroneLoadingDock(
+                                         end_drone_loading_docks=MatchedDroneLoadingDock(
                                              graph_index=0,
                                              drone_loading_dock=loading_dock,
                                              delivery_time_window=TimeWindowExtension(
@@ -224,9 +224,9 @@ class ORToolsMatcherDifferentLoadingDockIndexTestCase(TestCase):
                                                      TimeDeltaExtension(timedelta(hours=1,minutes=5))),
                                                  until=loading_dock.time_window.since.add_time_delta(
                                                      TimeDeltaExtension(timedelta(hours=1,minutes=5))))))
-        drone_delivery_2 = MatchedDelivery(id_=empty_board.empty_drone_deliveries[1].id,
-                                           drone_formation=empty_board.empty_drone_deliveries[1].drone_formation,
-                                           matched_requests=[
+        drone_delivery_2 = DroneDelivery(id_=empty_board.empty_drone_deliveries[1].id,
+                                         drone_formation=empty_board.empty_drone_deliveries[1].drone_formation,
+                                         matched_requests=[
                                              MatchedDeliveryRequest(
                                                  graph_index=1,
                                                  delivery_request=delivery_requests[0],
@@ -237,14 +237,14 @@ class ORToolsMatcherDifferentLoadingDockIndexTestCase(TestCase):
                                                      until=ZERO_TIME.add_time_delta(
                                                          TimeDeltaExtension(timedelta(minutes=5))))),
                                          ],
-                                           start_matched_loading_dock=MatchedDroneLoadingDock(
+                                         start_drone_loading_docks=MatchedDroneLoadingDock(
                                              graph_index=0,
                                              drone_loading_dock=loading_dock,
                                              delivery_time_window=TimeWindowExtension(
                                                  since=loading_dock.time_window.since,
                                                  until=loading_dock.time_window.since)
                                          ),
-                                           end_matched_loading_dock=MatchedDroneLoadingDock(
+                                         end_drone_loading_docks=MatchedDroneLoadingDock(
                                              graph_index=0,
                                              drone_loading_dock=loading_dock,
                                              delivery_time_window=TimeWindowExtension(
@@ -257,10 +257,10 @@ class ORToolsMatcherDifferentLoadingDockIndexTestCase(TestCase):
     @staticmethod
     def _create_drone_deliveries_dock_end(delivery_requests: List[DeliveryRequest],
                                           empty_board: EmptyDroneDeliveryBoard,
-                                          loading_dock: DroneLoadingDock) -> List[MatchedDelivery]:
-        drone_delivery_1 = MatchedDelivery(id_=empty_board.empty_drone_deliveries[0].id,
-                                           drone_formation=empty_board.empty_drone_deliveries[0].drone_formation,
-                                           matched_requests=[
+                                          loading_dock: DroneLoadingDock) -> List[DroneDelivery]:
+        drone_delivery_1 = DroneDelivery(id_=empty_board.empty_drone_deliveries[0].id,
+                                         drone_formation=empty_board.empty_drone_deliveries[0].drone_formation,
+                                         matched_requests=[
                                              MatchedDeliveryRequest(
                                                  graph_index=1,
                                                  delivery_request=delivery_requests[1],
@@ -280,7 +280,7 @@ class ORToolsMatcherDifferentLoadingDockIndexTestCase(TestCase):
                                                      until=ZERO_TIME.add_time_delta(
                                                          TimeDeltaExtension(timedelta(minutes=50))))),
                                          ],
-                                           start_matched_loading_dock=MatchedDroneLoadingDock(
+                                         start_drone_loading_docks=MatchedDroneLoadingDock(
                                              graph_index=3,
                                              drone_loading_dock=loading_dock,
                                              delivery_time_window=TimeWindowExtension(
@@ -288,7 +288,7 @@ class ORToolsMatcherDifferentLoadingDockIndexTestCase(TestCase):
                                                      TimeDeltaExtension(timedelta(minutes=35))),
                                                  until=loading_dock.time_window.since.add_time_delta(
                                                      TimeDeltaExtension(timedelta(minutes=35))))),
-                                           end_matched_loading_dock=MatchedDroneLoadingDock(
+                                         end_drone_loading_docks=MatchedDroneLoadingDock(
                                              graph_index=3,
                                              drone_loading_dock=loading_dock,
                                              delivery_time_window=TimeWindowExtension(
@@ -297,9 +297,9 @@ class ORToolsMatcherDifferentLoadingDockIndexTestCase(TestCase):
                                                  until=loading_dock.time_window.since.add_time_delta(
                                                      TimeDeltaExtension(timedelta(hours=1,minutes=5))))))
 
-        drone_delivery_2 = MatchedDelivery(id_=empty_board.empty_drone_deliveries[1].id,
-                                           drone_formation=empty_board.empty_drone_deliveries[1].drone_formation,
-                                           matched_requests=[
+        drone_delivery_2 = DroneDelivery(id_=empty_board.empty_drone_deliveries[1].id,
+                                         drone_formation=empty_board.empty_drone_deliveries[1].drone_formation,
+                                         matched_requests=[
                                              MatchedDeliveryRequest(
                                                  graph_index=0,
                                                  delivery_request=delivery_requests[0],
@@ -310,13 +310,13 @@ class ORToolsMatcherDifferentLoadingDockIndexTestCase(TestCase):
                                                      until=ZERO_TIME.add_time_delta(
                                                          TimeDeltaExtension(timedelta(minutes=5))))),
                                          ],
-                                           start_matched_loading_dock=MatchedDroneLoadingDock(
+                                         start_drone_loading_docks=MatchedDroneLoadingDock(
                                              graph_index=3,
                                              drone_loading_dock=loading_dock,
                                              delivery_time_window=TimeWindowExtension(
                                                  since=loading_dock.time_window.since,
                                                  until=loading_dock.time_window.since)),
-                                           end_matched_loading_dock=MatchedDroneLoadingDock(
+                                         end_drone_loading_docks=MatchedDroneLoadingDock(
                                              graph_index=3,
                                              drone_loading_dock=loading_dock,
                                              delivery_time_window=TimeWindowExtension(
@@ -324,17 +324,17 @@ class ORToolsMatcherDifferentLoadingDockIndexTestCase(TestCase):
                                                      TimeDeltaExtension(timedelta(minutes=10))),
                                                  until=loading_dock.time_window.since.add_time_delta(
                                                      TimeDeltaExtension(timedelta(minutes=10)))))
-                                           )
+                                         )
 
         return [drone_delivery_1, drone_delivery_2]
 
     @staticmethod
     def _create_drone_deliveries_dock_middle(delivery_requests: List[DeliveryRequest],
                                              empty_board: EmptyDroneDeliveryBoard,
-                                             loading_dock: DroneLoadingDock) -> List[MatchedDelivery]:
-        drone_delivery_1 = MatchedDelivery(id_=empty_board.empty_drone_deliveries[0].id,
-                                           drone_formation=empty_board.empty_drone_deliveries[0].drone_formation,
-                                           matched_requests=[
+                                             loading_dock: DroneLoadingDock) -> List[DroneDelivery]:
+        drone_delivery_1 = DroneDelivery(id_=empty_board.empty_drone_deliveries[0].id,
+                                         drone_formation=empty_board.empty_drone_deliveries[0].drone_formation,
+                                         matched_requests=[
                                              MatchedDeliveryRequest(
                                                  graph_index=2,
                                                  delivery_request=delivery_requests[1],
@@ -354,7 +354,7 @@ class ORToolsMatcherDifferentLoadingDockIndexTestCase(TestCase):
                                                      until=ZERO_TIME.add_time_delta(
                                                          TimeDeltaExtension(timedelta(minutes=50))))),
                                          ],
-                                           start_matched_loading_dock=MatchedDroneLoadingDock(
+                                         start_drone_loading_docks=MatchedDroneLoadingDock(
                                              graph_index=1,
                                              drone_loading_dock=loading_dock,
                                              delivery_time_window=TimeWindowExtension(
@@ -362,7 +362,7 @@ class ORToolsMatcherDifferentLoadingDockIndexTestCase(TestCase):
                                                      TimeDeltaExtension(timedelta(minutes=35))),
                                                  until=loading_dock.time_window.since.add_time_delta(
                                                      TimeDeltaExtension(timedelta(minutes=35))))),
-                                           end_matched_loading_dock=MatchedDroneLoadingDock(
+                                         end_drone_loading_docks=MatchedDroneLoadingDock(
                                              graph_index=1,
                                              drone_loading_dock=loading_dock,
                                              delivery_time_window=TimeWindowExtension(
@@ -370,9 +370,9 @@ class ORToolsMatcherDifferentLoadingDockIndexTestCase(TestCase):
                                                      TimeDeltaExtension(timedelta(hours=1,minutes=5))),
                                                  until=loading_dock.time_window.since.add_time_delta(
                                                      TimeDeltaExtension(timedelta(hours=1,minutes=5))))))
-        drone_delivery_2 = MatchedDelivery(id_=empty_board.empty_drone_deliveries[1].id,
-                                           drone_formation=empty_board.empty_drone_deliveries[1].drone_formation,
-                                           matched_requests=[
+        drone_delivery_2 = DroneDelivery(id_=empty_board.empty_drone_deliveries[1].id,
+                                         drone_formation=empty_board.empty_drone_deliveries[1].drone_formation,
+                                         matched_requests=[
                                              MatchedDeliveryRequest(
                                                  graph_index=0,
                                                  delivery_request=delivery_requests[0],
@@ -383,13 +383,13 @@ class ORToolsMatcherDifferentLoadingDockIndexTestCase(TestCase):
                                                      until=ZERO_TIME.add_time_delta(
                                                          TimeDeltaExtension(timedelta(minutes=5))))),
                                          ],
-                                           start_matched_loading_dock=MatchedDroneLoadingDock(
+                                         start_drone_loading_docks=MatchedDroneLoadingDock(
                                              graph_index=1,
                                              drone_loading_dock=loading_dock,
                                              delivery_time_window=TimeWindowExtension(
                                                  since=loading_dock.time_window.since,
                                                  until=loading_dock.time_window.since)),
-                                           end_matched_loading_dock=MatchedDroneLoadingDock(
+                                         end_drone_loading_docks=MatchedDroneLoadingDock(
                                              graph_index=1,
                                              drone_loading_dock=loading_dock,
                                              delivery_time_window=TimeWindowExtension(
@@ -397,5 +397,5 @@ class ORToolsMatcherDifferentLoadingDockIndexTestCase(TestCase):
                                                      TimeDeltaExtension(timedelta(minutes=10))),
                                                  until=loading_dock.time_window.since.add_time_delta(
                                                      TimeDeltaExtension(timedelta(minutes=10)))))
-                                           )
+                                         )
         return [drone_delivery_1, drone_delivery_2]
