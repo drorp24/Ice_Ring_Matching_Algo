@@ -30,8 +30,8 @@ def add_delivery_board_with_row_per_edd(drawer: GanttDrawer, board: DroneDeliver
             continue
         drawer.add_row_area(
             row=delivery_row,
-            time_window=TimeWindowExtension(delivery.start_drone_loading_docks.delivery_time_window.since,
-                                            delivery.end_drone_loading_docks.delivery_time_window.since),
+            time_window=TimeWindowExtension(delivery.start_time_window.delivery_time_window.since,
+                                            delivery.end_time_window.delivery_time_window.since),
             edgecolor=OPERATING_TIME_WINDOW_COLOR)
         for request_index, request in enumerate(delivery.matched_requests):
             bar_color = Color.White
@@ -74,8 +74,8 @@ def add_delivery_board_with_row_per_drone_delivery(drawer: GanttDrawer, board: D
             continue
         drawer.add_row_area(
             row=delivery_row,
-            time_window=TimeWindowExtension(delivery.start_drone_loading_docks.delivery_time_window.since,
-                                            delivery.end_drone_loading_docks.delivery_time_window.since),
+            time_window=TimeWindowExtension(delivery.start_time_window.delivery_time_window.since,
+                                            delivery.end_time_window.delivery_time_window.since),
             edgecolor=OPERATING_TIME_WINDOW_COLOR)
         for request_index, request in enumerate(delivery.matched_requests):
             drawer.add_bar(

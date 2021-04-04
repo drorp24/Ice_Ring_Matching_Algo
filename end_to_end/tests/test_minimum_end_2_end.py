@@ -4,6 +4,7 @@ from pathlib import Path
 
 from common.entities.base_entities.drone import DroneType, PackageConfiguration
 from common.entities.base_entities.drone_formation import DroneFormationType
+from common.entities.base_entities.drone_loading_dock import DroneLoadingDock
 from common.entities.base_entities.fleet.empty_drone_delivery_board_generation import generate_empty_delivery_board
 from common.entities.base_entities.fleet.fleet_property_sets import DroneSetProperties, DroneFormationTypePolicy, \
     PackageConfigurationPolicy
@@ -35,6 +36,7 @@ class BasicMinimumEnd2End(unittest.TestCase):
                                   package_configuration_policy=PackageConfigurationPolicy(
                                       {PackageConfiguration.LARGE_X2: 0.4, PackageConfiguration.MEDIUM_X4: 0.2,
                                        PackageConfiguration.SMALL_X8: 0.2, PackageConfiguration.TINY_X16: 0.2}),
+                                  start_loading_dock=DroneLoadingDock
                                   drone_amount=30)
 
     def test_create_graph_model(self):

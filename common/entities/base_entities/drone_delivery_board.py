@@ -4,16 +4,16 @@ from functools import lru_cache
 from common.entities.base_entities.base_entity import JsonableBaseEntity
 from common.entities.base_entities.delivery_request import DeliveryRequest
 from common.entities.base_entities.drone import PackageTypeAmountMap
-from common.entities.base_entities.drone_delivery import DroneDelivery, EmptyDroneDelivery
+from common.entities.base_entities.drone_delivery import MatchedDelivery, DeliveringDrones
 from common.entities.base_entities.package import PackageType
 
 
 class EmptyDroneDeliveryBoard(JsonableBaseEntity):
-    def __init__(self, empty_drone_deliveries: [EmptyDroneDelivery]):
+    def __init__(self, empty_drone_deliveries: [DeliveringDrones]):
         self._empty_drone_deliveries = empty_drone_deliveries
 
     @property
-    def empty_drone_deliveries(self) -> [EmptyDroneDelivery]:
+    def empty_drone_deliveries(self) -> [DeliveringDrones]:
         return self._empty_drone_deliveries
 
     def amount_of_formations(self) -> int:
@@ -36,7 +36,7 @@ class EmptyDroneDeliveryBoard(JsonableBaseEntity):
     def dict_to_obj(cls, dict_input):
         assert (dict_input['__class__'] == cls.__name__)
         return EmptyDroneDeliveryBoard(
-            empty_drone_deliveries=[EmptyDroneDelivery.dict_to_obj(empty_drone_delivery_dict)
+            empty_drone_deliveries=[DeliveringDrones.dict_to_obj(empty_drone_delivery_dict)
                                     for empty_drone_delivery_dict
                                     in dict_input['empty_drone_deliveries']])
 
@@ -62,12 +62,12 @@ class UnmatchedDeliveryRequest(JsonableBaseEntity):
 
 
 class DroneDeliveryBoard(JsonableBaseEntity):
-    def __init__(self, drone_deliveries: [DroneDelivery], unmatched_delivery_requests: [UnmatchedDeliveryRequest]):
+    def __init__(self, drone_deliveries: [MatchedDelivery], unmatched_delivery_requests: [UnmatchedDeliveryRequest]):
         self._drone_deliveries = drone_deliveries
         self._unmatched_delivery_requests = unmatched_delivery_requests
 
     @property
-    def drone_deliveries(self) -> [DroneDelivery]:
+    def drone_deliveries(self) -> [MatchedDelivery]:
         return self._drone_deliveries
 
     @property
@@ -117,7 +117,7 @@ class DroneDeliveryBoard(JsonableBaseEntity):
     def dict_to_obj(cls, dict_input):
         assert (dict_input['__class__'] == cls.__name__)
         return DroneDeliveryBoard(
-            drone_deliveries=[DroneDelivery.dict_to_obj(drone_delivery_dict) for drone_delivery_dict in
+            drone_deliveries=[MatchedDelivery.dict_to_obj(drone_delivery_dict) for drone_delivery_dict in
                               dict_input['drone_deliveries']],
             unmatched_delivery_requests=[UnmatchedDeliveryRequest.dict_to_obj(unmatched_dict) for unmatched_dict in
                                          dict_input['unmatched_delivery_requests']])

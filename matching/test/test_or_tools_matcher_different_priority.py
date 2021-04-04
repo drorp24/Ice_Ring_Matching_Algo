@@ -6,7 +6,7 @@ from unittest import TestCase
 
 from common.entities.base_entities.delivery_request import DeliveryRequest
 from common.entities.base_entities.drone import DroneType
-from common.entities.base_entities.drone_delivery import EmptyDroneDelivery, DroneDelivery, MatchedDeliveryRequest, \
+from common.entities.base_entities.drone_delivery import DeliveringDrones, MatchedDelivery, MatchedDeliveryRequest, \
     MatchedDroneLoadingDock
 from common.entities.base_entities.drone_delivery_board import UnmatchedDeliveryRequest, DroneDeliveryBoard, \
     EmptyDroneDeliveryBoard
@@ -103,7 +103,7 @@ class ORToolsMatcherDifferentPriorityTestCase(TestCase):
 
     @staticmethod
     def _create_empty_board() -> EmptyDroneDeliveryBoard:
-        empty_drone_delivery_1 = EmptyDroneDelivery(EntityID(uuid.uuid4()), DroneFormations.get_drone_formation(
+        empty_drone_delivery_1 = DeliveringDrones(EntityID(uuid.uuid4()), DroneFormations.get_drone_formation(
             DroneFormationType.PAIR, PackageConfigurationOption.LARGE_PACKAGES, DroneType.drone_type_1))
         return EmptyDroneDeliveryBoard([empty_drone_delivery_1])
 
@@ -127,10 +127,10 @@ class ORToolsMatcherDifferentPriorityTestCase(TestCase):
 
     @staticmethod
     def _create_drone_deliveries(delivery_requests: List[DeliveryRequest], empty_board: EmptyDroneDeliveryBoard,
-                                 loading_dock: DroneLoadingDock) -> List[DroneDelivery]:
-        drone_delivery_1 = DroneDelivery(id_=empty_board.empty_drone_deliveries[0].id,
-                                         drone_formation=empty_board.empty_drone_deliveries[0].drone_formation,
-                                         matched_requests=[MatchedDeliveryRequest(
+                                 loading_dock: DroneLoadingDock) -> List[MatchedDelivery]:
+        drone_delivery_1 = MatchedDelivery(id_=empty_board.empty_drone_deliveries[0].id,
+                                           drone_formation=empty_board.empty_drone_deliveries[0].drone_formation,
+                                           matched_requests=[MatchedDeliveryRequest(
                                              graph_index=1,
                                              delivery_request=delivery_requests[0],
                                              matched_delivery_option_index=0,
@@ -149,13 +149,13 @@ class ORToolsMatcherDifferentPriorityTestCase(TestCase):
                                                      until=ZERO_TIME.add_time_delta(
                                                          TimeDeltaExtension(timedelta(minutes=15))))),
                                          ],
-                                         start_drone_loading_docks=MatchedDroneLoadingDock(
+                                           start_matched_loading_dock=MatchedDroneLoadingDock(
                                              graph_index=0,
                                              drone_loading_dock=loading_dock,
                                              delivery_time_window=TimeWindowExtension(
                                                  since=loading_dock.time_window.since,
                                                  until=loading_dock.time_window.since)),
-                                         end_drone_loading_docks=MatchedDroneLoadingDock(
+                                           end_matched_loading_dock=MatchedDroneLoadingDock(
                                              graph_index=0,
                                              drone_loading_dock=loading_dock,
                                              delivery_time_window=TimeWindowExtension(
@@ -163,5 +163,5 @@ class ORToolsMatcherDifferentPriorityTestCase(TestCase):
                                                      TimeDeltaExtension(timedelta(minutes=30))),
                                                  until=loading_dock.time_window.since.add_time_delta(
                                                      TimeDeltaExtension(timedelta(minutes=30)))))
-                                         )
+                                           )
         return [drone_delivery_1]

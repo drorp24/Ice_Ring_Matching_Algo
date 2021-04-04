@@ -14,6 +14,8 @@ from common.entities.base_entities.drone_loading_dock import DroneLoadingDock
 from common.entities.base_entities.drone_loading_station import DroneLoadingStation
 from common.entities.base_entities.entity_distribution.delivery_requestion_dataset_builder import \
     build_delivery_request_distribution
+from common.entities.base_entities.entity_distribution.drone_loading_dock_distribution import \
+    DroneLoadingDockDistribution
 from common.entities.base_entities.entity_distribution.package_distribution import PackageDistribution
 from common.entities.base_entities.entity_distribution.priority_distribution import ExactPriorityDistribution
 from common.entities.base_entities.entity_distribution.temporal_distribution import ExactTimeWindowDistribution
@@ -35,12 +37,12 @@ from matching.solver_config import SolverVendor
 ZERO_TIME = DateTimeExtension(dt_date=date(2020, 1, 23), dt_time=time(11, 30, 0))
 
 
-class ORToolsMatcherReloadWithDifferentPriorityTestCase(TestCase):
+class ORToolsMatcherReloadWithMultipleDepotsTestCase(TestCase):
     @classmethod
     def setUpClass(cls):
         cls.delivery_requests = cls._create_delivery_requests()
-        cls.loading_dock = cls._create_loading_dock()
-        cls.graph = cls._create_graph(cls.delivery_requests, cls.loading_dock)
+        cls.loading_docks = cls._create_loading_docks()
+        cls.graph = cls._create_graph(cls.delivery_requests, cls.loading_docks)
         cls.empty_board = cls._create_empty_board()
         cls.match_input = MatcherInput(cls.graph, cls.empty_board, cls._create_match_config())
         matcher = ORToolsMatcher(cls.match_input)
@@ -101,19 +103,20 @@ class ORToolsMatcherReloadWithDifferentPriorityTestCase(TestCase):
         return dist.choose_rand(Random(42), amount={DeliveryRequest: 17})
 
     @staticmethod
-    def _create_loading_dock() -> DroneLoadingDock:
-        return DroneLoadingDock(EntityID.generate_uuid(),
-                                DroneLoadingStation(EntityID.generate_uuid(), create_point_2d(0, 0)),
-                                DroneType.drone_type_1,
-                                TimeWindowExtension(
-                                    since=ZERO_TIME,
-                                    until=ZERO_TIME.add_time_delta(
-                                        TimeDeltaExtension(timedelta(hours=5)))))
+    def _create_loading_docks() -> [DroneLoadingDock]:
+        return DroneLoadingDockDistribution().choose_rand(random=Random(42), amount=2)
+        # return DroneLoadingDock(EntityID.generate_uuid(),
+        #                         DroneLoadingStation(EntityID.generate_uuid(), create_point_2d(0, 0)),
+        #                         DroneType.drone_type_1,
+        #                         TimeWindowExtension(
+        #                             since=ZERO_TIME,
+        #                             until=ZERO_TIME.add_time_delta(
+        #                                 TimeDeltaExtension(timedelta(hours=5)))))
 
     @staticmethod
-    def _create_graph(delivery_requests: List[DeliveryRequest], loading_dock: DroneLoadingDock) -> OperationalGraph:
+    def _create_graph(delivery_requests: List[DeliveryRequest], loading_docks: [DroneLoadingDock]) -> OperationalGraph:
         graph = OperationalGraph()
-        graph.add_drone_loading_docks([loading_dock])
+        graph.add_drone_loading_docks(loading_docks)
         graph.add_delivery_requests(delivery_requests)
         build_fully_connected_graph(graph)
         return graph

@@ -1,4 +1,4 @@
-from common.entities.base_entities.drone_delivery import EmptyDroneDelivery
+from common.entities.base_entities.drone_delivery import DeliveringDrones
 from common.entities.base_entities.drone_delivery import DEFAULT_MAX_ROUTE_TIME_IN_MINUTES, DEFAULT_VELOCITY_METER_PER_SEC
 from common.entities.base_entities.drone_delivery_board import EmptyDroneDeliveryBoard
 from common.entities.base_entities.entity_id import EntityID
@@ -22,14 +22,14 @@ def _calc_drone_formation_amounts(formation_sizes_amounts: FormationSizesAmounts
 
 def calc_drone_deliveries(platform_properties: PlatformPropertySet,
                           max_route_time_entire_board: int = DEFAULT_MAX_ROUTE_TIME_IN_MINUTES,
-                          velocity_entire_board: float = DEFAULT_VELOCITY_METER_PER_SEC) -> [EmptyDroneDelivery]:
+                          velocity_entire_board: float = DEFAULT_VELOCITY_METER_PER_SEC) -> [DeliveringDrones]:
     empty_deliveries = []
     formation_sizes_amounts = _calc_formation_amounts(platform_properties)
     drone_formations_per_type_amounts = _calc_drone_formation_amounts(formation_sizes_amounts, platform_properties)
     for drone_formation, amount in drone_formations_per_type_amounts.amounts.items():
         for i in range(amount):
-            empty_deliveries.append(EmptyDroneDelivery(EntityID(uuid.uuid4()), drone_formation,
-                                                       max_route_time_entire_board, velocity_entire_board))
+            empty_deliveries.append(DeliveringDrones(EntityID(uuid.uuid4()), drone_formation,
+                                                     max_route_time_entire_board, velocity_entire_board))
     return empty_deliveries
 
 

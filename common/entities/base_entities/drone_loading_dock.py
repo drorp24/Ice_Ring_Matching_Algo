@@ -39,10 +39,6 @@ class DroneLoadingDock(JsonableBaseEntity, Localizable, Temporal, ShapeableColle
     def time_window(self) -> TimeWindowExtension:
         return self._time_window
 
-    @property
-    def priority(self) -> int:
-        return 0
-
     def calc_location(self) -> Point2D:
         return self.drone_loading_station.location
 
