@@ -93,7 +93,6 @@ class BasicPointTestCase(unittest.TestCase):
 
     def test_sampling_uniform_points_not_in_polygon(self):
         points = self.ppd.choose_rand(Random(42), 200)
-        print(any([p not in self.polygon2 for p in points]))
         self.assertTrue(any([p not in self.polygon2 for p in points]))
 
     def test_sampling_normal_points_in_polygon(self):
@@ -109,7 +108,7 @@ class BasicPointTestCase(unittest.TestCase):
         self.assertTrue(all([p in self.polygon1 or self.polygon3 for p in points]))
 
     @staticmethod
-    def _plot_points_distribution(self, points: List[Point2D]):
+    def _plot_points_distribution(points: List[Point2D]):
         x = [p.x for p in points]
         y = [p.y for p in points]
         fig, ax = plt.subplots()

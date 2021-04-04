@@ -7,13 +7,12 @@ from common.entities.base_entities.delivery_request import DeliveryRequest
 from common.entities.base_entities.drone_loading_dock import DroneLoadingDock
 from common.entities.base_entities.entity_distribution.delivery_requestion_dataset_builder import \
     build_zone_delivery_request_distribution
+from common.entities.base_entities.entity_id import EntityID
 from common.entities.base_entities.zone import Zone
 from experiment_space.distribution.supplier_category_distribution import SupplierCategoryDistribution
 from experiment_space.supplier_category import SupplierCategory
 from geometry.distribution.geo_distribution import NormalPointsInMultiPolygonDistribution
 from geometry.geo_factory import create_polygon_2d, create_point_2d, create_multipolygon_2d
-from common.entities.base_entities.entity_id import EntityID
-from uuid import uuid4
 
 
 class BasicSupplierCategoryTests(unittest.TestCase):

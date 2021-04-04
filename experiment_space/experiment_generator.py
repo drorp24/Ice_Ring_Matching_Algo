@@ -29,7 +29,7 @@ class Options:
 
     def get_first_sample(self):
         d = {k: v[0] for k, v in self.__dict__.items() if k is not 'internal_class' and k[:1] != '_'}
-        a = self.__getattribute__(self, 'internal_class')
+        a = self.__getattr__(self, 'internal_class')
         return a(**d)
 
     def calc_cartesian_product(self):
@@ -60,9 +60,9 @@ class Options:
 
     @staticmethod
     def _extract_internal_list(options):
-        return {op[0]: op[1][0]['internal_list']
-        if isinstance(op[1], list) and isinstance(op[1][0], dict) and 'internal_list' in
-           op[1][0].keys() else op[1] for op in options.items()}
+        return {op[0]: op[1][0]['internal_list'] if isinstance(op[1], list) and isinstance(op[1][0], dict)
+                                                    and 'internal_list' in op[1][0].keys() else op[1] for
+                op in options.items()}
 
     @staticmethod
     def _dict_of_lists_to_generator_of_dicts(options):
@@ -73,8 +73,8 @@ class Options:
         return hasattr(i, '__name__') and 'Options' in i.__name__
 
 
-def _flatten(input: Union[List, object]) -> Union[List, object]:
-    return [item for sublist in input for item in sublist] if isinstance(input, list) else input
+def _flatten(input_list: Union[List, object]) -> Union[List, object]:
+    return [item for sublist in input_list for item in sublist] if isinstance(input_list, list) else input_list
 
 
 def _extract_properties_from_class(base_instance):
@@ -82,11 +82,10 @@ def _extract_properties_from_class(base_instance):
             k[:1] != '_' and not callable(getattr(type(base_instance), k))]
 
 
-def _extract_properties_option_from_class(base_instance, hierarchical_classes: List[str] = []):
-    if dataclasses.is_dataclass(base_instance):  # base_instance.internal_dict(member)
+def _extract_properties_option_from_class(base_instance, hierarchical_classes: List[str]):
+    if dataclasses.is_dataclass(base_instance):
         d = {member: [_calc_internal_extract(base_instance.__getattribute__(member), hierarchical_classes)] for member
-             in
-             base_instance.__annotations__.keys()}
+             in base_instance.__annotations__.keys()}
     else:
         d = {k: [_calc_internal_extract(base_instance.__getattribute__(k), hierarchical_classes)] for k, v in
              type(base_instance).__dict__.items() if k[:1] != '_' and not callable(getattr(type(base_instance), k))}

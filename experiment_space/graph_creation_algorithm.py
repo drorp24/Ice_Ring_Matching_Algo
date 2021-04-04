@@ -1,14 +1,25 @@
 from abc import abstractmethod
 
+from common.entities.base_entities.base_entity import JsonableBaseEntity
 from common.graph.operational.graph_creator import *
+from common.utils.class_controller import name_to_class
 from experiment_space.supplier_category import SupplierCategory
 
 
-class GraphCreationAlgorithm:
+class GraphCreationAlgorithm(JsonableBaseEntity):
 
     @abstractmethod
     def create(self, supplier_category: SupplierCategory):
         pass
+
+    @classmethod
+    @abstractmethod
+    def dict_to_obj(cls, dict_input):
+        pass
+
+
+def create_graph_algorithm_by_name(graph_algorithm_name: str):
+    return name_to_class(graph_algorithm_name, __name__)
 
 
 class FullyConnectedGraphAlgorithm(GraphCreationAlgorithm):
@@ -17,14 +28,33 @@ class FullyConnectedGraphAlgorithm(GraphCreationAlgorithm):
         self._edge_cost_factor = edge_cost_factor
         self._edge_travel_time_factor = edge_travel_time_factor
 
+    @property
+    def edge_cost_factor(self):
+        return self._edge_cost_factor
+
+    @property
+    def edge_travel_time_factor(self):
+        return self._edge_travel_time_factor
+
     def create(self, supplier_category: SupplierCategory):
         operational_graph = OperationalGraph()
         operational_graph.add_drone_loading_docks(supplier_category.drone_loading_docks)
         operational_graph.add_delivery_requests(supplier_category.delivery_requests)
         build_time_overlapping_dependent_connected_graph(operational_graph,
-                                                         self._edge_cost_factor,
-                                                         self._edge_travel_time_factor)
+                                                         self.edge_cost_factor,
+                                                         self.edge_travel_time_factor)
         return operational_graph
+
+    @classmethod
+    def dict_to_obj(cls, dict_input):
+        return FullyConnectedGraphAlgorithm(
+            edge_cost_factor=dict_input['edge_cost_factor'],
+            edge_travel_time_factor=dict_input['edge_travel_time_factor']
+        )
+
+    def __eq__(self, other):
+        return self.edge_cost_factor == other.edge_cost_factor and \
+               self.edge_travel_time_factor == other.edge_travel_time_factor
 
 
 class ClusteredDeliveryRequestGraphAlgorithm(GraphCreationAlgorithm):
@@ -36,6 +66,26 @@ class ClusteredDeliveryRequestGraphAlgorithm(GraphCreationAlgorithm):
         self._edge_travel_time_factor = edge_travel_time_factor
         self._max_clusters_per_zone = max_clusters_per_zone
 
+    @property
+    def edge_cost_factor(self):
+        return self._edge_cost_factor
+
+    @property
+    def edge_travel_time_factor(self):
+        return self._edge_travel_time_factor
+
+    @property
+    def max_clusters_per_zone(self):
+        return self._max_clusters_per_zone
+
+    @classmethod
+    def dict_to_obj(cls, dict_input):
+        return ClusteredDeliveryRequestGraphAlgorithm(
+            edge_cost_factor=dict_input['edge_cost_factor'],
+            edge_travel_time_factor=dict_input['edge_travel_time_factor'],
+            max_clusters_per_zone=dict_input['max_clusters_per_zone']
+        )
+
     def create(self, supplier_category: SupplierCategory):
         return create_clustered_delivery_requests_graph(delivery_requests=supplier_category.delivery_requests,
                                                         drone_loading_docks=supplier_category.drone_loading_docks,
@@ -43,3 +93,8 @@ class ClusteredDeliveryRequestGraphAlgorithm(GraphCreationAlgorithm):
                                                         edge_cost_factor=self._edge_cost_factor,
                                                         edge_travel_time_factor=self._edge_travel_time_factor,
                                                         max_clusters=self._max_clusters_per_zone)
+
+    def __eq__(self, other):
+        return self.edge_cost_factor == other.edge_cost_factor and \
+               self.edge_travel_time_factor == other.edge_travel_time_factor and \
+               self.max_clusters_per_zone == other.max_clusters_per_zone
