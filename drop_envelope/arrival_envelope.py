@@ -1,3 +1,4 @@
+import sys
 from math import cos, sin
 from typing import List, Dict, Union
 from common.math.angle import Angle, AngleUnit
@@ -22,15 +23,16 @@ class ArrivalEnvelope:
                                    repr_point=centroid,
                                    maneuver_polygon=create_empty_geometry_2d())
 
-        maneuver_factor = list(map(lambda angle_factor:
-                                   1 / (2 * resolution_parameter) * angle_factor,
-                                   list(range(-resolution_parameter, resolution_parameter + 1))))
-        observation_angles = list(map(lambda factor:
-                                      Angle(value=observation_angle.degrees + factor * maneuver_angle.degrees,
-                                            unit=AngleUnit.DEGREE), maneuver_factor))
-        outer_arcs_points = list(map(lambda angle: create_point_2d(x=centroid.x + radius * cos(angle.radians),
-                                                                   y=centroid.y + radius * sin(angle.radians))
-                                     , observation_angles))
+        resolution_parameter_list = list(range(-resolution_parameter, resolution_parameter + 1))
+        maneuver_factor = [1 / (2 * resolution_parameter) * angle_factor for angle_factor in resolution_parameter_list]
+
+        observation_angles = [
+            Angle(value=observation_angle.degrees + factor * maneuver_angle.degrees, unit=AngleUnit.DEGREE) for factor
+            in maneuver_factor]
+
+        outer_arcs_points = [
+            create_point_2d(x=centroid.x + radius * cos(angle.radians), y=centroid.y + radius * sin(angle.radians)) for
+            angle in observation_angles]
         return ArrivalEnvelope(arrival_azimuth=arrival_azimuth,
                                repr_point=outer_arcs_points[resolution_parameter],
                                maneuver_polygon=create_polygon_2d([centroid] + outer_arcs_points))
@@ -53,7 +55,7 @@ class ArrivalEnvelope:
     def contains(self, point: Point2D) -> bool:
         if isinstance(self.maneuver_polygon, EmptyGeometry2D):
             return point == self.repr_point
-        return self.maneuver_polygon.__contains__(point)
+        return point in self.maneuver_polygon
 
     def contains_any(self, points: List[Point2D]) -> bool:
         if isinstance(self.maneuver_polygon, EmptyGeometry2D):
@@ -64,8 +66,8 @@ class ArrivalEnvelope:
         return all([self.contains_any(points) for points in points_collection])
 
     def __eq__(self, other):
-        return self.repr_point == other.repr_point and self.arrival_azimuth == other.arrival_azimuth and \
-               self.maneuver_polygon == other.maneuver_polygon
+        return all([self.repr_point == other.repr_point, self.arrival_azimuth == other.arrival_azimuth,
+                    self.maneuver_polygon == other.maneuver_polygon])
 
 
 class PotentialArrivalEnvelope:
@@ -82,15 +84,24 @@ class PotentialArrivalEnvelope:
     def centroid(self) -> Point2D:
         return self._centroid
 
+    def __eq__(self, other):
+        return self.arrival_envelopes == other.arrival_envelopes and self.centroid == other.centroid
+
     def get_arrival_envelope(self, arrival_azimuth: Angle) -> ArrivalEnvelope:
         return self.arrival_envelopes[arrival_azimuth]
 
 
+def inner_calc(ar_tuple) -> float:
+    cost = ar_tuple[0].calc_cost(ar_tuple[1]) * (
+                2 - cos(ar_tuple[0].arrival_azimuth.radians - ar_tuple[1].arrival_azimuth.radians))
+    return cost
+
+
 def calc_cost(potential_arrival_envelope_1: PotentialArrivalEnvelope,
               potential_arrival_envelope_2: PotentialArrivalEnvelope) -> float:
-    arrival_envelopes_tuples = itertools.product(*[potential_arrival_envelope_1.arrival_envelopes.values(),
-                                                   potential_arrival_envelope_2.arrival_envelopes.values()])
-    costs = list(map(lambda ar_tuple: ar_tuple[0].calc_cost(ar_tuple[1]) *
-                                      (2 - cos(ar_tuple[0].arrival_azimuth.radians -
-                                               ar_tuple[1].arrival_azimuth.radians)), arrival_envelopes_tuples))
+    arrival_envelopes_tuples = itertools.product(potential_arrival_envelope_1.arrival_envelopes.values(),
+                                                 potential_arrival_envelope_2.arrival_envelopes.values())
+    costs = [inner_calc(ar_tuple) for ar_tuple in arrival_envelopes_tuples]
+    if len(costs) == 0:
+        return sys.maxsize
     return min(costs)

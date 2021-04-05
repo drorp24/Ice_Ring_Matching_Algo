@@ -9,8 +9,6 @@ from common.entities.base_entities.temporal import DateTimeExtension, TimeWindow
 from visualization.basic.color import Color
 from visualization.basic.gantt_drawer import GanttDrawer
 
-BARS_IN_ROW = 5
-BAR_HEIGHT_RATIO = 1 / BARS_IN_ROW
 MARK_WIDTH_RATIO = 0.1
 YLIMIT = 100
 BAR_ALPHA = 0.6
@@ -29,9 +27,7 @@ class PltGanttDrawer(GanttDrawer):
         self._fig, self._ax = plt.subplots()
         self._row_names = row_names
         self._rows_title = rows_title
-        self._counters = np.zeros(len(row_names))
         self._row_y_factor = YLIMIT / len(row_names)
-        self._bar_height = self._row_y_factor * BAR_HEIGHT_RATIO
 
         self._set_plot_limits()
         self._set_xtick_locations_and_labels()
@@ -42,20 +38,31 @@ class PltGanttDrawer(GanttDrawer):
         self._ax.grid(b=True)
 
     def add_bar(self, row: int, time_window: TimeWindowExtension, name: str, time_mark: DateTimeExtension = None,
-                side_text: str = None, color: Color = Color.Blue) -> None:
+                side_text: str = None, color: Color = Color.Blue, inner_row: int = 0, max_inner_rows: int = 1) -> None:
         since, until = time_window.get_relative_time_in_min(self._zero_time)
-        y = self._calc_y(row)
-        self._ax.barh(y=y, width=until - since, height=self._bar_height, left=since,
-                      color=color.get_rgb_with_alpha(BAR_ALPHA), label=name,
-                      edgecolor=Color.Black.get_rgb(), linewidth=1)
-        if side_text:
-            self._ax.text(x=until + MARK_WIDTH_RATIO * self._hours_period, y=y - self._bar_height / 2, s=side_text,
-                          color=Color.Black.get_rgb(), fontsize=9)
-        if time_mark:
-            relative_time_in_min = time_mark.get_time_delta(self._zero_time).in_minutes()
-            width = MARK_WIDTH_RATIO * self._hours_period
-            self._ax.barh(y=y, width=width, height=self._bar_height, left=relative_time_in_min - width / 2,
-                          color=color.Black.get_rgb())
+        bar_height = self._row_y_factor * 1 / max_inner_rows
+        y = self._calc_y(row, inner_row, bar_height)
+        if color is not Color.White:
+            self._ax.barh(y=y, width=until - since, height=bar_height, left=since,
+                          color=color.get_rgb_with_alpha(BAR_ALPHA), label=name,
+                          edgecolor=Color.Black.get_rgb(), linewidth=1)
+            if time_mark:
+                relative_time_in_min = time_mark.get_time_delta(self._zero_time).in_minutes()
+                mark_width = MARK_WIDTH_RATIO * self._hours_period
+                self._ax.barh(y=y, width=mark_width, height=bar_height, left=relative_time_in_min - mark_width / 2,
+                              color=color.Black.get_rgb())
+            if side_text:
+                self._ax.text(x=until + MARK_WIDTH_RATIO * self._hours_period, y=y - bar_height / 2, s=side_text,
+                              color=Color.Black.get_rgb(), fontsize=9)
+        else:
+            if time_mark:
+                relative_time_in_min = time_mark.get_time_delta(self._zero_time).in_minutes()
+                mark_width = MARK_WIDTH_RATIO * self._hours_period
+                self._ax.barh(y=y, width=mark_width, height=bar_height, left=relative_time_in_min - mark_width / 2,
+                              color=color.Black.get_rgb())
+                if side_text:
+                    self._ax.text(x=relative_time_in_min + mark_width, y=y - bar_height / 2, s=side_text,
+                                  color=Color.Black.get_rgb(), fontsize=9)
 
     def add_row_area(self, row: int, time_window: TimeWindowExtension,
                      facecolor: Color = Color.Red, face_alpha: float = 0,
@@ -110,11 +117,9 @@ class PltGanttDrawer(GanttDrawer):
                 self._ax.axhspan(i * self._row_y_factor, (i + 1) * self._row_y_factor,
                                  facecolor=Color.Grey.get_rgb_with_alpha(BACKGROUND_ALPHA / 2))
 
-    def _calc_y(self, row: int) -> float:
-        # To prevent bars override we change their height
-        bar_center = self._bar_height / 2
+    def _calc_y(self, row: int, inner_row: int, bar_height: float) -> float:
+        bar_center = bar_height / 2
         row_height = (row - 1) * self._row_y_factor
-        bar_height_in_row = self._counters[row - 1] * self._bar_height
+        bar_height_in_row = inner_row * bar_height
         y = row_height + bar_height_in_row + bar_center
-        self._counters[row - 1] = (self._counters[row - 1] + 1) % BARS_IN_ROW
         return y

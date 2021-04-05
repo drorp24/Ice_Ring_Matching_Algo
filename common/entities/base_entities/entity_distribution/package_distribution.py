@@ -9,8 +9,12 @@ from common.entities.distribution.distribution import ChoiceDistribution
 
 class PackageDistribution(ChoiceDistribution):
     def __init__(self, package_distribution_dict={}):
-        super().__init__({package_type: package_distribution_dict.get(package_type, 0)
-                          for package_type in PackageType})
+        package_distribution_per_type = {package_type: package_distribution_dict.get(package_type, 0)
+         for package_type in PackageType}
+        if sum(package_distribution_dict.values()) != sum(package_distribution_per_type.values()):
+            raise RuntimeError(
+                f"Got invalid package_distribution_dict={package_distribution_dict}. Keys must be of PackageType.")
+        super().__init__(package_distribution_per_type)
 
     def choose_rand(self, random: Random, amount=1) -> List[PackageType]:
         return super().choose_rand(random=random, amount=amount)

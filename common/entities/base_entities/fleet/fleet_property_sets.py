@@ -73,7 +73,7 @@ class DroneSetProperties(JsonableBaseEntity):
 
 @dataclass
 class BoardLevelProperties(JsonableBaseEntity):
-    max_route_time_entire_board: int = 400
+    max_route_time_entire_board: int = 1440
     velocity_entire_board: float = 10.0
 
     @classmethod

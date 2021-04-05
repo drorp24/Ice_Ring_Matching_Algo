@@ -18,29 +18,36 @@
     "vendor": {
       "__enum__": "SolverVendor.OR_TOOLS"
     },
-    "first_solution_strategy": "path_cheapest_arc",
-    "local_search_strategy": "automatic",
-    "timeout_sec": 60
+    "first_solution_strategy": "PATH_CHEAPEST_ARC",
+    "local_search_strategy": "GUIDED_LOCAL_SEARCH",
+    "timeout_sec": 30
   },
   "constraints": {
     "__class__": "ConstraintsConfig",
     "capacity": {
       "__class__": "CapacityConstraints",
       "count_capacity_from_zero": true,
-      "capacity_cost_coefficient":1
+      "capacity_cost_coefficient": 10000
     },
-    "time": {
-      "__class__": "TimeConstraints",
+    "travel_time": {
+      "__class__": "TravelTimeConstraints",
       "max_waiting_time": 0,
-      "max_route_time": 30000000000,
-      "count_time_from_zero": false
+      "max_route_time": 1440,
+      "count_time_from_zero": false,
+      "reloading_time": 120
+    },
+    "session_time": {
+      "__class__": "SessionTimeConstraints",
+      "max_session_time": 60
     },
     "priority": {
       "__class__": "PriorityConstraints",
-      "count_priority_from_zero": true
+      "count_priority_from_zero": true,
+      "priority_cost_coefficient": 1000
     }
   },
-  "unmatched_penalty": 1000
+  "unmatched_penalty": 10000,
+  "reload_per_vehicle": 3
 }
 
 

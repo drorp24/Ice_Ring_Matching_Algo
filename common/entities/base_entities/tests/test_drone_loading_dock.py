@@ -2,6 +2,7 @@ import unittest
 from random import Random
 
 from common.entities.base_entities.drone_loading_dock import DroneLoadingDock
+from common.entities.base_entities.entity_id import EntityID
 from common.entities.base_entities.entity_distribution.drone_loading_dock_distribution import \
     DroneLoadingDockDistribution
 
@@ -17,9 +18,10 @@ class BasicDroneLoadingDockGenerationTests(unittest.TestCase):
         docks = drone_loading_dock_distribution.choose_rand(random=Random(100), amount=self.num_of_drone_docks)
         self.assertEqual(len(docks), self.num_of_drone_docks)
         self.assertIsInstance(docks[0], DroneLoadingDock)
+        self.assertIsInstance(docks[0].id, EntityID)
 
     def test_drone_loading_dock_as_shapeable_collection(self):
         drone_loading_dock_distribution = DroneLoadingDockDistribution()
         dock = drone_loading_dock_distribution.choose_rand(random=Random(100), amount=1)[0]
-        self.assertEqual(dock.get_shapeabls(), [dock.drone_loading_station])
+        self.assertEqual(dock.get_shapeables(), [dock.drone_loading_station])
         self.assertEqual(dock.get_centroid(), dock.drone_loading_station.location)

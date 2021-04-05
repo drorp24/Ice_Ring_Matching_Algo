@@ -24,7 +24,8 @@ from common.graph.operational.graph_creator import build_fully_connected_graph
 from common.graph.operational.operational_graph import OperationalGraph
 from geometry.distribution.geo_distribution import ExactPointLocationDistribution
 from geometry.geo_factory import create_point_2d
-from matching.constraint_config import ConstraintsConfig, CapacityConstraints, TimeConstraints, PriorityConstraints
+from matching.constraint_config import ConstraintsConfig, CapacityConstraints, TravelTimeConstraints, \
+    PriorityConstraints, SessionTimeConstraints
 from matching.matcher_config import MatcherConfig
 from matching.matcher_input import MatcherInput
 from matching.ortools.ortools_matcher import ORToolsMatcher
@@ -90,12 +91,12 @@ class ORToolsMatcherDropPenaltyTestCase(TestCase):
                     since=ZERO_TIME,
                     until=ZERO_TIME.add_time_delta(TimeDeltaExtension(timedelta(minutes=30)))),
             ]),
-            package_type_distribution=PackageDistribution({PackageType.LARGE.name: 1}))
+            package_type_distribution=PackageDistribution({PackageType.LARGE: 1}))
         return dist.choose_rand(Random(42), amount={DeliveryRequest: 3})
 
     @staticmethod
     def _create_loading_dock() -> DroneLoadingDock:
-        return DroneLoadingDock(DroneLoadingStation(create_point_2d(0, 0)),
+        return DroneLoadingDock(EntityID.generate_uuid(),DroneLoadingStation(EntityID.generate_uuid(),create_point_2d(0, 0)),
                                 DroneType.drone_type_1,
                                 TimeWindowExtension(
                                     since=ZERO_TIME,
@@ -125,12 +126,16 @@ class ORToolsMatcherDropPenaltyTestCase(TestCase):
             solver=ORToolsSolverConfig(first_solution_strategy="path_cheapest_arc",
                                        local_search_strategy="automatic", timeout_sec=30),
             constraints=ConstraintsConfig(
-                capacity=CapacityConstraints(count_capacity_from_zero=True),
-                time=TimeConstraints(max_waiting_time=10,
-                                     max_route_time=300,
-                                     count_time_from_zero=False),
-                priority=PriorityConstraints(True)),
-            unmatched_penalty=0)
+                capacity_constraints=CapacityConstraints(count_capacity_from_zero=True, capacity_cost_coefficient=1),
+                travel_time_constraints=TravelTimeConstraints(max_waiting_time=10,
+                                                              max_route_time=1440,
+                                                              count_time_from_zero=False,
+                                                              reloading_time=0),
+                session_time_constraints=SessionTimeConstraints(max_session_time=300),
+                priority_constraints=PriorityConstraints(True, priority_cost_coefficient=1)),
+            unmatched_penalty=0,
+            reload_per_vehicle=0
+        )
 
     @staticmethod
     def _create_unmatched(delivery_requests: List[DeliveryRequest]):

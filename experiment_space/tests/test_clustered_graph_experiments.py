@@ -1,3 +1,4 @@
+import os
 import unittest
 from datetime import time, date, timedelta, datetime
 from pathlib import Path
@@ -43,32 +44,38 @@ class BasicMinimumEnd2EndClusteredDrsTest(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        match_config_file_path = Path('experiment_space/tests/jsons/test_matcher_config.json')
+        match_config_file_path = Path('end_to_end/tests/jsons/test_min_e2e_config.json')
         cls.match_config = MatcherConfig.dict_to_obj(MatcherConfig.json_to_dict(match_config_file_path))
 
         cls.mapImage = MapImage(map_background_path=Path(r"visualization/basic/gush_dan_background.Png"),
                                 west_lon=34.83927, east_lon=35.32341, south_lat=31.77279, north_lat=32.19276)
 
+    @unittest.skipIf(os.environ.get('NO_SLOW_TESTS', False), 'slow tests')
     def test_1_zone_1_centroid(self):
         self._test_cluster_graph_algorithm(zone_amount=1, max_centroids_per_zone=1, drs_amount=37, docks_amount=1,
                                            max_clusters_per_zone=5, dr_timewindow=18, draw_match=False)
 
+    @unittest.skipIf(os.environ.get('NO_SLOW_TESTS', False), 'slow tests')
     def test_1_zone_2_centroids(self):
         self._test_cluster_graph_algorithm(zone_amount=1, max_centroids_per_zone=2, drs_amount=37, docks_amount=1,
                                            max_clusters_per_zone=5, dr_timewindow=18, draw_match=False)
 
+    @unittest.skipIf(os.environ.get('NO_SLOW_TESTS', False), 'slow tests')
     def test_1_zone_3_centroids(self):
         self._test_cluster_graph_algorithm(zone_amount=1, max_centroids_per_zone=3, drs_amount=37, docks_amount=1,
                                            max_clusters_per_zone=5, dr_timewindow=18, draw_match=False)
 
+    @unittest.skipIf(os.environ.get('NO_SLOW_TESTS', False), 'slow tests')
     def test_2_zones_1_centroid(self):
         self._test_cluster_graph_algorithm(zone_amount=2, max_centroids_per_zone=1, drs_amount=37, docks_amount=1,
                                            max_clusters_per_zone=3, dr_timewindow=23, draw_match=False)
 
+    @unittest.skipIf(os.environ.get('NO_SLOW_TESTS', False), 'slow tests')
     def test_2_zones_2_centroids(self):
         self._test_cluster_graph_algorithm(zone_amount=2, max_centroids_per_zone=2, drs_amount=37, docks_amount=1,
                                            max_clusters_per_zone=3, dr_timewindow=18, draw_match=False)
 
+    @unittest.skipIf(os.environ.get('NO_SLOW_TESTS', False), 'slow tests')
     def test_2_zones_3_centroids(self):
         self._test_cluster_graph_algorithm(zone_amount=2, max_centroids_per_zone=3, drs_amount=37, docks_amount=1,
                                            max_clusters_per_zone=3, dr_timewindow=18, draw_match=False)
@@ -102,9 +109,9 @@ class BasicMinimumEnd2EndClusteredDrsTest(unittest.TestCase):
                                                       max_clusters=max_clusters_per_zone).values()),
                 sort_delivery_requests_by_zone(supplier_category.delivery_requests, supplier_category.zones).items()))))
 
-        expected_num_edge_in_graph = 2 * (
-                sum([sum(range(0, len(drs))) for drs in expected_delivery_requests_clusters]) +
-                len(supplier_category.delivery_requests))
+        expected_num_edge_in_graph = sum(
+            [len(drs) * (len(drs) - 1) for drs in expected_delivery_requests_clusters]) + (
+                                             2 * len(supplier_category.delivery_requests))
 
         if PRINT_LOGS:
             print("# expected delivery requests clusters", len(expected_delivery_requests_clusters))
@@ -148,11 +155,11 @@ def _create_zones(zone_amount: int = 1) -> List[Zone]:
                Zone(create_polygon_2d([create_point_2d(35.03, 31.82),
                                        create_point_2d(35.03, 32.01),
                                        create_point_2d(35.3, 32.01),
-                                       create_point_2d(35.3, 31.82)]),id = EntityID.generate_uuid()),
+                                       create_point_2d(35.3, 31.82)]), id=EntityID.generate_uuid()),
                Zone(create_polygon_2d([create_point_2d(35.03, 32.01),
                                        create_point_2d(35.09, 32.18),
                                        create_point_2d(35.3, 32.18),
-                                       create_point_2d(35.3, 32.01)]),id = EntityID.generate_uuid())
+                                       create_point_2d(35.3, 32.01)]), id=EntityID.generate_uuid())
            ][0:zone_amount]
 
 

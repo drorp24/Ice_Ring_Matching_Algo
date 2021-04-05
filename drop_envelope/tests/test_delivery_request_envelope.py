@@ -37,9 +37,8 @@ def create_single_package_distribution() -> PackageDistribution:
 
 
 def create_azimuth_choice_distribution() -> ChoicesAngleDistribution:
-    azimuths_choices = [Angle(value=0, unit=AngleUnit.DEGREE), Angle(value=30, unit=AngleUnit.DEGREE),
-                        Angle(value=60, unit=AngleUnit.DEGREE), Angle(value=90, unit=AngleUnit.DEGREE),
-                        Angle(value=180, unit=AngleUnit.DEGREE)]
+    azimuths_choices = [Angle(value=value, unit=AngleUnit.DEGREE)
+                        for value in [0, 30, 60, 90, 180]]
     return ChoicesAngleDistribution(angles=azimuths_choices)
 
 
@@ -61,7 +60,7 @@ class BasicDeliveryRequestEnvelope(unittest.TestCase):
         legend_colors = []
         for i, potential_drop_envelope in enumerate(potential_drop_envelopes):
             envelopes = potential_drop_envelope.envelopes
-            drop_direction = potential_drop_envelope.drop_azimuth.get().calc_reverse().to_direction().__mul__(10)
+            drop_direction = potential_drop_envelope.drop_azimuth.get().calc_reverse().to_direction() * 10
             color = random.choice(list(Color))
             legend_names.append("pdp_{}".format(i))
             legend_colors.append(color)
@@ -76,10 +75,10 @@ class BasicDeliveryRequestEnvelope(unittest.TestCase):
         potential_arrival_envelope = dr_potential_envelope.get_potential_arrival_envelope(
             get_azimuth_quantization_values(MockSlidesServiceWrapper.drone_azimuth_level_amount),
             maneuver_angle=maneuver_angle)
-        drawer.add_point2d(potential_arrival_envelope.get_centroid)
-        arrival_envelopes = list(potential_arrival_envelope.arrival_envelopes.values())
+        drawer.add_point2d(potential_arrival_envelope.get_centroid())
+        arrival_envelopes = list(potential_arrival_envelope.potential_envelopes.values())
         for arrival_envelope in arrival_envelopes:
-            arrival_direction = arrival_envelope.arrival_azimuth.calc_reverse().to_direction().__mul__(20)
+            arrival_direction = arrival_envelope.arrival_azimuth.calc_reverse().to_direction() * 20
             drawer.add_polygon2d(arrival_envelope.maneuver_polygon, edgecolor=Color.Red, facecolor=Color.White,
                                  facecolor_alpha=0)
             drawer.add_arrow2d(tail=arrival_envelope.repr_point.add_vector(arrival_direction),
@@ -108,7 +107,7 @@ class BasicDeliveryRequestEnvelope(unittest.TestCase):
         potential_arrival_envelope = dr_potential_envelope.get_potential_arrival_envelope(
             get_azimuth_quantization_values(MockSlidesServiceWrapper.drone_azimuth_level_amount),
             maneuver_angle=maneuver_angle)
-        self.assertEqual(len(potential_arrival_envelope.arrival_envelopes),2)
+        self.assertEqual(len(potential_arrival_envelope.arrival_envelopes), 2)
         self.assertAlmostEqual(list(potential_arrival_envelope.arrival_envelopes.values())[0].repr_point.x, -92.147071,
                                delta=0.1)
         self.assertAlmostEqual(list(potential_arrival_envelope.arrival_envelopes.values())[0].repr_point.y, -108.24997,

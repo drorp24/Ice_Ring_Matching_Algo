@@ -24,7 +24,8 @@ from common.graph.operational.graph_creator import build_fully_connected_graph
 from common.graph.operational.operational_graph import OperationalGraph
 from geometry.distribution.geo_distribution import ExactPointLocationDistribution
 from geometry.geo_factory import create_point_2d
-from matching.constraint_config import ConstraintsConfig, CapacityConstraints, TimeConstraints, PriorityConstraints
+from matching.constraint_config import ConstraintsConfig, CapacityConstraints, TravelTimeConstraints, \
+    PriorityConstraints, SessionTimeConstraints
 from matching.matcher_config import MatcherConfig
 from matching.matcher_input import MatcherInput
 from matching.ortools.ortools_matcher import ORToolsMatcher
@@ -33,7 +34,7 @@ from matching.ortools.ortools_solver_config import ORToolsSolverConfig
 ZERO_TIME = DateTimeExtension(dt_date=date(2020, 1, 23), dt_time=time(11, 30, 0))
 
 
-class ORToolsMatcherFleetWithMultiplePackageTYpe(TestCase):
+class ORToolsMatcherFleetWithMultiplePackageType(TestCase):
 
     @classmethod
     def setUpClass(cls):
@@ -79,7 +80,7 @@ class ORToolsMatcherFleetWithMultiplePackageTYpe(TestCase):
 
     @staticmethod
     def _create_loading_dock() -> DroneLoadingDock:
-        return DroneLoadingDock(DroneLoadingStation(create_point_2d(0, 0)),
+        return DroneLoadingDock(EntityID.generate_uuid(),DroneLoadingStation(EntityID.generate_uuid(),create_point_2d(0, 0)),
                                 DroneType.drone_type_1,
                                 TimeWindowExtension(
                                     since=ZERO_TIME,
@@ -108,12 +109,16 @@ class ORToolsMatcherFleetWithMultiplePackageTYpe(TestCase):
             solver=ORToolsSolverConfig(first_solution_strategy="path_cheapest_arc",
                                        local_search_strategy="automatic", timeout_sec=30),
             constraints=ConstraintsConfig(
-                capacity=CapacityConstraints(count_capacity_from_zero=True),
-                time=TimeConstraints(max_waiting_time=10,
-                                     max_route_time=300,
-                                     count_time_from_zero=False),
-                priority=PriorityConstraints(True)),
-            unmatched_penalty=1000)
+                capacity_constraints=CapacityConstraints(count_capacity_from_zero=True, capacity_cost_coefficient=1),
+                travel_time_constraints=TravelTimeConstraints(max_waiting_time=0,
+                                                              max_route_time=300,
+                                                              count_time_from_zero=False,
+                                                              reloading_time=0),
+                session_time_constraints=SessionTimeConstraints(max_session_time=300),
+                priority_constraints=PriorityConstraints(True, priority_cost_coefficient=100)),
+            unmatched_penalty=100000,
+            reload_per_vehicle=0
+        )
 
     @staticmethod
     def _create_drone_deliveries(delivery_requests: List[DeliveryRequest], empty_board: EmptyDroneDeliveryBoard,
@@ -126,18 +131,18 @@ class ORToolsMatcherFleetWithMultiplePackageTYpe(TestCase):
                                              matched_delivery_option_index=0,
                                              delivery_time_window=TimeWindowExtension(
                                                  since=ZERO_TIME.add_time_delta(
-                                                     TimeDeltaExtension(timedelta(minutes=60))),
+                                                     TimeDeltaExtension(timedelta(hours=1))),
                                                  until=ZERO_TIME.add_time_delta(
-                                                     TimeDeltaExtension(timedelta(minutes=60)))))
+                                                     TimeDeltaExtension(timedelta(hours=1)))))
                                          ],
                                          start_drone_loading_docks=MatchedDroneLoadingDock(
                                              graph_index=0,
                                              drone_loading_dock=loading_dock,
                                              delivery_time_window=TimeWindowExtension(
                                                  since=loading_dock.time_window.since.add_time_delta(
-                                                     TimeDeltaExtension(timedelta(minutes=40))),
+                                                     TimeDeltaExtension(timedelta(minutes=50))),
                                                  until=loading_dock.time_window.since.add_time_delta(
-                                                     TimeDeltaExtension(timedelta(minutes=40))))),
+                                                     TimeDeltaExtension(timedelta(minutes=50))))),
                                          end_drone_loading_docks=MatchedDroneLoadingDock(
                                              graph_index=0,
                                              drone_loading_dock=loading_dock,

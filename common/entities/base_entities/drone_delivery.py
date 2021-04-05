@@ -16,8 +16,9 @@ class EmptyDroneDelivery(JsonableBaseEntity):
     def __init__(self, id_: EntityID, drone_formation: DroneFormation, board_level_properties=BoardLevelProperties()):
         self._id = id_
         self._drone_formation = drone_formation
-        self._max_route_times_in_minutes = board_level_properties.max_route_time_entire_board
-        self._velocity_meter_per_sec = board_level_properties.velocity_entire_board
+        self._max_route_times_in_minutes = board_level_properties.max_route_time_entire_board  # TODO: Change to real endurance
+        self._velocity_meter_per_sec = board_level_properties.velocity_entire_board  # TODO: Change to real velocity
+        self._reload_time_in_minutes = 60
 
     def __eq__(self, other):
         return self._id == other.id and self._drone_formation == other.drone_formation
@@ -36,6 +37,10 @@ class EmptyDroneDelivery(JsonableBaseEntity):
     @property
     def max_route_time_in_minutes(self) -> int:
         return self._max_route_times_in_minutes
+
+    @property
+    def reload_time_in_minutes(self) -> int:
+        return self._reload_time_in_minutes
 
     @property
     def velocity_meter_per_sec(self) -> float:
@@ -161,7 +166,8 @@ class DroneDelivery(EmptyDroneDelivery):
             .format(id=self.id,
                     origin_capacity=self.drone_formation.get_package_type_amount_map(),
                     total_amount_per_package_type=str(self.get_total_package_type_amount_map()),
-                    priority=str(self.get_total_priority()), total_time=str(self.get_total_work_time_in_minutes()),
+                    priority=str(self.get_total_priority()),
+                    total_time=str(self.get_total_work_time_in_minutes()),
                     start_drone_loading_docks=str(self.start_drone_loading_docks),
                     matched_requests='\n'.join(map(str, self._matched_requests)),
                     end_drone_loading_docks=str(self.end_drone_loading_docks))

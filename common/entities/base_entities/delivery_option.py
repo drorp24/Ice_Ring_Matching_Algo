@@ -7,12 +7,13 @@ from common.entities.base_entities.drone import PackageTypeAmountMap
 from common.entities.base_entities.package import PackageType
 from common.entities.base_entities.package_delivery_plan import PackageDeliveryPlan
 from common.entities.base_entities.entity_id import EntityID
+from common.entities.base_entities.package_holder import PackageHolder
 from geometry.geo2d import Point2D
 from geometry.geo_factory import calc_centroid
 from geometry.utils import Localizable
 
 
-class DeliveryOption(JsonableBaseEntity, Localizable):
+class DeliveryOption(JsonableBaseEntity, Localizable, PackageHolder):
 
     def __init__(self, customer_deliveries: [CustomerDelivery], delivery_options_id: EntityID):
         self._id = delivery_options_id
@@ -36,7 +37,7 @@ class DeliveryOption(JsonableBaseEntity, Localizable):
 
     def get_package_type_amount(self, package_type: PackageType) -> int:
         customer_deliveries = self.customer_deliveries
-        demands = list(map(lambda x: x.get_package_type_amount(package_type), customer_deliveries))
+        demands = [customer_delivery.get_package_type_amount(package_type) for customer_delivery in customer_deliveries ]
         return sum(demands)
 
     def get_package_type_amount_map(self) -> PackageTypeAmountMap:

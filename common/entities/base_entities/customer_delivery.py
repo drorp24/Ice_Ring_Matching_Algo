@@ -1,15 +1,16 @@
 from typing import List
 
 from common.entities.base_entities.base_entity import JsonableBaseEntity
+from common.entities.base_entities.entity_id import EntityID
 from common.entities.base_entities.package import PackageType
 from common.entities.base_entities.package_delivery_plan import PackageDeliveryPlan
-from common.entities.base_entities.entity_id import EntityID
+from common.entities.base_entities.package_holder import PackageHolder
 from geometry.geo2d import Point2D, Polygon2D
 from geometry.geo_factory import calc_centroid, calc_convex_hull_polygon
 from geometry.utils import Localizable
 
 
-class CustomerDelivery(JsonableBaseEntity, Localizable):
+class CustomerDelivery(JsonableBaseEntity, Localizable, PackageHolder):
 
     def __init__(self, package_delivery_plans: List[PackageDeliveryPlan], customer_delivery_id: EntityID):
         self._id = customer_delivery_id
@@ -43,7 +44,6 @@ class CustomerDelivery(JsonableBaseEntity, Localizable):
     def dict_to_obj(cls, dict_input):
         assert (dict_input['__class__'] == cls.__name__)
         return CustomerDelivery(
-            customer_delivery_id= EntityID.dict_to_obj(dict_input['id']),
+            customer_delivery_id=EntityID.dict_to_obj(dict_input['id']),
             package_delivery_plans=[PackageDeliveryPlan.dict_to_obj(pdp_dict) for pdp_dict in
                                     dict_input['package_delivery_plans']])
-
