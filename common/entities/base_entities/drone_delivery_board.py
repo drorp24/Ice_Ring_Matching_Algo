@@ -8,7 +8,7 @@ from common.entities.base_entities.drone_delivery import DroneDelivery, Deliveri
 from common.entities.base_entities.package import PackageType
 
 
-class EmptyDroneDeliveryBoard(JsonableBaseEntity):
+class DeliveringDronesBoard(JsonableBaseEntity):
     def __init__(self, empty_drone_deliveries: [DeliveringDrones]):
         self._empty_drone_deliveries = empty_drone_deliveries
 
@@ -35,7 +35,7 @@ class EmptyDroneDeliveryBoard(JsonableBaseEntity):
     @classmethod
     def dict_to_obj(cls, dict_input):
         assert (dict_input['__class__'] == cls.__name__)
-        return EmptyDroneDeliveryBoard(
+        return DeliveringDronesBoard(
             empty_drone_deliveries=[DeliveringDrones.dict_to_obj(empty_drone_delivery_dict)
                                     for empty_drone_delivery_dict
                                     in dict_input['empty_drone_deliveries']])

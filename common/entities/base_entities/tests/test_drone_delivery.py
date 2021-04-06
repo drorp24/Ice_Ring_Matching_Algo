@@ -9,7 +9,7 @@ from common.entities.base_entities.delivery_request import DeliveryRequest
 from common.entities.base_entities.drone import DroneType
 from common.entities.base_entities.drone_delivery import DroneDelivery, DeliveringDrones, MatchedDroneLoadingDock, \
     MatchedDeliveryRequest
-from common.entities.base_entities.drone_delivery_board import EmptyDroneDeliveryBoard, DroneDeliveryBoard, \
+from common.entities.base_entities.drone_delivery_board import DeliveringDronesBoard, DroneDeliveryBoard, \
     UnmatchedDeliveryRequest
 from common.entities.base_entities.drone_formation import DroneFormations, DroneFormationType, \
     PackageConfigurationOption
@@ -134,7 +134,7 @@ class BasicDroneDeliveryGenerationTests(unittest.TestCase):
     def test_empty_drone_delivery_is_jsonable(self):
         self.empty_drone_delivery_1.to_json(self.empty_drone_delivery_json_path)
 
-        empty_drone_delivery_from_json = EmptyDroneDelivery.from_json(EmptyDroneDelivery,
+        empty_drone_delivery_from_json = DeliveringDrones.from_json(DeliveringDrones,
                                                                       self.empty_drone_delivery_json_path)
         self.assertEqual(self.empty_drone_delivery_1, empty_drone_delivery_from_json)
 
@@ -142,7 +142,7 @@ class BasicDroneDeliveryGenerationTests(unittest.TestCase):
     def _create_delivery_requests() -> List[DeliveryRequest]:
         return DeliveryRequestDistribution().choose_rand(random=Random(42), amount={DeliveryRequest: 3})
 
-    def _create_empty_board(self) -> EmptyDroneDeliveryBoard:
+    def _create_empty_board(self) -> DeliveringDronesBoard:
         self.entity_id_1 = EntityID(uuid.uuid4())
         self.entity_id_2 = EntityID(uuid.uuid4())
         self.empty_drone_delivery_1 = DeliveringDrones(id_=self.entity_id_1,
@@ -155,7 +155,7 @@ class BasicDroneDeliveryGenerationTests(unittest.TestCase):
             DroneFormationType.QUAD, PackageConfigurationOption.TINY_PACKAGES, DroneType.drone_type_1),
                                                        start_loading_dock=self.docks[0],
                                                        end_loading_dock=self.docks[0])
-        return EmptyDroneDeliveryBoard([self.empty_drone_delivery_1, self.empty_drone_delivery_2])
+        return DeliveringDronesBoard([self.empty_drone_delivery_1, self.empty_drone_delivery_2])
 
     @staticmethod
     def _create_expected_single_matched_drone_loading_dock(cls) -> MatchedDroneLoadingDock:

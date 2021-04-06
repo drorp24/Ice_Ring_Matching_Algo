@@ -1,6 +1,6 @@
 import sys
 from functools import lru_cache
-from typing import Tuple, List
+from typing import Tuple, List, Union
 import numpy as np
 
 from common.entities.base_entities.delivery_request import DeliveryRequest
@@ -64,8 +64,8 @@ class OrtoolsGraphExporter(GraphExporter):
         return node
 
     @staticmethod
-    def get_node_graph_index(graph: OperationalGraph, node: OperationalNode) -> int:
-        index = graph.get_node_index(node)
+    def get_node_graph_index(graph: OperationalGraph, node: Union[DeliveryRequest, DroneLoadingDock]) -> int:
+        index = graph.get_node_index(OperationalNode(node))
         return index
 
     @lru_cache()

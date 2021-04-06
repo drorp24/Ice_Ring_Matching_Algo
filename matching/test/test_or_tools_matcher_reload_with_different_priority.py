@@ -7,7 +7,7 @@ from unittest import TestCase
 from common.entities.base_entities.delivery_request import DeliveryRequest
 from common.entities.base_entities.drone import DroneType
 from common.entities.base_entities.drone_delivery import DeliveringDrones
-from common.entities.base_entities.drone_delivery_board import EmptyDroneDeliveryBoard
+from common.entities.base_entities.drone_delivery_board import DeliveringDronesBoard
 from common.entities.base_entities.drone_formation import DroneFormations, PackageConfigurationOption, \
     DroneFormationType
 from common.entities.base_entities.drone_loading_dock import DroneLoadingDock
@@ -119,7 +119,7 @@ class ORToolsMatcherReloadWithDifferentPriorityTestCase(TestCase):
         return graph
 
     @staticmethod
-    def _create_empty_board(loading_dock: DroneLoadingDock) -> EmptyDroneDeliveryBoard:
+    def _create_empty_board(loading_dock: DroneLoadingDock) -> DeliveringDronesBoard:
         empty_drone_delivery_1 = DeliveringDrones(id_=EntityID(uuid.uuid4()),
                                                   drone_formation=DroneFormations.get_drone_formation(
             DroneFormationType.PAIR, PackageConfigurationOption.LARGE_PACKAGES, DroneType.drone_type_1),
@@ -130,7 +130,7 @@ class ORToolsMatcherReloadWithDifferentPriorityTestCase(TestCase):
             DroneFormationType.PAIR, PackageConfigurationOption.LARGE_PACKAGES, DroneType.drone_type_1),
                                                   start_loading_dock=loading_dock,
                                                   end_loading_dock=loading_dock)
-        return EmptyDroneDeliveryBoard([empty_drone_delivery_1, empty_drone_delivery_2])
+        return DeliveringDronesBoard([empty_drone_delivery_1, empty_drone_delivery_2])
 
     @staticmethod
     def _create_match_config() -> MatcherConfig:

@@ -3,7 +3,7 @@ import uuid
 
 from common.entities.base_entities.drone_delivery import DeliveringDrones
 from common.entities.base_entities.drone_delivery import DEFAULT_MAX_ROUTE_TIME_IN_MINUTES, DEFAULT_VELOCITY_METER_PER_SEC
-from common.entities.base_entities.drone_delivery_board import EmptyDroneDeliveryBoard
+from common.entities.base_entities.drone_delivery_board import DeliveringDronesBoard
 from common.entities.base_entities.entity_id import EntityID
 from common.entities.base_entities.fleet.fleet_configuration_attribution import FleetConfigurationAttribution, \
     DroneFormationsPerTypeAmounts
@@ -38,15 +38,15 @@ def calc_drone_deliveries(drone_set_properties: DroneSetProperties,
     return empty_deliveries
 
 def generate_empty_delivery_board(drone_set_properties: [DroneSetProperties],max_route_time_entire_board: int,
-                                     velocity_entire_board: float) -> EmptyDroneDeliveryBoard:
+                                     velocity_entire_board: float) -> DeliveringDronesBoard:
     total_drone_deliveries = []
     for drone_properties in drone_set_properties:
         total_drone_deliveries += calc_drone_deliveries(drone_properties,max_route_time_entire_board,
                                    velocity_entire_board)
-    return EmptyDroneDeliveryBoard(total_drone_deliveries)
+    return DeliveringDronesBoard(total_drone_deliveries)
 
 
 def build_empty_drone_delivery_board(drone_set_properties: DroneSetProperties, max_route_time_entire_board: int,
                                      velocity_entire_board: float):
-    return EmptyDroneDeliveryBoard(calc_drone_deliveries(drone_set_properties, max_route_time_entire_board,
+    return DeliveringDronesBoard(calc_drone_deliveries(drone_set_properties, max_route_time_entire_board,
                                    velocity_entire_board))
