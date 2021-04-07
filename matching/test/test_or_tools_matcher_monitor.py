@@ -82,7 +82,7 @@ class ORToolsMatcherMonitorTestCase(TestCase):
             unmatched_delivery_requests=[unmatched_delivery_request])
 
         self.assertEqual(expected_matched_board, actual_delivery_board)
-        self.assertNotEqual(matcher.matcher_monitor.monitor.num_of_iterations, num_of_iterations)
+        self.assertGreater(matcher.matcher_monitor.monitor.num_of_iterations, 0)
         self.assertGreater(matcher.matcher_monitor.monitor.best_objective_value, 0)
 
     def test_matcher_without_monitor(self):

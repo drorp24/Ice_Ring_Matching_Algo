@@ -60,7 +60,19 @@ class Monitor:
     def num_of_iterations(self):
         return self._num_of_iterations
 
-    def add_monitor(self, objective, total_priority, total_unmatched_delivery_requests,
+    def increase_iterations(self):
+        self._num_of_iterations += 1
+
+    def update_data(self, current_objective_value: int = 0, total_priority_value: int = 0,
+                    total_unmatched_delivery_requests: int = 0,
+                    unmatched_delivery_requests_total_priority: int = 0):
+        self._prev_objective_value = self._best_objective_value
+        self._best_objective_value = current_objective_value
+        self._add_iteration_data(current_objective_value, total_priority_value, total_unmatched_delivery_requests,
+                                 unmatched_delivery_requests_total_priority, self.num_of_iterations,
+                                 current_milli_time() - self._start_time)
+
+    def _add_iteration_data(self, objective, total_priority, total_unmatched_delivery_requests,
                     unmatched_delivery_requests_total_priority, iterations, runtime):
         to_append = [objective,
                      total_priority,
@@ -72,18 +84,6 @@ class Monitor:
         a_series = pd.Series(to_append, index=self._data.columns)
 
         self._data = self._data.append(a_series, ignore_index=True)
-
-    def update_data(self, current_objective_value: int = 0, total_priority_value: int = 0,
-                    total_unmatched_delivery_requests: int = 0,
-                    unmatched_delivery_requests_total_priority: int = 0):
-        self._prev_objective_value = self._best_objective_value
-        self._best_objective_value = current_objective_value
-        self.add_monitor(current_objective_value, total_priority_value, total_unmatched_delivery_requests,
-                         unmatched_delivery_requests_total_priority, self.num_of_iterations,
-                         current_milli_time() - self._start_time)
-
-    def increase_iterations(self):
-        self._num_of_iterations += 1
 
     def __repr__(self):
         return repr(self._data)
