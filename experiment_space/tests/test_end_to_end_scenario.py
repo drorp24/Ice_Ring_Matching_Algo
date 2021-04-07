@@ -4,14 +4,16 @@ from pathlib import Path
 from common.entities.base_entities.drone import DroneType, PackageConfiguration
 from common.entities.base_entities.drone_formation import DroneFormationType
 from common.entities.base_entities.fleet.fleet_property_sets import DroneSetProperties, DroneFormationTypePolicy, \
-    PackageConfigurationPolicy
+    PackageConfigurationPolicy, BoardLevelProperties
 from common.entities.base_entities.package import PackageType
 from experiment_space.analyzer.quantitative_analyzers import AmountMatchedPerPackageTypeAnalyzer, \
     UnmatchedDeliveryRequestsAnalyzer
 from experiment_space.experiment import Experiment
 from experiment_space.graph_creation_algorithm import FullyConnectedGraphAlgorithm
 from experiment_space.supplier_category import SupplierCategory
+from experiment_space.visualization.experiment_visualizer import draw_matched_scenario
 from matching.matcher_config import MatcherConfig
+from visualization.basic.pltdrawer2d import MapImage
 
 
 class BasicMinimumEnd2End(unittest.TestCase):
@@ -32,7 +34,7 @@ class BasicMinimumEnd2End(unittest.TestCase):
                                   package_configuration_policy=PackageConfigurationPolicy(
                                       {PackageConfiguration.LARGE_X2: 0.6, PackageConfiguration.MEDIUM_X4: 0.2,
                                        PackageConfiguration.SMALL_X8: 0.2, PackageConfiguration.TINY_X16: 0.0}),
-                                  drone_amount=30)
+                                  drone_amount=50)
 
     def test_create_graph_model(self):
         operational_graph = FullyConnectedGraphAlgorithm().create(self.supplier_category)
@@ -43,9 +45,18 @@ class BasicMinimumEnd2End(unittest.TestCase):
         e = Experiment(supplier_category=self.supplier_category,
                        drone_set_properties=self.drone_set_properties,
                        matcher_config=self.matcher_config,
-                       graph_creation_algorithm=FullyConnectedGraphAlgorithm())
+                       graph_creation_algorithm=FullyConnectedGraphAlgorithm(),
+                       board_level_properties=BoardLevelProperties(100, 10.0))
 
         delivery_board = e.run_match()
+
+        map_image = MapImage(map_background_path=Path("visualization/basic/gush_dan_background.png"),
+                             west_lon=34.83927, east_lon=35.32341, south_lat=31.77279, north_lat=32.59276)
+
+        draw_matched_scenario(delivery_board=delivery_board,
+                              graph=e.graph_creation_algorithm.create(supplier_category=self.supplier_category),
+                              supplier_category=self.supplier_category,
+                              map_image=map_image)
 
         analysis = Experiment.run_analysis_suite(delivery_board,
                                                  [UnmatchedDeliveryRequestsAnalyzer,

@@ -62,7 +62,7 @@ def draw_match_gantt(delivery_board, supplier_category, should_block):
                                              hours_period=24,
                                              row_names=row_names,
                                              rows_title='Formation Type x Package Type Amounts')
-    operational_gantt_drawer.add_delivery_board(board_gantt_drawer, delivery_board, draw_unmatched=True)
+    operational_gantt_drawer.add_delivery_board_with_row_per_drone_delivery(board_gantt_drawer, delivery_board, draw_unmatched=True)
     board_gantt_drawer.draw(should_block)
 
 

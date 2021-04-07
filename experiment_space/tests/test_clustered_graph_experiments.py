@@ -44,7 +44,7 @@ class BasicMinimumEnd2EndClusteredDrsTest(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        match_config_file_path = Path('end_to_end/tests/jsons/test_min_e2e_config.json')
+        match_config_file_path = Path('experiment_space/tests/jsons/test_min_e2e_config.json')
         cls.match_config = MatcherConfig.dict_to_obj(MatcherConfig.json_to_dict(match_config_file_path))
 
         cls.mapImage = MapImage(map_background_path=Path(r"visualization/basic/gush_dan_background.Png"),

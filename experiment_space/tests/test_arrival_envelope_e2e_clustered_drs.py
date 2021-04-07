@@ -31,13 +31,13 @@ from common.entities.base_entities.package import PackageType
 from common.entities.base_entities.temporal import DateTimeExtension, TimeDeltaExtension
 from common.entities.base_entities.zone import Zone
 from common.graph.operational.graph_utils import sort_delivery_requests_by_zone, split_delivery_requests_into_clusters
-from experiment_space.arrival_envelope_minimum_end_to_end import create_clustered_delivery_requests_graph_model, \
-    calc_assignment
 from experiment_space.distribution.supplier_category_distribution import SupplierCategoryDistribution
+from experiment_space.graph_creation_algorithm import ClusteredDeliveryRequestGraphAlgorithm
 from geometry.distribution.geo_distribution import UniformPointInBboxDistribution, \
     NormalPointsInMultiPolygonDistribution
 from geometry.geo_factory import create_point_2d, create_polygon_2d, create_multipolygon_2d
 from matching.matcher_config import MatcherConfig
+from matching.matcher_factory import create_matcher
 from matching.matcher_input import MatcherInput
 from visualization.basic.drawer2d import Drawer2DCoordinateSys
 from visualization.basic.pltdrawer2d import create_drawer_2d, MapImage
@@ -103,11 +103,10 @@ class BasicMinimumEnd2EndClusteredDrsTest(unittest.TestCase):
             amount={
                 DeliveryRequest: drs_amount,
                 DroneLoadingDock: docks_amount})[0]
-
-        clustered_connected_graph = create_clustered_delivery_requests_graph_model(supplier_category,
-                                                                                   edge_cost_factor=0.1,
-                                                                                   edge_travel_time_factor=0.1,
-                                                                                   max_clusters_per_zone=max_clusters_per_zone)
+        clustered_connected_graph = ClusteredDeliveryRequestGraphAlgorithm(edge_cost_factor=0.1,
+                                                                           edge_travel_time_factor=0.1,
+                                                                           max_clusters_per_zone=max_clusters_per_zone) \
+            .create(supplier_category)
 
         print("--- clustered_connected_graph run time: %s  ---" % (datetime.now() - start_time))
         start_time = datetime.now()
@@ -165,7 +164,7 @@ class BasicMinimumEnd2EndClusteredDrsTest(unittest.TestCase):
                                      config=self.match_config)
         start_time = datetime.now()
 
-        delivery_board = calc_assignment(matcher_input=matcher_input)
+        delivery_board = create_matcher(matcher_input).match()
 
         print("--- calc_assignment run time: %s  ---" % (datetime.now() - start_time))
 
@@ -235,7 +234,7 @@ def _create_empty_drone_delivery_board(
                                               drone_formation_policy=drone_formation_policy,
                                               drone_amount=amount)
     return generate_empty_delivery_board([drone_set_properties], BoardLevelProperties(max_route_time_entire_board,
-                                                                                    velocity_entire_board))
+                                                                                      velocity_entire_board))
 
 
 def _create_supplier_category_distribution(zone_amount: int = 1, max_centroids_per_polygon: int = 1,
