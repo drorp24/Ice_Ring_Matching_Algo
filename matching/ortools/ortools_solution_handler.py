@@ -6,6 +6,7 @@ from common.entities.base_entities.drone_delivery import DroneDelivery, MatchedD
 from common.entities.base_entities.drone_delivery_board import DroneDeliveryBoard, UnmatchedDeliveryRequest
 from common.entities.base_entities.temporal import TimeWindowExtension, TimeDeltaExtension
 from common.graph.operational.export_ortools_graph import OrtoolsGraphExporter
+from matching.initial_solution import Routes, Route
 from matching.matcher_input import MatcherInput
 from matching.ortools.ortools_index_manager_wrapper import OrToolsIndexManagerWrapper
 from matching.ortools.ortools_matcher_constraints import OrToolsDimensionDescription
@@ -32,6 +33,22 @@ class ORToolsSolutionHandler:
 
         return DroneDeliveryBoard(drone_deliveries=self._create_drone_deliveries(solution),
                                   unmatched_delivery_requests=self._extract_unmatched_delivery_requests(solution))
+
+    def get_routes(self, solution: Assignment) -> Routes:
+        if solution is None:
+            return Routes([])
+
+        routes = []
+        for edd_index, empty_drone_delivery in enumerate(self._matcher_input.empty_board.empty_drone_deliveries):
+            index = self._routing_model.Start(edd_index)
+            route = []
+            while not self._routing_model.IsEnd(index):
+                if not self._routing_model.IsStart(index):
+                    route.append(index)
+                index = solution.Value(self._routing_model.NextVar(index))
+
+            routes.append(Route(route))
+        return Routes(routes)
 
     def _create_drone_deliveries(self, solution: Assignment) -> List[DroneDelivery]:
         if solution is None:
