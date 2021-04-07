@@ -52,11 +52,12 @@
   "reload_per_vehicle": 0,
   "monitor": {
     "__class__": "MonitorConfig",
-    "enabled": true,
-    "iterations_between_monitoring": 1,
+    "enabled": false,
+    "iterations_between_monitoring": 1000,
     "max_iterations": 0,
     "save_plot": true,
     "show_plot": true,
+    "separate_charts": true,
     "output_directory" : "outputs"
   }
 }

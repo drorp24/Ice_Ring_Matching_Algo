@@ -35,6 +35,7 @@ class MatchConfigTestCase(TestCase):
                                   max_iterations=100000,
                                   save_plot=True,
                                   show_plot=True,
+                                  separate_charts=True,
                                   output_directory="outputs")
         )
 

@@ -53,6 +53,7 @@
     "max_iterations": 100000,
     "save_plot": true,
     "show_plot": true,
+    "separate_charts": true,
     "output_directory" : "outputs"
   }
 }
