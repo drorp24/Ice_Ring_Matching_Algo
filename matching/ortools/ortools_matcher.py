@@ -4,6 +4,7 @@ from ortools.constraint_solver.routing_parameters_pb2 import RoutingSearchParame
 
 from common.entities.base_entities.drone_delivery_board import DroneDeliveryBoard
 from common.graph.operational.export_ortools_graph import OrtoolsGraphExporter
+from matching.initial_solution import Routes
 from matching.matcher import Matcher
 from matching.matcher_input import MatcherInput
 from matching.ortools.ortools_index_manager_wrapper import OrToolsIndexManagerWrapper
@@ -50,6 +51,16 @@ class ORToolsMatcher(Matcher):
 
     def match(self) -> DroneDeliveryBoard:
         solution = self._routing_model.SolveWithParameters(self._search_parameters)
+        return self._solution_handler.create_drone_delivery_board(solution)
+
+    def match_to_routes(self) -> Routes:
+        solution = self._routing_model.SolveWithParameters(self._search_parameters)
+        return self._solution_handler.get_routes(solution=solution)
+
+    def match_from_init_solution(self, initial_routes: Routes) -> DroneDeliveryBoard:
+        self._routing_model.CloseModelWithParameters(self._search_parameters)
+        initial_solution = self._routing_model.ReadAssignmentFromRoutes(initial_routes.as_list(), False)
+        solution = self._routing_model.SolveFromAssignmentWithParameters(initial_solution, self._search_parameters)
         return self._solution_handler.create_drone_delivery_board(solution)
 
     def _set_index_manager(self) -> OrToolsIndexManagerWrapper:
