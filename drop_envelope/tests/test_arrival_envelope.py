@@ -30,14 +30,14 @@ class BasicArrivalEnvelopeTestCase(unittest.TestCase):
         self.assertAlmostEqual(arrival_envelope.repr_point, expected_repr_point)
 
     def test_potential_arrival_envelope(self):
-        arrival_azimuths = list(map(lambda value: Angle(value=value, unit=AngleUnit.DEGREE), list(range(0, 360, 45))))
-        arrival_envelopes = list(map(lambda arrival_azimuth: ArrivalEnvelope.from_maneuver_angle(centroid=self.centroid,
-                                                                                                 radius=self.radius,
-                                                                                                 arrival_azimuth=
-                                                                                                 arrival_azimuth,
-                                                                                                 maneuver_angle=
-                                                                                                 self.maneuver_angle),
-                                     arrival_azimuths))
+        arrival_azimuths = [Angle(value=value, unit=AngleUnit.DEGREE) for value in list(range(0, 360, 45))]
+        arrival_envelopes = [ArrivalEnvelope.from_maneuver_angle(centroid=self.centroid,
+                                                                 radius=self.radius,
+                                                                 arrival_azimuth=arrival_azimuth,
+                                                                 maneuver_angle=self.maneuver_angle)
+                             for arrival_azimuth in
+                             arrival_azimuths]
+
         potential_arrival_envelope = PotentialArrivalEnvelope(arrival_envelopes=arrival_envelopes,
                                                               centroid=self.centroid)
         self.assertEqual(len(range(0, 360, 45)), len(potential_arrival_envelope.arrival_envelopes))
@@ -47,29 +47,26 @@ class BasicArrivalEnvelopeTestCase(unittest.TestCase):
         self.assertEqual(arrival_envelopes[2], potential_arrival_envelope.arrival_envelopes[arrival_azimuths[2]])
         self.assertEqual(arrival_envelopes[3], potential_arrival_envelope.arrival_envelopes[arrival_azimuths[3]])
 
-    def test_calc_cost(self):
-        arrival_azimuths_1 = list(map(lambda value: Angle(value=value, unit=AngleUnit.DEGREE), list(range(0, 360, 45))))
-        arrival_envelopes_1 = list(
-            map(lambda arrival_azimuth: ArrivalEnvelope.from_maneuver_angle(centroid=self.centroid,
-                                                                            radius=self.radius,
-                                                                            arrival_azimuth=
-                                                                            arrival_azimuth,
-                                                                            maneuver_angle=
-                                                                            self.maneuver_angle),
-                arrival_azimuths_1))
-        potential_arrival_envelope_1 = PotentialArrivalEnvelope(arrival_envelopes=arrival_envelopes_1,
-                                                                centroid=self.centroid)
 
-        arrival_azimuths_2 = list(map(lambda value: Angle(value=value, unit=AngleUnit.DEGREE), list(range(0, 360, 45))))
-        arrival_envelopes_2 = list(
-            map(lambda arrival_azimuth: ArrivalEnvelope.from_maneuver_angle(centroid=create_point_2d(0,100),
-                                                                            radius=self.radius,
-                                                                            arrival_azimuth=
-                                                                            arrival_azimuth,
-                                                                            maneuver_angle=
-                                                                            self.maneuver_angle),
-                arrival_azimuths_2))
-        potential_arrival_envelope_2 = PotentialArrivalEnvelope(arrival_envelopes=arrival_envelopes_2,
-                                                                centroid=self.centroid)
-        cost = calc_cost(potential_arrival_envelope_1, potential_arrival_envelope_2)
-        self.assertAlmostEqual(cost, 100)
+def test_calc_cost(self):
+    arrival_azimuths_1 = [Angle(value=value, unit=AngleUnit.DEGREE) for value in list(range(0, 360, 45))]
+    arrival_envelopes_1 = [ArrivalEnvelope.from_maneuver_angle(centroid=self.centroid,
+                                                               radius=self.radius,
+                                                               arrival_azimuth=arrival_azimuth,
+                                                               maneuver_angle=self.maneuver_angle)
+                           for arrival_azimuth in
+                           arrival_azimuths_1]
+    potential_arrival_envelope_1 = PotentialArrivalEnvelope(arrival_envelopes=arrival_envelopes_1,
+                                                            centroid=self.centroid)
+
+    arrival_azimuths_2 = [Angle(value=value, unit=AngleUnit.DEGREE) for value in list(range(0, 360, 45))]
+    arrival_envelopes_2 = [ArrivalEnvelope.from_maneuver_angle(centroid=self.centroid,
+                                                               radius=self.radius,
+                                                               arrival_azimuth=arrival_azimuth,
+                                                               maneuver_angle=self.maneuver_angle)
+                           for arrival_azimuth in
+                           arrival_azimuths_2]
+    potential_arrival_envelope_2 = PotentialArrivalEnvelope(arrival_envelopes=arrival_envelopes_2,
+                                                            centroid=self.centroid)
+    cost = calc_cost(potential_arrival_envelope_1, potential_arrival_envelope_2)
+    self.assertAlmostEqual(cost, 100)

@@ -17,11 +17,11 @@ class DeliveryRequestPotentialEnvelope(PotentialEnvelopeCollection):
     @classmethod
     def from_delivery_request(cls, delivery_request: DeliveryRequest, chosen_delivery_option_index: int = 0):
         package_delivery_plans = delivery_request.delivery_options[chosen_delivery_option_index].package_delivery_plans
-        dr_potential_drop_envelopes = list(map(
-            lambda pdp: PotentialDropEnvelopes.from_drop_envelope_properties(drop_azimuth=Optional.of(pdp.azimuth),
-                                                                             package_type=pdp.package_type,
-                                                                             drop_point=pdp.drop_point),
-            package_delivery_plans))
+        dr_potential_drop_envelopes = [
+            PotentialDropEnvelopes.from_drop_envelope_properties(drop_azimuth=Optional.of(pdp.azimuth),
+                                                                 package_type=pdp.package_type,
+                                                                 drop_point=pdp.drop_point) for pdp in
+            package_delivery_plans]
         return DeliveryRequestPotentialEnvelope(potential_drop_envelopes=dr_potential_drop_envelopes,
                                                 centroid=delivery_request.calc_location())
 

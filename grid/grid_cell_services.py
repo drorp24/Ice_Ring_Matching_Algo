@@ -1,11 +1,9 @@
-import math
-
 import numpy as np
 
 from common.math.angle import Angle, AngleUnit
 from common.utils import distance_calculator
 from grid.grid_cell import EnvelopeGridCell
-from params import MAX_PITCH_DEGREES
+from common.math.params import MAX_PITCH_DEGREES
 
 
 class GridCellServices:

@@ -66,7 +66,7 @@ class DroneLoadingDock(JsonableBaseEntity, Localizable, Temporal, ShapeableColle
     def __hash__(self):
         return hash((self.id, self._drone_loading_station, self._drone_type, self._time_window))
 
-    def get_shapeabls(self) -> List[Shapeable]:
+    def get_shapeables(self) -> List[Shapeable]:
         return [self.drone_loading_station]
 
     def get_centroid(self) -> Point2D:

@@ -7,7 +7,7 @@ from common.entities.base_entities.package import PackageType
 from common.math.angle import AngleUnit, Angle
 from grid.slide import Slide, SlideProperties
 from grid.slides_container import SlidesContainer
-from params import MIN_AZIMUTH_DEGREES, MAX_AZIMUTH_DEGREES
+from common.math.params import MIN_AZIMUTH_DEGREES, MAX_AZIMUTH_DEGREES
 from services.envelope_services_interface import EnvelopeServicesInterface
 
 

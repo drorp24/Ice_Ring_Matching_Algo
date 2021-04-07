@@ -89,7 +89,7 @@ class ORToolsMatcherConstraints:
             max_capacity = max(self._matcher_input.empty_board.get_package_type_amount_per_drone_delivery(package_type))
             self._routing_model.AddDimensionWithVehicleCapacity(
                 demand_callback_index,
-                0,
+                max_capacity,
                 self._matcher_input.empty_board.get_package_type_amount_per_drone_delivery(package_type),
                 self._matcher_input.config.constraints.capacity.count_capacity_from_zero,
                 demand_dimension_name)
@@ -104,11 +104,11 @@ class ORToolsMatcherConstraints:
             self._routing_model.AddDisjunction([self._index_manager.node_to_index(node)],
                                                0)
 
-    def _add_vehicle_start_node_index_transit_and_slack_vars_to_solution(self, travel_time_dimension):
+    def _add_vehicle_start_node_index_transit_and_slack_vars_to_solution(self, dimension):
         for vehicle_id in range(self._matcher_input.empty_board.amount_of_formations()):
             index = self._routing_model.Start(vehicle_id)
-            self._routing_model.AddToAssignment(travel_time_dimension.TransitVar(index))
-            self._routing_model.AddToAssignment(travel_time_dimension.SlackVar(index))
+            self._routing_model.AddToAssignment(dimension.TransitVar(index))
+            self._routing_model.AddToAssignment(dimension.SlackVar(index))
 
     def _add_to_objective_minimize_delivery_time_of_high_priority(self, travel_time_dimension):
         for node in self._graph_exporter.export_delivery_request_nodes_indices(self._matcher_input.graph):

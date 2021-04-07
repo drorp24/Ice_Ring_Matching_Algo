@@ -23,5 +23,5 @@ class BasicDroneLoadingDockGenerationTests(unittest.TestCase):
     def test_drone_loading_dock_as_shapeable_collection(self):
         drone_loading_dock_distribution = DroneLoadingDockDistribution()
         dock = drone_loading_dock_distribution.choose_rand(random=Random(100), amount=1)[0]
-        self.assertEqual(dock.get_shapeabls(), [dock.drone_loading_station])
+        self.assertEqual(dock.get_shapeables(), [dock.drone_loading_station])
         self.assertEqual(dock.get_centroid(), dock.drone_loading_station.location)
