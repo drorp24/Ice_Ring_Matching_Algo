@@ -23,7 +23,7 @@ class ORToolsMatcherObjective:
         self._routing_model.AddDimension(
             priority_callback_index,
             0,
-            1000,
+            self._matcher_input.config.constraints.priority.priority_cost_coefficient * 10000,
             True,
             'priority')
 

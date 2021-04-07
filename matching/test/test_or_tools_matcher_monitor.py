@@ -49,7 +49,7 @@ class ORToolsMatcherMonitorTestCase(TestCase):
 
     def test_matcher_with_monitor(self):
         num_of_iterations = 100
-        config = self._create_match_config(enabled=True, min_iterations=num_of_iterations)
+        config = self._create_match_config(enabled=True, max_iterations=num_of_iterations)
         match_input = MatcherInput(self.graph, self.empty_board, config)
         matcher = ORToolsMatcher(match_input)
         actual_delivery_board = matcher.match()
@@ -64,11 +64,11 @@ class ORToolsMatcherMonitorTestCase(TestCase):
 
         self.assertEqual(expected_matched_board, actual_delivery_board)
         self.assertEqual(matcher.matcher_monitor.monitor.num_of_iterations, num_of_iterations)
-        self.assertIsNotNone(matcher.matcher_monitor.monitor.best_objective_value)
+        self.assertGreater(matcher.matcher_monitor.monitor.best_objective_value, 0)
 
     def test_matcher_with_monitor_without_iterations_limit(self):
-        num_of_iterations = 0
-        config = self._create_match_config(enabled=True, min_iterations=num_of_iterations)
+        num_of_iterations = -1
+        config = self._create_match_config(enabled=True, max_iterations=num_of_iterations)
         match_input = MatcherInput(self.graph, self.empty_board, config)
         matcher = ORToolsMatcher(match_input)
         actual_delivery_board = matcher.match()
@@ -83,10 +83,10 @@ class ORToolsMatcherMonitorTestCase(TestCase):
 
         self.assertEqual(expected_matched_board, actual_delivery_board)
         self.assertNotEqual(matcher.matcher_monitor.monitor.num_of_iterations, num_of_iterations)
-        self.assertIsNotNone(matcher.matcher_monitor.monitor.best_objective_value)
+        self.assertGreater(matcher.matcher_monitor.monitor.best_objective_value, 0)
 
     def test_matcher_without_monitor(self):
-        config = self._create_match_config(enabled=False, min_iterations=0)
+        config = self._create_match_config(enabled=False, max_iterations=0)
         match_input = MatcherInput(self.graph, self.empty_board, config)
         matcher = ORToolsMatcher(match_input)
         actual_delivery_board = matcher.match()
@@ -106,7 +106,7 @@ class ORToolsMatcherMonitorTestCase(TestCase):
         dist = build_delivery_request_distribution(
             relative_pdp_location_distribution=ExactPointLocationDistribution([
                 create_point_2d(0, 5),
-                create_point_2d(0, 10),
+                create_point_2d(0, -10),
                 create_point_2d(0, 15)
             ]),
             time_window_distribution=ExactTimeWindowDistribution([
@@ -120,15 +120,14 @@ class ORToolsMatcherMonitorTestCase(TestCase):
                     since=ZERO_TIME,
                     until=ZERO_TIME.add_time_delta(TimeDeltaExtension(timedelta(minutes=30)))),
             ]),
-            package_type_distribution=PackageDistribution({PackageType.LARGE.name: 1}),
+            package_type_distribution=PackageDistribution({PackageType.LARGE: 1}),
             priority_distribution=ExactPriorityDistribution([1, 10, 1])
         )
         return dist.choose_rand(Random(42), amount={DeliveryRequest: 3})
 
     @staticmethod
     def _create_loading_dock() -> DroneLoadingDock:
-        return DroneLoadingDock(EntityID.generate_uuid(),
-                                DroneLoadingStation(EntityID.generate_uuid(), create_point_2d(0, 0)),
+        return DroneLoadingDock(EntityID.generate_uuid(),DroneLoadingStation(EntityID.generate_uuid(),create_point_2d(0, 0)),
                                 DroneType.drone_type_1,
                                 TimeWindowExtension(
                                     since=ZERO_TIME,
@@ -150,7 +149,7 @@ class ORToolsMatcherMonitorTestCase(TestCase):
         return EmptyDroneDeliveryBoard([empty_drone_delivery_1])
 
     @staticmethod
-    def _create_match_config(enabled: bool, min_iterations: int) -> MatcherConfig:
+    def _create_match_config(enabled: bool, max_iterations: int, iterations_between_monitoring:int =1) -> MatcherConfig:
         return MatcherConfig(
             zero_time=ZERO_TIME,
             solver=ORToolsSolverConfig(SolverVendor.OR_TOOLS, first_solution_strategy="path_cheapest_arc",
@@ -158,14 +157,16 @@ class ORToolsMatcherMonitorTestCase(TestCase):
             constraints=ConstraintsConfig(
                 capacity_constraints=CapacityConstraints(count_capacity_from_zero=True, capacity_cost_coefficient=1),
                 travel_time_constraints=TravelTimeConstraints(max_waiting_time=0,
-                                                              max_route_time=300,
+                                                              max_route_time=30,
                                                               count_time_from_zero=False,
                                                               reloading_time=0),
-                session_time_constraints=SessionTimeConstraints(max_session_time=300),
+                session_time_constraints=SessionTimeConstraints(max_session_time=30),
                 priority_constraints=PriorityConstraints(True, priority_cost_coefficient=100)),
-            unmatched_penalty=100000,
+            unmatched_penalty=10000,
             reload_per_vehicle=0,
-            monitor=MonitorConfig(enabled=enabled, min_iterations=min_iterations))
+            monitor=MonitorConfig(enabled=enabled, iterations_between_monitoring=iterations_between_monitoring,
+                                  max_iterations=max_iterations,
+                                  save_plot=False, show_plot=False, output_directory=''))
 
     @staticmethod
     def _create_drone_deliveries(delivery_requests: List[DeliveryRequest], empty_board: EmptyDroneDeliveryBoard,
@@ -173,23 +174,23 @@ class ORToolsMatcherMonitorTestCase(TestCase):
         drone_delivery_1 = DroneDelivery(id_=empty_board.empty_drone_deliveries[0].id,
                                          drone_formation=empty_board.empty_drone_deliveries[0].drone_formation,
                                          matched_requests=[MatchedDeliveryRequest(
-                                             graph_index=3,
-                                             delivery_request=delivery_requests[2],
+                                             graph_index=1,
+                                             delivery_request=delivery_requests[0],
                                              matched_delivery_option_index=0,
                                              delivery_time_window=TimeWindowExtension(
                                                  since=ZERO_TIME.add_time_delta(
-                                                     TimeDeltaExtension(timedelta(minutes=15))),
+                                                     TimeDeltaExtension(timedelta(minutes=5))),
                                                  until=ZERO_TIME.add_time_delta(
-                                                     TimeDeltaExtension(timedelta(minutes=15))))),
+                                                     TimeDeltaExtension(timedelta(minutes=5))))),
                                              MatchedDeliveryRequest(
-                                                 graph_index=1,
-                                                 delivery_request=delivery_requests[0],
+                                                 graph_index=3,
+                                                 delivery_request=delivery_requests[2],
                                                  matched_delivery_option_index=0,
                                                  delivery_time_window=TimeWindowExtension(
                                                      since=ZERO_TIME.add_time_delta(
-                                                         TimeDeltaExtension(timedelta(minutes=25))),
+                                                         TimeDeltaExtension(timedelta(minutes=15))),
                                                      until=ZERO_TIME.add_time_delta(
-                                                         TimeDeltaExtension(timedelta(minutes=25))))),
+                                                         TimeDeltaExtension(timedelta(minutes=15))))),
                                          ],
                                          start_drone_loading_docks=MatchedDroneLoadingDock(
                                              graph_index=0,

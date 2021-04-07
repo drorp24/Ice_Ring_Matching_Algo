@@ -62,7 +62,6 @@ class Monitor:
 
     def add_monitor(self, objective, total_priority, total_unmatched_delivery_requests,
                     unmatched_delivery_requests_total_priority, iterations, runtime):
-
         to_append = [objective,
                      total_priority,
                      total_unmatched_delivery_requests,
@@ -74,10 +73,9 @@ class Monitor:
 
         self._data = self._data.append(a_series, ignore_index=True)
 
-    def update_data(self, current_objective_value: int = None, total_priority_value: int = None,
-                    total_unmatched_delivery_requests: int = None,
-                    unmatched_delivery_requests_total_priority: int = None):
-
+    def update_data(self, current_objective_value: int = 0, total_priority_value: int = 0,
+                    total_unmatched_delivery_requests: int = 0,
+                    unmatched_delivery_requests_total_priority: int = 0):
         self._prev_objective_value = self._best_objective_value
         self._best_objective_value = current_objective_value
         self.add_monitor(current_objective_value, total_priority_value, total_unmatched_delivery_requests,

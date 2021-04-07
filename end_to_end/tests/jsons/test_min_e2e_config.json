@@ -54,9 +54,9 @@
     "__class__": "MonitorConfig",
     "enabled": true,
     "iterations_between_monitoring": 1,
-    "min_iterations": 0,
-    "save_data": true,
-    "plot_data": true,
+    "max_iterations": 0,
+    "save_plot": true,
+    "show_plot": true,
     "output_directory" : "outputs"
   }
 }

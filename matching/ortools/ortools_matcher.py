@@ -6,10 +6,9 @@ from common.entities.base_entities.drone_delivery_board import DroneDeliveryBoar
 from common.graph.operational.export_ortools_graph import OrtoolsGraphExporter
 from matching.matcher import Matcher
 from matching.matcher_input import MatcherInput
-from matching.monitor_plotter import create_monitor_figure
-from matching.ortools.ortools_matcher_monitor import ORToolsMatcherMonitor
 from matching.ortools.ortools_index_manager_wrapper import OrToolsIndexManagerWrapper
 from matching.ortools.ortools_matcher_constraints import ORToolsMatcherConstraints
+from matching.ortools.ortools_matcher_monitor import ORToolsMatcherMonitor
 from matching.ortools.ortools_matcher_objective import ORToolsMatcherObjective
 from matching.ortools.ortools_solution_handler import ORToolsSolutionHandler
 
@@ -23,9 +22,9 @@ class ORToolsMatcher(Matcher):
     def __init__(self, matcher_input: MatcherInput):
         super().__init__(matcher_input)
         num_of_reloading_depo_nodes_per_formation = matcher_input.config.reload_per_vehicle \
-            * NUM_OF_NODES_IN_RELOADING_DEPO
+                                                    * NUM_OF_NODES_IN_RELOADING_DEPO
         num_of_reloading_depo_nodes = self._matcher_input.empty_board.amount_of_formations() \
-            * num_of_reloading_depo_nodes_per_formation
+                                      * num_of_reloading_depo_nodes_per_formation
         self._reloading_virtual_depos_indices = list(range(
             len(self._matcher_input.graph.nodes),
             len(self._matcher_input.graph.nodes) + num_of_reloading_depo_nodes))
@@ -53,7 +52,8 @@ class ORToolsMatcher(Matcher):
 
     def match(self) -> DroneDeliveryBoard:
         solution = self._routing_model.SolveWithParameters(self._search_parameters)
-        self._save_monitor_data()
+        if self._matcher_input.config.monitor.enabled:
+            self.matcher_monitor.save_monitor_data()
         return self._solution_handler.create_drone_delivery_board(solution)
 
     def _set_index_manager(self) -> OrToolsIndexManagerWrapper:
@@ -105,15 +105,6 @@ class ORToolsMatcher(Matcher):
                                                      self._search_parameters, self.matcher_input,
                                                      self._solution_handler)
         self.matcher_monitor.add_search_monitor()
-
-    def _save_monitor_data(self):
-        monitor_config = self.matcher_input.config.monitor
-        if not monitor_config.enabled or not (monitor_config.save_data or monitor_config.plot_data):
-            return
-
-        # print(f'total iteration: {self.matcher_monitor.monitor.num_of_iterations}')
-        create_monitor_figure(self.matcher_monitor.monitor, self.matcher_input)
-
 
     def _set_reloading_depos_for_each_formation(self, num_of_reloading_depo_nodes_per_formation):
         for formation_index in range(self._matcher_input.empty_board.amount_of_formations()):
