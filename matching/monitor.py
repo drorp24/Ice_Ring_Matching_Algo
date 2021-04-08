@@ -1,7 +1,7 @@
 import enum
-import time
-
 import pandas as pd
+
+from common.entities.base_entities.temporal import current_milli_time
 
 
 class MonitorData(enum.Enum):
@@ -13,13 +13,9 @@ class MonitorData(enum.Enum):
     runtime = 6
 
 
-current_milli_time = lambda: int(round(time.time() * 1000))
-
-
 class Monitor:
 
     def __init__(self):
-        # data - DataFrame of MonitorData
         self._data = pd.DataFrame([], columns=[MonitorData.objective.name,
                                                MonitorData.total_priority.name,
                                                MonitorData.total_unmatched_delivery_requests.name,
@@ -73,7 +69,7 @@ class Monitor:
                                  current_milli_time() - self._start_time)
 
     def _add_iteration_data(self, objective, total_priority, total_unmatched_delivery_requests,
-                    unmatched_delivery_requests_total_priority, iterations, runtime):
+                            unmatched_delivery_requests_total_priority, iterations, runtime):
         to_append = [objective,
                      total_priority,
                      total_unmatched_delivery_requests,

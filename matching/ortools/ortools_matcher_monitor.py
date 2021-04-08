@@ -17,6 +17,8 @@ class ORToolsMatcherMonitor:
                  routing_model: RoutingModel, search_parameters: RoutingSearchParameters, matcher_input: MatcherInput,
                  solution_handler: ORToolsSolutionHandler):
 
+        self._initial_unmatched_delivery_requests, self._initial_unmatched_delivery_requests_total_priority = \
+            self._calc_initial_unmatched_delivery_requests()
         self._graph_exporter = graph_exporter
         self._index_manager = index_manager
         self._routing_model = routing_model
@@ -34,14 +36,11 @@ class ORToolsMatcherMonitor:
         return self._monitor
 
     def add_search_monitor(self) -> None:
-        # CloseModelWithParameters
         self._routing_model.CloseModelWithParameters(self._search_parameters)
 
         self._add_best_solution_collector()
         self._add_unmatched_delivery_requests_monitoring()
         self._add_priority_monitoring()
-        self.init_unmatched_delivery_requests, self.init_unmatched_delivery_requests_total_priority = \
-            self._calc_initial_unmatched_delivery_requests()
         # self._add_drone_delivery_board_monitoring()
         self._routing_model.AddSearchMonitor(self._routing_model.solver().CustomLimit(self.monitor_search))
 
@@ -134,7 +133,7 @@ class ORToolsMatcherMonitor:
                 best_objective_value = 0
                 total_priority_value = 0
                 total_unmatched_delivery_requests, unmatched_delivery_requests_total_priority = \
-                    self.init_unmatched_delivery_requests, self.init_unmatched_delivery_requests_total_priority
+                    self._initial_unmatched_delivery_requests, self._initial_unmatched_delivery_requests_total_priority
                 if self.print_status:
                     print(f"iteration {self._monitor.num_of_iterations} : No Solution")
             else:
