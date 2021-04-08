@@ -1,6 +1,7 @@
 from common.entities.base_entities.drone_delivery_board import DroneDeliveryBoard
 from common.graph.operational.graph_creator import *
 from end_to_end.supplier_category import SupplierCategory
+from matching.initial_solution import Routes
 from matching.matcher_factory import create_matcher
 from matching.matcher_input import MatcherInput
 
@@ -31,3 +32,9 @@ def create_clustered_delivery_requests_graph_model(supplier_category: SupplierCa
 def calc_assignment(matcher_input: MatcherInput) -> DroneDeliveryBoard:
     matcher = create_matcher(matcher_input)
     return matcher.match()
+
+
+def calc_assignment_from_init_solution(matcher_input: MatcherInput,
+                                       initial_routes: Routes) -> DroneDeliveryBoard:
+    matcher = create_matcher(matcher_input)
+    return matcher.match_from_init_solution(initial_routes)

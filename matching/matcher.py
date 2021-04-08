@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 
 from common.entities.base_entities.drone_delivery_board import DroneDeliveryBoard
+from matching.initial_solution import Routes
 from matching.matcher_input import MatcherInput
 
 
@@ -21,6 +22,14 @@ class Matcher(ABC):
 
     @abstractmethod
     def match(self) -> DroneDeliveryBoard:
+        raise NotImplementedError()
+
+    @abstractmethod
+    def match_to_routes(self) -> Routes:
+        raise NotImplementedError()
+
+    @abstractmethod
+    def match_from_init_solution(self, initial_routes: Routes) -> DroneDeliveryBoard:
         raise NotImplementedError()
 
     def _validate_input(self) -> bool:
