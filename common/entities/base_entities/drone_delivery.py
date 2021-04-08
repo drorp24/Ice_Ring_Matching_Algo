@@ -36,11 +36,7 @@ class EmptyDroneDelivery(JsonableBaseEntity):
 
     @property
     def max_route_time_in_minutes(self) -> int:
-        return self._max_route_times_in_minutes
-
-    @property
-    def reload_time_in_minutes(self) -> int:
-        return self._reload_time_in_minutes
+        return self._max_route_time_in_minutes
 
     @property
     def velocity_meter_per_sec(self) -> float:
@@ -49,11 +45,22 @@ class EmptyDroneDelivery(JsonableBaseEntity):
     def get_formation_max_range_in_meters(self) -> float:
         return self.velocity_meter_per_sec * self.max_route_time_in_minutes * 60.0
 
+    def __eq__(self, other):
+        return all([self.id == other.id,
+                   self.drone_formation == other.drone_formation,
+                    self.max_route_time_in_minutes == other.max_route_time_in_minutes,
+                    self.velocity_meter_per_sec == other.velocity_meter_per_sec])
+
+    def __hash__(self):
+        return hash((self._id, self._drone_formation, self._max_route_time_in_minutes, self._velocity_meter_per_sec))
+
     @classmethod
     def dict_to_obj(cls, dict_input):
         assert (dict_input['__class__'] == cls.__name__)
         return EmptyDroneDelivery(id_=EntityID.dict_to_obj(dict_input['id']),
-                                  drone_formation=DroneFormation.dict_to_obj(dict_input['drone_formation']))
+                                  drone_formation=DroneFormation.dict_to_obj(dict_input['drone_formation']),
+                                  max_route_time_in_minutes=int(dict_input['max_route_time_in_minutes']),
+                                  velocity_meter_per_sec=float(dict_input['velocity_meter_per_sec']))
 
 
 @dataclass

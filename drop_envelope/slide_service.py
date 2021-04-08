@@ -1,15 +1,10 @@
-import math
 from typing import List
 
-from optional import Optional
-from optional.nothing import Nothing
-
 from common.entities.base_entities.package import PackageType
-from common.math.angle import Angle, AngleUnit
+from common.math.angle import Angle
 from drop_envelope.azimuth_quantization import get_azimuth_quantization_value, get_azimuth_quantization_values
 from drop_envelope.slide import Slide
 from drop_envelope.slide_container_factory import create_slides_container
-from params import MIN_AZIMUTH_DEGREES, MAX_AZIMUTH_DEGREES
 
 
 class _SlidesService:

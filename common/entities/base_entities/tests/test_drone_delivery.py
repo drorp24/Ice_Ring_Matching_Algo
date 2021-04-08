@@ -25,6 +25,7 @@ ZERO_TIME = DateTimeExtension(dt_date=date(2020, 1, 23), dt_time=time(11, 30, 0)
 class BasicDroneDeliveryGenerationTests(unittest.TestCase):
 
     drone_delivery_board_json_path = Path('common/entities/base_entities/tests/delivery_board_test_file.json')
+    empty_drone_delivery_json_path = Path('common/entities/base_entities/tests/empty_drone_delivery_test_file.json')
 
     @classmethod
     def setUpClass(cls):
@@ -39,6 +40,7 @@ class BasicDroneDeliveryGenerationTests(unittest.TestCase):
     @classmethod
     def tearDownClass(cls):
         cls.drone_delivery_board_json_path.unlink()
+        cls.empty_drone_delivery_json_path.unlink()
 
     def test_empty_drone_delivery(self):
         self.assertEqual(self.empty_drone_delivery_1.drone_formation, DroneFormations.get_drone_formation(
@@ -122,6 +124,13 @@ class BasicDroneDeliveryGenerationTests(unittest.TestCase):
         drone_delivery_board_from_json = DroneDeliveryBoard.from_json(DroneDeliveryBoard,
                                                                       self.drone_delivery_board_json_path)
         self.assertEqual(self.drone_delivery_board, drone_delivery_board_from_json)
+
+    def test_empty_drone_delivery_is_jsonable(self):
+        self.empty_drone_delivery_1.to_json(self.empty_drone_delivery_json_path)
+
+        empty_drone_delivery_from_json = EmptyDroneDelivery.from_json(EmptyDroneDelivery,
+                                                                      self.empty_drone_delivery_json_path)
+        self.assertEqual(self.empty_drone_delivery_1, empty_drone_delivery_from_json)
 
     @staticmethod
     def _create_delivery_requests() -> List[DeliveryRequest]:

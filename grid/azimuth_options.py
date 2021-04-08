@@ -1,7 +1,7 @@
 import math
 from typing import List
 from common.math.angle import AngleUnit, Angle
-from params import MAX_AZIMUTH_DEGREES, MIN_AZIMUTH_DEGREES
+from common.math.params import MAX_AZIMUTH_DEGREES, MIN_AZIMUTH_DEGREES
 
 
 class AzimuthOptions:
