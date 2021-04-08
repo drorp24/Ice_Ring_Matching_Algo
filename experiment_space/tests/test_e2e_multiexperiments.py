@@ -54,7 +54,7 @@ class EndToEndMultipleExperimentRun(unittest.TestCase):
         cls.drone_set_properties_even = EndToEndMultipleExperimentRun._create_even_drone_set_properties()
         cls.drone_set_properties_heavily_weighted = EndToEndMultipleExperimentRun._create_even_drone_set_properties()
         cls.matcher_config = MatcherConfig.dict_to_obj(
-            MatcherConfig.json_to_dict(Path('experiment_space/tests/jsons/test_matcher_config.json')))
+            MatcherConfig.json_to_dict(Path('experiment_space/tests/jsons/test_min_e2e_config.json')))
 
     @unittest.skip
     def test_calc_north_scenario_visualization(self):

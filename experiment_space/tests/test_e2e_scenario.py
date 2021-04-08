@@ -24,7 +24,7 @@ class BasicMinimumEnd2End(unittest.TestCase):
             Path('experiment_space/tests/jsons/test_supplier_category.json')))
         cls.drone_set_properties = BasicMinimumEnd2End._create_simple_drone_set_properties()
         cls.matcher_config = MatcherConfig.dict_to_obj(
-            MatcherConfig.json_to_dict(Path('experiment_space/tests/jsons/test_matcher_config.json')))
+            MatcherConfig.json_to_dict(Path('experiment_space/tests/jsons/test_min_e2e_config.json')))
 
     @classmethod
     def _create_simple_drone_set_properties(cls):
