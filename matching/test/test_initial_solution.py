@@ -27,6 +27,7 @@ from geometry.geo_factory import create_point_2d
 from matching.constraint_config import ConstraintsConfig, CapacityConstraints, TravelTimeConstraints, \
     SessionTimeConstraints, PriorityConstraints
 from matching.matcher_config import MatcherConfig
+from matching.monitor_config import MonitorConfig
 from matching.ortools.ortools_initial_solution import ORToolsInitialSolution
 from matching.ortools.ortools_solver_config import ORToolsSolverConfig
 from matching.solver_config import SolverVendor
@@ -122,7 +123,8 @@ class BasicInitialSolutionTest(TestCase):
                 session_time_constraints=SessionTimeConstraints(max_session_time=60),
                 priority_constraints=PriorityConstraints(True, priority_cost_coefficient=1000)),
             unmatched_penalty=10000,
-            reload_per_vehicle=reload_per_vehicle
+            reload_per_vehicle=reload_per_vehicle,
+            monitor=MonitorConfig(enabled=False)
         )
 
     @staticmethod

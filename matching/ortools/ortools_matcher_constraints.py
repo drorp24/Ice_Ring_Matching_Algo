@@ -19,6 +19,7 @@ class OrToolsDimensionDescription(Enum):
     travel_cost = "travel_cost"
     travel_time = "travel_time"
     session_time = "session_time"
+    priority = "priority"
 
 
 class ORToolsMatcherConstraints:

@@ -8,6 +8,7 @@ from matching.constraint_config import CapacityConstraints, TravelTimeConstraint
     SessionTimeConstraints
 from matching.matcher_config import ConstraintsConfig, MatcherConfig
 from matching.matcher_factory import SolverVendor
+from matching.monitor_config import MonitorConfig
 from matching.ortools.ortools_solver_config import ORToolsSolverConfig
 
 
@@ -18,7 +19,7 @@ class MatchConfigTestCase(TestCase):
         cls.config_obj = MatcherConfig(
             zero_time=DateTimeExtension(dt_date=date(2020, 1, 23), dt_time=time(11, 30, 0)),
             solver=ORToolsSolverConfig(SolverVendor.OR_TOOLS, first_solution_strategy="path_cheapest_arc",
-                                local_search_strategy="automatic", timeout_sec=30),
+                                       local_search_strategy="automatic", timeout_sec=30),
             constraints=ConstraintsConfig(
                 capacity_constraints=CapacityConstraints(count_capacity_from_zero=True, capacity_cost_coefficient=1000),
                 travel_time_constraints=TravelTimeConstraints(max_waiting_time=10,
@@ -28,7 +29,14 @@ class MatchConfigTestCase(TestCase):
                 session_time_constraints=SessionTimeConstraints(max_session_time=300),
                 priority_constraints=PriorityConstraints(True, priority_cost_coefficient=1000)),
             unmatched_penalty=100000,
-            reload_per_vehicle=0
+            reload_per_vehicle=0,
+            monitor=MonitorConfig(enabled=True,
+                                  iterations_between_monitoring=10,
+                                  max_iterations=100000,
+                                  save_plot=True,
+                                  show_plot=True,
+                                  separate_charts=True,
+                                  output_directory="outputs")
         )
 
     def test_match_config_to_dict(self):

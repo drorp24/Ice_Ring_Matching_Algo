@@ -28,6 +28,7 @@ from matching.constraint_config import ConstraintsConfig, PriorityConstraints, C
     TravelTimeConstraints, SessionTimeConstraints
 from matching.matcher_config import MatcherConfig
 from matching.matcher_input import MatcherInput
+from matching.monitor_config import MonitorConfig
 from matching.ortools.ortools_matcher import ORToolsMatcher
 from matching.ortools.ortools_solver_config import ORToolsSolverConfig
 from matching.solver_config import SolverVendor
@@ -122,7 +123,8 @@ class ORToolsMatcherDifferentTWTestCase(TestCase):
                 session_time_constraints=SessionTimeConstraints(max_session_time=300),
                 priority_constraints=PriorityConstraints(True, priority_cost_coefficient=1)),
             unmatched_penalty=100000,
-            reload_per_vehicle=0
+            reload_per_vehicle=0,
+            monitor=MonitorConfig(enabled=False)
         )
 
     @staticmethod
