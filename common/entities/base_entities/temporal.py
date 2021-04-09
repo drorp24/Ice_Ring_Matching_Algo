@@ -185,7 +185,7 @@ class TimeDeltaExtension(BaseEntity):
 
 
 def current_milli_time() -> int:
-    return int(round(time.time() * 1000))
+    return int(round(datetime.now().timestamp() * 1000))
 
 
 class NoViableTimesGivenDistribution(Exception):

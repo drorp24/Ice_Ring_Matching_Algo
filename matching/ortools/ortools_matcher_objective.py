@@ -4,6 +4,7 @@ from ortools.constraint_solver.pywrapcp import RoutingModel
 from common.graph.operational.export_ortools_graph import OrtoolsGraphExporter
 from matching.matcher_input import MatcherInput
 from matching.ortools.ortools_index_manager_wrapper import OrToolsIndexManagerWrapper
+from matching.ortools.ortools_matcher_constraints import OrToolsDimensionDescription
 
 
 class ORToolsMatcherObjective:
@@ -25,7 +26,7 @@ class ORToolsMatcherObjective:
             0,
             self._matcher_input.config.constraints.priority.priority_cost_coefficient * 10000,
             True,
-            'priority')
+            OrToolsDimensionDescription.priority.value)
 
     def create_priority_evaluator(self):
 

@@ -54,7 +54,7 @@ class ORToolsMatcher(Matcher):
     def match(self) -> DroneDeliveryBoard:
         solution = self._routing_model.SolveWithParameters(self._search_parameters)
         if self._matcher_input.config.monitor.enabled:
-            self.matcher_monitor.save_monitor_data()
+            self.matcher_monitor.handle_monitor_data()
         return self._solution_handler.create_drone_delivery_board(solution)
 
     def match_to_routes(self) -> Routes:

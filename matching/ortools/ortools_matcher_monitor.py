@@ -17,8 +17,6 @@ class ORToolsMatcherMonitor:
                  routing_model: RoutingModel, search_parameters: RoutingSearchParameters, matcher_input: MatcherInput,
                  solution_handler: ORToolsSolutionHandler):
 
-        self._initial_unmatched_delivery_requests, self._initial_unmatched_delivery_requests_total_priority = \
-            self._calc_initial_unmatched_delivery_requests()
         self._graph_exporter = graph_exporter
         self._index_manager = index_manager
         self._routing_model = routing_model
@@ -27,9 +25,11 @@ class ORToolsMatcherMonitor:
         self._matcher_input = matcher_input
         self._monitor_config = matcher_input.config.monitor
         self._graph = matcher_input.graph
+        self._initial_unmatched_delivery_requests, self._initial_unmatched_delivery_requests_total_priority = \
+            self._calc_initial_unmatched_delivery_requests()
         self._monitor = Monitor()
         self._priority_dimension = self._routing_model.GetDimensionOrDie('priority')
-        self.print_status = False
+        self._print_status = False
 
     @property
     def monitor(self):
@@ -44,7 +44,7 @@ class ORToolsMatcherMonitor:
         # self._add_drone_delivery_board_monitoring()
         self._routing_model.AddSearchMonitor(self._routing_model.solver().CustomLimit(self.monitor_search))
 
-    def save_monitor_data(self) -> None:
+    def handle_monitor_data(self) -> None:
         if not (self._monitor_config.save_plot or self._monitor_config.show_plot):
             return
 
@@ -134,7 +134,7 @@ class ORToolsMatcherMonitor:
                 total_priority_value = 0
                 total_unmatched_delivery_requests, unmatched_delivery_requests_total_priority = \
                     self._initial_unmatched_delivery_requests, self._initial_unmatched_delivery_requests_total_priority
-                if self.print_status:
+                if self._print_status:
                     print(f"iteration {self._monitor.num_of_iterations} : No Solution")
             else:
                 # dr = self._solution_handler.create_drone_delivery_board(self.best_solution_collector.Solution(0))
@@ -142,7 +142,7 @@ class ORToolsMatcherMonitor:
                 total_priority_value = self._calc_total_priority()
                 total_unmatched_delivery_requests, unmatched_delivery_requests_total_priority = \
                     self._calc_total_unmatched_delivery_requests()
-                if self.print_status:
+                if self._print_status:
                     print(
                         f"iteration {self._monitor.num_of_iterations} current objective value {best_objective_value}, total priority {total_priority_value}, unmatched delivery requests {total_unmatched_delivery_requests}, unmatched delivery requests total priority {unmatched_delivery_requests_total_priority}")
 
