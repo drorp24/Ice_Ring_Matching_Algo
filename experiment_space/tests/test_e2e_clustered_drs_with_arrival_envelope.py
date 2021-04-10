@@ -152,7 +152,8 @@ class BasicMinimumEnd2EndClusteredDrsTest(unittest.TestCase):
                                                  row_names=row_names,
                                                  rows_title='Formation Type x Package Type Amounts'
                                                  )
-        operational_gantt_drawer.add_delivery_board(board_gantt_drawer, delivery_board, True)
+        operational_gantt_drawer.add_delivery_board_with_row_per_drone_delivery(board_gantt_drawer, delivery_board,
+                                                                                True)
         board_gantt_drawer.draw(True)
 
     def _run_match(self, clustered_connected_graph, drone_deliveries_amount) -> DroneDeliveryBoard:

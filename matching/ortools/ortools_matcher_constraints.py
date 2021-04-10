@@ -335,5 +335,5 @@ class ORToolsMatcherConstraints:
 
     def _set_max_route_time_for_each_vehicle(self, time_dimension: RoutingDimension):
         for i, drone_delivery in enumerate(self._matcher_input.empty_board.empty_drone_deliveries):
-            max_route_time_in_minutes = drone_delivery.max_route_time_in_minutes
+            max_route_time_in_minutes = drone_delivery.get_max_route_time_in_minutes()
             time_dimension.SetSpanUpperBoundForVehicle(max_route_time_in_minutes, i)

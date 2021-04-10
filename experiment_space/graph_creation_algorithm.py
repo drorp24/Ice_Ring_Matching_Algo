@@ -1,9 +1,13 @@
 from abc import abstractmethod
 
 from common.entities.base_entities.base_entity import JsonableBaseEntity
+from common.entities.base_entities.drone_delivery_board import DroneDeliveryBoard
 from common.graph.operational.graph_creator import *
 from common.utils.class_controller import name_to_class
 from experiment_space.supplier_category import SupplierCategory
+from matching.initial_solution import Routes
+from matching.matcher_factory import create_matcher
+from matching.matcher_input import MatcherInput
 
 
 class GraphCreationAlgorithm(JsonableBaseEntity):
@@ -98,3 +102,9 @@ class ClusteredDeliveryRequestGraphAlgorithm(GraphCreationAlgorithm):
         return self.edge_cost_factor == other.edge_cost_factor and \
                self.edge_travel_time_factor == other.edge_travel_time_factor and \
                self.max_clusters_per_zone == other.max_clusters_per_zone
+
+
+def calc_assignment_from_init_solution(matcher_input: MatcherInput,
+                                       initial_routes: Routes) -> DroneDeliveryBoard:
+    matcher = create_matcher(matcher_input)
+    return matcher.match_from_init_solution(initial_routes)

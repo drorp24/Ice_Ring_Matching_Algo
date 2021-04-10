@@ -11,9 +11,7 @@ from experiment_space.analyzer.quantitative_analyzers import AmountMatchedPerPac
 from experiment_space.experiment import Experiment
 from experiment_space.graph_creation_algorithm import FullyConnectedGraphAlgorithm
 from experiment_space.supplier_category import SupplierCategory
-from experiment_space.visualization.experiment_visualizer import draw_matched_scenario
 from matching.matcher_config import MatcherConfig
-from visualization.basic.pltdrawer2d import MapImage
 
 
 class BasicMinimumEnd2End(unittest.TestCase):
@@ -49,14 +47,6 @@ class BasicMinimumEnd2End(unittest.TestCase):
                        board_level_properties=BoardLevelProperties(100, 10.0))
 
         delivery_board = e.run_match()
-
-        map_image = MapImage(map_background_path=Path("visualization/basic/gush_dan_background.png"),
-                             west_lon=34.83927, east_lon=35.32341, south_lat=31.77279, north_lat=32.59276)
-
-        draw_matched_scenario(delivery_board=delivery_board,
-                              graph=e.graph_creation_algorithm.create(supplier_category=self.supplier_category),
-                              supplier_category=self.supplier_category,
-                              map_image=map_image)
 
         analysis = Experiment.run_analysis_suite(delivery_board,
                                                  [UnmatchedDeliveryRequestsAnalyzer,

@@ -16,8 +16,7 @@ class EmptyDroneDelivery(JsonableBaseEntity):
     def __init__(self, id_: EntityID, drone_formation: DroneFormation, board_level_properties=BoardLevelProperties()):
         self._id = id_
         self._drone_formation = drone_formation
-        self._max_route_times_in_minutes = board_level_properties.max_route_time_entire_board  # TODO: Change to real endurance
-        self._velocity_meter_per_sec = board_level_properties.velocity_entire_board  # TODO: Change to real velocity
+        self._board_level_properties = board_level_properties
         self._reload_time_in_minutes = 60
 
     def __eq__(self, other):
@@ -31,36 +30,37 @@ class EmptyDroneDelivery(JsonableBaseEntity):
         return self._id
 
     @property
+    def board_level_properties(self) -> BoardLevelProperties:
+        return self._board_level_properties
+
+    @property
     def drone_formation(self) -> DroneFormation:
         return self._drone_formation
 
-    @property
-    def max_route_time_in_minutes(self) -> int:
-        return self._max_route_time_in_minutes
+    def get_max_route_time_in_minutes(self) -> int:
+        return self._board_level_properties.max_route_time_entire_board
 
-    @property
-    def velocity_meter_per_sec(self) -> float:
-        return self._velocity_meter_per_sec
+    def get_velocity_meter_per_sec(self) -> float:
+        return self._board_level_properties.velocity_entire_board
 
     def get_formation_max_range_in_meters(self) -> float:
-        return self.velocity_meter_per_sec * self.max_route_time_in_minutes * 60.0
+        return self.get_velocity_meter_per_sec() * self.get_max_route_time_in_minutes() * 60.0
 
     def __eq__(self, other):
         return all([self.id == other.id,
-                   self.drone_formation == other.drone_formation,
-                    self.max_route_time_in_minutes == other.max_route_time_in_minutes,
-                    self.velocity_meter_per_sec == other.velocity_meter_per_sec])
+                    self.drone_formation == other.drone_formation,
+                    self.board_level_properties == other.board_level_properties])
 
     def __hash__(self):
-        return hash((self._id, self._drone_formation, self._max_route_time_in_minutes, self._velocity_meter_per_sec))
+        return hash((self._id, self._drone_formation, self._board_level_properties))
 
     @classmethod
     def dict_to_obj(cls, dict_input):
         assert (dict_input['__class__'] == cls.__name__)
         return EmptyDroneDelivery(id_=EntityID.dict_to_obj(dict_input['id']),
                                   drone_formation=DroneFormation.dict_to_obj(dict_input['drone_formation']),
-                                  max_route_time_in_minutes=int(dict_input['max_route_time_in_minutes']),
-                                  velocity_meter_per_sec=float(dict_input['velocity_meter_per_sec']))
+                                  board_level_properties=BoardLevelProperties.dict_to_obj(
+                                      dict_input['board_level_properties']))
 
 
 @dataclass

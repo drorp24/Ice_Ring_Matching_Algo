@@ -4,6 +4,7 @@ from unittest import TestCase
 
 from common.entities.base_entities.drone import PackageConfiguration, DroneType
 from common.entities.base_entities.drone_formation import DroneFormationType
+from common.entities.base_entities.drone_loading_dock import DroneLoadingDock
 from common.entities.base_entities.entity_distribution.delivery_requestion_dataset_builder import \
     build_delivery_request_distribution
 from common.entities.base_entities.entity_distribution.drone_loading_dock_distribution import \
@@ -14,19 +15,19 @@ from common.entities.base_entities.entity_distribution.package_distribution impo
 from common.entities.base_entities.entity_distribution.priority_distribution import PriorityDistribution
 from common.entities.base_entities.entity_distribution.temporal_distribution import TimeDeltaDistribution, \
     TimeWindowDistribution, DateTimeDistribution
-from common.entities.base_entities.fleet.empty_drone_delivery_board_generation import build_empty_drone_delivery_board
 from common.entities.base_entities.fleet.fleet_property_sets import DroneFormationTypePolicy, \
     PackageConfigurationPolicy, DroneSetProperties
 from common.entities.base_entities.package import PackageType
 from common.entities.base_entities.temporal import DateTimeExtension, TimeDeltaExtension
-from end_to_end.distribution.supplier_category_distribution import SupplierCategoryDistribution
-from end_to_end.minimum_end_to_end import *
+
+from experiment_space.graph_creation_algorithm import calc_assignment_from_init_solution, DeliveryRequest
 from geometry.distribution.geo_distribution import NormalPointDistribution, UniformPointInBboxDistribution
 from geometry.geo2d import Point2D
 from geometry.geo_factory import create_point_2d
 from matching.constraint_config import ConstraintsConfig, CapacityConstraints, TravelTimeConstraints, \
     SessionTimeConstraints, PriorityConstraints
 from matching.matcher_config import MatcherConfig
+from matching.matcher_input import MatcherInput
 from matching.ortools.ortools_initial_solution import ORToolsInitialSolution
 from matching.ortools.ortools_solver_config import ORToolsSolverConfig
 from matching.solver_config import SolverVendor
