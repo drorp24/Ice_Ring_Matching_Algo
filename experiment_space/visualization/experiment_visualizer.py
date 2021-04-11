@@ -1,12 +1,13 @@
-from random import random, Random
+from random import Random
 from typing import List, Dict, Tuple
+
+import matplotlib.pyplot as plt
 
 from experiment_space.analyzer.analyzer import Analyzer
 from visualization.basic.drawer2d import Drawer2DCoordinateSys
 from visualization.basic.pltdrawer2d import create_drawer_2d
 from visualization.basic.pltgantt_drawer import create_gantt_drawer
 from visualization.operational import operational_drawer2d, operational_gantt_drawer
-import matplotlib.pyplot as plt
 
 
 def draw_matched_scenario(delivery_board, graph, supplier_category, map_image):

@@ -86,7 +86,7 @@ class BasicInitialSolutionTest(TestCase):
                                                   empty_board=empty_drone_delivery_board,
                                                   config=match_config_auto_noreuse)
 
-        delivery_board_auto_noreuse = calc_assignment(matcher_input=matcher_input_auto_noreuse)
+        delivery_board_auto_noreuse = create_matcher(matcher_input=matcher_input_auto_noreuse).match()
 
         match_config_initial = BasicInitialSolutionTest.create_match_config(local_search_strategy="GUIDED_LOCAL_SEARCH",
                                                                             reload_per_vehicle=3)
