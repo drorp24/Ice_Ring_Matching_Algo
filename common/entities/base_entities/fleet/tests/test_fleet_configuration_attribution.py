@@ -3,7 +3,7 @@ from datetime import timedelta
 from pathlib import Path
 
 from common.entities.base_entities.drone import DroneType, PackageConfiguration
-from common.entities.base_entities.drone_delivery_board import EmptyDroneDeliveryBoard
+from common.entities.base_entities.drone_delivery_board import DeliveringDronesBoard
 from common.entities.base_entities.drone_formation import DroneFormationType, DroneFormations, \
     PackageConfigurationOption, DroneFormation
 from common.entities.base_entities.drone_loading_dock import DroneLoadingDock
@@ -101,7 +101,7 @@ class TestFleetConfigurationAttribution(unittest.TestCase):
     def test_empty_drone_delivery_board(self):
         empty_drone_delivery_board = generate_empty_delivery_board(
             [self.drone_set_properties_1, self.drone_set_properties_2],400,10)
-        self.assertIsInstance(empty_drone_delivery_board, EmptyDroneDeliveryBoard)
+        self.assertIsInstance(empty_drone_delivery_board, DeliveringDronesBoard)
         self.assertEqual(len(empty_drone_delivery_board.empty_drone_deliveries), 24)
         self.assertIsInstance(empty_drone_delivery_board.empty_drone_deliveries[0].drone_formation, DroneFormation)
 
@@ -111,7 +111,7 @@ class TestFleetConfigurationAttribution(unittest.TestCase):
         empty_drone_delivery_board.to_json(self.empty_drone_delivery_board_json_path)
 
         empty_drone_delivery_board_from_json = \
-            EmptyDroneDeliveryBoard.from_json(EmptyDroneDeliveryBoard, self.empty_drone_delivery_board_json_path)
+            DeliveringDronesBoard.from_json(DeliveringDronesBoard, self.empty_drone_delivery_board_json_path)
 
         self.assertEqual(empty_drone_delivery_board, empty_drone_delivery_board_from_json)
 

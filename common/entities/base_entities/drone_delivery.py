@@ -29,7 +29,7 @@ class DeliveringDrones(JsonableBaseEntity):
         self._drone_formation = drone_formation
         self._start_loading_dock = start_loading_dock
         self._end_loading_dock = end_loading_dock
-        self._max_route_times_in_minutes = max_route_time_in_minutes  # TODO: Change to real endurance
+        self._max_route_time_in_minutes = max_route_time_in_minutes  # TODO: Change to real endurance
         self._velocity_meter_per_sec = velocity_meter_per_sec  # TODO: Change to real velocity
 
     @property
@@ -50,7 +50,7 @@ class DeliveringDrones(JsonableBaseEntity):
 
     @property
     def max_route_time_in_minutes(self) -> int:
-        return self._max_route_times_in_minutes
+        return self._max_route_time_in_minutes
 
     @property
     def velocity_meter_per_sec(self) -> float:
@@ -69,6 +69,7 @@ class DeliveringDrones(JsonableBaseEntity):
 
     def __hash__(self):
         return hash((
+            self.id,
             self.drone_formation,
             self.start_loading_dock,
             self.end_loading_dock,
@@ -83,8 +84,8 @@ class DeliveringDrones(JsonableBaseEntity):
                                 drone_formation=DroneFormation.dict_to_obj(dict_input['drone_formation']),
                                 start_loading_dock=DroneLoadingDock.dict_to_obj(dict_input['start_loading_dock']),
                                 end_loading_dock=DroneLoadingDock.dict_to_obj(dict_input['end_loading_dock']),
-                                max_route_time_in_minutes=dict_input['max_route_time_in_minutes'],
-                                velocity_meter_per_sec=dict_input['velocity_meter_per_sec'],
+                                max_route_time_in_minutes=int(dict_input['max_route_time_in_minutes']),
+                                velocity_meter_per_sec=float(dict_input['velocity_meter_per_sec']),
                                 )
 
 

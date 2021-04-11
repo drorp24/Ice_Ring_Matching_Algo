@@ -3,7 +3,7 @@ from pathlib import Path
 from random import Random
 
 from common.entities.base_entities.drone import PackageConfiguration, DroneType
-from common.entities.base_entities.drone_delivery_board import EmptyDroneDeliveryBoard
+from common.entities.base_entities.drone_delivery_board import DeliveringDronesBoard
 from common.entities.base_entities.drone_formation import DroneFormationType
 from common.entities.base_entities.drone_loading_station import DroneLoadingStation
 from common.entities.base_entities.entity_distribution.delivery_requestion_dataset_builder import \
@@ -135,7 +135,7 @@ class BasicMinimumEnd2EndExperiment:
         start_time = datetime.now()
         empty_drone_delivery_board = _create_empty_drone_delivery_board(amount=24, max_route_time_entire_board=1440,
                                                                         velocity_entire_board=10.0)
-        # empty_drone_delivery_board = EmptyDroneDeliveryBoard.from_json(EmptyDroneDeliveryBoard, "C:\\Users\\ronen.benhayon\\Downloads\\runs_with_graph\\e94e623f-0559-4e78-9da8-87fbc9d9d01f\\configuration_file.json")
+        # empty_drone_delivery_board = DeliveringDronesBoard.from_json(DeliveringDronesBoard, "C:\\Users\\ronen.benhayon\\Downloads\\runs_with_graph\\e94e623f-0559-4e78-9da8-87fbc9d9d01f\\configuration_file.json")
         print("--- _create_empty_drone_delivery_board run time: %s  ---" % (datetime.now() - start_time))
         start_time = datetime.now()
 

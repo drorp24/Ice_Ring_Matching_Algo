@@ -8,7 +8,7 @@ from common.entities.base_entities.delivery_request import DeliveryRequest
 from common.entities.base_entities.drone import DroneType
 from common.entities.base_entities.drone_delivery import DeliveringDrones, DroneDelivery, MatchedDeliveryRequest, \
     MatchedDroneLoadingDock
-from common.entities.base_entities.drone_delivery_board import DroneDeliveryBoard, EmptyDroneDeliveryBoard
+from common.entities.base_entities.drone_delivery_board import DroneDeliveryBoard, DeliveringDronesBoard
 from common.entities.base_entities.drone_formation import DroneFormations, PackageConfigurationOption, \
     DroneFormationType
 from common.entities.base_entities.drone_loading_dock import DroneLoadingDock
@@ -96,7 +96,7 @@ class ORToolsMatcherFleetWithMultiplePackageType(TestCase):
         return graph
 
     @staticmethod
-    def _create_empty_board(loading_dock: DroneLoadingDock) -> EmptyDroneDeliveryBoard:
+    def _create_empty_board(loading_dock: DroneLoadingDock) -> DeliveringDronesBoard:
         empty_drone_delivery_1 = DeliveringDrones(id_=EntityID(uuid.uuid4()),
                                                   drone_formation=DroneFormations.get_drone_formation(
             DroneFormationType.PAIR, PackageConfigurationOption.MEDIUM_PACKAGES, DroneType.drone_type_1),
@@ -107,7 +107,7 @@ class ORToolsMatcherFleetWithMultiplePackageType(TestCase):
             DroneFormationType.PAIR, PackageConfigurationOption.SMALL_PACKAGES, DroneType.drone_type_1),
                                                   start_loading_dock=loading_dock,
                                                   end_loading_dock=loading_dock)
-        return EmptyDroneDeliveryBoard([empty_drone_delivery_1, empty_drone_delivery_2])
+        return DeliveringDronesBoard([empty_drone_delivery_1, empty_drone_delivery_2])
 
     @staticmethod
     def _create_match_config() -> MatcherConfig:
@@ -128,7 +128,7 @@ class ORToolsMatcherFleetWithMultiplePackageType(TestCase):
         )
 
     @staticmethod
-    def _create_drone_deliveries(delivery_requests: List[DeliveryRequest], empty_board: EmptyDroneDeliveryBoard,
+    def _create_drone_deliveries(delivery_requests: List[DeliveryRequest], empty_board: DeliveringDronesBoard,
                                  loading_dock: DroneLoadingDock) -> List[DroneDelivery]:
         drone_delivery_1 = DroneDelivery(delivering_drones=empty_board.empty_drone_deliveries[0],
                                          matched_requests=[MatchedDeliveryRequest(

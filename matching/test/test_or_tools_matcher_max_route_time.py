@@ -7,7 +7,7 @@ from unittest import TestCase
 from common.entities.base_entities.delivery_request import DeliveryRequest
 from common.entities.base_entities.drone import DroneType
 from common.entities.base_entities.drone_delivery import DeliveringDrones
-from common.entities.base_entities.drone_delivery_board import EmptyDroneDeliveryBoard
+from common.entities.base_entities.drone_delivery_board import DeliveringDronesBoard
 from common.entities.base_entities.drone_formation import DroneFormations, PackageConfigurationOption, \
     DroneFormationType
 from common.entities.base_entities.drone_loading_dock import DroneLoadingDock
@@ -53,8 +53,8 @@ class ORToolsMatcherMaxRouteTimeTestCase(TestCase):
         cls.edd2_max_endurance = cls.empty_drone_delivery_2.max_route_time_in_minutes
         cls.edd2_max_range = cls.empty_drone_delivery_2.get_formation_max_range_in_meters()
         cls.edd2_velocity_per_minute = cls.empty_drone_delivery_2.velocity_meter_per_sec * 60.0
-        cls.empty_board_1 = EmptyDroneDeliveryBoard([cls.empty_drone_delivery_1])
-        cls.empty_board_2 = EmptyDroneDeliveryBoard([cls.empty_drone_delivery_2])
+        cls.empty_board_1 = DeliveringDronesBoard([cls.empty_drone_delivery_1])
+        cls.empty_board_2 = DeliveringDronesBoard([cls.empty_drone_delivery_2])
 
     def test_when_travel_time_is_greater_than_max_route_time(self):
         delivery_requests = self._create_2_delivery_requests_with_big_travel_time_difference()

@@ -24,7 +24,8 @@ class OrToolsDimensionDescription(Enum):
 class ORToolsMatcherConstraints:
     def __init__(self, index_manager: OrToolsIndexManagerWrapper, routing_model: RoutingModel,
                  matcher_input: MatcherInput, reloading_depos_arrive_indices: [int],
-                 reloading_depos_depart_indices: [int]):
+                 reloading_depos_depart_indices: [int], reloading_depots_per_vehicle: {},
+                 vehicle_per_reloading_depot: {}):
         self._graph_exporter = OrtoolsGraphExporter()
         self._index_manager = index_manager
         self._routing_model = routing_model
@@ -40,6 +41,8 @@ class ORToolsMatcherConstraints:
         self._depos = self._graph_exporter.export_basis_nodes_indices(self._matcher_input.graph) \
             + self._reloading_virtual_depos_indices
         self._num_of_nodes = len(self._matcher_input.graph.nodes) + len(self._reloading_virtual_depos_indices)
+        self._reloading_depots_per_vehicle = reloading_depots_per_vehicle
+        self._vehicle_per_reloading_depot = vehicle_per_reloading_depot
 
     def add_travel_cost(self):
         travel_cost_callback_index = self._routing_model.RegisterTransitCallback(self._create_travel_cost_evaluator())
@@ -99,9 +102,10 @@ class ORToolsMatcherConstraints:
         for node in self._graph_exporter.export_delivery_request_nodes_indices(self._matcher_input.graph):
             self._routing_model.AddDisjunction([self._index_manager.node_to_index(node)],
                                                self._matcher_input.config.unmatched_penalty)
+        unmatched_reloading_virtual_depo_penalty = 0
         for node in self._reloading_virtual_depos_indices[1:]:
             self._routing_model.AddDisjunction([self._index_manager.node_to_index(node)],
-                                               0)
+                                               unmatched_reloading_virtual_depo_penalty)
 
     def _add_vehicle_start_node_index_transit_and_slack_vars_to_solution(self, dimension):
         for vehicle_id in range(self._matcher_input.empty_board.amount_of_formations()):
@@ -113,8 +117,9 @@ class ORToolsMatcherConstraints:
         for node in self._graph_exporter.export_delivery_request_nodes_indices(self._matcher_input.graph):
             index = self._index_manager.node_to_index(node)
             coefficient = max(self._graph_exporter.export_priorities(self._matcher_input.graph)) \
-                          / (self._graph_exporter.export_priorities(self._matcher_input.graph)[node] + 1)
-            travel_time_dimension.SetCumulVarSoftUpperBound(index, 0, int(coefficient))
+                / (self._graph_exporter.export_priorities(self._matcher_input.graph)[node] + 1)
+            route_start_time = 0
+            travel_time_dimension.SetCumulVarSoftUpperBound(index, route_start_time, int(coefficient))
 
     def _set_waiting_time_for_each_node(self, travel_time_dimension):
         for node in range(self._num_of_nodes):
@@ -171,7 +176,9 @@ class ORToolsMatcherConstraints:
             time_dimension.CumulVar(index).SetRange(time_window[0], time_window[1])
         for node in self._reloading_virtual_depos_indices:
             index = self._index_manager.node_to_index(node)
-            time_dimension.CumulVar(index).SetRange(self._time_windows[0][0], self._time_windows[0][1])
+            original_depo = self._graph_exporter.export_basis_nodes_indices(
+                self._matcher_input.graph)[self._vehicle_per_reloading_depot[node]]
+            time_dimension.CumulVar(index).SetRange(self._time_windows[original_depo][0], self._time_windows[original_depo][1])
 
     def _create_travel_cost_evaluator(self):
 
@@ -187,9 +194,13 @@ class ORToolsMatcherConstraints:
             if self._are_nodes_consecutive_depos(_from_node, _to_node):
                 return sys.maxsize
             if _from_node in self._reloading_virtual_depos_indices:
-                _from_node = 0
+                original_depo = self._graph_exporter.export_basis_nodes_indices(
+                    self._matcher_input.graph)[self._vehicle_per_reloading_depot[_from_node]]
+                _from_node = original_depo
             elif _to_node in self._reloading_virtual_depos_indices:
-                _to_node = 0
+                original_depo = self._graph_exporter.export_basis_nodes_indices(
+                    self._matcher_input.graph)[self._vehicle_per_reloading_depot[_to_node]]
+                _to_node = original_depo
             graph_travel_cost = self._travel_cost_matrix[_from_node][_to_node]
             return graph_travel_cost
 
@@ -225,9 +236,13 @@ class ORToolsMatcherConstraints:
             if self._are_nodes_consecutive_depos(_from_node, _to_node):
                 return sys.maxsize
             if _from_node in self._reloading_virtual_depos_indices:
-                _from_node = 0
+                original_depo = self._graph_exporter.export_basis_nodes_indices(
+                    self._matcher_input.graph)[self._vehicle_per_reloading_depot[_from_node]]
+                _from_node = original_depo
             elif _to_node in self._reloading_virtual_depos_indices:
-                _to_node = 0
+                original_depo = self._graph_exporter.export_basis_nodes_indices(
+                    self._matcher_input.graph)[self._vehicle_per_reloading_depot[_to_node]]
+                _to_node = original_depo
             graph_travel_time = self._travel_time_matrix[_from_node][_to_node]
             return graph_travel_time
 
@@ -263,9 +278,13 @@ class ORToolsMatcherConstraints:
             if self._are_nodes_consecutive_depos(_from_node, _to_node):
                 return sys.maxsize
             if _from_node in self._reloading_virtual_depos_indices:
-                _from_node = 0
+                original_depo = self._graph_exporter.export_basis_nodes_indices(
+                    self._matcher_input.graph)[self._vehicle_per_reloading_depot[_from_node]]
+                _from_node = original_depo
             elif _to_node in self._reloading_virtual_depos_indices:
-                _to_node = 0
+                original_depo = self._graph_exporter.export_basis_nodes_indices(
+                    self._matcher_input.graph)[self._vehicle_per_reloading_depot[_to_node]]
+                _to_node = original_depo
             graph_session_time = self._travel_time_matrix[_from_node][_to_node]
             return graph_session_time
 
