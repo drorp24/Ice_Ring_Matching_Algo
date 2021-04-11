@@ -42,14 +42,17 @@ class BasicInitialSolutionTest(TestCase):
         cls.supplier_category_distribution = BasicInitialSolutionTest.create_supplier_category()
 
     def test_initial_solution(self):
-        empty_drone_delivery_board = BasicInitialSolutionTest.create_empty_drone_delivery_board(
-            amount=6,
-            max_route_time_entire_board=1440,
-            velocity_entire_board=10.0)
-
         supplier_category = self.supplier_category_distribution.choose_rand(random=Random(10),
                                                                             amount={DeliveryRequest: 50,
                                                                                     DroneLoadingDock: 1})
+
+        empty_drone_delivery_board = BasicInitialSolutionTest.create_empty_drone_delivery_board(
+            amount=6,
+            max_route_time_entire_board=1440,
+            velocity_entire_board=10.0,
+            loading_docks=supplier_category.drone_loading_docks
+        )
+
         time_overlapping_dependent_graph = create_time_overlapping_dependent_graph_model(supplier_category,
                                                                                          edge_cost_factor=25.0,
                                                                                          edge_travel_time_factor=25.0)
@@ -64,14 +67,15 @@ class BasicInitialSolutionTest(TestCase):
             self.assertEqual(len(set(route)), len(route))
 
     def test_set_initial_solution(self):
+        supplier_category = self.supplier_category_distribution.choose_rand(random=Random(10),
+                                                                            amount={DeliveryRequest: 37,
+                                                                                    DroneLoadingDock: 1})
         empty_drone_delivery_board = BasicInitialSolutionTest.create_empty_drone_delivery_board(
+            loading_docks=supplier_category.drone_loading_docks,
             amount=6,
             max_route_time_entire_board=1440,
             velocity_entire_board=10.0)
 
-        supplier_category = self.supplier_category_distribution.choose_rand(random=Random(10),
-                                                                            amount={DeliveryRequest: 37,
-                                                                                    DroneLoadingDock: 1})
         time_overlapping_dependent_graph = create_time_overlapping_dependent_graph_model(supplier_category,
                                                                                          edge_cost_factor=25.0,
                                                                                          edge_travel_time_factor=25.0)
@@ -174,6 +178,7 @@ class BasicInitialSolutionTest(TestCase):
 
     @staticmethod
     def create_empty_drone_delivery_board(
+            loading_docks: [DroneLoadingDock],
             drone_formation_policy=DroneFormationTypePolicy(
                 {DroneFormationType.PAIR: 1, DroneFormationType.QUAD: 0}),
             package_configurations_policy=PackageConfigurationPolicy({PackageConfiguration.LARGE_X2: 1,
@@ -182,9 +187,11 @@ class BasicInitialSolutionTest(TestCase):
                                                                       PackageConfiguration.TINY_X16: 0}),
             drone_type: DroneType = DroneType.drone_type_1,
             amount: int = 30, max_route_time_entire_board: int = 400, velocity_entire_board: float = 10.0):
-        drone_set_properties = DroneSetProperties(drone_type=drone_type,
+        drone_set_properties = DroneSetProperties(drone_type=loading_docks[0].drone_type,
                                                   package_configuration_policy=package_configurations_policy,
                                                   drone_formation_policy=drone_formation_policy,
-                                                  drone_amount=amount)
+                                                  drone_amount=amount,
+                                                  start_loading_dock=loading_docks[0],
+                                                  end_loading_dock=loading_docks[0])
         return build_empty_drone_delivery_board(drone_set_properties, max_route_time_entire_board,
                                                 velocity_entire_board)

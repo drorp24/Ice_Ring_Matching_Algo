@@ -6,9 +6,9 @@ from unittest import TestCase
 
 from common.entities.base_entities.delivery_request import DeliveryRequest
 from common.entities.base_entities.drone import DroneType
-from common.entities.base_entities.drone_delivery import EmptyDroneDelivery, DroneDelivery, MatchedDeliveryRequest, \
+from common.entities.base_entities.drone_delivery import DeliveringDrones, DroneDelivery, MatchedDeliveryRequest, \
     MatchedDroneLoadingDock
-from common.entities.base_entities.drone_delivery_board import DroneDeliveryBoard, EmptyDroneDeliveryBoard, \
+from common.entities.base_entities.drone_delivery_board import DroneDeliveryBoard, DeliveringDronesBoard, \
     UnmatchedDeliveryRequest
 from common.entities.base_entities.drone_formation import DroneFormations, PackageConfigurationOption, \
     DroneFormationType
@@ -143,10 +143,10 @@ class ORToolsMatcherMonitorTestCase(TestCase):
         return graph
 
     @staticmethod
-    def _create_empty_board() -> EmptyDroneDeliveryBoard:
-        empty_drone_delivery_1 = EmptyDroneDelivery(EntityID(uuid.uuid4()), DroneFormations.get_drone_formation(
+    def _create_empty_board() -> DeliveringDronesBoard:
+        empty_drone_delivery_1 = DeliveringDrones(EntityID(uuid.uuid4()), DroneFormations.get_drone_formation(
             DroneFormationType.PAIR, PackageConfigurationOption.LARGE_PACKAGES, DroneType.drone_type_1))
-        return EmptyDroneDeliveryBoard([empty_drone_delivery_1])
+        return DeliveringDronesBoard([empty_drone_delivery_1])
 
     @staticmethod
     def _create_match_config(enabled: bool, max_iterations: int, iterations_between_monitoring:int =1) -> MatcherConfig:
@@ -169,7 +169,7 @@ class ORToolsMatcherMonitorTestCase(TestCase):
                                   save_plot=False, show_plot=False, output_directory=''))
 
     @staticmethod
-    def _create_drone_deliveries(delivery_requests: List[DeliveryRequest], empty_board: EmptyDroneDeliveryBoard,
+    def _create_drone_deliveries(delivery_requests: List[DeliveryRequest], empty_board: DeliveringDronesBoard,
                                  loading_dock: DroneLoadingDock) -> List[DroneDelivery]:
         drone_delivery_1 = DroneDelivery(id_=empty_board.empty_drone_deliveries[0].id,
                                          drone_formation=empty_board.empty_drone_deliveries[0].drone_formation,

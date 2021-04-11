@@ -98,9 +98,9 @@ class ORToolsMatcher(Matcher):
 
     def _set_objective(self):
         objective = ORToolsMatcherObjective(self._index_manager, self._routing_model, self.matcher_input,
-                                self._reloading_virtual_depos_indices,
-                                self._reloading_depots_per_vehicle,
-                                self._vehicle_per_reloading_depot)
+                                            self._reloading_virtual_depos_indices,
+                                            self._reloading_depots_per_vehicle,
+                                            self._vehicle_per_reloading_depot)
         objective.add_priority()
 
     def _set_search_params(self) -> RoutingSearchParameters:

@@ -31,6 +31,7 @@ from matching.constraint_config import ConstraintsConfig, CapacityConstraints, T
     PriorityConstraints, SessionTimeConstraints
 from matching.matcher_config import MatcherConfig
 from matching.matcher_input import MatcherInput
+from matching.monitor_config import MonitorConfig
 from matching.ortools.ortools_matcher import ORToolsMatcher
 from matching.ortools.ortools_solver_config import ORToolsSolverConfig
 from matching.solver_config import SolverVendor
@@ -142,5 +143,6 @@ class ORToolsMatcherReloadWithMultipleDepotsTestCase(TestCase):
                 session_time_constraints=SessionTimeConstraints(max_session_time=60),
                 priority_constraints=PriorityConstraints(True, priority_cost_coefficient=100)),
             unmatched_penalty=10000,
-            reload_per_vehicle=1
+            reload_per_vehicle=1,
+            monitor=MonitorConfig(enabled=False)
         )

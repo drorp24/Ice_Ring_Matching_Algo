@@ -36,7 +36,8 @@ class ORToolsMatcherObjective:
         def priority(_from_node):
             if _from_node in self._reloading_virtual_depos_indices:
                 vehicle_of_node = self._vehicle_per_reloading_depot[_from_node]
-                _from_node = self._graph_exporter.export_basis_nodes_indices(self._matcher_input.graph)[vehicle_of_node]
+                dock = self._matcher_input.empty_board.empty_drone_deliveries[vehicle_of_node].start_loading_dock
+                _from_node = self._graph_exporter.get_node_graph_index(self._matcher_input.graph, dock)
             _priority = self._graph_exporter.export_priorities(self._matcher_input.graph)[_from_node] * \
                 self._matcher_input.config.constraints.priority.priority_cost_coefficient
             return _priority

@@ -177,8 +177,9 @@ class ORToolsMatcherConstraints:
             time_dimension.CumulVar(index).SetRange(time_window[0], time_window[1])
         for node in self._reloading_virtual_depos_indices:
             index = self._index_manager.node_to_index(node)
-            original_depo = self._graph_exporter.export_basis_nodes_indices(
-                self._matcher_input.graph)[self._vehicle_per_reloading_depot[node]]
+            vehicle_of_node = self._vehicle_per_reloading_depot[node]
+            dock = self._matcher_input.empty_board.empty_drone_deliveries[vehicle_of_node].start_loading_dock
+            original_depo = self._graph_exporter.get_node_graph_index(self._matcher_input.graph, dock)
             time_dimension.CumulVar(index).SetRange(self._time_windows[original_depo][0], self._time_windows[original_depo][1])
 
     def _create_travel_cost_evaluator(self):
@@ -195,13 +196,13 @@ class ORToolsMatcherConstraints:
             if self._are_nodes_consecutive_depos(_from_node, _to_node):
                 return sys.maxsize
             if _from_node in self._reloading_virtual_depos_indices:
-                original_depo = self._graph_exporter.export_basis_nodes_indices(
-                    self._matcher_input.graph)[self._vehicle_per_reloading_depot[_from_node]]
-                _from_node = original_depo
+                vehicle_of_node = self._vehicle_per_reloading_depot[_from_node]
+                dock = self._matcher_input.empty_board.empty_drone_deliveries[vehicle_of_node].start_loading_dock
+                _from_node = self._graph_exporter.get_node_graph_index(self._matcher_input.graph, dock)
             elif _to_node in self._reloading_virtual_depos_indices:
-                original_depo = self._graph_exporter.export_basis_nodes_indices(
-                    self._matcher_input.graph)[self._vehicle_per_reloading_depot[_to_node]]
-                _to_node = original_depo
+                vehicle_of_node = self._vehicle_per_reloading_depot[_to_node]
+                dock = self._matcher_input.empty_board.empty_drone_deliveries[vehicle_of_node].start_loading_dock
+                _to_node = self._graph_exporter.get_node_graph_index(self._matcher_input.graph, dock)
             graph_travel_cost = self._travel_cost_matrix[_from_node][_to_node]
             return graph_travel_cost
 
@@ -237,13 +238,13 @@ class ORToolsMatcherConstraints:
             if self._are_nodes_consecutive_depos(_from_node, _to_node):
                 return sys.maxsize
             if _from_node in self._reloading_virtual_depos_indices:
-                original_depo = self._graph_exporter.export_basis_nodes_indices(
-                    self._matcher_input.graph)[self._vehicle_per_reloading_depot[_from_node]]
-                _from_node = original_depo
+                vehicle_of_node = self._vehicle_per_reloading_depot[_from_node]
+                dock = self._matcher_input.empty_board.empty_drone_deliveries[vehicle_of_node].start_loading_dock
+                _from_node = self._graph_exporter.get_node_graph_index(self._matcher_input.graph, dock)
             elif _to_node in self._reloading_virtual_depos_indices:
-                original_depo = self._graph_exporter.export_basis_nodes_indices(
-                    self._matcher_input.graph)[self._vehicle_per_reloading_depot[_to_node]]
-                _to_node = original_depo
+                vehicle_of_node = self._vehicle_per_reloading_depot[_to_node]
+                dock = self._matcher_input.empty_board.empty_drone_deliveries[vehicle_of_node].start_loading_dock
+                _to_node = self._graph_exporter.get_node_graph_index(self._matcher_input.graph, dock)
             graph_travel_time = self._travel_time_matrix[_from_node][_to_node]
             return graph_travel_time
 
@@ -279,13 +280,13 @@ class ORToolsMatcherConstraints:
             if self._are_nodes_consecutive_depos(_from_node, _to_node):
                 return sys.maxsize
             if _from_node in self._reloading_virtual_depos_indices:
-                original_depo = self._graph_exporter.export_basis_nodes_indices(
-                    self._matcher_input.graph)[self._vehicle_per_reloading_depot[_from_node]]
-                _from_node = original_depo
+                vehicle_of_node = self._vehicle_per_reloading_depot[_from_node]
+                dock = self._matcher_input.empty_board.empty_drone_deliveries[vehicle_of_node].start_loading_dock
+                _from_node = self._graph_exporter.get_node_graph_index(self._matcher_input.graph, dock)
             elif _to_node in self._reloading_virtual_depos_indices:
-                original_depo = self._graph_exporter.export_basis_nodes_indices(
-                    self._matcher_input.graph)[self._vehicle_per_reloading_depot[_to_node]]
-                _to_node = original_depo
+                vehicle_of_node = self._vehicle_per_reloading_depot[_to_node]
+                dock = self._matcher_input.empty_board.empty_drone_deliveries[vehicle_of_node].start_loading_dock
+                _to_node = self._graph_exporter.get_node_graph_index(self._matcher_input.graph, dock)
             graph_session_time = self._travel_time_matrix[_from_node][_to_node]
             return graph_session_time
 
