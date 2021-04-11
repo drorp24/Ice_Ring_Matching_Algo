@@ -7,13 +7,16 @@ from unittest import TestCase
 from common.entities.base_entities.delivery_request import DeliveryRequest
 from common.entities.base_entities.drone import DroneType
 from common.entities.base_entities.drone_delivery import DeliveringDrones
-from common.entities.base_entities.drone_delivery_board import DeliveringDronesBoard
+from common.entities.base_entities.drone_delivery_board import DeliveringDronesBoard, DroneDeliveryBoard
 from common.entities.base_entities.drone_formation import DroneFormations, PackageConfigurationOption, \
     DroneFormationType
 from common.entities.base_entities.drone_loading_dock import DroneLoadingDock
 from common.entities.base_entities.drone_loading_station import DroneLoadingStation
 from common.entities.base_entities.entity_distribution.delivery_requestion_dataset_builder import \
     build_delivery_request_distribution
+from common.entities.base_entities.entity_distribution.drone_distribution import DroneTypeDistribution
+from common.entities.base_entities.entity_distribution.drone_loading_dock_distribution import \
+    DroneLoadingDockDistribution
 from common.entities.base_entities.entity_distribution.package_distribution import PackageDistribution
 from common.entities.base_entities.entity_distribution.priority_distribution import ExactPriorityDistribution
 from common.entities.base_entities.entity_distribution.temporal_distribution import ExactTimeWindowDistribution
@@ -28,7 +31,6 @@ from matching.constraint_config import ConstraintsConfig, CapacityConstraints, T
     PriorityConstraints, SessionTimeConstraints
 from matching.matcher_config import MatcherConfig
 from matching.matcher_input import MatcherInput
-from matching.monitor_config import MonitorConfig
 from matching.ortools.ortools_matcher import ORToolsMatcher
 from matching.ortools.ortools_solver_config import ORToolsSolverConfig
 from matching.solver_config import SolverVendor
@@ -36,38 +38,27 @@ from matching.solver_config import SolverVendor
 ZERO_TIME = DateTimeExtension(dt_date=date(2020, 1, 23), dt_time=time(11, 30, 0))
 
 
-class ORToolsMatcherReloadWithDifferentPriorityTestCase(TestCase):
+class ORToolsMatcherReloadWithMultipleDepotsTestCase(TestCase):
     @classmethod
     def setUpClass(cls):
         cls.delivery_requests = cls._create_delivery_requests()
-        cls.loading_dock = cls._create_loading_dock()
-        cls.graph = cls._create_graph(cls.delivery_requests, cls.loading_dock)
-        cls.empty_board = cls._create_empty_board(cls.loading_dock)
+        cls.loading_docks = cls._create_loading_docks()
+        cls.graph = cls._create_graph(cls.delivery_requests, cls.loading_docks)
+        cls.empty_board = cls._create_empty_board_with_delivering_drones_with_different_loading_docks(cls.loading_docks)
         cls.match_input = MatcherInput(cls.graph, cls.empty_board, cls._create_match_config())
-        matcher = ORToolsMatcher(cls.match_input)
-        cls.actual_delivery_board = matcher.match()
 
-    def test_matcher_reload_requests(self):
-        self.assert_max_reload_was_done()
-        self.assert_one_extra_request_dropped_with_lowest_priority()
-        self.assert_highest_priority_delivered_first()
-        self.assert_all_loaded_packages_delivered()
+    def test_matcher_when_delivering_drones_have_different_loading_docks_then_reload_successful(self):
+        matcher = ORToolsMatcher(self.match_input)
+        actual_delivery_board = matcher.match()
+        self._assert_all_requests_matched(actual_delivery_board)
+        self._assert_drone_deliveries_have_different_loading_docks(actual_delivery_board)
 
-    def assert_all_loaded_packages_delivered(self):
-        for delivery in self.actual_delivery_board.drone_deliveries:
-            self.assertEqual(4, len(delivery.matched_requests))
+    def _assert_all_requests_matched(self, actual_delivery_board: DroneDeliveryBoard):
+        self.assertEqual(len(self.delivery_requests),actual_delivery_board.get_total_amount_per_package_type().get_package_type_amount(PackageType.LARGE))
 
-    def assert_highest_priority_delivered_first(self):
-        first_session_total_priority = self.actual_delivery_board.drone_deliveries[0].get_total_priority()
-        second_session_total_priority = self.actual_delivery_board.drone_deliveries[1].get_total_priority()
-        self.assertLess(first_session_total_priority, second_session_total_priority)
-
-    def assert_one_extra_request_dropped_with_lowest_priority(self):
-        self.assertEqual(1, len(self.actual_delivery_board.unmatched_delivery_requests))
-        self.assertEqual(17, self.actual_delivery_board.unmatched_delivery_requests[0].delivery_request.priority)
-
-    def assert_max_reload_was_done(self):
-        self.assertEqual(4, len(self.actual_delivery_board.drone_deliveries))
+    def _assert_drone_deliveries_have_different_loading_docks(self, actual_delivery_board: DroneDeliveryBoard):
+        matched_start_loading_docks = [delivery.start_drone_loading_docks.drone_loading_dock for delivery in actual_delivery_board.drone_deliveries]
+        self.assertNotEqual(len(set(matched_start_loading_docks)), len(matched_start_loading_docks))
 
     @staticmethod
     def _create_delivery_requests() -> List[DeliveryRequest]:
@@ -75,7 +66,6 @@ class ORToolsMatcherReloadWithDifferentPriorityTestCase(TestCase):
             relative_pdp_location_distribution=ExactPointLocationDistribution([
                 create_point_2d(0, 5),
                 create_point_2d(0, 5),
-                create_point_2d(0, 5),
                 create_point_2d(0, 10),
                 create_point_2d(0, 10),
                 create_point_2d(0, 15),
@@ -91,46 +81,50 @@ class ORToolsMatcherReloadWithDifferentPriorityTestCase(TestCase):
                 create_point_2d(0, -20),
                 create_point_2d(0, -20),
             ]),
-            time_window_distribution=ExactTimeWindowDistribution(17*[
+            time_window_distribution=ExactTimeWindowDistribution(16*[
                 TimeWindowExtension(
                     since=ZERO_TIME,
                     until=ZERO_TIME.add_time_delta(TimeDeltaExtension(timedelta(hours=2)))),
             ]),
             package_type_distribution=PackageDistribution({PackageType.LARGE: 1}),
-            priority_distribution=ExactPriorityDistribution(list(range(1, 18)))
+            priority_distribution=ExactPriorityDistribution(list(range(1, 17)))
         )
-        return dist.choose_rand(Random(42), amount={DeliveryRequest: 17})
+        return dist.choose_rand(Random(42), amount={DeliveryRequest: 16})
 
     @staticmethod
-    def _create_loading_dock() -> DroneLoadingDock:
-        return DroneLoadingDock(EntityID.generate_uuid(),
-                                DroneLoadingStation(EntityID.generate_uuid(), create_point_2d(0, 0)),
-                                DroneType.drone_type_1,
-                                TimeWindowExtension(
-                                    since=ZERO_TIME,
-                                    until=ZERO_TIME.add_time_delta(
-                                        TimeDeltaExtension(timedelta(hours=5)))))
+    def _create_loading_docks() -> [DroneLoadingDock]:
+        drone_type_distribution = DroneTypeDistribution({DroneType.drone_type_1: 1})
+        return DroneLoadingDockDistribution(
+            drone_type_distribution=drone_type_distribution).choose_rand(random=Random(42), amount=2)
+        # return DroneLoadingDock(EntityID.generate_uuid(),
+        #                         DroneLoadingStation(EntityID.generate_uuid(), create_point_2d(0, 0)),
+        #                         DroneType.drone_type_1,
+        #                         TimeWindowExtension(
+        #                             since=ZERO_TIME,
+        #                             until=ZERO_TIME.add_time_delta(
+        #                                 TimeDeltaExtension(timedelta(hours=5)))))
 
     @staticmethod
-    def _create_graph(delivery_requests: List[DeliveryRequest], loading_dock: DroneLoadingDock) -> OperationalGraph:
+    def _create_graph(delivery_requests: List[DeliveryRequest], loading_docks: [DroneLoadingDock]) -> OperationalGraph:
         graph = OperationalGraph()
-        graph.add_drone_loading_docks([loading_dock])
+        graph.add_drone_loading_docks(loading_docks)
         graph.add_delivery_requests(delivery_requests)
         build_fully_connected_graph(graph)
         return graph
 
     @staticmethod
-    def _create_empty_board(loading_dock: DroneLoadingDock) -> DeliveringDronesBoard:
+    def _create_empty_board_with_delivering_drones_with_different_loading_docks(
+            loading_docks: [DroneLoadingDock]) -> DeliveringDronesBoard:
         empty_drone_delivery_1 = DeliveringDrones(id_=EntityID(uuid.uuid4()),
                                                   drone_formation=DroneFormations.get_drone_formation(
             DroneFormationType.PAIR, PackageConfigurationOption.LARGE_PACKAGES, DroneType.drone_type_1),
-                                                  start_loading_dock=loading_dock,
-                                                  end_loading_dock=loading_dock)
+                                                  start_loading_dock=loading_docks[0],
+                                                  end_loading_dock=loading_docks[0])
         empty_drone_delivery_2 = DeliveringDrones(id_=EntityID(uuid.uuid4()),
                                                   drone_formation=DroneFormations.get_drone_formation(
             DroneFormationType.PAIR, PackageConfigurationOption.LARGE_PACKAGES, DroneType.drone_type_1),
-                                                  start_loading_dock=loading_dock,
-                                                  end_loading_dock=loading_dock)
+                                                  start_loading_dock=loading_docks[1],
+                                                  end_loading_dock=loading_docks[1])
         return DeliveringDronesBoard([empty_drone_delivery_1, empty_drone_delivery_2])
 
     @staticmethod
@@ -148,6 +142,5 @@ class ORToolsMatcherReloadWithDifferentPriorityTestCase(TestCase):
                 session_time_constraints=SessionTimeConstraints(max_session_time=60),
                 priority_constraints=PriorityConstraints(True, priority_cost_coefficient=100)),
             unmatched_penalty=10000,
-            reload_per_vehicle=1,
-            monitor=MonitorConfig(enabled=False)
+            reload_per_vehicle=1
         )

@@ -14,12 +14,21 @@ DEFAULT_MAX_ROUTE_TIME_IN_MINUTES = 1440
 DEFAULT_VELOCITY_METER_PER_SEC = 10.0
 
 
-class EmptyDroneDelivery(JsonableBaseEntity):
+class DeliveringDrones(JsonableBaseEntity):
     def __init__(self, id_: EntityID, drone_formation: DroneFormation,
+                 start_loading_dock: DroneLoadingDock, end_loading_dock: DroneLoadingDock,
                  max_route_time_in_minutes: int = DEFAULT_MAX_ROUTE_TIME_IN_MINUTES,
                  velocity_meter_per_sec: float = DEFAULT_VELOCITY_METER_PER_SEC):
+        if drone_formation.get_drone_type() != start_loading_dock.drone_type:
+            raise TypeError(f"The Drone formation's drone_type {drone_formation.get_drone_type()} "
+                            f"is not equal to start_loading_dock's drone_type {start_loading_dock.drone_type}")
+        if drone_formation.get_drone_type() != end_loading_dock.drone_type:
+            raise TypeError(f"The Drone formation's drone_type {drone_formation.get_drone_type()} "
+                            f"is not equal to end_loading_dock's drone_type {end_loading_dock.drone_type}")
         self._id = id_
         self._drone_formation = drone_formation
+        self._start_loading_dock = start_loading_dock
+        self._end_loading_dock = end_loading_dock
         self._max_route_time_in_minutes = max_route_time_in_minutes  # TODO: Change to real endurance
         self._velocity_meter_per_sec = velocity_meter_per_sec  # TODO: Change to real velocity
 
@@ -30,6 +39,14 @@ class EmptyDroneDelivery(JsonableBaseEntity):
     @property
     def drone_formation(self) -> DroneFormation:
         return self._drone_formation
+
+    @property
+    def start_loading_dock(self) -> DroneLoadingDock:
+        return self._start_loading_dock
+
+    @property
+    def end_loading_dock(self) -> DroneLoadingDock:
+        return self._end_loading_dock
 
     @property
     def max_route_time_in_minutes(self) -> int:
@@ -45,19 +62,31 @@ class EmptyDroneDelivery(JsonableBaseEntity):
     def __eq__(self, other):
         return all([self.id == other.id,
                    self.drone_formation == other.drone_formation,
-                    self.max_route_time_in_minutes == other.max_route_time_in_minutes,
-                    self.velocity_meter_per_sec == other.velocity_meter_per_sec])
+                   self.start_loading_dock == other.start_loading_dock,
+                   self.end_loading_dock == other.end_loading_dock,
+                   self.max_route_time_in_minutes == other.max_route_time_in_minutes,
+                   self.velocity_meter_per_sec == other.velocity_meter_per_sec])
 
     def __hash__(self):
-        return hash((self._id, self._drone_formation, self._max_route_time_in_minutes, self._velocity_meter_per_sec))
+        return hash((
+            self.id,
+            self.drone_formation,
+            self.start_loading_dock,
+            self.end_loading_dock,
+            self.max_route_time_in_minutes,
+            self.velocity_meter_per_sec
+        ))
 
     @classmethod
     def dict_to_obj(cls, dict_input):
         assert (dict_input['__class__'] == cls.__name__)
-        return EmptyDroneDelivery(id_=EntityID.dict_to_obj(dict_input['id']),
-                                  drone_formation=DroneFormation.dict_to_obj(dict_input['drone_formation']),
-                                  max_route_time_in_minutes=int(dict_input['max_route_time_in_minutes']),
-                                  velocity_meter_per_sec=float(dict_input['velocity_meter_per_sec']))
+        return DeliveringDrones(id_=EntityID.dict_to_obj(dict_input['id']),
+                                drone_formation=DroneFormation.dict_to_obj(dict_input['drone_formation']),
+                                start_loading_dock=DroneLoadingDock.dict_to_obj(dict_input['start_loading_dock']),
+                                end_loading_dock=DroneLoadingDock.dict_to_obj(dict_input['end_loading_dock']),
+                                max_route_time_in_minutes=int(dict_input['max_route_time_in_minutes']),
+                                velocity_meter_per_sec=float(dict_input['velocity_meter_per_sec']),
+                                )
 
 
 @dataclass
@@ -112,16 +141,19 @@ class MatchedDeliveryRequest(JsonableBaseEntity):
             delivery_time_window=TimeWindowExtension.dict_to_obj(dict_input['delivery_time_window']))
 
 
-# TODO change to MatchedDroneDelivery
-class DroneDelivery(EmptyDroneDelivery):
-    def __init__(self, id_: EntityID, drone_formation: DroneFormation,
+class DroneDelivery(JsonableBaseEntity):
+    def __init__(self, delivering_drones: DeliveringDrones,
                  matched_requests: [MatchedDeliveryRequest],
                  start_drone_loading_docks: MatchedDroneLoadingDock,
                  end_drone_loading_docks: MatchedDroneLoadingDock):
-        super().__init__(id_, drone_formation)
+        self._delivering_drones = delivering_drones
         self._matched_requests = matched_requests
         self._start_drone_loading_docks = start_drone_loading_docks
         self._end_drone_loading_docks = end_drone_loading_docks
+
+    @property
+    def delivering_drones(self) -> DeliveringDrones:
+        return self._delivering_drones
 
     @property
     def matched_requests(self) -> [MatchedDeliveryRequest]:
@@ -157,14 +189,14 @@ class DroneDelivery(EmptyDroneDelivery):
     def __str__(self):
         if len(self._matched_requests) == 0:
             return "\n[DroneDelivery id={id} - origin {origin_capacity} No match found]".format(
-                id=self.id,
-                origin_capacity=self.drone_formation.get_package_type_amount_map(), )
+                id=self.delivering_drones.id,
+                origin_capacity=self.delivering_drones.drone_formation.get_package_type_amount_map(), )
 
         return "\n[DroneDelivery id={id} origin {origin_capacity} matched " \
                "{total_amount_per_package_type} total priority={priority} total time in " \
                "minutes={total_time}]\n{start_drone_loading_docks}\n{matched_requests}\n{end_drone_loading_docks}" \
-            .format(id=self.id,
-                    origin_capacity=self.drone_formation.get_package_type_amount_map(),
+            .format(id=self.delivering_drones.id,
+                    origin_capacity=self.delivering_drones.drone_formation.get_package_type_amount_map(),
                     total_amount_per_package_type=str(self.get_total_package_type_amount_map()),
                     priority=str(self.get_total_priority()),
                     total_time=str(self.get_total_work_time_in_minutes()),
@@ -173,20 +205,20 @@ class DroneDelivery(EmptyDroneDelivery):
                     end_drone_loading_docks=str(self.end_drone_loading_docks))
 
     def __hash__(self):
-        return hash((tuple(self._matched_requests),
+        return hash((self._delivering_drones, tuple(self._matched_requests),
                      self._start_drone_loading_docks, self._end_drone_loading_docks))
 
     def __eq__(self, other):
-        return super().__eq__(
-            other) and self._matched_requests == other.matched_requests and self.start_drone_loading_docks == \
-               other.start_drone_loading_docks and self.end_drone_loading_docks == other.end_drone_loading_docks
+        return all([self.delivering_drones == other.delivering_drones,
+                    self._matched_requests == other.matched_requests,
+                    self.start_drone_loading_docks == other.start_drone_loading_docks,
+                    self.end_drone_loading_docks == other.end_drone_loading_docks])
 
     @classmethod
     def dict_to_obj(cls, dict_input):
         assert (dict_input['__class__'] == cls.__name__)
         return DroneDelivery(
-            id_=EntityID.dict_to_obj(dict_input['id']),
-            drone_formation=DroneFormation.dict_to_obj(dict_input['drone_formation']),
+            delivering_drones=DeliveringDrones.dict_to_obj(dict_input['delivering_drones']),
             matched_requests=[MatchedDeliveryRequest.dict_to_obj(matched_request_dict) for matched_request_dict in
                               dict_input['matched_requests']],
             start_drone_loading_docks=MatchedDroneLoadingDock.dict_to_obj(dict_input['start_drone_loading_docks']),

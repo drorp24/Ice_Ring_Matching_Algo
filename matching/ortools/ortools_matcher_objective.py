@@ -9,13 +9,16 @@ from matching.ortools.ortools_matcher_constraints import OrToolsDimensionDescrip
 
 class ORToolsMatcherObjective:
     def __init__(self, index_manager: OrToolsIndexManagerWrapper, routing_model: RoutingModel,
-                 matcher_input: MatcherInput, reloading_virtual_depos_indices: [int]):
+                 matcher_input: MatcherInput, reloading_virtual_depos_indices: [int],
+                 reloading_depots_per_vehicle: {}, vehicle_per_reloading_depot: {}):
         self._graph_exporter = OrtoolsGraphExporter()
         self._index_manager = index_manager
         self._routing_model = routing_model
         self._matcher_input = matcher_input
         self._reloading_virtual_depos_indices = reloading_virtual_depos_indices
         self._num_of_nodes = len(self._matcher_input.graph.nodes) + len(self._reloading_virtual_depos_indices)
+        self._reloading_depots_per_vehicle = reloading_depots_per_vehicle
+        self._vehicle_per_reloading_depot = vehicle_per_reloading_depot
 
     def add_priority(self):
         priority_callback_index = self._routing_model.RegisterUnaryTransitCallback(
@@ -32,7 +35,8 @@ class ORToolsMatcherObjective:
 
         def priority(_from_node):
             if _from_node in self._reloading_virtual_depos_indices:
-                _from_node = self._graph_exporter.export_basis_nodes_indices(self._matcher_input.graph)[0]
+                vehicle_of_node = self._vehicle_per_reloading_depot[_from_node]
+                _from_node = self._graph_exporter.export_basis_nodes_indices(self._matcher_input.graph)[vehicle_of_node]
             _priority = self._graph_exporter.export_priorities(self._matcher_input.graph)[_from_node] * \
                 self._matcher_input.config.constraints.priority.priority_cost_coefficient
             return _priority

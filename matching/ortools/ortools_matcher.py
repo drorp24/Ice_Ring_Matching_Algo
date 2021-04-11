@@ -23,9 +23,9 @@ class ORToolsMatcher(Matcher):
     def __init__(self, matcher_input: MatcherInput):
         super().__init__(matcher_input)
         num_of_reloading_depo_nodes_per_formation = matcher_input.config.reload_per_vehicle \
-                                                    * NUM_OF_NODES_IN_RELOADING_DEPO
+            * NUM_OF_NODES_IN_RELOADING_DEPO
         num_of_reloading_depo_nodes = self._matcher_input.empty_board.amount_of_formations() \
-                                      * num_of_reloading_depo_nodes_per_formation
+            * num_of_reloading_depo_nodes_per_formation
         self._reloading_virtual_depos_indices = list(range(
             len(self._matcher_input.graph.nodes),
             len(self._matcher_input.graph.nodes) + num_of_reloading_depo_nodes))
@@ -38,10 +38,21 @@ class ORToolsMatcher(Matcher):
         self._search_parameters = self._set_search_params()
         self._solution_handler = ORToolsSolutionHandler(self._graph_exporter, self._index_manager, self._routing_model,
                                                         self._matcher_input, self._arrive_indices, self._depart_indices)
+        self._reloading_depots_per_vehicle = {vehicle_index: depots
+                                              for (vehicle_index, depots)
+                                              in enumerate([self._reloading_virtual_depos_indices[
+                                                  formation_index * num_of_reloading_depo_nodes_per_formation:
+                                                  (formation_index + 1) * num_of_reloading_depo_nodes_per_formation]
+                                                  for formation_index in range(
+                                                    self._matcher_input.empty_board.amount_of_formations())])}
+        self._vehicle_per_reloading_depot = {}
+        for vehicle_index in self._reloading_depots_per_vehicle.keys():
+            for depo in self._reloading_depots_per_vehicle[vehicle_index]:
+                self._vehicle_per_reloading_depot[depo] = vehicle_index
         self._set_objective()
         self._set_constraints()
         self._set_monitor()
-        # self._set_reloading_depos_for_each_formation(num_of_reloading_depo_nodes_per_formation)
+        self._set_reloading_depos_for_each_formation(self._reloading_depots_per_vehicle)
 
     def _calc_reload_arriving_nodes(self):
         starting_index = 0
@@ -68,21 +79,29 @@ class ORToolsMatcher(Matcher):
         return self._solution_handler.create_drone_delivery_board(solution)
 
     def _set_index_manager(self) -> OrToolsIndexManagerWrapper:
-        depot_ids_start = self._graph_exporter.export_basis_nodes_indices(self._matcher_input.graph)
-        # TODO depot_ids_end = self._graph_exporter.export_basis_nodes_indices(self._match_input.graph)
+        start_depots = [empty_drone_delivery.start_loading_dock
+                        for empty_drone_delivery in self._matcher_input.empty_board.empty_drone_deliveries]
+        end_depots = [empty_drone_delivery.end_loading_dock
+                      for empty_drone_delivery in self._matcher_input.empty_board.empty_drone_deliveries]
+        start_depots_graph_indices = [self._graph_exporter.get_node_graph_index(self._matcher_input.graph, start_depot)
+                                      for start_depot in start_depots]
+        end_depots_graph_indices = [self._graph_exporter.get_node_graph_index(self._matcher_input.graph, end_depot)
+                                    for end_depot in end_depots]
         manager = pywrapcp.RoutingIndexManager(self._num_of_nodes,
                                                self._matcher_input.empty_board.amount_of_formations(),
-                                               depot_ids_start[0])
-        # TODO add depot_ids_end as forth param)
-
+                                               start_depots_graph_indices,
+                                               end_depots_graph_indices)
         return OrToolsIndexManagerWrapper(manager)
 
     def _set_routing_model(self) -> RoutingModel:
         return pywrapcp.RoutingModel(self._index_manager.get_internal())
 
     def _set_objective(self):
-        ORToolsMatcherObjective(self._index_manager, self._routing_model, self.matcher_input,
-                                self._reloading_virtual_depos_indices).add_priority()
+        objective = ORToolsMatcherObjective(self._index_manager, self._routing_model, self.matcher_input,
+                                self._reloading_virtual_depos_indices,
+                                self._reloading_depots_per_vehicle,
+                                self._vehicle_per_reloading_depot)
+        objective.add_priority()
 
     def _set_search_params(self) -> RoutingSearchParameters:
 
@@ -100,7 +119,9 @@ class ORToolsMatcher(Matcher):
 
     def _set_constraints(self):
         matcher_constraints = ORToolsMatcherConstraints(self._index_manager, self._routing_model, self.matcher_input,
-                                                        self._arrive_indices, self._depart_indices)
+                                                        self._arrive_indices, self._depart_indices,
+                                                        self._reloading_depots_per_vehicle,
+                                                        self._vehicle_per_reloading_depot)
         #  TODO: should be reload depos for every formation type (size and package)
         matcher_constraints.add_demand()
         matcher_constraints.add_travel_cost()
@@ -117,12 +138,9 @@ class ORToolsMatcher(Matcher):
                                                      self._solution_handler)
         self.matcher_monitor.add_search_monitor()
 
-    def _set_reloading_depos_for_each_formation(self, num_of_reloading_depo_nodes_per_formation):
-        for formation_index in range(self._matcher_input.empty_board.amount_of_formations()):
-            formation_reloading_depos = self._reloading_virtual_depos_indices[
-                                        formation_index * num_of_reloading_depo_nodes_per_formation:
-                                        (formation_index + 1) * num_of_reloading_depo_nodes_per_formation]
-            for node in [formation_reloading_depos[0]]:
+    def _set_reloading_depos_for_each_formation(self, reloading_depots_per_vehicle):
+        for formation_index in reloading_depots_per_vehicle.keys():
+            for node in reloading_depots_per_vehicle[formation_index]:
                 index = self._index_manager.node_to_index(node)
                 must_have_not_active_option_index = -1
                 self._routing_model.VehicleVar(index).SetValues([must_have_not_active_option_index, formation_index])
