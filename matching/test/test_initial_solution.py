@@ -15,22 +15,24 @@ from common.entities.base_entities.entity_distribution.package_distribution impo
 from common.entities.base_entities.entity_distribution.priority_distribution import PriorityDistribution
 from common.entities.base_entities.entity_distribution.temporal_distribution import TimeDeltaDistribution, \
     TimeWindowDistribution, DateTimeDistribution
+from common.entities.base_entities.fleet.empty_drone_delivery_board_generation import generate_empty_delivery_board
 from common.entities.base_entities.fleet.fleet_property_sets import DroneFormationTypePolicy, \
-    PackageConfigurationPolicy, DroneSetProperties
+    PackageConfigurationPolicy, DroneSetProperties, BoardLevelProperties
 from common.entities.base_entities.package import PackageType
 from common.entities.base_entities.temporal import DateTimeExtension, TimeDeltaExtension
-
-from experiment_space.graph_creation_algorithm import calc_assignment_from_init_solution, DeliveryRequest
+from experiment_space.distribution.supplier_category_distribution import SupplierCategoryDistribution
+from experiment_space.graph_creation_algorithm import calc_assignment_from_init_solution, DeliveryRequest, \
+    FullyConnectedGraphAlgorithm
 from geometry.distribution.geo_distribution import NormalPointDistribution, UniformPointInBboxDistribution
 from geometry.geo2d import Point2D
 from geometry.geo_factory import create_point_2d
 from matching.constraint_config import ConstraintsConfig, CapacityConstraints, TravelTimeConstraints, \
     SessionTimeConstraints, PriorityConstraints
 from matching.matcher_config import MatcherConfig
+from matching.matcher_factory import create_matcher
 from matching.matcher_input import MatcherInput
 from matching.ortools.ortools_initial_solution import ORToolsInitialSolution
 from matching.ortools.ortools_solver_config import ORToolsSolverConfig
-from matching.solver_config import SolverVendor
 
 ZERO_TIME = DateTimeExtension(dt_date=date(2021, 1, 1), dt_time=time(0, 0, 0))
 
@@ -49,10 +51,11 @@ class BasicInitialSolutionTest(TestCase):
 
         supplier_category = self.supplier_category_distribution.choose_rand(random=Random(10),
                                                                             amount={DeliveryRequest: 50,
-                                                                                    DroneLoadingDock: 1})
-        time_overlapping_dependent_graph = create_time_overlapping_dependent_graph_model(supplier_category,
-                                                                                         edge_cost_factor=25.0,
-                                                                                         edge_travel_time_factor=25.0)
+                                                                                    DroneLoadingDock: 1})[0]
+
+        time_overlapping_dependent_graph = FullyConnectedGraphAlgorithm(edge_cost_factor=25.0,
+                                                                        edge_travel_time_factor=25.0).create(
+            supplier_category)
 
         match_config_initial = BasicInitialSolutionTest.create_match_config(local_search_strategy="GUIDED_LOCAL_SEARCH",
                                                                             reload_per_vehicle=3)
@@ -71,10 +74,10 @@ class BasicInitialSolutionTest(TestCase):
 
         supplier_category = self.supplier_category_distribution.choose_rand(random=Random(10),
                                                                             amount={DeliveryRequest: 37,
-                                                                                    DroneLoadingDock: 1})
-        time_overlapping_dependent_graph = create_time_overlapping_dependent_graph_model(supplier_category,
-                                                                                         edge_cost_factor=25.0,
-                                                                                         edge_travel_time_factor=25.0)
+                                                                                    DroneLoadingDock: 1})[0]
+        time_overlapping_dependent_graph = FullyConnectedGraphAlgorithm(edge_cost_factor=25.0,
+                                                                        edge_travel_time_factor=25.0).create(
+            supplier_category)
 
         match_config_auto_noreuse = BasicInitialSolutionTest.create_match_config(local_search_strategy="AUTOMATIC",
                                                                                  reload_per_vehicle=0)
@@ -82,12 +85,13 @@ class BasicInitialSolutionTest(TestCase):
                                                   empty_board=empty_drone_delivery_board,
                                                   config=match_config_auto_noreuse)
 
-        delivery_board_auto_noreuse = calc_assignment(matcher_input=matcher_input_auto_noreuse)
+        delivery_board_auto_noreuse = create_matcher(matcher_input=matcher_input_auto_noreuse).match()
 
         match_config_initial = BasicInitialSolutionTest.create_match_config(local_search_strategy="GUIDED_LOCAL_SEARCH",
                                                                             reload_per_vehicle=3)
 
         matcher_input_initial_reuse = MatcherInput(graph=time_overlapping_dependent_graph,
+
                                                    empty_board=empty_drone_delivery_board,
                                                    config=match_config_initial)
 
@@ -111,7 +115,7 @@ class BasicInitialSolutionTest(TestCase):
     def create_match_config(local_search_strategy: str = "automatic", reload_per_vehicle: int = 0) -> MatcherConfig:
         return MatcherConfig(
             zero_time=ZERO_TIME,
-            solver=ORToolsSolverConfig(SolverVendor.OR_TOOLS, first_solution_strategy="path_cheapest_arc",
+            solver=ORToolsSolverConfig(first_solution_strategy="path_cheapest_arc",
                                        local_search_strategy=local_search_strategy, timeout_sec=30),
             constraints=ConstraintsConfig(
                 capacity_constraints=CapacityConstraints(count_capacity_from_zero=True,
@@ -185,5 +189,5 @@ class BasicInitialSolutionTest(TestCase):
                                                   package_configuration_policy=package_configurations_policy,
                                                   drone_formation_policy=drone_formation_policy,
                                                   drone_amount=amount)
-        return build_empty_drone_delivery_board(drone_set_properties, max_route_time_entire_board,
-                                                velocity_entire_board)
+        return generate_empty_delivery_board([drone_set_properties], BoardLevelProperties(max_route_time_entire_board,
+                                                                                        velocity_entire_board))
