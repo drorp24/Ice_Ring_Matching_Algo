@@ -190,4 +190,4 @@ class BasicInitialSolutionTest(TestCase):
                                                   drone_formation_policy=drone_formation_policy,
                                                   drone_amount=amount)
         return generate_empty_delivery_board([drone_set_properties], BoardLevelProperties(max_route_time_entire_board,
-                                                                                        velocity_entire_board))
+                                                                                          velocity_entire_board))
