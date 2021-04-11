@@ -8,8 +8,8 @@ from common.entities.base_entities.delivery_request import DeliveryRequest
 from common.entities.base_entities.drone import DroneType
 from common.entities.base_entities.drone_delivery import EmptyDroneDelivery, DroneDelivery, MatchedDeliveryRequest, \
     MatchedDroneLoadingDock
-from common.entities.base_entities.drone_delivery_board import UnmatchedDeliveryRequest, DroneDeliveryBoard, \
-    EmptyDroneDeliveryBoard
+from common.entities.base_entities.drone_delivery_board import DroneDeliveryBoard, EmptyDroneDeliveryBoard, \
+    UnmatchedDeliveryRequest
 from common.entities.base_entities.drone_formation import DroneFormations, PackageConfigurationOption, \
     DroneFormationType
 from common.entities.base_entities.drone_loading_dock import DroneLoadingDock
@@ -21,33 +21,74 @@ from common.entities.base_entities.entity_distribution.priority_distribution imp
 from common.entities.base_entities.entity_distribution.temporal_distribution import ExactTimeWindowDistribution
 from common.entities.base_entities.entity_id import EntityID
 from common.entities.base_entities.package import PackageType
-from common.entities.base_entities.temporal import TimeWindowExtension, DateTimeExtension, TimeDeltaExtension
+from common.entities.base_entities.temporal import TimeWindowExtension, TimeDeltaExtension, DateTimeExtension
 from common.graph.operational.graph_creator import build_fully_connected_graph
 from common.graph.operational.operational_graph import OperationalGraph
 from geometry.distribution.geo_distribution import ExactPointLocationDistribution
 from geometry.geo_factory import create_point_2d
-from matching.constraint_config import ConstraintsConfig, CapacityConstraints, TravelTimeConstraints, \
-    PriorityConstraints, SessionTimeConstraints
+from matching.constraint_config import ConstraintsConfig, PriorityConstraints, CapacityConstraints, \
+    SessionTimeConstraints, TravelTimeConstraints
 from matching.matcher_config import MatcherConfig
 from matching.matcher_input import MatcherInput
 from matching.monitor_config import MonitorConfig
 from matching.ortools.ortools_matcher import ORToolsMatcher
 from matching.ortools.ortools_solver_config import ORToolsSolverConfig
+from matching.solver_config import SolverVendor
 
 ZERO_TIME = DateTimeExtension(dt_date=date(2020, 1, 23), dt_time=time(11, 30, 0))
 
 
-class ORToolsMatcherDifferentPriorityTestCase(TestCase):
+class ORToolsMatcherMonitorTestCase(TestCase):
+
     @classmethod
     def setUpClass(cls):
         cls.delivery_requests = cls._create_delivery_requests()
         cls.loading_dock = cls._create_loading_dock()
         cls.graph = cls._create_graph(cls.delivery_requests, cls.loading_dock)
         cls.empty_board = cls._create_empty_board()
-        cls.match_input = MatcherInput(cls.graph, cls.empty_board, cls._create_match_config())
 
-    def test_matcher_when_requests_with_different_priorities(self):
-        matcher = ORToolsMatcher(self.match_input)
+    def test_matcher_with_monitor(self):
+        num_of_iterations = 100
+        config = self._create_match_config(enabled=True, max_iterations=num_of_iterations)
+        match_input = MatcherInput(self.graph, self.empty_board, config)
+        matcher = ORToolsMatcher(match_input)
+        actual_delivery_board = matcher.match()
+
+        expected_drone_deliveries = self._create_drone_deliveries(delivery_requests=self.delivery_requests,
+                                                                  empty_board=self.empty_board,
+                                                                  loading_dock=self.loading_dock)
+        unmatched_delivery_request = UnmatchedDeliveryRequest(graph_index=2, delivery_request=self.delivery_requests[1])
+        expected_matched_board = DroneDeliveryBoard(
+            drone_deliveries=expected_drone_deliveries,
+            unmatched_delivery_requests=[unmatched_delivery_request])
+
+        self.assertEqual(expected_matched_board, actual_delivery_board)
+        self.assertEqual(matcher.matcher_monitor.monitor.num_of_iterations, num_of_iterations)
+        self.assertGreater(matcher.matcher_monitor.monitor.best_objective_value, 0)
+
+    def test_matcher_with_monitor_without_iterations_limit(self):
+        num_of_iterations = -1
+        config = self._create_match_config(enabled=True, max_iterations=num_of_iterations)
+        match_input = MatcherInput(self.graph, self.empty_board, config)
+        matcher = ORToolsMatcher(match_input)
+        actual_delivery_board = matcher.match()
+
+        expected_drone_deliveries = self._create_drone_deliveries(delivery_requests=self.delivery_requests,
+                                                                  empty_board=self.empty_board,
+                                                                  loading_dock=self.loading_dock)
+        unmatched_delivery_request = UnmatchedDeliveryRequest(graph_index=2, delivery_request=self.delivery_requests[1])
+        expected_matched_board = DroneDeliveryBoard(
+            drone_deliveries=expected_drone_deliveries,
+            unmatched_delivery_requests=[unmatched_delivery_request])
+
+        self.assertEqual(expected_matched_board, actual_delivery_board)
+        self.assertGreater(matcher.matcher_monitor.monitor.num_of_iterations, 0)
+        self.assertGreater(matcher.matcher_monitor.monitor.best_objective_value, 0)
+
+    def test_matcher_without_monitor(self):
+        config = self._create_match_config(enabled=False, max_iterations=0)
+        match_input = MatcherInput(self.graph, self.empty_board, config)
+        matcher = ORToolsMatcher(match_input)
         actual_delivery_board = matcher.match()
 
         expected_drone_deliveries = self._create_drone_deliveries(delivery_requests=self.delivery_requests,
@@ -108,10 +149,10 @@ class ORToolsMatcherDifferentPriorityTestCase(TestCase):
         return EmptyDroneDeliveryBoard([empty_drone_delivery_1])
 
     @staticmethod
-    def _create_match_config() -> MatcherConfig:
+    def _create_match_config(enabled: bool, max_iterations: int, iterations_between_monitoring:int =1) -> MatcherConfig:
         return MatcherConfig(
             zero_time=ZERO_TIME,
-            solver=ORToolsSolverConfig(first_solution_strategy="path_cheapest_arc",
+            solver=ORToolsSolverConfig(SolverVendor.OR_TOOLS, first_solution_strategy="path_cheapest_arc",
                                        local_search_strategy="automatic", timeout_sec=30),
             constraints=ConstraintsConfig(
                 capacity_constraints=CapacityConstraints(count_capacity_from_zero=True, capacity_cost_coefficient=1),
@@ -123,8 +164,9 @@ class ORToolsMatcherDifferentPriorityTestCase(TestCase):
                 priority_constraints=PriorityConstraints(True, priority_cost_coefficient=100)),
             unmatched_penalty=10000,
             reload_per_vehicle=0,
-            monitor=MonitorConfig(enabled=False)
-        )
+            monitor=MonitorConfig(enabled=enabled, iterations_between_monitoring=iterations_between_monitoring,
+                                  max_iterations=max_iterations,
+                                  save_plot=False, show_plot=False, output_directory=''))
 
     @staticmethod
     def _create_drone_deliveries(delivery_requests: List[DeliveryRequest], empty_board: EmptyDroneDeliveryBoard,

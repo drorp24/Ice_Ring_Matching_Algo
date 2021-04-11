@@ -7,6 +7,8 @@ from common.entities.base_entities.temporal import DateTimeExtension
 from matching.constraint_config import CapacityConstraints, PriorityConstraints, \
     SessionTimeConstraints, TravelTimeConstraints
 from matching.matcher_config import ConstraintsConfig, MatcherConfig
+from matching.matcher_factory import SolverVendor
+from matching.monitor_config import MonitorConfig
 from matching.ortools.ortools_solver_config import ORToolsSolverConfig
 
 
@@ -28,7 +30,14 @@ class MatchConfigTestCase(TestCase):
                 session_time_constraints=SessionTimeConstraints(max_session_time=300),
                 priority_constraints=PriorityConstraints(True, priority_cost_coefficient=1000)),
             unmatched_penalty=100000,
-            reload_per_vehicle=0
+            reload_per_vehicle=0,
+            monitor=MonitorConfig(enabled=True,
+                                  iterations_between_monitoring=10,
+                                  max_iterations=100000,
+                                  save_plot=True,
+                                  show_plot=True,
+                                  separate_charts=True,
+                                  output_directory="outputs")
         )
 
     @classmethod

@@ -31,6 +31,7 @@ from matching.constraint_config import ConstraintsConfig, CapacityConstraints, T
 from matching.matcher_config import MatcherConfig
 from matching.matcher_factory import create_matcher
 from matching.matcher_input import MatcherInput
+from matching.monitor_config import MonitorConfig
 from matching.ortools.ortools_initial_solution import ORToolsInitialSolution
 from matching.ortools.ortools_solver_config import ORToolsSolverConfig
 
@@ -85,7 +86,7 @@ class BasicInitialSolutionTest(TestCase):
                                                   empty_board=empty_drone_delivery_board,
                                                   config=match_config_auto_noreuse)
 
-        delivery_board_auto_noreuse = create_matcher(matcher_input=matcher_input_auto_noreuse).match()
+        delivery_board_auto_noreuse = calc_assignment(matcher_input=matcher_input_auto_noreuse)
 
         match_config_initial = BasicInitialSolutionTest.create_match_config(local_search_strategy="GUIDED_LOCAL_SEARCH",
                                                                             reload_per_vehicle=3)
@@ -127,7 +128,8 @@ class BasicInitialSolutionTest(TestCase):
                 session_time_constraints=SessionTimeConstraints(max_session_time=60),
                 priority_constraints=PriorityConstraints(True, priority_cost_coefficient=1000)),
             unmatched_penalty=10000,
-            reload_per_vehicle=reload_per_vehicle
+            reload_per_vehicle=reload_per_vehicle,
+            monitor=MonitorConfig(enabled=False)
         )
 
     @staticmethod

@@ -184,5 +184,9 @@ class TimeDeltaExtension(BaseEntity):
         return self.get_internal().total_seconds() / SEC_IN_MIN
 
 
+def current_milli_time() -> int:
+    return int(round(datetime.now().timestamp() * 1000))
+
+
 class NoViableTimesGivenDistribution(Exception):
     pass

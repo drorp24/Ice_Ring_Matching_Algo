@@ -3,10 +3,6 @@ from ortools.constraint_solver.pywrapcp import RoutingModel
 from ortools.constraint_solver.routing_parameters_pb2 import RoutingSearchParameters
 
 from common.entities.base_entities.drone_delivery_board import DroneDeliveryBoard
-from common.entities.base_entities.delivery_request import DeliveryRequest
-from common.entities.base_entities.drone_delivery import DroneDelivery, MatchedDroneLoadingDock, MatchedDeliveryRequest
-from common.entities.base_entities.drone_delivery_board import DroneDeliveryBoard, UnmatchedDeliveryRequest
-from common.entities.base_entities.temporal import TimeDeltaExtension, TimeWindowExtension
 from common.graph.operational.export_ortools_graph import OrtoolsGraphExporter
 from matching.initial_solution import Routes
 from matching.matcher import Matcher
@@ -27,9 +23,9 @@ class ORToolsMatcher(Matcher):
         super().__init__(matcher_input)
         self._matcher_input = matcher_input
         num_of_reloading_depo_nodes_per_formation = matcher_input.config.reload_per_vehicle \
-            * NUM_OF_NODES_IN_RELOADING_DEPO
+                                                    * NUM_OF_NODES_IN_RELOADING_DEPO
         num_of_reloading_depo_nodes = self._matcher_input.empty_board.amount_of_formations() \
-            * num_of_reloading_depo_nodes_per_formation
+                                      * num_of_reloading_depo_nodes_per_formation
         self._reloading_virtual_depos_indices = list(range(
             len(self._matcher_input.graph.nodes),
             len(self._matcher_input.graph.nodes) + num_of_reloading_depo_nodes))
@@ -44,6 +40,7 @@ class ORToolsMatcher(Matcher):
                                                         self._matcher_input, self._arrive_indices, self._depart_indices)
         self._set_objective()
         self._set_constraints()
+        self._set_monitor()
         # self._set_reloading_depos_for_each_formation(num_of_reloading_depo_nodes_per_formation)
 
     def _calc_reload_arriving_nodes(self):
@@ -57,6 +54,8 @@ class ORToolsMatcher(Matcher):
     def match(self) -> DroneDeliveryBoard:
         solution = self._routing_model.SolveWithParameters(self._search_parameters)
         if ORToolsMatcher.is_solution_valid(solution):
+            if self._matcher_input.config.monitor.enabled:
+                self.matcher_monitor.handle_monitor_data()
             return self._solution_handler.create_drone_delivery_board(solution)
         else:
             return DroneDeliveryBoard([], [UnmatchedDeliveryRequest(i, node.internal_node) for i, node in enumerate(self.matcher_input.graph.nodes) if
@@ -116,6 +115,15 @@ class ORToolsMatcher(Matcher):
         matcher_constraints.add_travel_time()
         matcher_constraints.add_session_time()
         matcher_constraints.add_unmatched_penalty()
+
+    def _set_monitor(self):
+        if not self.matcher_input.config.monitor.enabled:
+            return
+
+        self.matcher_monitor = ORToolsMatcherMonitor(self._graph_exporter, self._index_manager, self._routing_model,
+                                                     self._search_parameters, self.matcher_input,
+                                                     self._solution_handler)
+        self.matcher_monitor.add_search_monitor()
 
     def _set_reloading_depos_for_each_formation(self, num_of_reloading_depo_nodes_per_formation):
         for formation_index in range(self._matcher_input.empty_board.amount_of_formations()):
