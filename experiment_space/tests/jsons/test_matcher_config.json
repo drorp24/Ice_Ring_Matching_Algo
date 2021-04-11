@@ -47,7 +47,17 @@
     }
   },
   "unmatched_penalty": 1000,
-  "reload_per_vehicle": 1
+  "reload_per_vehicle": 1,
+  "monitor": {
+    "__class__": "MonitorConfig",
+    "enabled": false,
+    "iterations_between_monitoring": 1000,
+    "max_iterations": 0,
+    "save_plot": true,
+    "show_plot": true,
+    "separate_charts": true,
+    "output_directory" : "outputs"
+  }
 }
 
 

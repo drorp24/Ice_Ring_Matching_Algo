@@ -152,7 +152,7 @@ class ORToolsMatcherMonitorTestCase(TestCase):
     def _create_match_config(enabled: bool, max_iterations: int, iterations_between_monitoring:int =1) -> MatcherConfig:
         return MatcherConfig(
             zero_time=ZERO_TIME,
-            solver=ORToolsSolverConfig(SolverVendor.OR_TOOLS, first_solution_strategy="path_cheapest_arc",
+            solver=ORToolsSolverConfig(first_solution_strategy="path_cheapest_arc",
                                        local_search_strategy="automatic", timeout_sec=30),
             constraints=ConstraintsConfig(
                 capacity_constraints=CapacityConstraints(count_capacity_from_zero=True, capacity_cost_coefficient=1),
