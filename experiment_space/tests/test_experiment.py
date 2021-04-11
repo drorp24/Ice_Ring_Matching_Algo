@@ -87,7 +87,7 @@ class BasicExperimentTest(unittest.TestCase):
         experiment_options.supplier_category += [self.supplier_category, self.supplier_category]
         experiment_options.matcher_config += [self.matcher_config]
 
-        experiments = experiment_options.calc_random_k(experiment_options, amount=50, random=Random(100024))
+        experiments = Options.calc_random_k(experiment_options, amount=50, random=Random(100024))
 
         result_drone_delivery_boards = [experiment.run_match() for experiment in experiments]
 

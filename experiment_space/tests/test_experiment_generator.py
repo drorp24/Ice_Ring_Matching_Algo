@@ -1,4 +1,5 @@
 import unittest
+from pathlib import Path
 from random import Random
 
 from common.entities.base_entities.fleet.fleet_property_sets import DroneSetProperties
@@ -13,11 +14,11 @@ class BasicExperimentGeneratorTest(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        supplier_category_path = 'experiment_space/tests/jsons/test_supplier_category.json'
+        supplier_category_path = Path('experiment_space/tests/jsons/test_supplier_category.json')
         supplier_category = SupplierCategory.from_json(SupplierCategory, supplier_category_path)
-        matcher_config_path = 'experiment_space/tests/jsons/test_matcher_config.json'
+        matcher_config_path = Path('experiment_space/tests/jsons/test_matcher_config.json')
         matcher_config = MatcherConfig.from_json(MatcherConfig, matcher_config_path)
-        drone_set_properties_path = 'experiment_space/tests/jsons/test_drone_set_properties.json'
+        drone_set_properties_path = Path('experiment_space/tests/jsons/test_drone_set_properties.json')
         drone_set_properties = DroneSetProperties.from_json(DroneSetProperties, drone_set_properties_path)
         default_graph_creation_algorithm = FullyConnectedGraphAlgorithm()
         cls.base_experiment = Experiment(supplier_category=supplier_category,

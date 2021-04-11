@@ -96,10 +96,17 @@ def _calc_internal_extract(base_instance, hierarchical_classes: List[str]):
     if type(base_instance).__name__ in hierarchical_classes:
         internal_extracted = create_options_class(base_instance, hierarchical_classes)
         return internal_extracted
+    # if hasattr(base_instance, '__dict__'):
+    #     base_instance_keys = base_instance.__dict__().keys()
+    #     if '__class__' in base_instance_keys or '__enum__' in base_instance_keys:
+    #         internal_extracted = create_options_class(base_instance, hierarchical_classes)
+    #         return internal_extracted
     return base_instance
 
 
-def create_options_class(base_instance: object, hierarchical_classes: List[str] = []) -> Options:
+def create_options_class(base_instance: object, hierarchical_classes: List[str] = None) -> Options:
+    if hierarchical_classes is None:
+        hierarchical_classes = []
     internal_extracted = {'internal_class': type(base_instance)}
     internal_extracted.update(_extract_properties_option_from_class(base_instance, hierarchical_classes))
     return type(type(base_instance).__name__ + 'Options', (Options,), internal_extracted)
