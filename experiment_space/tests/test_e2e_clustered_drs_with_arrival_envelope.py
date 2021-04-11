@@ -150,8 +150,7 @@ class BasicMinimumEnd2EndClusteredDrsTest(unittest.TestCase):
         board_gantt_drawer = create_gantt_drawer(zero_time=supplier_category.zero_time,
                                                  hours_period=24,
                                                  row_names=row_names,
-                                                 rows_title='Formation Type x Package Type Amounts'
-                                                 )
+                                                 rows_title='Formation Type x Package Type Amounts')
         operational_gantt_drawer.add_delivery_board_with_row_per_drone_delivery(board_gantt_drawer, delivery_board,
                                                                                 True)
         board_gantt_drawer.draw(True)
