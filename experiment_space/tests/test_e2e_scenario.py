@@ -30,8 +30,8 @@ class BasicMinimumEnd2End(unittest.TestCase):
                                   drone_formation_policy=DroneFormationTypePolicy(
                                       {DroneFormationType.PAIR: 1.0, DroneFormationType.QUAD: 0.0}),
                                   package_configuration_policy=PackageConfigurationPolicy(
-                                      {PackageConfiguration.LARGE_X2: 0.6, PackageConfiguration.MEDIUM_X4: 0.2,
-                                       PackageConfiguration.SMALL_X8: 0.2, PackageConfiguration.TINY_X16: 0.0}),
+                                      {PackageConfiguration.LARGE_X2: 0.4, PackageConfiguration.MEDIUM_X4: 0.2,
+                                       PackageConfiguration.SMALL_X8: 0.2, PackageConfiguration.TINY_X16: 0.2}),
                                   drone_amount=50)
 
     def test_create_graph_model(self):
@@ -44,7 +44,7 @@ class BasicMinimumEnd2End(unittest.TestCase):
                        drone_set_properties=self.drone_set_properties,
                        matcher_config=self.matcher_config,
                        graph_creation_algorithm=FullyConnectedGraphAlgorithm(),
-                       board_level_properties=BoardLevelProperties(100, 10.0))
+                       board_level_properties=BoardLevelProperties(400, 10.0))
 
         delivery_board = e.run_match()
 

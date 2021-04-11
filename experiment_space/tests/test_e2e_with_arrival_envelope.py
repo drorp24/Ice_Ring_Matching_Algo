@@ -47,7 +47,7 @@ class BasicArrivalEnvelopeMinimumEnd2End(unittest.TestCase):
 
     @unittest.skipIf(os.environ.get('NO_SLOW_TESTS', False), 'slow tests')
     def test_calc_assignment(self):
-        operational_graph = FullyConnectedGraphAlgorithm(edge_cost_factor=1, edge_travel_time_factor=1) \
+        operational_graph = FullyConnectedGraphAlgorithm(edge_cost_factor=0.1, edge_travel_time_factor=0.1) \
             .create(supplier_category=self.supplier_category)
 
         matcher_input = MatcherInput(graph=operational_graph,
