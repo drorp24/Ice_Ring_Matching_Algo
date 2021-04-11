@@ -47,7 +47,7 @@ class BasicArrivalEnvelopeMinimumEnd2End(unittest.TestCase):
 
     @unittest.skipIf(os.environ.get('NO_SLOW_TESTS', False), 'slow tests')
     def test_calc_assignment(self):
-        operational_graph = FullyConnectedGraphAlgorithm(edge_cost_factor=0.1, edge_travel_time_factor=0.1) \
+        operational_graph = FullyConnectedGraphAlgorithm(edge_cost_factor=1, edge_travel_time_factor=1) \
             .create(supplier_category=self.supplier_category)
 
         matcher_input = MatcherInput(graph=operational_graph,
@@ -55,10 +55,9 @@ class BasicArrivalEnvelopeMinimumEnd2End(unittest.TestCase):
                                      config=self.matcher_config)
 
         delivery_board = create_matcher(matcher_input).match()
-        self.assertEqual(len(delivery_board.unmatched_delivery_requests), 2)
+        self.assertEqual(len(delivery_board.unmatched_delivery_requests), 4)
         amount_per_package_type = delivery_board.get_total_amount_per_package_type()
-        self.assertEqual(amount_per_package_type.get_package_type_amount(PackageType.SMALL), 0)
-        self.assertEqual(amount_per_package_type.get_package_type_amount(PackageType.TINY), 0)
-        self.assertEqual(amount_per_package_type.get_package_type_amount(PackageType.MEDIUM), 2)
-        self.assertEqual(amount_per_package_type.get_package_type_amount(PackageType.LARGE), 6)
-        self.assertEqual(delivery_board.get_total_priority(), 512)
+        self.assertEqual(amount_per_package_type.get_package_type_amount(PackageType.TINY), 1)
+        self.assertEqual(amount_per_package_type.get_package_type_amount(PackageType.MEDIUM), 1)
+        self.assertEqual(amount_per_package_type.get_package_type_amount(PackageType.LARGE), 4)
+        self.assertEqual(delivery_board.get_total_priority(), 477)
