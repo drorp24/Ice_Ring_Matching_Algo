@@ -76,7 +76,7 @@ class ORToolsMatcherMaxRouteTimeTestCase(TestCase):
     def _create_limited_route_time_empty_drone_delivery(max_route_times_in_minutes: int, velocity_meter_per_sec: float):
         board_level_properties = BoardLevelProperties(max_route_times_in_minutes, velocity_meter_per_sec)
         return EmptyDroneDelivery(EntityID(uuid.uuid4()), DroneFormations.get_drone_formation(
-            DroneFormationType.PAIR, PackageConfigurationOption.LARGE_PACKAGES, DroneType.drone_type_1),
+            DroneFormationType.PAIR, PackageConfigurationOption.TINY_PACKAGES, DroneType.drone_type_1),
                                   board_level_properties)
 
     @staticmethod
@@ -143,7 +143,7 @@ class ORToolsMatcherMaxRouteTimeTestCase(TestCase):
     @staticmethod
     def _create_sufficient_route_time_empty_drone_delivery(board_level_properties: BoardLevelProperties):
         return EmptyDroneDelivery(EntityID(uuid.uuid4()), DroneFormations.get_drone_formation(
-            DroneFormationType.PAIR, PackageConfigurationOption.LARGE_PACKAGES, DroneType.drone_type_2),
+            DroneFormationType.PAIR, PackageConfigurationOption.TINY_PACKAGES, DroneType.drone_type_2),
                                   board_level_properties)
 
     @staticmethod
