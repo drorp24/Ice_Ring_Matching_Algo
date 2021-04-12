@@ -38,11 +38,6 @@ from geometry.geo_factory import create_point_2d
 from matching.matcher_config import MatcherConfig
 from visualization.basic.pltdrawer2d import MapImage
 
-west_lon = 34.83927
-east_lon = 35.32341
-south_lat = 31.77279
-north_lat = 32.19276
-
 ZERO_TIME = DateTimeExtension(dt_date=date(2021, 1, 1), dt_time=time(0, 0, 0))
 SHOW_VISUALS = True
 
@@ -54,16 +49,21 @@ class EndToEndMultipleExperimentRun(unittest.TestCase):
         cls.drone_set_properties_even = EndToEndMultipleExperimentRun._create_even_drone_set_properties()
         cls.drone_set_properties_heavily_weighted = EndToEndMultipleExperimentRun._create_even_drone_set_properties()
         cls.matcher_config = MatcherConfig.dict_to_obj(
-            MatcherConfig.json_to_dict(Path('experiment_space/tests/jsons/test_min_e2e_config.json')))
+            MatcherConfig.json_to_dict(Path('experiment_space/tests/jsons/test_e2e_experiment_config.json')))
 
-    @unittest.skip
+    # @unittest.skip
     def test_calc_north_scenario_visualization(self):
         sampled_supplier_category = self._create_sampled_supplier_category_north()
         experiment = Experiment(supplier_category=sampled_supplier_category,
-                                drone_set_properties=EndToEndMultipleExperimentRun._create_large_drone_set_properties(),
+                                drone_set_properties=EndToEndMultipleExperimentRun._create_large_drone_set_properties(
+                                    drone_amount=6),
                                 matcher_config=self.matcher_config,
-                                graph_creation_algorithm=FullyConnectedGraphAlgorithm())
-        self._run_end_to_end_visual_experiment(experiment, SHOW_VISUALS)
+                                graph_creation_algorithm=FullyConnectedGraphAlgorithm(edge_cost_factor=25.0,
+                                                                                      edge_travel_time_factor=25.0),
+                                board_level_properties=BoardLevelProperties())
+        map_image = MapImage(map_background_path=Path("visualization/basic/North_map.png"),
+                             west_lon=34.907, east_lon=35.905, south_lat=32.489, north_lat=33.932)
+        self._run_end_to_end_visual_experiment(experiment, SHOW_VISUALS, map_image)
 
     @unittest.skip
     def test_calc_center_scenario_visualization(self):
@@ -72,7 +72,9 @@ class EndToEndMultipleExperimentRun(unittest.TestCase):
                                 drone_set_properties=self.drone_set_properties_even,
                                 matcher_config=self.matcher_config,
                                 graph_creation_algorithm=FullyConnectedGraphAlgorithm())
-        self._run_end_to_end_visual_experiment(experiment, SHOW_VISUALS)
+        map_image = MapImage(map_background_path=Path("visualization/basic/gush_dan_background.png"),
+                             west_lon=34.839, east_lon=35.323, south_lat=31.772, north_lat=32.192)
+        self._run_end_to_end_visual_experiment(experiment, SHOW_VISUALS, map_image)
 
     @unittest.skip
     def test_calc_center_scenario_with_different_first_solution_strategies(self):
@@ -141,7 +143,7 @@ class EndToEndMultipleExperimentRun(unittest.TestCase):
                                     ylabel='Match Percentage')
 
     @staticmethod
-    def _run_end_to_end_visual_experiment(experiment: Experiment, show_visuals: bool):
+    def _run_end_to_end_visual_experiment(experiment: Experiment, show_visuals: bool, map_image: None):
         graph = experiment.graph_creation_algorithm.create(experiment.supplier_category)
         result_drone_delivery_board = experiment.run_match()
         analyzers_to_run = [MatchedDeliveryRequestsAnalyzer,
@@ -153,8 +155,6 @@ class EndToEndMultipleExperimentRun(unittest.TestCase):
         analysis_results = Experiment.run_analysis_suite(result_drone_delivery_board, analyzers_to_run)
         print(analysis_results)
         if show_visuals:
-            map_image = MapImage(map_background_path=Path("visualization/basic/gush_dan_background.png"),
-                                 west_lon=west_lon, east_lon=east_lon, south_lat=south_lat, north_lat=north_lat)
             draw_matched_scenario(delivery_board=result_drone_delivery_board, graph=graph,
                                   supplier_category=experiment.supplier_category, map_image=map_image)
         return analysis_results
@@ -166,9 +166,9 @@ class EndToEndMultipleExperimentRun(unittest.TestCase):
             delivery_requests_distribution=cls._create_custom_delivery_request_distribution_north(),
             drone_loading_docks_distribution=DroneLoadingDockDistribution(
                 drone_loading_station_distributions=DroneLoadingStationDistribution(
-                    drone_station_locations_distribution=UniformPointInBboxDistribution(35.11, 35.11, 31.79, 31.79)),
+                    drone_station_locations_distribution=UniformPointInBboxDistribution(35.19, 35.19, 32.66, 32.66)),
                 time_window_distributions=_create_standard_full_day_test_time())).choose_rand(Random(42), amount={
-            DeliveryRequest: 30})[0]
+                    DeliveryRequest: 50})[0]
 
     @classmethod
     def _create_sampled_supplier_category_center(cls):
@@ -200,13 +200,13 @@ class EndToEndMultipleExperimentRun(unittest.TestCase):
                                   drone_amount=30)
 
     @classmethod
-    def _create_large_drone_set_properties(cls):
+    def _create_large_drone_set_properties(cls, drone_amount: int):
         return DroneSetProperties(drone_type=DroneType.drone_type_1,
                                   drone_formation_policy=DroneFormationTypePolicy(
                                       {DroneFormationType.PAIR: 1.0, DroneFormationType.QUAD: 0.0}),
                                   package_configuration_policy=PackageConfigurationPolicy(
                                       {PackageConfiguration.LARGE_X2: 1.0}),
-                                  drone_amount=50)
+                                  drone_amount=drone_amount)
 
     @staticmethod
     def _create_custom_drone_loading_dock_distribution(drone_station_location):
@@ -221,11 +221,11 @@ class EndToEndMultipleExperimentRun(unittest.TestCase):
     @staticmethod
     def _create_custom_delivery_request_distribution_north():
         return EndToEndMultipleExperimentRun._create_delivery_request_distribution(
-            center_point=create_point_2d(35.11, 32.0),
-            sigma_lat=0.12,
-            sigma_lon=0.08,
+            center_point=create_point_2d(35.46, 33.25),
+            sigma_lon=0.2,
+            sigma_lat=0.3,
             lowest_priority=10,
-            dr_timewindow=3)
+            dr_timewindow=20)
 
     @staticmethod
     def _create_custom_delivery_request_distribution_center():

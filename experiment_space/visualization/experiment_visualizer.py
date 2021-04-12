@@ -75,7 +75,7 @@ def draw_matches_on_map(delivery_board, map_image, should_block=False):
 
 def draw_operational_graph_on_map(graph, map_image, should_block=False):
     dr_drawer = create_drawer_2d(Drawer2DCoordinateSys.GEOGRAPHIC, map_image)
-    operational_drawer2d.add_operational_graph(dr_drawer, graph, draw_internal=True, draw_edges=True)
+    operational_drawer2d.add_operational_graph(dr_drawer, graph, draw_internal=True, draw_edges=False)
     dr_drawer.draw(should_block)
 
 
