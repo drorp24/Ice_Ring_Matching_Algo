@@ -38,9 +38,10 @@ def draw_labeled_analysis_graph(experiment_analysis: List[Tuple[str, Dict]], ana
                                 title: str, xlabel: str, ylabel: str, color: Tuple = (0, 0, 1, 0.5), seed=42):
     fig, ax = plt.subplots(constrained_layout=True)
     for i, analyzer in enumerate(analyzers):
-        color = (Random(seed + i).random(), Random(seed + i*100).random(), Random(seed + i*1000).random(), 0.5)
+        color = (Random(seed + i).random(), Random(seed + i * 100).random(), Random(seed + i * 1000).random(), 0.5)
         x_experiment_label, y_analysis_output = _extract_x_y_from_labeled_experiment(analyzer, experiment_analysis)
-        ax.plot(x_experiment_label, y_analysis_output, 'o', color=color, linestyle='solid', linewidth=2, markersize=10, markerfacecolor=color, label=analyzer.__name__)
+        ax.plot(x_experiment_label, y_analysis_output, 'o', color=color, linestyle='solid', linewidth=2, markersize=10,
+                markerfacecolor=color, label=analyzer.__name__)
     _add_wording_to_plot(ax, title, xlabel, ylabel)
     ax.grid('on')
     plt.legend()
@@ -58,12 +59,22 @@ def draw_labeled_analysis_bar_chart(labeled_experiment_analysis: List[Tuple[str,
 
 
 def draw_match_gantt(delivery_board, supplier_category, should_block):
-    row_names = _get_row_names(delivery_board)
+    num_of_edds = len(set([delivery.id for delivery in delivery_board.drone_deliveries]))
+    aggregate_by_edd = len(delivery_board.drone_deliveries) > num_of_edds
+    if aggregate_by_edd:
+        row_names = _get_row_name_per_empty_drone_delivery(delivery_board)
+    else:
+        row_names = _get_row_name_per_drone_delivery(delivery_board)
+
     board_gantt_drawer = create_gantt_drawer(zero_time=supplier_category.zero_time,
                                              hours_period=24,
                                              row_names=row_names,
                                              rows_title='Formation Type x Package Type Amounts')
-    operational_gantt_drawer.add_delivery_board_with_row_per_drone_delivery(board_gantt_drawer, delivery_board, draw_unmatched=True)
+    if aggregate_by_edd:
+        operational_gantt_drawer.add_delivery_board_with_row_per_edd(board_gantt_drawer, delivery_board, True)
+    else:
+        operational_gantt_drawer.add_delivery_board_with_row_per_drone_delivery(board_gantt_drawer, delivery_board,
+                                                                                draw_unmatched=True)
     board_gantt_drawer.draw(should_block)
 
 
@@ -93,8 +104,20 @@ def _add_wording_to_plot(ax, title, xlabel, ylabel):
     ax.figure.autofmt_xdate()
 
 
-def _get_row_names(delivery_board):
+def _get_row_name_per_drone_delivery(delivery_board):
     return ["Unmatched Out"] + \
            ["[" + str(delivery.drone_formation.drone_formation_type.name) + "] * " +
             str(delivery.drone_formation.drone_package_configuration.package_type_map)
             for delivery in delivery_board.drone_deliveries]
+
+
+def _get_row_name_per_empty_drone_delivery(delivery_board):
+    formations = set((delivery.id, delivery.drone_formation) for delivery in delivery_board.drone_deliveries)
+    return ["Unmatched Out"] + \
+           [_get_short_formation_id(str(formation[0])) + " [" + str(formation[1].drone_formation_type.name) + "] * " +
+            str(formation[1].drone_package_configuration.package_type_map)
+            for formation in formations]
+
+
+def _get_short_formation_id(formation_id: str):
+    return formation_id[-7:-2]
