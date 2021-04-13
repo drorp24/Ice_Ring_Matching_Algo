@@ -36,30 +36,38 @@ from matching.solver_config import SolverVendor
 ZERO_TIME = DateTimeExtension(dt_date=date(2020, 1, 23), dt_time=time(11, 30, 0))
 
 
-class ORToolsMatcherReloadWithMultipleDepotsTestCase(TestCase):
+class ORToolsMatcherReloadWithMultipleConfigurationsTestCase(TestCase):
     @classmethod
     def setUpClass(cls):
         cls.delivery_requests = cls._create_delivery_requests()
         cls.loading_docks = cls._create_loading_docks()
         cls.graph = cls._create_graph(cls.delivery_requests, cls.loading_docks)
-        cls.empty_board = cls._create_empty_board_with_delivering_drones_with_different_loading_docks(cls.loading_docks)
+        cls.empty_board = cls._create_empty_board_with_delivering_drones_with_different_configurations(
+            cls.loading_docks)
         cls.match_input = MatcherInput(cls.graph, cls.empty_board, cls._create_match_config())
 
-    def test_matcher_when_delivering_drones_have_different_loading_docks_then_reload_successful(self):
+    def test_matcher_when_delivering_drones_have_different_configurations_then_reload_successful(self):
         matcher = ORToolsMatcher(self.match_input)
         actual_delivery_board = matcher.match()
         self._assert_all_requests_matched(actual_delivery_board)
-        self._assert_drone_deliveries_have_different_loading_docks(actual_delivery_board)
+        self._assert_drone_deliveries_have_different_configurations(actual_delivery_board)
 
     def _assert_all_requests_matched(self, actual_delivery_board: DroneDeliveryBoard):
         self.assertEqual(len(self.delivery_requests),
                          actual_delivery_board.get_total_amount_per_package_type().get_package_type_amount(
                              PackageType.LARGE))
 
-    def _assert_drone_deliveries_have_different_loading_docks(self, actual_delivery_board: DroneDeliveryBoard):
-        matched_start_loading_docks = [delivery.start_drone_loading_docks.drone_loading_dock for delivery in
-                                       actual_delivery_board.drone_deliveries]
-        self.assertNotEqual(len(set(matched_start_loading_docks)), len(matched_start_loading_docks))
+    def _assert_drone_deliveries_have_different_configurations(self, actual_delivery_board: DroneDeliveryBoard):
+        num_matched_packages_1 = self._get_num_of_matched_packages_of_first_drone_delivery_of_delivering_drones(
+            actual_delivery_board, self.empty_board.empty_drone_deliveries[0])
+        num_matched_packages_2 = self._get_num_of_matched_packages_of_first_drone_delivery_of_delivering_drones(
+            actual_delivery_board, self.empty_board.empty_drone_deliveries[1])
+        self.assertEqual(
+            self.empty_board.empty_drone_deliveries[0].drone_formation.get_package_type_amount_map()
+                .get_package_type_amount(PackageType.LARGE), num_matched_packages_1)
+        self.assertEqual(
+            self.empty_board.empty_drone_deliveries[1].drone_formation.get_package_type_amount_map()
+                .get_package_type_amount(PackageType.LARGE), num_matched_packages_2)
 
     @staticmethod
     def _create_delivery_requests() -> List[DeliveryRequest]:
@@ -103,7 +111,7 @@ class ORToolsMatcherReloadWithMultipleDepotsTestCase(TestCase):
                                          TimeDeltaExtension(timedelta(hours=5)))))
         dock2 = DroneLoadingDock(EntityID.generate_uuid(),
                                  DroneLoadingStation(EntityID.generate_uuid(), create_point_2d(0, 10)),
-                                 DroneType.drone_type_3,
+                                 DroneType.drone_type_2,
                                  TimeWindowExtension(
                                      since=ZERO_TIME,
                                      until=ZERO_TIME.add_time_delta(
@@ -119,7 +127,7 @@ class ORToolsMatcherReloadWithMultipleDepotsTestCase(TestCase):
         return graph
 
     @staticmethod
-    def _create_empty_board_with_delivering_drones_with_different_loading_docks(
+    def _create_empty_board_with_delivering_drones_with_different_configurations(
             loading_docks: [DroneLoadingDock]) -> DeliveringDronesBoard:
         empty_drone_delivery_1 = DeliveringDrones(id_=EntityID(uuid.uuid4()),
                                                   drone_formation=DroneFormations.get_drone_formation(
@@ -132,7 +140,7 @@ class ORToolsMatcherReloadWithMultipleDepotsTestCase(TestCase):
                                                   drone_formation=DroneFormations.get_drone_formation(
                                                       DroneFormationType.PAIR,
                                                       PackageConfigurationOption.LARGE_PACKAGES,
-                                                      DroneType.drone_type_3),
+                                                      DroneType.drone_type_2),
                                                   start_loading_dock=loading_docks[1],
                                                   end_loading_dock=loading_docks[1])
         return DeliveringDronesBoard([empty_drone_delivery_1, empty_drone_delivery_2])
@@ -155,3 +163,10 @@ class ORToolsMatcherReloadWithMultipleDepotsTestCase(TestCase):
             reload_per_vehicle=1,
             monitor=MonitorConfig(enabled=False)
         )
+
+    def _get_num_of_matched_packages_of_first_drone_delivery_of_delivering_drones(actual_delivery_board,
+                                                                                  delivering_drones):
+        for delivery in actual_delivery_board.drone_deliveries:
+            if delivery.delivering_drones is delivering_drones:
+                return delivery.get_total_package_type_amount_map().get_package_type_amount(PackageType.LARGE)
+
