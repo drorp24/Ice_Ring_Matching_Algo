@@ -20,7 +20,6 @@ from geometry.geo_factory import create_point_2d
 
 
 class TestFleetConfigurationAttribution(unittest.TestCase):
-
     empty_drone_delivery_board_json_path = Path('common/entities/base_entities/fleet/tests/empty_drone_test_file.json')
 
     @classmethod
@@ -86,14 +85,14 @@ class TestFleetConfigurationAttribution(unittest.TestCase):
 
     def test_empty_drone_delivery_board(self):
         empty_drone_delivery_board = generate_empty_delivery_board(
-            [self.drone_set_properties_1, self.drone_set_properties_2],400,10)
+            [self.drone_set_properties_1, self.drone_set_properties_2], 400, 10)
         self.assertIsInstance(empty_drone_delivery_board, DeliveringDronesBoard)
         self.assertEqual(len(empty_drone_delivery_board.empty_drone_deliveries), 24)
         self.assertIsInstance(empty_drone_delivery_board.empty_drone_deliveries[0].drone_formation, DroneFormation)
 
     def test_empty_board_to_json_and_back_to_empty_board(self):
         empty_drone_delivery_board = generate_empty_delivery_board(
-            [self.drone_set_properties_1, self.drone_set_properties_2],400,10)
+            [self.drone_set_properties_1, self.drone_set_properties_2], 400, 10)
         empty_drone_delivery_board.to_json(self.empty_drone_delivery_board_json_path)
 
         empty_drone_delivery_board_from_json = \

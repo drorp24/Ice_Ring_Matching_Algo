@@ -64,8 +64,11 @@ class OrtoolsGraphExporter(GraphExporter):
         return node
 
     @staticmethod
-    def get_node_graph_index(graph: OperationalGraph, node: Union[DroneLoadingDock,DeliveryRequest]) -> int:
-        index = graph.get_node_index(OperationalNode(node))
+    def get_node_graph_index(graph: OperationalGraph, node: Union[DroneLoadingDock, DeliveryRequest]) -> int:
+        try:
+            index = graph.get_node_index(OperationalNode(node))
+        except ValueError:
+            raise TypeError(f"Node not found: {node}")
         return index
 
     @lru_cache()

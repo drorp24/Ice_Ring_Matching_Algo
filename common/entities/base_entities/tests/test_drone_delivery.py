@@ -24,7 +24,6 @@ ZERO_TIME = DateTimeExtension(dt_date=date(2020, 1, 23), dt_time=time(11, 30, 0)
 
 
 class BasicDroneDeliveryGenerationTests(unittest.TestCase):
-
     drone_delivery_board_json_path = Path('common/entities/base_entities/tests/delivery_board_test_file.json')
     empty_drone_delivery_json_path = Path('common/entities/base_entities/tests/empty_drone_delivery_test_file.json')
 
@@ -106,7 +105,9 @@ class BasicDroneDeliveryGenerationTests(unittest.TestCase):
     def test_2_empty_drone_deliveries_are_equal(self):
         actual_empty_drone_delivery = DeliveringDrones(id_=self.entity_id_1,
                                                        drone_formation=DroneFormations.get_drone_formation(
-            DroneFormationType.PAIR, PackageConfigurationOption.TINY_PACKAGES, DroneType.drone_type_1),
+                                                           DroneFormationType.PAIR,
+                                                           PackageConfigurationOption.TINY_PACKAGES,
+                                                           DroneType.drone_type_1),
                                                        start_loading_dock=self.docks[0],
                                                        end_loading_dock=self.docks[0])
         self.assertEqual(self.empty_drone_delivery_1, actual_empty_drone_delivery)
@@ -135,7 +136,7 @@ class BasicDroneDeliveryGenerationTests(unittest.TestCase):
         self.empty_drone_delivery_1.to_json(self.empty_drone_delivery_json_path)
 
         empty_drone_delivery_from_json = DeliveringDrones.from_json(DeliveringDrones,
-                                                                      self.empty_drone_delivery_json_path)
+                                                                    self.empty_drone_delivery_json_path)
         self.assertEqual(self.empty_drone_delivery_1, empty_drone_delivery_from_json)
 
     @staticmethod
@@ -147,12 +148,16 @@ class BasicDroneDeliveryGenerationTests(unittest.TestCase):
         self.entity_id_2 = EntityID(uuid.uuid4())
         self.empty_drone_delivery_1 = DeliveringDrones(id_=self.entity_id_1,
                                                        drone_formation=DroneFormations.get_drone_formation(
-            DroneFormationType.PAIR, PackageConfigurationOption.TINY_PACKAGES, DroneType.drone_type_1),
+                                                           DroneFormationType.PAIR,
+                                                           PackageConfigurationOption.TINY_PACKAGES,
+                                                           DroneType.drone_type_1),
                                                        start_loading_dock=self.docks[0],
                                                        end_loading_dock=self.docks[0])
         self.empty_drone_delivery_2 = DeliveringDrones(id_=self.entity_id_2,
                                                        drone_formation=DroneFormations.get_drone_formation(
-            DroneFormationType.QUAD, PackageConfigurationOption.TINY_PACKAGES, DroneType.drone_type_1),
+                                                           DroneFormationType.QUAD,
+                                                           PackageConfigurationOption.TINY_PACKAGES,
+                                                           DroneType.drone_type_1),
                                                        start_loading_dock=self.docks[0],
                                                        end_loading_dock=self.docks[0])
         return DeliveringDronesBoard([self.empty_drone_delivery_1, self.empty_drone_delivery_2])
