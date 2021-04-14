@@ -164,9 +164,9 @@ class ORToolsMatcherReloadWithMultipleConfigurationsTestCase(TestCase):
             monitor=MonitorConfig(enabled=False)
         )
 
-    def _get_num_of_matched_packages_of_first_drone_delivery_of_delivering_drones(actual_delivery_board,
-                                                                                  delivering_drones):
+    @staticmethod
+    def _get_num_of_matched_packages_of_first_drone_delivery_of_delivering_drones(
+            actual_delivery_board: DroneDeliveryBoard, delivering_drones: DeliveringDrones):
         for delivery in actual_delivery_board.drone_deliveries:
             if delivery.delivering_drones is delivering_drones:
                 return delivery.get_total_package_type_amount_map().get_package_type_amount(PackageType.LARGE)
-

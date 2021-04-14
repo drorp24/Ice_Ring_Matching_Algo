@@ -45,7 +45,7 @@ class ORToolsMatcherMonitorTestCase(TestCase):
         cls.delivery_requests = cls._create_delivery_requests()
         cls.loading_dock = cls._create_loading_dock()
         cls.graph = cls._create_graph(cls.delivery_requests, cls.loading_dock)
-        cls.empty_board = cls._create_empty_board()
+        cls.empty_board = cls._create_empty_board(cls.loading_dock)
 
     def test_matcher_with_monitor(self):
         num_of_iterations = 100
@@ -127,7 +127,8 @@ class ORToolsMatcherMonitorTestCase(TestCase):
 
     @staticmethod
     def _create_loading_dock() -> DroneLoadingDock:
-        return DroneLoadingDock(EntityID.generate_uuid(),DroneLoadingStation(EntityID.generate_uuid(),create_point_2d(0, 0)),
+        return DroneLoadingDock(EntityID.generate_uuid(),
+                                DroneLoadingStation(EntityID.generate_uuid(), create_point_2d(0, 0)),
                                 DroneType.drone_type_1,
                                 TimeWindowExtension(
                                     since=ZERO_TIME,
@@ -143,13 +144,18 @@ class ORToolsMatcherMonitorTestCase(TestCase):
         return graph
 
     @staticmethod
-    def _create_empty_board() -> DeliveringDronesBoard:
-        empty_drone_delivery_1 = DeliveringDrones(EntityID(uuid.uuid4()), DroneFormations.get_drone_formation(
-            DroneFormationType.PAIR, PackageConfigurationOption.LARGE_PACKAGES, DroneType.drone_type_1))
+    def _create_empty_board(loading_dock: DroneLoadingDock) -> DeliveringDronesBoard:
+        empty_drone_delivery_1 = DeliveringDrones(
+            id_=EntityID(uuid.uuid4()),
+            drone_formation=DroneFormations.get_drone_formation(
+                DroneFormationType.PAIR, PackageConfigurationOption.LARGE_PACKAGES, DroneType.drone_type_1),
+            start_loading_dock=loading_dock,
+            end_loading_dock=loading_dock)
         return DeliveringDronesBoard([empty_drone_delivery_1])
 
     @staticmethod
-    def _create_match_config(enabled: bool, max_iterations: int, iterations_between_monitoring:int =1) -> MatcherConfig:
+    def _create_match_config(enabled: bool, max_iterations: int,
+                             iterations_between_monitoring: int = 1) -> MatcherConfig:
         return MatcherConfig(
             zero_time=ZERO_TIME,
             solver=ORToolsSolverConfig(SolverVendor.OR_TOOLS, first_solution_strategy="path_cheapest_arc",
@@ -171,8 +177,7 @@ class ORToolsMatcherMonitorTestCase(TestCase):
     @staticmethod
     def _create_drone_deliveries(delivery_requests: List[DeliveryRequest], empty_board: DeliveringDronesBoard,
                                  loading_dock: DroneLoadingDock) -> List[DroneDelivery]:
-        drone_delivery_1 = DroneDelivery(id_=empty_board.empty_drone_deliveries[0].id,
-                                         drone_formation=empty_board.empty_drone_deliveries[0].drone_formation,
+        drone_delivery_1 = DroneDelivery(delivering_drones=empty_board.empty_drone_deliveries[0],
                                          matched_requests=[MatchedDeliveryRequest(
                                              graph_index=1,
                                              delivery_request=delivery_requests[0],
