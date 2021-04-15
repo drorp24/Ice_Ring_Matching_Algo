@@ -22,10 +22,11 @@ OPERATING_TIME_WINDOW_COLOR = Color.Red
 
 
 def add_delivery_board_with_row_per_edd(drawer: GanttDrawer, board: DroneDeliveryBoard, draw_unmatched=True):
-    formations = list(set(delivery.id for delivery in board.drone_deliveries))
+    formations = list(set(delivery.delivering_drones.id for delivery in board.drone_deliveries))
     for i, delivery in enumerate(board.drone_deliveries):
-        delivery_row = formations.index(delivery.id) + 1 + UNMATCHED_ROW_NUMBER
-        max_inner_rows = max(delivery.drone_formation.get_package_type_amount_map().get_package_type_amounts())
+        delivery_row = formations.index(delivery.delivering_drones.id) + 1 + UNMATCHED_ROW_NUMBER
+        max_inner_rows = max(
+            delivery.delivering_drones.drone_formation.get_package_type_amount_map().get_package_type_amounts())
         if len(delivery.matched_requests) == 0:
             continue
         drawer.add_row_area(
@@ -69,7 +70,9 @@ def _add_unmatched_requests(board, drawer):
 def add_delivery_board_with_row_per_drone_delivery(drawer: GanttDrawer, board: DroneDeliveryBoard, draw_unmatched=True):
     for i, delivery in enumerate(board.drone_deliveries):
         delivery_row = i + 1 + UNMATCHED_ROW_NUMBER
-        max_inner_rows = max(delivery.drone_formation.get_package_type_amount_map().get_package_type_amounts())
+        max_inner_rows = max(
+
+            delivery.delivering_drones.drone_formation.get_package_type_amount_map().get_package_type_amounts())
         if len(delivery.matched_requests) == 0:
             continue
         drawer.add_row_area(

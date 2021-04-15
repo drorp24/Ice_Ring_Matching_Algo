@@ -104,9 +104,10 @@ class _MatchedDeliveryLabelsHandler:
         self.matched_delivery_labels = []
 
     def add_matched_delivery(self, delivery: DroneDelivery) -> Color:
-        self.matched_delivery_labels.append("[" +
-                                            str(delivery.drone_formation.drone_formation_type.name) + "] * " +
-                                            str(delivery.drone_formation.drone_package_configuration.package_type_map))
+        self.matched_delivery_labels.append(
+            "[" +
+            str(delivery.delivering_drones.drone_formation.drone_formation_type.name) + "] * " +
+            str(delivery.delivering_drones.drone_formation.drone_package_configuration.package_type_map))
         delivery_color = self._optional_delivery_colors[
             len(self.selected_delivery_colors) % len(self._optional_delivery_colors)]
         self.selected_delivery_colors.append(delivery_color)
