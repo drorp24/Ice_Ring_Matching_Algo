@@ -96,10 +96,11 @@ class BasicMinimumEnd2EndClusteredDrsTest(unittest.TestCase):
                 DeliveryRequest: drs_amount,
                 DroneLoadingDock: docks_amount})
 
-        clustered_connected_graph = create_clustered_delivery_requests_graph_model(supplier_category,
-                                                                                   edge_cost_factor=0.1,
-                                                                                   edge_travel_time_factor=0.1,
-                                                                                   max_clusters_per_zone=max_clusters_per_zone)
+        clustered_connected_graph = create_clustered_delivery_requests_graph_model(
+            supplier_category=supplier_category,
+            edge_cost_factor=0.1,
+            edge_travel_time_factor=0.1,
+            max_clusters_per_zone=max_clusters_per_zone)
 
         print("--- clustered_connected_graph run time: %s  ---" % (datetime.now() - start_time))
         start_time = datetime.now()
@@ -112,7 +113,7 @@ class BasicMinimumEnd2EndClusteredDrsTest(unittest.TestCase):
 
         expected_num_edge_in_graph = sum(
             [len(drs) * (len(drs) - 1) for drs in expected_delivery_requests_clusters]) + (
-                                                   2 * len(supplier_category.delivery_requests))
+                                             2 * len(supplier_category.delivery_requests))
 
         print("#expected delivery requests clusters", len(expected_delivery_requests_clusters))
         self.assertLessEqual(len(expected_delivery_requests_clusters), max_clusters_per_zone * zone_amount)
@@ -121,13 +122,15 @@ class BasicMinimumEnd2EndClusteredDrsTest(unittest.TestCase):
 
         print("--- assert expected values run time: %s  ---" % (datetime.now() - start_time))
 
-        delivery_board = self._run_match(clustered_connected_graph, drone_deliveries_amount)
+        delivery_board = self._run_match(clustered_connected_graph, drone_deliveries_amount,
+                                         supplier_category.drone_loading_docks[0])
         # print(delivery_board)
 
         if draw_match:
             self._draw_matched_supplier_category(clustered_connected_graph, delivery_board, supplier_category,
                                                  self.mapImage)
 
+    @staticmethod
     def _draw_matched_supplier_category(self, clustered_connected_graph, delivery_board, supplier_category, map_image):
         dr_drawer = create_drawer_2d(Drawer2DCoordinateSys.GEOGRAPHIC, map_image)
         operational_drawer2d.add_operational_graph(dr_drawer, clustered_connected_graph, draw_internal=True,
@@ -145,11 +148,12 @@ class BasicMinimumEnd2EndClusteredDrsTest(unittest.TestCase):
                                                  row_names=row_names,
                                                  rows_title='Formation Type x Package Type Amounts'
                                                  )
-        operational_gantt_drawer.add_delivery_board(board_gantt_drawer, delivery_board, True)
+        operational_gantt_drawer.add_delivery_board_with_row_per_drone_delivery(board_gantt_drawer, delivery_board, True)
         board_gantt_drawer.draw(True)
 
-    def _run_match(self, clustered_connected_graph, drone_deliveries_amount) -> DroneDeliveryBoard:
+    def _run_match(self, clustered_connected_graph, drone_deliveries_amount, loading_dock) -> DroneDeliveryBoard:
         empty_drone_delivery_board = _create_empty_drone_delivery_board(amount=drone_deliveries_amount,
+                                                                        loading_dock=loading_dock,
                                                                         max_route_time_entire_board=45,
                                                                         velocity_entire_board=10.0)
 
@@ -215,21 +219,14 @@ def _create_single_package_distribution():
 
 
 def _create_empty_drone_delivery_board(
+        loading_dock: DroneLoadingDock,
         drone_formation_policy=DroneFormationTypePolicy({DroneFormationType.PAIR: 1, DroneFormationType.QUAD: 0}),
         package_configurations_policy=PackageConfigurationPolicy({PackageConfiguration.LARGE_X2: 0.9,
                                                                   PackageConfiguration.MEDIUM_X4: 0.1,
                                                                   PackageConfiguration.SMALL_X8: 0,
                                                                   PackageConfiguration.TINY_X16: 0}),
-        drone_type: DroneType = DroneType.drone_type_1,
         amount: int = 30, max_route_time_entire_board: int = 400, velocity_entire_board: float = 10.0):
-    loading_dock = DroneLoadingDock(EntityID.generate_uuid(),
-                                    DroneLoadingStation(EntityID.generate_uuid(), create_point_2d(0, 0)),
-                                    DroneType.drone_type_1,
-                                    TimeWindowExtension(
-                                        since=ZERO_TIME,
-                                        until=ZERO_TIME.add_time_delta(
-                                            TimeDeltaExtension(timedelta(hours=5)))))
-    drone_set_properties = DroneSetProperties(drone_type=drone_type,
+    drone_set_properties = DroneSetProperties(drone_type=loading_dock.drone_type,
                                               package_configuration_policy=package_configurations_policy,
                                               drone_formation_policy=drone_formation_policy,
                                               start_loading_dock=loading_dock,
