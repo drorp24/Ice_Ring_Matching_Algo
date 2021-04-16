@@ -21,9 +21,9 @@ def _calc_drone_formation_amounts(formation_sizes_amounts: FormationTypeAmounts,
     return FleetConfigurationAttribution.solve()
 
 
-def calc_drone_deliveries(drone_set_properties: DroneSetProperties,
-                          max_route_time_entire_board: int = DEFAULT_MAX_ROUTE_TIME_IN_MINUTES,
-                          velocity_entire_board: float = DEFAULT_VELOCITY_METER_PER_SEC) -> [DeliveringDrones]:
+def _calc_drone_deliveries(drone_set_properties: DroneSetProperties,
+                           max_route_time_entire_board: int = DEFAULT_MAX_ROUTE_TIME_IN_MINUTES,
+                           velocity_entire_board: float = DEFAULT_VELOCITY_METER_PER_SEC) -> [DeliveringDrones]:
     empty_deliveries = []
     formation_type_amounts = _calc_formation_amounts(drone_set_properties)
     drone_formations_per_type_amounts = _calc_drone_formation_amounts(formation_type_amounts, drone_set_properties)
@@ -42,12 +42,12 @@ def generate_empty_delivery_board(drone_set_properties: [DroneSetProperties], ma
                                   velocity_entire_board: float) -> DeliveringDronesBoard:
     total_drone_deliveries = []
     for drone_properties in drone_set_properties:
-        total_drone_deliveries += calc_drone_deliveries(drone_properties, max_route_time_entire_board,
-                                                        velocity_entire_board)
+        total_drone_deliveries += _calc_drone_deliveries(drone_properties, max_route_time_entire_board,
+                                                         velocity_entire_board)
     return DeliveringDronesBoard(total_drone_deliveries)
 
 
 def build_empty_drone_delivery_board(drone_set_properties: DroneSetProperties, max_route_time_entire_board: int,
                                      velocity_entire_board: float):
-    return DeliveringDronesBoard(calc_drone_deliveries(drone_set_properties, max_route_time_entire_board,
-                                                       velocity_entire_board))
+    return DeliveringDronesBoard(_calc_drone_deliveries(drone_set_properties, max_route_time_entire_board,
+                                                        velocity_entire_board))

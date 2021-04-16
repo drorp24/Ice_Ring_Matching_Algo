@@ -2,10 +2,11 @@ from datetime import time, date, timedelta, datetime
 from pathlib import Path
 from random import Random
 
-from common.entities.base_entities.drone import PackageConfiguration
+from common.entities.base_entities.drone import PackageConfiguration, DroneType
 from common.entities.base_entities.drone_formation import DroneFormationType
 from common.entities.base_entities.entity_distribution.delivery_requestion_dataset_builder import \
     build_delivery_request_distribution
+from common.entities.base_entities.entity_distribution.drone_distribution import DroneTypeDistribution
 from common.entities.base_entities.entity_distribution.drone_loading_dock_distribution import \
     DroneLoadingDockDistribution
 from common.entities.base_entities.entity_distribution.drone_loading_station_distribution import \
@@ -14,7 +15,8 @@ from common.entities.base_entities.entity_distribution.package_distribution impo
 from common.entities.base_entities.entity_distribution.priority_distribution import PriorityDistribution
 from common.entities.base_entities.entity_distribution.temporal_distribution import TimeDeltaDistribution, \
     TimeWindowDistribution, DateTimeDistribution
-from common.entities.base_entities.fleet.empty_drone_delivery_board_generation import build_empty_drone_delivery_board
+from common.entities.base_entities.fleet.empty_drone_delivery_board_generation import \
+    generate_empty_delivery_board
 from common.entities.base_entities.fleet.fleet_property_sets import DroneFormationTypePolicy, \
     PackageConfigurationPolicy, DroneSetProperties
 from common.entities.base_entities.package import PackageType
@@ -69,21 +71,22 @@ def create_single_package_distribution():
     return package_distribution
 
 
-def _create_empty_drone_delivery_board(
-        loading_docks: [DroneLoadingDock],
+def _create_drone_set_properties(
+        loading_dock: DroneLoadingDock,
         drone_formation_policy=DroneFormationTypePolicy({DroneFormationType.PAIR: 1, DroneFormationType.QUAD: 0}),
         package_configurations_policy=PackageConfigurationPolicy({PackageConfiguration.LARGE_X2: 1,
                                                                   PackageConfiguration.MEDIUM_X4: 0,
                                                                   PackageConfiguration.SMALL_X8: 0,
                                                                   PackageConfiguration.TINY_X16: 0}),
-        amount: int = 30, max_route_time_entire_board: int = 400, velocity_entire_board: float = 10.0):
-    drone_set_properties = DroneSetProperties(drone_type=loading_docks[0].drone_type,
-                                              package_configuration_policy=package_configurations_policy,
-                                              drone_formation_policy=drone_formation_policy,
-                                              start_loading_dock=loading_docks[0],
-                                              end_loading_dock=loading_docks[0],
-                                              drone_amount=amount)
-    return build_empty_drone_delivery_board(drone_set_properties, max_route_time_entire_board, velocity_entire_board)
+        amount: int = 30):
+    drone_set_properties = DroneSetProperties(
+        drone_type=loading_dock.drone_type,
+        package_configuration_policy=package_configurations_policy,
+        drone_formation_policy=drone_formation_policy,
+        start_loading_dock=loading_dock,
+        end_loading_dock=loading_dock,
+        drone_amount=amount)
+    return drone_set_properties
 
 
 class BasicMinimumEnd2EndExperiment:
@@ -96,9 +99,11 @@ class BasicMinimumEnd2EndExperiment:
                 delivery_requests_distribution=_create_delivery_request_distribution(
                     create_point_2d(35.46, 33.25), 0.2, 0.3, 10, 20),
                 drone_loading_docks_distribution=DroneLoadingDockDistribution(
+                    drone_type_distribution=DroneTypeDistribution({DroneType.drone_type_1: 0.5,
+                                                                   DroneType.drone_type_3: 0.5}),
                     drone_loading_station_distributions=DroneLoadingStationDistribution(
                         drone_station_locations_distribution=UniformPointInBboxDistribution(35.19336,
-                                                                                            35.19336,
+                                                                                            35.59336,
                                                                                             32.6675,
                                                                                             32.6675
                                                                                             )),
@@ -124,11 +129,16 @@ class BasicMinimumEnd2EndExperiment:
     def test_small_supplier_category(self):
         start_time = datetime.now()
         supplier_category = self.supplier_category_distribution.choose_rand(random=Random(10),
-                                                                            amount={DeliveryRequest: 50,
-                                                                                    DroneLoadingDock: 1})
-        empty_drone_delivery_board = _create_empty_drone_delivery_board(
-            loading_docks=supplier_category.drone_loading_docks,
-            amount=6, max_route_time_entire_board=1440, velocity_entire_board=10.0)
+                                                                            amount={DeliveryRequest: 74,
+                                                                                    DroneLoadingDock: 2})
+        drone_set_properties_1 = _create_drone_set_properties(
+            loading_dock=supplier_category.drone_loading_docks[0], amount=6)
+        drone_set_properties_2 = _create_drone_set_properties(
+            loading_dock=supplier_category.drone_loading_docks[1], amount=6)
+        empty_drone_delivery_board = generate_empty_delivery_board(
+            [drone_set_properties_1, drone_set_properties_2],
+            max_route_time_entire_board=1440,
+            velocity_entire_board=10.0)
         print("--- _create_empty_drone_delivery_board run time: %s  ---" % (datetime.now() - start_time))
         start_time = datetime.now()
 
