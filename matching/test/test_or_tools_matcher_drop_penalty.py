@@ -54,13 +54,11 @@ class ORToolsMatcherDropPenaltyTestCase(TestCase):
         drone_delivery = DroneDelivery(delivering_drones=self.empty_board.empty_drone_deliveries[0],
                                        matched_requests=[],
                                        start_drone_loading_docks=MatchedDroneLoadingDock(
-                                           graph_index=0,
                                            drone_loading_dock=self.loading_dock,
                                            delivery_time_window=TimeWindowExtension(
                                                since=ZERO_TIME,
                                                until=ZERO_TIME)),
                                        end_drone_loading_docks=MatchedDroneLoadingDock(
-                                           graph_index=0,
                                            drone_loading_dock=self.loading_dock,
                                            delivery_time_window=TimeWindowExtension(
                                                since=ZERO_TIME,
@@ -96,7 +94,8 @@ class ORToolsMatcherDropPenaltyTestCase(TestCase):
 
     @staticmethod
     def _create_loading_dock() -> DroneLoadingDock:
-        return DroneLoadingDock(EntityID.generate_uuid(),DroneLoadingStation(EntityID.generate_uuid(),create_point_2d(0, 0)),
+        return DroneLoadingDock(EntityID.generate_uuid(),
+                                DroneLoadingStation(EntityID.generate_uuid(), create_point_2d(0, 0)),
                                 DroneType.drone_type_1,
                                 TimeWindowExtension(
                                     since=ZERO_TIME,
@@ -116,7 +115,9 @@ class ORToolsMatcherDropPenaltyTestCase(TestCase):
     def _create_empty_board(loading_dock: DroneLoadingDock) -> DeliveringDronesBoard:
         empty_drone_delivery_1 = DeliveringDrones(id_=EntityID(uuid.uuid4()),
                                                   drone_formation=DroneFormations.get_drone_formation(
-            DroneFormationType.PAIR, PackageConfigurationOption.LARGE_PACKAGES, DroneType.drone_type_1),
+                                                      DroneFormationType.PAIR,
+                                                      PackageConfigurationOption.LARGE_PACKAGES,
+                                                      DroneType.drone_type_1),
                                                   start_loading_dock=loading_dock,
                                                   end_loading_dock=loading_dock)
 

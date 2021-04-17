@@ -36,8 +36,6 @@ class ORToolsMatcher(Matcher):
         self._index_manager = self._set_index_manager()
         self._routing_model = self._set_routing_model()
         self._search_parameters = self._set_search_params()
-        self._solution_handler = ORToolsSolutionHandler(self._graph_exporter, self._index_manager, self._routing_model,
-                                                        self._matcher_input, self._arrive_indices, self._depart_indices)
         self._reloading_depots_per_vehicle = {vehicle_index: depots
                                               for (vehicle_index, depots)
                                               in enumerate([self._reloading_virtual_depos_indices[
@@ -49,6 +47,13 @@ class ORToolsMatcher(Matcher):
         for vehicle_index in self._reloading_depots_per_vehicle.keys():
             for depo in self._reloading_depots_per_vehicle[vehicle_index]:
                 self._vehicle_per_reloading_depot[depo] = vehicle_index
+        self._solution_handler = ORToolsSolutionHandler(self._graph_exporter, self._index_manager, self._routing_model,
+                                                        self._matcher_input, self._arrive_indices, self._depart_indices,
+                                                        self._reloading_depots_per_vehicle,
+                                                        self._vehicle_per_reloading_depot,
+                                                        self._start_depots_graph_indices,
+                                                        self._end_depots_graph_indices
+                                                        )
         self._set_objective()
         self._set_constraints()
         self._set_monitor()
@@ -83,14 +88,16 @@ class ORToolsMatcher(Matcher):
                         for empty_drone_delivery in self._matcher_input.empty_board.empty_drone_deliveries]
         end_depots = [empty_drone_delivery.end_loading_dock
                       for empty_drone_delivery in self._matcher_input.empty_board.empty_drone_deliveries]
-        start_depots_graph_indices = [self._graph_exporter.get_node_graph_index(self._matcher_input.graph, start_depot)
-                                      for start_depot in start_depots]
-        end_depots_graph_indices = [self._graph_exporter.get_node_graph_index(self._matcher_input.graph, end_depot)
-                                    for end_depot in end_depots]
+        self._start_depots_graph_indices = [self._graph_exporter.get_node_graph_index(
+                                                self._matcher_input.graph, start_depot)
+                                            for start_depot in start_depots]
+        self._end_depots_graph_indices = [self._graph_exporter.get_node_graph_index(
+                                             self._matcher_input.graph, end_depot)
+                                          for end_depot in end_depots]
         manager = pywrapcp.RoutingIndexManager(self._num_of_nodes,
                                                self._matcher_input.empty_board.amount_of_formations(),
-                                               start_depots_graph_indices,
-                                               end_depots_graph_indices)
+                                               self._start_depots_graph_indices,
+                                               self._end_depots_graph_indices)
         return OrToolsIndexManagerWrapper(manager)
 
     def _set_routing_model(self) -> RoutingModel:

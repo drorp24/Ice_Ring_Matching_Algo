@@ -91,24 +91,23 @@ class DeliveringDrones(JsonableBaseEntity):
 
 @dataclass
 class MatchedDroneLoadingDock(JsonableBaseEntity):
-    graph_index: int  # TODO: replace to DeliveryRequestUUID
     drone_loading_dock: DroneLoadingDock
     delivery_time_window: TimeWindowExtension
 
     def __str__(self):
-        return '[MatchedDroneLoadingDock(graph_index=' + str(
-            self.graph_index) + ', min_time=' + self.delivery_time_window.since.str_format_time() + \
+        return '[MatchedDroneLoadingDock(id=' + str(
+            self.drone_loading_dock.id.uuid) + ', min_time=' + self.delivery_time_window.since.str_format_time() + \
                ', max_time=' + self.delivery_time_window.until.str_format_time() + ')]'
 
     def __hash__(self):
-        return hash((self.graph_index, self.drone_loading_dock,
-                     self.delivery_time_window.since, self.delivery_time_window.until))
+        return hash((self.drone_loading_dock,
+                     self.delivery_time_window.since,
+                     self.delivery_time_window.until))
 
     @classmethod
     def dict_to_obj(cls, dict_input):
         assert (dict_input['__class__'] == cls.__name__)
         return MatchedDroneLoadingDock(
-            graph_index=dict_input['graph_index'],
             drone_loading_dock=DroneLoadingDock.dict_to_obj(dict_input['drone_loading_dock']),
             delivery_time_window=TimeWindowExtension.dict_to_obj(dict_input['delivery_time_window']))
 
@@ -192,10 +191,10 @@ class DroneDelivery(JsonableBaseEntity):
                 id=self.delivering_drones.id,
                 origin_capacity=self.delivering_drones.drone_formation.get_package_type_amount_map(), )
 
-        return "\n[DroneDelivery id={id} origin {origin_capacity} matched " \
+        return "\n[DroneDelivery delivering_drones_id={id} origin {origin_capacity} matched " \
                "{total_amount_per_package_type} total priority={priority} total time in " \
                "minutes={total_time}]\n{start_drone_loading_docks}\n{matched_requests}\n{end_drone_loading_docks}" \
-            .format(id=self.delivering_drones.id,
+            .format(id=self.delivering_drones.id.uuid,
                     origin_capacity=self.delivering_drones.drone_formation.get_package_type_amount_map(),
                     total_amount_per_package_type=str(self.get_total_package_type_amount_map()),
                     priority=str(self.get_total_priority()),

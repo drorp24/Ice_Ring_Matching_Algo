@@ -164,7 +164,7 @@ class BasicDroneDeliveryGenerationTests(unittest.TestCase):
 
     @staticmethod
     def _create_expected_single_matched_drone_loading_dock(cls) -> MatchedDroneLoadingDock:
-        return MatchedDroneLoadingDock(graph_index=0, drone_loading_dock=cls.docks[0],
+        return MatchedDroneLoadingDock(drone_loading_dock=cls.docks[0],
                                        delivery_time_window=TimeWindowExtension(
                                            since=DateTimeExtension(
                                                dt_date=date(2020, 1, 23),
