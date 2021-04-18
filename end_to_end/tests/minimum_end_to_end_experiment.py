@@ -131,14 +131,7 @@ class BasicMinimumEnd2EndExperiment:
         supplier_category = self.supplier_category_distribution.choose_rand(random=Random(10),
                                                                             amount={DeliveryRequest: 74,
                                                                                     DroneLoadingDock: 2})
-        drone_set_properties_1 = _create_drone_set_properties(
-            loading_dock=supplier_category.drone_loading_docks[0], amount=6)
-        drone_set_properties_2 = _create_drone_set_properties(
-            loading_dock=supplier_category.drone_loading_docks[1], amount=6)
-        delivering_drones_board = generate_delivering_drones_board(
-            [drone_set_properties_1, drone_set_properties_2],
-            max_route_time_entire_board=1440,
-            velocity_entire_board=10.0)
+        delivering_drones_board = self._create_delivering_drones_board(supplier_category)
         print("--- _create_delivering_drones_board run time: %s  ---" % (datetime.now() - start_time))
         start_time = datetime.now()
 
@@ -152,7 +145,8 @@ class BasicMinimumEnd2EndExperiment:
 
         match_config_file_path = Path('end_to_end/tests/jsons/e2e_experiment_config.json')
         match_config = MatcherConfig.dict_to_obj(MatcherConfig.json_to_dict(match_config_file_path))
-        matcher_input = MatcherInput(graph=time_overlapping_dependent_graph, delivering_drones_board=delivering_drones_board,
+        matcher_input = MatcherInput(graph=time_overlapping_dependent_graph,
+                                     delivering_drones_board=delivering_drones_board,
                                      config=match_config)
 
         delivery_board = calc_assignment(matcher_input=matcher_input)
@@ -162,6 +156,18 @@ class BasicMinimumEnd2EndExperiment:
 
         self._draw_matched_scenario(delivery_board, time_overlapping_dependent_graph, supplier_category, self.mapImage,
                                     aggregate_by_delivering_drones=True)
+
+    @staticmethod
+    def _create_delivering_drones_board(supplier_category):
+        drone_set_properties_1 = _create_drone_set_properties(
+            loading_dock=supplier_category.drone_loading_docks[0], amount=6)
+        drone_set_properties_2 = _create_drone_set_properties(
+            loading_dock=supplier_category.drone_loading_docks[1], amount=6)
+        delivering_drones_board = generate_delivering_drones_board(
+            [drone_set_properties_1, drone_set_properties_2],
+            max_route_time_entire_board=1440,
+            velocity_entire_board=10.0)
+        return delivering_drones_board
 
     @staticmethod
     def _draw_matched_scenario(delivery_board, graph, supplier_category, map_image,
@@ -174,12 +180,13 @@ class BasicMinimumEnd2EndExperiment:
         operational_drawer2d.add_delivery_board(board_map_drawer, delivery_board, draw_unmatched=True)
         board_map_drawer.draw(False)
         if aggregate_by_delivering_drones:
-            formations = set((delivery.delivering_drones.id, delivery.delivering_drones.drone_formation)
-                             for delivery in delivery_board.drone_deliveries)
+            delivering_drones_list = set(delivery.delivering_drones
+                                         for delivery in delivery_board.drone_deliveries)
             row_names = ["Unmatched Out"] + \
-                        [str(formation[0])[-7:-2] + " [" + str(formation[1].drone_formation_type.name) + "] * " +
-                         str(formation[1].drone_package_configuration.package_type_map)
-                         for formation in formations]
+                        [str(delivering_drones.id)[-7:-2] + " [" + str(
+                            delivering_drones.drone_formation.drone_formation_type.name) + "] * " +
+                         str(delivering_drones.drone_formation.drone_package_configuration.package_type_map)
+                         for delivering_drones in delivering_drones_list]
         else:
             row_names = ["Unmatched Out"] + \
                         ["[" + str(delivery.delivering_drones.drone_formation.drone_formation_type.name) + "] * " +
@@ -191,7 +198,8 @@ class BasicMinimumEnd2EndExperiment:
                                                  rows_title='Formation Type x Package Type Amounts',
                                                  alternating_row_color=False)
         if aggregate_by_delivering_drones:
-            operational_gantt_drawer.add_delivery_board_with_row_per_delivering_drones(board_gantt_drawer, delivery_board, True)
+            operational_gantt_drawer.add_delivery_board_with_row_per_delivering_drones(board_gantt_drawer,
+                                                                                       delivery_board, True)
         else:
             operational_gantt_drawer.add_delivery_board_with_row_per_drone_delivery(board_gantt_drawer, delivery_board,
                                                                                     True)
