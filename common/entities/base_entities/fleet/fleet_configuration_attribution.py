@@ -109,7 +109,7 @@ class FleetConfigurationAttribution:
     def _calc_objective_coefficients(cls) -> Any:
         num_vars = cls._calc_number_variables()
         configuration_options_size = cls.attribution_config.package_configuration_options_amount
-        formation_amounts = cls.attribution_config.amount_per_formation_type
+        formation_amounts = list(filter(lambda formation: formation != 0, cls.attribution_config.amount_per_formation_type))
         formation_sizes = cls.attribution_config.formation_types_sizes
         constraints_coefficients = np.zeros(num_vars)
         for i in range(len(formation_amounts)):
