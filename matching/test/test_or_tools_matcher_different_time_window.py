@@ -43,16 +43,16 @@ class ORToolsMatcherDifferentTWTestCase(TestCase):
         cls.delivery_requests = cls._create_delivery_requests()
         cls.loading_dock = cls._create_loading_dock()
         cls.graph = cls._create_graph(cls.delivery_requests, cls.loading_dock)
-        cls.empty_board = cls._create_empty_board(cls.loading_dock)
+        cls.delivering_drones_board = cls._create_delivering_drones_board(cls.loading_dock)
         cls.match_config = cls._create_match_config()
-        cls.match_input = MatcherInput(cls.graph, cls.empty_board, cls.match_config)
+        cls.match_input = MatcherInput(cls.graph, cls.delivering_drones_board, cls.match_config)
 
     def test_matcher_when_requests_with_different_time_windows(self):
         matcher = ORToolsMatcher(self.match_input)
         actual_delivery_board = matcher.match()
 
         expected_drone_deliveries = self._create_drone_deliveries(delivery_requests=self.delivery_requests,
-                                                                  empty_board=self.empty_board,
+                                                                  delivering_drones_board=self.delivering_drones_board,
                                                                   loading_dock=self.loading_dock)
         expected_matched_board = DroneDeliveryBoard(
             drone_deliveries=[expected_drone_deliveries[0], expected_drone_deliveries[1]],
@@ -100,8 +100,8 @@ class ORToolsMatcherDifferentTWTestCase(TestCase):
         return graph
 
     @staticmethod
-    def _create_empty_board(loading_dock: DroneLoadingDock) -> DeliveringDronesBoard:
-        empty_drone_delivery_1 = DeliveringDrones(id_=EntityID(uuid.uuid4()),
+    def _create_delivering_drones_board(loading_dock: DroneLoadingDock) -> DeliveringDronesBoard:
+        delivering_drones_1 = DeliveringDrones(id_=EntityID(uuid.uuid4()),
                                                   drone_formation=DroneFormations.get_drone_formation(
                                                       DroneFormationType.PAIR,
                                                       PackageConfigurationOption.MEDIUM_PACKAGES,
@@ -109,14 +109,14 @@ class ORToolsMatcherDifferentTWTestCase(TestCase):
                                                   start_loading_dock=loading_dock,
                                                   end_loading_dock=loading_dock)
 
-        empty_drone_delivery_2 = DeliveringDrones(id_=EntityID(uuid.uuid4()),
+        delivering_drones_2 = DeliveringDrones(id_=EntityID(uuid.uuid4()),
                                                   drone_formation=DroneFormations.get_drone_formation(
                                                       DroneFormationType.PAIR, PackageConfigurationOption.TINY_PACKAGES,
                                                       DroneType.drone_type_1),
                                                   start_loading_dock=loading_dock,
                                                   end_loading_dock=loading_dock)
 
-        return DeliveringDronesBoard([empty_drone_delivery_1, empty_drone_delivery_2])
+        return DeliveringDronesBoard([delivering_drones_1, delivering_drones_2])
 
     @staticmethod
     def _create_match_config() -> MatcherConfig:
@@ -138,9 +138,9 @@ class ORToolsMatcherDifferentTWTestCase(TestCase):
         )
 
     @staticmethod
-    def _create_drone_deliveries(delivery_requests: List[DeliveryRequest], empty_board: DeliveringDronesBoard,
+    def _create_drone_deliveries(delivery_requests: List[DeliveryRequest], delivering_drones_board: DeliveringDronesBoard,
                                  loading_dock: DroneLoadingDock) -> List[DroneDelivery]:
-        drone_delivery_1 = DroneDelivery(delivering_drones=empty_board.empty_drone_deliveries[0],
+        drone_delivery_1 = DroneDelivery(delivering_drones=delivering_drones_board.delivering_drones_list[0],
                                          matched_requests=[
                                              MatchedDeliveryRequest(
                                                  graph_index=2,
@@ -176,7 +176,7 @@ class ORToolsMatcherDifferentTWTestCase(TestCase):
                                                  until=loading_dock.time_window.since.add_time_delta(
                                                      TimeDeltaExtension(timedelta(hours=1, minutes=5))))))
 
-        drone_delivery_2 = DroneDelivery(delivering_drones=empty_board.empty_drone_deliveries[1],
+        drone_delivery_2 = DroneDelivery(delivering_drones=delivering_drones_board.delivering_drones_list[1],
                                          matched_requests=[
                                              MatchedDeliveryRequest(
                                                  graph_index=1,

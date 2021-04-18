@@ -19,7 +19,7 @@ from common.entities.base_entities.entity_distribution.temporal_distribution imp
 from common.entities.base_entities.entity_distribution.zone_delivery_request_distribution import \
     ZoneDeliveryRequestDistribution
 from common.entities.base_entities.entity_id import EntityID
-from common.entities.base_entities.fleet.empty_drone_delivery_board_generation import build_empty_drone_delivery_board
+from common.entities.base_entities.fleet.delivering_drones_board_generation import build_delivering_drones_board
 from common.entities.base_entities.fleet.fleet_property_sets import DroneFormationTypePolicy, \
     PackageConfigurationPolicy, DroneSetProperties
 from common.entities.base_entities.package import PackageType
@@ -152,12 +152,12 @@ class BasicMinimumEnd2EndClusteredDrsTest(unittest.TestCase):
         board_gantt_drawer.draw(True)
 
     def _run_match(self, clustered_connected_graph, drone_deliveries_amount, loading_dock) -> DroneDeliveryBoard:
-        empty_drone_delivery_board = _create_empty_drone_delivery_board(amount=drone_deliveries_amount,
+        delivering_drones_board = _create_delivering_drones_board(amount=drone_deliveries_amount,
                                                                         loading_dock=loading_dock,
                                                                         max_route_time_entire_board=45,
                                                                         velocity_entire_board=10.0)
 
-        matcher_input = MatcherInput(graph=clustered_connected_graph, empty_board=empty_drone_delivery_board,
+        matcher_input = MatcherInput(graph=clustered_connected_graph, delivering_drones_board=delivering_drones_board,
                                      config=self.match_config)
         start_time = datetime.now()
 
@@ -218,7 +218,7 @@ def _create_single_package_distribution():
     return package_distribution
 
 
-def _create_empty_drone_delivery_board(
+def _create_delivering_drones_board(
         loading_dock: DroneLoadingDock,
         drone_formation_policy=DroneFormationTypePolicy({DroneFormationType.PAIR: 1, DroneFormationType.QUAD: 0}),
         package_configurations_policy=PackageConfigurationPolicy({PackageConfiguration.LARGE_X2: 0.9,
@@ -232,7 +232,7 @@ def _create_empty_drone_delivery_board(
                                               start_loading_dock=loading_dock,
                                               end_loading_dock=loading_dock,
                                               drone_amount=amount)
-    return build_empty_drone_delivery_board(drone_set_properties, max_route_time_entire_board,
+    return build_delivering_drones_board(drone_set_properties, max_route_time_entire_board,
                                             velocity_entire_board)
 
 

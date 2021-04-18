@@ -23,17 +23,17 @@ def _calc_drone_formation_amounts(formation_sizes_amounts: FormationSizesAmounts
 def calc_drone_deliveries(platform_properties: PlatformPropertySet,
                           max_route_time_entire_board: int = DEFAULT_MAX_ROUTE_TIME_IN_MINUTES,
                           velocity_entire_board: float = DEFAULT_VELOCITY_METER_PER_SEC) -> [DeliveringDrones]:
-    empty_deliveries = []
+    delivering_drones_list = []
     formation_sizes_amounts = _calc_formation_amounts(platform_properties)
     drone_formations_per_type_amounts = _calc_drone_formation_amounts(formation_sizes_amounts, platform_properties)
     for drone_formation, amount in drone_formations_per_type_amounts.amounts.items():
         for i in range(amount):
-            empty_deliveries.append(DeliveringDrones(EntityID(uuid.uuid4()), drone_formation,
+            delivering_drones_list.append(DeliveringDrones(EntityID(uuid.uuid4()), drone_formation,
                                                      max_route_time_entire_board, velocity_entire_board))
-    return empty_deliveries
+    return delivering_drones_list
 
 
-def generate_empty_delivery_board(fleet_reader: FleetReader) -> DeliveringDronesBoard:
+def generate_delivering_drones_board(fleet_reader: FleetReader) -> DeliveringDronesBoard:
     platforms_properties = fleet_reader.get_platforms_properties()
     total_drone_deliveries = []
     for platform_property in platforms_properties:
@@ -41,7 +41,7 @@ def generate_empty_delivery_board(fleet_reader: FleetReader) -> DeliveringDrones
     return DeliveringDronesBoard(total_drone_deliveries)
 
 
-def build_empty_drone_delivery_board(platform_properties: PlatformPropertySet, max_route_time_entire_board: int,
+def build_delivering_drones_board(platform_properties: PlatformPropertySet, max_route_time_entire_board: int,
                                      velocity_entire_board: float):
     return DeliveringDronesBoard(calc_drone_deliveries(platform_properties, max_route_time_entire_board,
                                    velocity_entire_board))

@@ -24,7 +24,7 @@ class ORToolsMatcher(Matcher):
         super().__init__(matcher_input)
         num_of_reloading_depo_nodes_per_formation = matcher_input.config.reload_per_vehicle \
             * NUM_OF_NODES_IN_RELOADING_DEPO
-        num_of_reloading_depo_nodes = self._matcher_input.empty_board.amount_of_formations() \
+        num_of_reloading_depo_nodes = self._matcher_input.delivering_drones_board.amount_of_formations() \
             * num_of_reloading_depo_nodes_per_formation
         self._reloading_virtual_depos_indices = list(range(
             len(self._matcher_input.graph.nodes),
@@ -42,7 +42,7 @@ class ORToolsMatcher(Matcher):
                                                   formation_index * num_of_reloading_depo_nodes_per_formation:
                                                   (formation_index + 1) * num_of_reloading_depo_nodes_per_formation]
                                                   for formation_index in range(
-                                                    self._matcher_input.empty_board.amount_of_formations())])}
+                                                    self._matcher_input.delivering_drones_board.amount_of_formations())])}
         self._vehicle_per_reloading_depot = {}
         for vehicle_index in self._reloading_depots_per_vehicle.keys():
             for depo in self._reloading_depots_per_vehicle[vehicle_index]:
@@ -84,10 +84,10 @@ class ORToolsMatcher(Matcher):
         return self._solution_handler.create_drone_delivery_board(solution)
 
     def _set_index_manager(self) -> OrToolsIndexManagerWrapper:
-        start_depots = [empty_drone_delivery.start_loading_dock
-                        for empty_drone_delivery in self._matcher_input.empty_board.empty_drone_deliveries]
-        end_depots = [empty_drone_delivery.end_loading_dock
-                      for empty_drone_delivery in self._matcher_input.empty_board.empty_drone_deliveries]
+        start_depots = [delivering_drones.start_loading_dock
+                        for delivering_drones in self._matcher_input.delivering_drones_board.delivering_drones_list]
+        end_depots = [delivering_drones.end_loading_dock
+                      for delivering_drones in self._matcher_input.delivering_drones_board.delivering_drones_list]
         self._start_depots_graph_indices = [self._graph_exporter.get_node_graph_index(
                                                 self._matcher_input.graph, start_depot)
                                             for start_depot in start_depots]
@@ -95,7 +95,7 @@ class ORToolsMatcher(Matcher):
                                              self._matcher_input.graph, end_depot)
                                           for end_depot in end_depots]
         manager = pywrapcp.RoutingIndexManager(self._num_of_nodes,
-                                               self._matcher_input.empty_board.amount_of_formations(),
+                                               self._matcher_input.delivering_drones_board.amount_of_formations(),
                                                self._start_depots_graph_indices,
                                                self._end_depots_graph_indices)
         return OrToolsIndexManagerWrapper(manager)

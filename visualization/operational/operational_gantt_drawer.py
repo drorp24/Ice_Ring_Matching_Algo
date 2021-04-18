@@ -22,7 +22,7 @@ OPERATING_TIME_WINDOW_COLOR = Color.Red
 ROW_BACKGROUND_ALPHA = 0.3
 
 
-def add_delivery_board_with_row_per_edd(drawer: GanttDrawer, board: DroneDeliveryBoard, draw_unmatched=True):
+def add_delivery_board_with_row_per_delivering_drones(drawer: GanttDrawer, board: DroneDeliveryBoard, draw_unmatched=True):
     delivering_drones_list = list(set(delivery.delivering_drones for delivery in board.drone_deliveries))
     _set_row_color_per_dock(delivering_drones_list, drawer)
     for i, delivery in enumerate(board.drone_deliveries):

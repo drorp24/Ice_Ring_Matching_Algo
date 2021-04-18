@@ -9,7 +9,7 @@ from common.entities.base_entities.drone_formation import DroneFormationType, Dr
 from common.entities.base_entities.drone_loading_dock import DroneLoadingDock
 from common.entities.base_entities.drone_loading_station import DroneLoadingStation
 from common.entities.base_entities.entity_id import EntityID
-from common.entities.base_entities.fleet.empty_drone_delivery_board_generation import generate_empty_delivery_board
+from common.entities.base_entities.fleet.delivering_drones_board_generation import generate_delivering_drones_board
 from common.entities.base_entities.fleet.fleet_configuration_attribution import FleetConfigurationAttribution
 from common.entities.base_entities.fleet.fleet_partition import FleetPartition
 from common.entities.base_entities.fleet.fleet_property_sets import DroneSetProperties, DroneFormationTypePolicy, \
@@ -20,7 +20,7 @@ from geometry.geo_factory import create_point_2d
 
 
 class TestFleetConfigurationAttribution(unittest.TestCase):
-    empty_drone_delivery_board_json_path = Path('common/entities/base_entities/fleet/tests/empty_drone_test_file.json')
+    delivering_drones_board_json_path = Path('common/entities/base_entities/fleet/tests/empty_drone_test_file.json')
 
     @classmethod
     def setUpClass(cls):
@@ -31,7 +31,7 @@ class TestFleetConfigurationAttribution(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls):
-        cls.empty_drone_delivery_board_json_path.unlink()
+        cls.delivering_drones_board_json_path.unlink()
 
     def test_fleet_configuration_with_none_zero_policy(self):
         drone_set_properties = self.drone_set_properties_1
@@ -83,22 +83,22 @@ class TestFleetConfigurationAttribution(unittest.TestCase):
         self.assertEqual(formation_sizes_amounts.amounts[DroneFormationType.PAIR], 15)
         self.assertEqual(formation_sizes_amounts.amounts[DroneFormationType.QUAD], 0)
 
-    def test_empty_drone_delivery_board(self):
-        empty_drone_delivery_board = generate_empty_delivery_board(
+    def test_delivering_drones_board(self):
+        delivering_drones_board = generate_delivering_drones_board(
             [self.drone_set_properties_1, self.drone_set_properties_2], 400, 10)
-        self.assertIsInstance(empty_drone_delivery_board, DeliveringDronesBoard)
-        self.assertEqual(len(empty_drone_delivery_board.empty_drone_deliveries), 24)
-        self.assertIsInstance(empty_drone_delivery_board.empty_drone_deliveries[0].drone_formation, DroneFormation)
+        self.assertIsInstance(delivering_drones_board, DeliveringDronesBoard)
+        self.assertEqual(len(delivering_drones_board.delivering_drones_list), 24)
+        self.assertIsInstance(delivering_drones_board.delivering_drones_list[0].drone_formation, DroneFormation)
 
-    def test_empty_board_to_json_and_back_to_empty_board(self):
-        empty_drone_delivery_board = generate_empty_delivery_board(
+    def test_delivering_drones_board_to_json_and_back_to_delivering_drones_board(self):
+        delivering_drones_board = generate_delivering_drones_board(
             [self.drone_set_properties_1, self.drone_set_properties_2], 400, 10)
-        empty_drone_delivery_board.to_json(self.empty_drone_delivery_board_json_path)
+        delivering_drones_board.to_json(self.delivering_drones_board_json_path)
 
-        empty_drone_delivery_board_from_json = \
-            DeliveringDronesBoard.from_json(DeliveringDronesBoard, self.empty_drone_delivery_board_json_path)
+        delivering_drones_board_from_json = \
+            DeliveringDronesBoard.from_json(DeliveringDronesBoard, self.delivering_drones_board_json_path)
 
-        self.assertEqual(empty_drone_delivery_board, empty_drone_delivery_board_from_json)
+        self.assertEqual(delivering_drones_board, delivering_drones_board_from_json)
 
     @classmethod
     def define_drone_set_properties_1(cls):

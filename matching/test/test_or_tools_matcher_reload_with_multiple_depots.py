@@ -42,8 +42,8 @@ class ORToolsMatcherReloadWithMultipleDepotsTestCase(TestCase):
         cls.delivery_requests = cls._create_delivery_requests()
         cls.loading_docks = cls._create_loading_docks()
         cls.graph = cls._create_graph(cls.delivery_requests, cls.loading_docks)
-        cls.empty_board = cls._create_empty_board_with_delivering_drones_with_different_loading_docks(cls.loading_docks)
-        cls.match_input = MatcherInput(cls.graph, cls.empty_board, cls._create_match_config())
+        cls.delivering_drones_board = cls._create_delivering_drones_board_with_delivering_drones_with_different_loading_docks(cls.loading_docks)
+        cls.match_input = MatcherInput(cls.graph, cls.delivering_drones_board, cls._create_match_config())
 
     def test_matcher_when_delivering_drones_have_different_loading_docks_then_reload_successful(self):
         matcher = ORToolsMatcher(self.match_input)
@@ -119,23 +119,23 @@ class ORToolsMatcherReloadWithMultipleDepotsTestCase(TestCase):
         return graph
 
     @staticmethod
-    def _create_empty_board_with_delivering_drones_with_different_loading_docks(
+    def _create_delivering_drones_board_with_delivering_drones_with_different_loading_docks(
             loading_docks: [DroneLoadingDock]) -> DeliveringDronesBoard:
-        empty_drone_delivery_1 = DeliveringDrones(id_=EntityID(uuid.uuid4()),
+        delivering_drones_1 = DeliveringDrones(id_=EntityID(uuid.uuid4()),
                                                   drone_formation=DroneFormations.get_drone_formation(
                                                       DroneFormationType.PAIR,
                                                       PackageConfigurationOption.LARGE_PACKAGES,
                                                       DroneType.drone_type_1),
                                                   start_loading_dock=loading_docks[0],
                                                   end_loading_dock=loading_docks[0])
-        empty_drone_delivery_2 = DeliveringDrones(id_=EntityID(uuid.uuid4()),
+        delivering_drones_2 = DeliveringDrones(id_=EntityID(uuid.uuid4()),
                                                   drone_formation=DroneFormations.get_drone_formation(
                                                       DroneFormationType.PAIR,
                                                       PackageConfigurationOption.LARGE_PACKAGES,
                                                       DroneType.drone_type_3),
                                                   start_loading_dock=loading_docks[1],
                                                   end_loading_dock=loading_docks[1])
-        return DeliveringDronesBoard([empty_drone_delivery_1, empty_drone_delivery_2])
+        return DeliveringDronesBoard([delivering_drones_1, delivering_drones_2])
 
     @staticmethod
     def _create_match_config() -> MatcherConfig:

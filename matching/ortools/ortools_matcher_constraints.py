@@ -89,11 +89,11 @@ class ORToolsMatcherConstraints:
             demand_dimension_name = demand_dimension_name_prefix + str.lower(package_type.name)
             demand_callback_index = self._routing_model.RegisterUnaryTransitCallback(
                 self._create_demand_evaluator(package_type))
-            max_capacity = max(self._matcher_input.empty_board.get_package_type_amount_per_drone_delivery(package_type))
+            max_capacity = max(self._matcher_input.delivering_drones_board.get_package_type_amount_per_drone_delivery(package_type))
             self._routing_model.AddDimensionWithVehicleCapacity(
                 demand_callback_index,
                 max_capacity,
-                self._matcher_input.empty_board.get_package_type_amount_per_drone_delivery(package_type),
+                self._matcher_input.delivering_drones_board.get_package_type_amount_per_drone_delivery(package_type),
                 self._matcher_input.config.constraints.capacity.count_capacity_from_zero,
                 demand_dimension_name)
             demand_dimension = self._routing_model.GetDimensionOrDie(demand_dimension_name)
@@ -109,7 +109,7 @@ class ORToolsMatcherConstraints:
                                                unmatched_reloading_virtual_depo_penalty)
 
     def _add_vehicle_start_node_index_transit_and_slack_vars_to_solution(self, dimension):
-        for vehicle_id in range(self._matcher_input.empty_board.amount_of_formations()):
+        for vehicle_id in range(self._matcher_input.delivering_drones_board.amount_of_formations()):
             index = self._routing_model.Start(vehicle_id)
             self._routing_model.AddToAssignment(dimension.TransitVar(index))
             self._routing_model.AddToAssignment(dimension.SlackVar(index))
@@ -151,7 +151,7 @@ class ORToolsMatcherConstraints:
             index = self._index_manager.node_to_index(node_index)
             self._routing_model.AddToAssignment(demand_dimension.TransitVar(index))
             self._routing_model.AddToAssignment(demand_dimension.SlackVar(index))
-        for vehicle_id in range(self._matcher_input.empty_board.amount_of_formations()):
+        for vehicle_id in range(self._matcher_input.delivering_drones_board.amount_of_formations()):
             end_index = self._routing_model.End(vehicle_id)
             demand_dimension.SetCumulVarSoftLowerBound(end_index, max_capacity,
                                                        self._matcher_input.config.constraints
@@ -162,7 +162,7 @@ class ORToolsMatcherConstraints:
 
     def _add_time_window_constraints_for_each_vehicle_start_node(self, time_dimension: RoutingDimension,
                                                                  time_windows: List[Tuple[int, int]]):
-        for i, drone_delivery in enumerate(self._matcher_input.empty_board.empty_drone_deliveries):
+        for i, drone_delivery in enumerate(self._matcher_input.delivering_drones_board.delivering_drones_list):
             start_index = self._routing_model.Start(i)
             graph_index = self._index_manager.index_to_node(start_index)
             time_dimension.CumulVar(start_index).SetRange(time_windows[graph_index][0],
@@ -178,7 +178,7 @@ class ORToolsMatcherConstraints:
         for node in self._reloading_virtual_depos_indices:
             index = self._index_manager.node_to_index(node)
             vehicle_of_node = self._vehicle_per_reloading_depot[node]
-            dock = self._matcher_input.empty_board.empty_drone_deliveries[vehicle_of_node].start_loading_dock
+            dock = self._matcher_input.delivering_drones_board.delivering_drones_list[vehicle_of_node].start_loading_dock
             original_depo = self._graph_exporter.get_node_graph_index(self._matcher_input.graph, dock)
             time_dimension.CumulVar(index).SetRange(self._time_windows[original_depo][0], self._time_windows[original_depo][1])
 
@@ -197,11 +197,11 @@ class ORToolsMatcherConstraints:
                 return sys.maxsize
             if _from_node in self._reloading_virtual_depos_indices:
                 vehicle_of_node = self._vehicle_per_reloading_depot[_from_node]
-                dock = self._matcher_input.empty_board.empty_drone_deliveries[vehicle_of_node].start_loading_dock
+                dock = self._matcher_input.delivering_drones_board.delivering_drones_list[vehicle_of_node].start_loading_dock
                 _from_node = self._graph_exporter.get_node_graph_index(self._matcher_input.graph, dock)
             elif _to_node in self._reloading_virtual_depos_indices:
                 vehicle_of_node = self._vehicle_per_reloading_depot[_to_node]
-                dock = self._matcher_input.empty_board.empty_drone_deliveries[vehicle_of_node].start_loading_dock
+                dock = self._matcher_input.delivering_drones_board.delivering_drones_list[vehicle_of_node].start_loading_dock
                 _to_node = self._graph_exporter.get_node_graph_index(self._matcher_input.graph, dock)
             graph_travel_cost = self._travel_cost_matrix[_from_node][_to_node]
             return graph_travel_cost
@@ -239,11 +239,11 @@ class ORToolsMatcherConstraints:
                 return sys.maxsize
             if _from_node in self._reloading_virtual_depos_indices:
                 vehicle_of_node = self._vehicle_per_reloading_depot[_from_node]
-                dock = self._matcher_input.empty_board.empty_drone_deliveries[vehicle_of_node].start_loading_dock
+                dock = self._matcher_input.delivering_drones_board.delivering_drones_list[vehicle_of_node].start_loading_dock
                 _from_node = self._graph_exporter.get_node_graph_index(self._matcher_input.graph, dock)
             elif _to_node in self._reloading_virtual_depos_indices:
                 vehicle_of_node = self._vehicle_per_reloading_depot[_to_node]
-                dock = self._matcher_input.empty_board.empty_drone_deliveries[vehicle_of_node].start_loading_dock
+                dock = self._matcher_input.delivering_drones_board.delivering_drones_list[vehicle_of_node].start_loading_dock
                 _to_node = self._graph_exporter.get_node_graph_index(self._matcher_input.graph, dock)
             graph_travel_time = self._travel_time_matrix[_from_node][_to_node]
             return graph_travel_time
@@ -281,11 +281,11 @@ class ORToolsMatcherConstraints:
                 return sys.maxsize
             if _from_node in self._reloading_virtual_depos_indices:
                 vehicle_of_node = self._vehicle_per_reloading_depot[_from_node]
-                dock = self._matcher_input.empty_board.empty_drone_deliveries[vehicle_of_node].start_loading_dock
+                dock = self._matcher_input.delivering_drones_board.delivering_drones_list[vehicle_of_node].start_loading_dock
                 _from_node = self._graph_exporter.get_node_graph_index(self._matcher_input.graph, dock)
             elif _to_node in self._reloading_virtual_depos_indices:
                 vehicle_of_node = self._vehicle_per_reloading_depot[_to_node]
-                dock = self._matcher_input.empty_board.empty_drone_deliveries[vehicle_of_node].start_loading_dock
+                dock = self._matcher_input.delivering_drones_board.delivering_drones_list[vehicle_of_node].start_loading_dock
                 _to_node = self._graph_exporter.get_node_graph_index(self._matcher_input.graph, dock)
             graph_session_time = self._travel_time_matrix[_from_node][_to_node]
             return graph_session_time
@@ -313,7 +313,7 @@ class ORToolsMatcherConstraints:
         def _get_package_amount_by_type(_from_node: np.int64, _package_type: PackageType) -> int:
             if _from_node in self._depart_indices:
                 package_amount_by_type = -1 * max(
-                    self._matcher_input.empty_board.get_package_type_amount_per_drone_delivery(_package_type))
+                    self._matcher_input.delivering_drones_board.get_package_type_amount_per_drone_delivery(_package_type))
             elif _from_node in self._arrive_indices:
                 package_amount_by_type = 0
             else:
@@ -355,6 +355,6 @@ class ORToolsMatcherConstraints:
         return from_node in self._depos and to_node in self._depos
 
     def _set_max_route_time_for_each_vehicle(self, time_dimension: RoutingDimension):
-        for i, drone_delivery in enumerate(self._matcher_input.empty_board.empty_drone_deliveries):
+        for i, drone_delivery in enumerate(self._matcher_input.delivering_drones_board.delivering_drones_list):
             max_route_time_in_minutes = drone_delivery.max_route_time_in_minutes
             time_dimension.SetSpanUpperBoundForVehicle(max_route_time_in_minutes, i)

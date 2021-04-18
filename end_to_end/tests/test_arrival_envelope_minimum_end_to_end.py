@@ -4,7 +4,7 @@ from pathlib import Path
 
 from common.entities.base_entities.drone import DroneType, PackageConfiguration
 from common.entities.base_entities.drone_formation import DroneFormationType
-from common.entities.base_entities.fleet.empty_drone_delivery_board_generation import generate_empty_delivery_board
+from common.entities.base_entities.fleet.delivering_drones_board_generation import generate_delivering_drones_board
 from common.entities.base_entities.fleet.fleet_property_sets import DroneSetProperties, DroneFormationTypePolicy, \
     PackageConfigurationPolicy
 from common.entities.base_entities.package import PackageType
@@ -23,8 +23,8 @@ class BasicArrivalEnvelopeMinimumEnd2End(unittest.TestCase):
             Path('end_to_end/tests/jsons/test_supplier_category.json')))
         cls.matcher_config = MatcherConfig.dict_to_obj(
             MatcherConfig.json_to_dict(Path('end_to_end/tests/jsons/test_min_e2e_config.json')))
-        cls.empty_drone_delivery_board = \
-            generate_empty_delivery_board(
+        cls.delivering_drones_board = \
+            generate_delivering_drones_board(
                 drone_set_properties=[BasicArrivalEnvelopeMinimumEnd2End._create_simple_drone_set_properties(
                     cls.supplier_category)],
                 max_route_time_entire_board=cls.matcher_config.constraints.travel_time.max_route_time,
@@ -53,7 +53,7 @@ class BasicArrivalEnvelopeMinimumEnd2End(unittest.TestCase):
                                                                           edge_cost_factor=0.1,
                                                                           edge_travel_time_factor=0.1)
         matcher_input = MatcherInput(graph=operational_graph,
-                                     empty_board=self.empty_drone_delivery_board,
+                                     delivering_drones_board=self.delivering_drones_board,
                                      config=self.matcher_config)
 
         delivery_board = calc_assignment(matcher_input=matcher_input)

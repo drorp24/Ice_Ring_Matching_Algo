@@ -8,5 +8,5 @@ from matching.matcher_config import MatcherConfig
 @dataclass
 class MatcherInput:
     graph: OperationalGraph
-    empty_board: DeliveringDronesBoard
+    delivering_drones_board: DeliveringDronesBoard
     config: MatcherConfig

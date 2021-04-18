@@ -42,9 +42,9 @@ class ORToolsMatcherReloadWithMultipleConfigurationsTestCase(TestCase):
         cls.delivery_requests = cls._create_delivery_requests()
         cls.loading_docks = cls._create_loading_docks()
         cls.graph = cls._create_graph(cls.delivery_requests, cls.loading_docks)
-        cls.empty_board = cls._create_empty_board_with_delivering_drones_with_different_configurations(
+        cls.delivering_drones_board = cls._create_delivering_drones_board_with_delivering_drones_with_different_configurations(
             cls.loading_docks)
-        cls.match_input = MatcherInput(cls.graph, cls.empty_board, cls._create_match_config())
+        cls.match_input = MatcherInput(cls.graph, cls.delivering_drones_board, cls._create_match_config())
 
     def test_matcher_when_delivering_drones_have_different_configurations_then_reload_successful(self):
         matcher = ORToolsMatcher(self.match_input)
@@ -59,14 +59,14 @@ class ORToolsMatcherReloadWithMultipleConfigurationsTestCase(TestCase):
 
     def _assert_drone_deliveries_have_different_configurations(self, actual_delivery_board: DroneDeliveryBoard):
         num_matched_packages_1 = self._get_num_of_matched_packages_of_first_drone_delivery_of_delivering_drones(
-            actual_delivery_board, self.empty_board.empty_drone_deliveries[0])
+            actual_delivery_board, self.delivering_drones_board.delivering_drones_list[0])
         num_matched_packages_2 = self._get_num_of_matched_packages_of_first_drone_delivery_of_delivering_drones(
-            actual_delivery_board, self.empty_board.empty_drone_deliveries[1])
+            actual_delivery_board, self.delivering_drones_board.delivering_drones_list[1])
         self.assertEqual(
-            self.empty_board.empty_drone_deliveries[0].drone_formation.get_package_type_amount_map()
+            self.delivering_drones_board.delivering_drones_list[0].drone_formation.get_package_type_amount_map()
                 .get_package_type_amount(PackageType.LARGE), num_matched_packages_1)
         self.assertEqual(
-            self.empty_board.empty_drone_deliveries[1].drone_formation.get_package_type_amount_map()
+            self.delivering_drones_board.delivering_drones_list[1].drone_formation.get_package_type_amount_map()
                 .get_package_type_amount(PackageType.LARGE), num_matched_packages_2)
 
     @staticmethod
@@ -127,23 +127,23 @@ class ORToolsMatcherReloadWithMultipleConfigurationsTestCase(TestCase):
         return graph
 
     @staticmethod
-    def _create_empty_board_with_delivering_drones_with_different_configurations(
+    def _create_delivering_drones_board_with_delivering_drones_with_different_configurations(
             loading_docks: [DroneLoadingDock]) -> DeliveringDronesBoard:
-        empty_drone_delivery_1 = DeliveringDrones(id_=EntityID(uuid.uuid4()),
+        delivering_drones_1 = DeliveringDrones(id_=EntityID(uuid.uuid4()),
                                                   drone_formation=DroneFormations.get_drone_formation(
                                                       DroneFormationType.PAIR,
                                                       PackageConfigurationOption.LARGE_PACKAGES,
                                                       DroneType.drone_type_1),
                                                   start_loading_dock=loading_docks[0],
                                                   end_loading_dock=loading_docks[0])
-        empty_drone_delivery_2 = DeliveringDrones(id_=EntityID(uuid.uuid4()),
+        delivering_drones_2 = DeliveringDrones(id_=EntityID(uuid.uuid4()),
                                                   drone_formation=DroneFormations.get_drone_formation(
                                                       DroneFormationType.PAIR,
                                                       PackageConfigurationOption.LARGE_PACKAGES,
                                                       DroneType.drone_type_2),
                                                   start_loading_dock=loading_docks[1],
                                                   end_loading_dock=loading_docks[1])
-        return DeliveringDronesBoard([empty_drone_delivery_1, empty_drone_delivery_2])
+        return DeliveringDronesBoard([delivering_drones_1, delivering_drones_2])
 
     @staticmethod
     def _create_match_config() -> MatcherConfig:

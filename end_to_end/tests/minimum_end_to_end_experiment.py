@@ -15,8 +15,8 @@ from common.entities.base_entities.entity_distribution.package_distribution impo
 from common.entities.base_entities.entity_distribution.priority_distribution import PriorityDistribution
 from common.entities.base_entities.entity_distribution.temporal_distribution import TimeDeltaDistribution, \
     TimeWindowDistribution, DateTimeDistribution
-from common.entities.base_entities.fleet.empty_drone_delivery_board_generation import \
-    generate_empty_delivery_board
+from common.entities.base_entities.fleet.delivering_drones_board_generation import \
+    generate_delivering_drones_board
 from common.entities.base_entities.fleet.fleet_property_sets import DroneFormationTypePolicy, \
     PackageConfigurationPolicy, DroneSetProperties
 from common.entities.base_entities.package import PackageType
@@ -135,11 +135,11 @@ class BasicMinimumEnd2EndExperiment:
             loading_dock=supplier_category.drone_loading_docks[0], amount=6)
         drone_set_properties_2 = _create_drone_set_properties(
             loading_dock=supplier_category.drone_loading_docks[1], amount=6)
-        empty_drone_delivery_board = generate_empty_delivery_board(
+        delivering_drones_board = generate_delivering_drones_board(
             [drone_set_properties_1, drone_set_properties_2],
             max_route_time_entire_board=1440,
             velocity_entire_board=10.0)
-        print("--- _create_empty_drone_delivery_board run time: %s  ---" % (datetime.now() - start_time))
+        print("--- _create_delivering_drones_board run time: %s  ---" % (datetime.now() - start_time))
         start_time = datetime.now()
 
         time_overlapping_dependent_graph = create_time_overlapping_dependent_graph_model(
@@ -152,7 +152,7 @@ class BasicMinimumEnd2EndExperiment:
 
         match_config_file_path = Path('end_to_end/tests/jsons/e2e_experiment_config.json')
         match_config = MatcherConfig.dict_to_obj(MatcherConfig.json_to_dict(match_config_file_path))
-        matcher_input = MatcherInput(graph=time_overlapping_dependent_graph, empty_board=empty_drone_delivery_board,
+        matcher_input = MatcherInput(graph=time_overlapping_dependent_graph, delivering_drones_board=delivering_drones_board,
                                      config=match_config)
 
         delivery_board = calc_assignment(matcher_input=matcher_input)
@@ -161,11 +161,11 @@ class BasicMinimumEnd2EndExperiment:
         print(delivery_board)
 
         self._draw_matched_scenario(delivery_board, time_overlapping_dependent_graph, supplier_category, self.mapImage,
-                                    aggregate_by_edd=True)
+                                    aggregate_by_delivering_drones=True)
 
     @staticmethod
     def _draw_matched_scenario(delivery_board, graph, supplier_category, map_image,
-                               aggregate_by_edd: bool = True):
+                               aggregate_by_delivering_drones: bool = True):
         dr_drawer = create_drawer_2d(Drawer2DCoordinateSys.GEOGRAPHIC, map_image)
         operational_drawer2d.add_operational_graph(dr_drawer, graph, draw_internal=True,
                                                    draw_edges=False)
@@ -173,7 +173,7 @@ class BasicMinimumEnd2EndExperiment:
         board_map_drawer = create_drawer_2d(Drawer2DCoordinateSys.GEOGRAPHIC, map_image)
         operational_drawer2d.add_delivery_board(board_map_drawer, delivery_board, draw_unmatched=True)
         board_map_drawer.draw(False)
-        if aggregate_by_edd:
+        if aggregate_by_delivering_drones:
             formations = set((delivery.delivering_drones.id, delivery.delivering_drones.drone_formation)
                              for delivery in delivery_board.drone_deliveries)
             row_names = ["Unmatched Out"] + \
@@ -190,8 +190,8 @@ class BasicMinimumEnd2EndExperiment:
                                                  row_names=row_names,
                                                  rows_title='Formation Type x Package Type Amounts',
                                                  alternating_row_color=False)
-        if aggregate_by_edd:
-            operational_gantt_drawer.add_delivery_board_with_row_per_edd(board_gantt_drawer, delivery_board, True)
+        if aggregate_by_delivering_drones:
+            operational_gantt_drawer.add_delivery_board_with_row_per_delivering_drones(board_gantt_drawer, delivery_board, True)
         else:
             operational_gantt_drawer.add_delivery_board_with_row_per_drone_delivery(board_gantt_drawer, delivery_board,
                                                                                     True)
