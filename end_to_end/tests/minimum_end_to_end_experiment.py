@@ -189,7 +189,7 @@ class BasicMinimumEnd2EndExperiment:
                                                  hours_period=24,
                                                  row_names=row_names,
                                                  rows_title='Formation Type x Package Type Amounts',
-                                                 )
+                                                 alternating_row_color=False)
         if aggregate_by_edd:
             operational_gantt_drawer.add_delivery_board_with_row_per_edd(board_gantt_drawer, delivery_board, True)
         else:

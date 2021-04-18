@@ -57,7 +57,7 @@ class ORToolsMatcherReloadWithMultipleDepotsTestCase(TestCase):
                              PackageType.LARGE))
 
     def _assert_drone_deliveries_have_different_loading_docks(self, actual_delivery_board: DroneDeliveryBoard):
-        matched_start_loading_docks = [delivery.start_drone_loading_docks.drone_loading_dock for delivery in
+        matched_start_loading_docks = [delivery.start_drone_loading_dock.drone_loading_dock for delivery in
                                        actual_delivery_board.drone_deliveries]
         self.assertNotEqual(len(set(matched_start_loading_docks)), len(matched_start_loading_docks))
 

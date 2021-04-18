@@ -82,8 +82,8 @@ def _get_color_of_graph_edge(edge: OperationalEdge):
 
 def add_drone_delivery(drawer: Drawer2D, delivery: DroneDelivery, delivery_color: Color):
     locations = []
-    add_drone_loading_dock(drawer, delivery.start_drone_loading_docks.drone_loading_dock)
-    locations.append(delivery.start_drone_loading_docks.drone_loading_dock.calc_location())
+    add_drone_loading_dock(drawer, delivery.start_drone_loading_dock.drone_loading_dock)
+    locations.append(delivery.start_drone_loading_dock.drone_loading_dock.calc_location())
     for request in delivery.matched_requests:
         matched_delivery_option = request.delivery_request.delivery_options[request.matched_delivery_option_index]
         add_delivery_option(drawer, matched_delivery_option,
@@ -91,8 +91,8 @@ def add_drone_delivery(drawer: Drawer2D, delivery: DroneDelivery, delivery_color
                             color=delivery_color)
         current_location = matched_delivery_option.calc_location()
         locations.append(current_location)
-    add_drone_loading_dock(drawer, delivery.end_drone_loading_docks.drone_loading_dock)
-    locations.append(delivery.end_drone_loading_docks.drone_loading_dock.calc_location())
+    add_drone_loading_dock(drawer, delivery.end_drone_loading_dock.drone_loading_dock)
+    locations.append(delivery.end_drone_loading_dock.drone_loading_dock.calc_location())
 
 
 class _MatchedDeliveryLabelsHandler:

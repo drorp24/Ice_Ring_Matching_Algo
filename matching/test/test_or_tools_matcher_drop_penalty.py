@@ -53,12 +53,12 @@ class ORToolsMatcherDropPenaltyTestCase(TestCase):
 
         drone_delivery = DroneDelivery(delivering_drones=self.empty_board.empty_drone_deliveries[0],
                                        matched_requests=[],
-                                       start_drone_loading_docks=MatchedDroneLoadingDock(
+                                       start_drone_loading_dock=MatchedDroneLoadingDock(
                                            drone_loading_dock=self.loading_dock,
                                            delivery_time_window=TimeWindowExtension(
                                                since=ZERO_TIME,
                                                until=ZERO_TIME)),
-                                       end_drone_loading_docks=MatchedDroneLoadingDock(
+                                       end_drone_loading_dock=MatchedDroneLoadingDock(
                                            drone_loading_dock=self.loading_dock,
                                            delivery_time_window=TimeWindowExtension(
                                                since=ZERO_TIME,

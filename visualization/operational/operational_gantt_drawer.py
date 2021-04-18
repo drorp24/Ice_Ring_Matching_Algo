@@ -19,20 +19,22 @@ def generate_matched_request_bar_colors() -> [Color]:
 UNMATCHED_ROW_NUMBER = 1
 MATCHED_REQUEST_BAR_COLORS = generate_matched_request_bar_colors()
 OPERATING_TIME_WINDOW_COLOR = Color.Red
+ROW_BACKGROUND_ALPHA = 0.3
 
 
 def add_delivery_board_with_row_per_edd(drawer: GanttDrawer, board: DroneDeliveryBoard, draw_unmatched=True):
-    formations = list(set(delivery.delivering_drones.id for delivery in board.drone_deliveries))
+    delivering_drones_list = list(set(delivery.delivering_drones for delivery in board.drone_deliveries))
+    _set_row_color_per_dock(delivering_drones_list, drawer)
     for i, delivery in enumerate(board.drone_deliveries):
-        delivery_row = formations.index(delivery.delivering_drones.id) + 1 + UNMATCHED_ROW_NUMBER
+        delivery_row = delivering_drones_list.index(delivery.delivering_drones) + 1 + UNMATCHED_ROW_NUMBER
         max_inner_rows = max(
             delivery.delivering_drones.drone_formation.get_package_type_amount_map().get_package_type_amounts())
         if len(delivery.matched_requests) == 0:
             continue
         drawer.add_row_area(
             row=delivery_row,
-            time_window=TimeWindowExtension(delivery.start_drone_loading_docks.delivery_time_window.since,
-                                            delivery.end_drone_loading_docks.delivery_time_window.since),
+            time_window=TimeWindowExtension(delivery.start_drone_loading_dock.delivery_time_window.since,
+                                            delivery.end_drone_loading_dock.delivery_time_window.since),
             edgecolor=OPERATING_TIME_WINDOW_COLOR)
         for request_index, request in enumerate(delivery.matched_requests):
             bar_color = Color.White
@@ -49,6 +51,19 @@ def add_delivery_board_with_row_per_edd(drawer: GanttDrawer, board: DroneDeliver
 
     if draw_unmatched:
         _add_unmatched_requests(board, drawer)
+
+
+def _set_row_color_per_dock(delivering_drones_list, drawer):
+    loading_dock_idx = set()
+    loading_docks_row_colors = set()
+    for i, delivering_drones in enumerate(delivering_drones_list):
+        row_color = MATCHED_REQUEST_BAR_COLORS[
+            int(delivering_drones.start_loading_dock.id.uuid) % len(MATCHED_REQUEST_BAR_COLORS)]
+        row_number = i + 1 + UNMATCHED_ROW_NUMBER
+        drawer.set_row_color(row_number, row_color, ROW_BACKGROUND_ALPHA)
+        loading_dock_idx.add(delivering_drones.start_loading_dock.id.uuid)
+        loading_docks_row_colors.add(row_color)
+    drawer.add_legend(list(loading_dock_idx), list(loading_docks_row_colors), ROW_BACKGROUND_ALPHA, title="Docks")
 
 
 def _add_unmatched_requests(board, drawer):
@@ -77,8 +92,8 @@ def add_delivery_board_with_row_per_drone_delivery(drawer: GanttDrawer, board: D
             continue
         drawer.add_row_area(
             row=delivery_row,
-            time_window=TimeWindowExtension(delivery.start_drone_loading_docks.delivery_time_window.since,
-                                            delivery.end_drone_loading_docks.delivery_time_window.since),
+            time_window=TimeWindowExtension(delivery.start_drone_loading_dock.delivery_time_window.since,
+                                            delivery.end_drone_loading_dock.delivery_time_window.since),
             edgecolor=OPERATING_TIME_WINDOW_COLOR)
         for request_index, request in enumerate(delivery.matched_requests):
             drawer.add_bar(

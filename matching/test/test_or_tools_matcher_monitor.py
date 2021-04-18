@@ -197,12 +197,12 @@ class ORToolsMatcherMonitorTestCase(TestCase):
                                                      until=ZERO_TIME.add_time_delta(
                                                          TimeDeltaExtension(timedelta(minutes=15))))),
                                          ],
-                                         start_drone_loading_docks=MatchedDroneLoadingDock(
+                                         start_drone_loading_dock=MatchedDroneLoadingDock(
                                              drone_loading_dock=loading_dock,
                                              delivery_time_window=TimeWindowExtension(
                                                  since=loading_dock.time_window.since,
                                                  until=loading_dock.time_window.since)),
-                                         end_drone_loading_docks=MatchedDroneLoadingDock(
+                                         end_drone_loading_dock=MatchedDroneLoadingDock(
                                              drone_loading_dock=loading_dock,
                                              delivery_time_window=TimeWindowExtension(
                                                  since=loading_dock.time_window.since.add_time_delta(

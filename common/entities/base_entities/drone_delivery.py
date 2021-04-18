@@ -143,12 +143,12 @@ class MatchedDeliveryRequest(JsonableBaseEntity):
 class DroneDelivery(JsonableBaseEntity):
     def __init__(self, delivering_drones: DeliveringDrones,
                  matched_requests: [MatchedDeliveryRequest],
-                 start_drone_loading_docks: MatchedDroneLoadingDock,
-                 end_drone_loading_docks: MatchedDroneLoadingDock):
+                 start_drone_loading_dock: MatchedDroneLoadingDock,
+                 end_drone_loading_dock: MatchedDroneLoadingDock):
         self._delivering_drones = delivering_drones
         self._matched_requests = matched_requests
-        self._start_drone_loading_docks = start_drone_loading_docks
-        self._end_drone_loading_docks = end_drone_loading_docks
+        self._start_drone_loading_dock = start_drone_loading_dock
+        self._end_drone_loading_dock = end_drone_loading_dock
 
     @property
     def delivering_drones(self) -> DeliveringDrones:
@@ -159,17 +159,17 @@ class DroneDelivery(JsonableBaseEntity):
         return self._matched_requests
 
     @property
-    def start_drone_loading_docks(self) -> MatchedDroneLoadingDock:
-        return self._start_drone_loading_docks
+    def start_drone_loading_dock(self) -> MatchedDroneLoadingDock:
+        return self._start_drone_loading_dock
 
     @property
-    def end_drone_loading_docks(self) -> MatchedDroneLoadingDock:
-        return self._end_drone_loading_docks
+    def end_drone_loading_dock(self) -> MatchedDroneLoadingDock:
+        return self._end_drone_loading_dock
 
     @lru_cache()
     def get_total_work_time_in_minutes(self) -> float:
-        return self._end_drone_loading_docks.delivery_time_window.since.get_time_delta(
-            self._start_drone_loading_docks.delivery_time_window.since).in_minutes()
+        return self._end_drone_loading_dock.delivery_time_window.since.get_time_delta(
+            self._start_drone_loading_dock.delivery_time_window.since).in_minutes()
 
     @lru_cache()
     def get_total_package_type_amount_map(self) -> PackageTypeAmountMap:
@@ -193,25 +193,25 @@ class DroneDelivery(JsonableBaseEntity):
 
         return "\n[DroneDelivery delivering_drones_id={id} origin {origin_capacity} matched " \
                "{total_amount_per_package_type} total priority={priority} total time in " \
-               "minutes={total_time}]\n{start_drone_loading_docks}\n{matched_requests}\n{end_drone_loading_docks}" \
+               "minutes={total_time}]\n{start_drone_loading_dock}\n{matched_requests}\n{end_drone_loading_dock}" \
             .format(id=self.delivering_drones.id.uuid,
                     origin_capacity=self.delivering_drones.drone_formation.get_package_type_amount_map(),
                     total_amount_per_package_type=str(self.get_total_package_type_amount_map()),
                     priority=str(self.get_total_priority()),
                     total_time=str(self.get_total_work_time_in_minutes()),
-                    start_drone_loading_docks=str(self.start_drone_loading_docks),
+                    start_drone_loading_dock=str(self.start_drone_loading_dock),
                     matched_requests='\n'.join(map(str, self._matched_requests)),
-                    end_drone_loading_docks=str(self.end_drone_loading_docks))
+                    end_drone_loading_dock=str(self.end_drone_loading_dock))
 
     def __hash__(self):
         return hash((self._delivering_drones, tuple(self._matched_requests),
-                     self._start_drone_loading_docks, self._end_drone_loading_docks))
+                     self._start_drone_loading_dock, self._end_drone_loading_dock))
 
     def __eq__(self, other):
         return all([self.delivering_drones == other.delivering_drones,
                     self._matched_requests == other.matched_requests,
-                    self.start_drone_loading_docks == other.start_drone_loading_docks,
-                    self.end_drone_loading_docks == other.end_drone_loading_docks])
+                    self.start_drone_loading_dock == other.start_drone_loading_dock,
+                    self.end_drone_loading_dock == other.end_drone_loading_dock])
 
     @classmethod
     def dict_to_obj(cls, dict_input):
@@ -220,5 +220,5 @@ class DroneDelivery(JsonableBaseEntity):
             delivering_drones=DeliveringDrones.dict_to_obj(dict_input['delivering_drones']),
             matched_requests=[MatchedDeliveryRequest.dict_to_obj(matched_request_dict) for matched_request_dict in
                               dict_input['matched_requests']],
-            start_drone_loading_docks=MatchedDroneLoadingDock.dict_to_obj(dict_input['start_drone_loading_docks']),
-            end_drone_loading_docks=MatchedDroneLoadingDock.dict_to_obj(dict_input['end_drone_loading_docks']))
+            start_drone_loading_dock=MatchedDroneLoadingDock.dict_to_obj(dict_input['start_drone_loading_dock']),
+            end_drone_loading_dock=MatchedDroneLoadingDock.dict_to_obj(dict_input['end_drone_loading_dock']))
