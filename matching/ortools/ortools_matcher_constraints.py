@@ -110,7 +110,8 @@ class ORToolsMatcherConstraints:
     def _add_to_objective_minimize_delivery_time_of_high_priority(self, travel_time_dimension):
         for node in self._graph_exporter.export_delivery_request_nodes_indices(self._matcher_input.graph):
             index = self._index_manager.node_to_index(node)
-            coefficient = max(self._graph_exporter.export_priorities(self._matcher_input.graph)) \
+            coefficient = self._matcher_input.config.constraints.travel_time.important_earliest_coeff \
+                * max(self._graph_exporter.export_priorities(self._matcher_input.graph)) \
                 / (self._graph_exporter.export_priorities(self._matcher_input.graph)[node] + 1)
             route_start_time = 0
             travel_time_dimension.SetCumulVarSoftUpperBound(index, route_start_time, int(coefficient))
