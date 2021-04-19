@@ -102,7 +102,8 @@ class ORToolsMatcher(Matcher):
         matcher_constraints.add_travel_cost()
         matcher_constraints.add_travel_time()
         matcher_constraints.add_session_time()
-        matcher_constraints.add_unmatched_penalty()
+        matcher_constraints.add_unmatched_delivery_request_penalty()
+        matcher_constraints.add_unmatched_reloading_depot_penalty()
 
     def _set_monitor(self):
         if not self.matcher_input.config.monitor.enabled:

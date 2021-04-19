@@ -92,12 +92,15 @@ class ORToolsMatcherConstraints:
             demand_dimension = self._routing_model.GetDimensionOrDie(demand_dimension_name)
             self._add_to_objective_minimize_return_not_empty(demand_dimension, max_capacity)
 
-    def add_unmatched_penalty(self):
+    def add_unmatched_delivery_request_penalty(self):
         for node in self._graph_exporter.export_delivery_request_nodes_indices(self._matcher_input.graph):
             self._routing_model.AddDisjunction([self._index_manager.node_to_index(node)],
                                                self._matcher_input.config.unmatched_penalty)
+
+    def add_unmatched_reloading_depot_penalty(self):
         unmatched_reloading_virtual_depo_penalty = 0
-        for node in self._reloader.reloading_virtual_depos_indices[1:]:
+        reloading_depots_except_first = self._reloader.reloading_virtual_depos_indices[1:]
+        for node in reloading_depots_except_first: # TODO: Return first reloading depo if reuse_init_guess is used
             self._routing_model.AddDisjunction([self._index_manager.node_to_index(node)],
                                                unmatched_reloading_virtual_depo_penalty)
 
