@@ -100,7 +100,7 @@ class ORToolsMatcherConstraints:
     def add_unmatched_reloading_depot_penalty(self):
         unmatched_reloading_virtual_depo_penalty = 0
         reloading_depots_except_first = self._reloader.reloading_virtual_depos_indices[1:]
-        for node in reloading_depots_except_first: # TODO: Return first reloading depo if reuse_init_guess is used
+        for node in reloading_depots_except_first:  # TODO: Return first reloading depo if reuse_init_guess is used
             self._routing_model.AddDisjunction([self._index_manager.node_to_index(node)],
                                                unmatched_reloading_virtual_depo_penalty)
 
@@ -327,35 +327,21 @@ class ORToolsMatcherConstraints:
                                                                                           _package_type)[_from_node]
             return package_amount_by_type
 
-        setattr(self, "_demands_" + str.lower(package_type.name), {})
-        _demands = getattr(self, "_demands_" + str.lower(package_type.name))
+        package_name = str.lower(package_type.name)
+        setattr(self, "_demands_" + package_name, {})
+        _demands = getattr(self, "_demands_" + package_name)
         for from_node in range(self._reloader.num_of_nodes):
             _demands[from_node] = int(_get_package_amount_by_type(from_node, package_type))
 
-        @lru_cache()
-        def _get_tiny_demand_callback(_from_index: np.int64) -> int:
-            return self._demands_tiny[self._index_manager.index_to_node(_from_index)]
-
-        @lru_cache()
-        def _get_small_demand_callback(_from_index: np.int64) -> int:
-            return self._demands_small[self._index_manager.index_to_node(_from_index)]
-
-        @lru_cache()
-        def _get_medium_demand_callback(_from_index: np.int64) -> int:
-            return self._demands_medium[self._index_manager.index_to_node(_from_index)]
-
-        @lru_cache()
-        def _get_large_demand_callback(_from_index: np.int64) -> int:
-            return self._demands_large[self._index_manager.index_to_node(_from_index)]
-
-        demand_evaluators = {
-            PackageType.TINY: _get_tiny_demand_callback,
-            PackageType.SMALL: _get_small_demand_callback,
-            PackageType.MEDIUM: _get_medium_demand_callback,
-            PackageType.LARGE: _get_large_demand_callback
-        }
-
-        return demand_evaluators[package_type]
+        exec_globals = {'self': self, 'lru_cache': lru_cache}
+        exec_locals = {}
+        callback_name = f"_get_{package_name}_demand_callback"
+        exec(f"@lru_cache()\n"
+             f"def {callback_name}(_from_index):\n"
+             f"\treturn self._demands_{package_name}["
+             f"self._index_manager.index_to_node(_from_index)]",
+             exec_globals, exec_locals)
+        return exec_locals[callback_name]
 
     def _are_nodes_consecutive_depos(self, from_node, to_node) -> bool:
         depots = self._graph_exporter.export_basis_nodes_indices(self._matcher_input.graph) \
