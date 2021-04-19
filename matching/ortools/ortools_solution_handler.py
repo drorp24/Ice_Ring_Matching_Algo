@@ -10,28 +10,21 @@ from common.graph.operational.export_ortools_graph import OrtoolsGraphExporter
 from matching.initial_solution import Routes, Route
 from matching.matcher_input import MatcherInput
 from matching.ortools.ortools_index_manager_wrapper import OrToolsIndexManagerWrapper
+from matching.ortools.ortools_matcher import Reloader
 from matching.ortools.ortools_matcher_constraints import OrToolsDimensionDescription
 
 
 class ORToolsSolutionHandler:
     def __init__(self, graph_exporter: OrtoolsGraphExporter, index_manager: OrToolsIndexManagerWrapper,
                  routing_model: RoutingModel, matcher_input: MatcherInput,
-                 reloading_depos_arrive_indices: [int], reloading_depos_depart_indices: [int],
-                 reloading_depots_per_vehicle: {}, vehicle_per_reloading_depot: {},
+                 reloader: Reloader,
                  start_depots_graph_indices: [int], end_depots_graph_indices: [int]):
         self._graph_exporter = graph_exporter
         self._index_manager = index_manager
         self._routing_model = routing_model
         self._matcher_input = matcher_input
-        self._arrive_indices = reloading_depos_arrive_indices
-        self._depart_indices = reloading_depos_depart_indices
-        self._reloading_virtual_depos_indices = self._arrive_indices + self._depart_indices
-        self._depos = self._graph_exporter.export_basis_nodes_indices(self._matcher_input.graph) \
-            + self._reloading_virtual_depos_indices
-        self._num_of_nodes = len(self._matcher_input.graph.nodes) + len(self._reloading_virtual_depos_indices)
+        self._reloader = reloader
         self._travel_time_matrix = self._graph_exporter.export_travel_times(self._matcher_input.graph)
-        self._reloading_depots_per_vehicle = reloading_depots_per_vehicle
-        self._vehicle_per_reloading_depot = vehicle_per_reloading_depot
         self._start_depots_graph_indices = start_depots_graph_indices
         self._end_depots_graph_indices = end_depots_graph_indices
 
@@ -45,7 +38,8 @@ class ORToolsSolutionHandler:
             return Routes([])
 
         routes = []
-        for delivering_drones_index, delivering_drones in enumerate(self._matcher_input.delivering_drones_board.delivering_drones_list):
+        for delivering_drones_index, delivering_drones \
+                in enumerate(self._matcher_input.delivering_drones_board.delivering_drones_list):
             index = self._routing_model.Start(delivering_drones_index)
             route = []
             while not self._routing_model.IsEnd(index):
@@ -60,12 +54,14 @@ class ORToolsSolutionHandler:
         if solution is None:
             return []
         drone_deliveries = []
-        for delivering_drones_index, delivering_drones in enumerate(self._matcher_input.delivering_drones_board.delivering_drones_list):
+        for delivering_drones_index, delivering_drones \
+                in enumerate(self._matcher_input.delivering_drones_board.delivering_drones_list):
             # self._print_solution_debug_info(delivering_drones_index, solution)
             start_index = self._routing_model.Start(delivering_drones_index)
             graph_start_index = self._index_manager.index_to_node(start_index)
             vehicle_of_node = self._start_depots_graph_indices.index(graph_start_index)
-            dock = self._matcher_input.delivering_drones_board.delivering_drones_list[vehicle_of_node].start_loading_dock
+            dock = self._matcher_input.delivering_drones_board.delivering_drones_list[
+                vehicle_of_node].start_loading_dock
             start_drone_loading_dock = self._create_start_drone_loading_dock(dock, start_index, solution)
             index = solution.Value(self._routing_model.NextVar(start_index))
             matched_requests = []
@@ -74,28 +70,31 @@ class ORToolsSolutionHandler:
                 if graph_index in self._graph_exporter.export_delivery_request_nodes_indices(self._matcher_input.graph):
                     matched_requests.append(
                         self._create_matched_delivery_request(graph_index, index, solution))
-                elif graph_index in self._arrive_indices:
-                    vehicle_of_node = self._vehicle_per_reloading_depot[graph_index]
-                    dock = self._matcher_input.delivering_drones_board.delivering_drones_list[vehicle_of_node].end_loading_dock
+                elif graph_index in self._reloader.arrive_indices:
+                    vehicle_of_node = self._reloader.get_reloading_depot_vehicle(graph_index)
+                    dock = self._matcher_input.delivering_drones_board.delivering_drones_list[
+                        vehicle_of_node].end_loading_dock
                     end_drone_loading_dock = self._create_end_drone_loading_dock(dock, index, solution)
                     drone_deliveries.append(
-                        self._create_drone_delivery(delivering_drones_index, start_drone_loading_dock, end_drone_loading_dock,
-                                                    matched_requests))
+                        self._create_drone_delivery(delivering_drones_index, start_drone_loading_dock,
+                                                    end_drone_loading_dock, matched_requests))
                     matched_requests = []
-                elif graph_index in self._depart_indices:
-                    vehicle_of_node = self._vehicle_per_reloading_depot[graph_index]
-                    dock = self._matcher_input.delivering_drones_board.delivering_drones_list[vehicle_of_node].start_loading_dock
+                elif graph_index in self._reloader.depart_indices:
+                    vehicle_of_node = self._reloader.get_reloading_depot_vehicle(graph_index)
+                    dock = self._matcher_input.delivering_drones_board.delivering_drones_list[
+                        vehicle_of_node].start_loading_dock
                     start_drone_loading_dock = self._create_start_drone_loading_dock(
                         dock, index, solution)
                 index = solution.Value(self._routing_model.NextVar(index))
             if self._routing_model.IsEnd(index):
                 graph_index = self._index_manager.index_to_node(index)
                 vehicle_of_node = self._end_depots_graph_indices.index(graph_index)
-                dock = self._matcher_input.delivering_drones_board.delivering_drones_list[vehicle_of_node].end_loading_dock
+                dock = self._matcher_input.delivering_drones_board.delivering_drones_list[
+                    vehicle_of_node].end_loading_dock
                 end_drone_loading_dock = self._create_end_drone_loading_dock(dock, index, solution)
                 drone_deliveries.append(
-                    self._create_drone_delivery(delivering_drones_index, start_drone_loading_dock, end_drone_loading_dock,
-                                                matched_requests))
+                    self._create_drone_delivery(delivering_drones_index, start_drone_loading_dock,
+                                                end_drone_loading_dock, matched_requests))
         return drone_deliveries
 
     def _print_solution_debug_info(self, delivering_drones_index, solution):
@@ -130,9 +129,9 @@ class ORToolsSolutionHandler:
         if solution is None:
             return []
         unmatched_delivery_request = []
-        for index in range(self._num_of_nodes):
+        for index in range(self._reloader.num_of_nodes):
             if self._routing_model.IsStart(index) or self._routing_model.IsEnd(
-                    index) or index in self._reloading_virtual_depos_indices:
+                    index) or index in self._reloader.reloading_virtual_depos_indices:
                 continue
             if solution.Value(self._routing_model.NextVar(index)) == index:
                 graph_index = self._index_manager.index_to_node(index)
@@ -146,8 +145,9 @@ class ORToolsSolutionHandler:
     def _create_drone_delivery(self, delivering_drones_index: int, start_drone_loading_dock: MatchedDroneLoadingDock,
                                end_drone_loading_dock: MatchedDroneLoadingDock,
                                matched_requests: List[MatchedDeliveryRequest]) -> DroneDelivery:
-        return DroneDelivery(self._matcher_input.delivering_drones_board.delivering_drones_list[delivering_drones_index],
-                             matched_requests, start_drone_loading_dock, end_drone_loading_dock)
+        return DroneDelivery(
+            self._matcher_input.delivering_drones_board.delivering_drones_list[delivering_drones_index],
+            matched_requests, start_drone_loading_dock, end_drone_loading_dock)
 
     def _create_matched_delivery_request(self, graph_index: int, index: int,
                                          solution: Assignment) -> MatchedDeliveryRequest:

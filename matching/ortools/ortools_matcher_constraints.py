@@ -10,6 +10,7 @@ from common.entities.base_entities.package import PackageType
 from common.graph.operational.export_ortools_graph import OrtoolsGraphExporter
 from matching.matcher import MatcherInput
 from matching.ortools.ortools_index_manager_wrapper import OrToolsIndexManagerWrapper
+from matching.ortools.ortools_matcher import Reloader
 
 MAX_OPERATION_TIME = 365 * 24 * 60  # minutes in year
 
@@ -24,9 +25,7 @@ class OrToolsDimensionDescription(Enum):
 
 class ORToolsMatcherConstraints:
     def __init__(self, index_manager: OrToolsIndexManagerWrapper, routing_model: RoutingModel,
-                 matcher_input: MatcherInput, reloading_depos_arrive_indices: [int],
-                 reloading_depos_depart_indices: [int], reloading_depots_per_vehicle: {},
-                 vehicle_per_reloading_depot: {}):
+                 matcher_input: MatcherInput, reloader: Reloader):
         self._graph_exporter = OrtoolsGraphExporter()
         self._index_manager = index_manager
         self._routing_model = routing_model
