@@ -4,13 +4,13 @@ from ortools.constraint_solver.pywrapcp import RoutingModel
 from common.graph.operational.export_ortools_graph import OrtoolsGraphExporter
 from matching.matcher_input import MatcherInput
 from matching.ortools.ortools_index_manager_wrapper import OrToolsIndexManagerWrapper
-from matching.ortools.ortools_matcher import Reloader
 from matching.ortools.ortools_matcher_constraints import OrToolsDimensionDescription
+from matching.ortools.ortools_reloader import ORToolsReloader
 
 
 class ORToolsMatcherObjective:
     def __init__(self, index_manager: OrToolsIndexManagerWrapper, routing_model: RoutingModel,
-                 matcher_input: MatcherInput, reloader: Reloader):
+                 matcher_input: MatcherInput, reloader: ORToolsReloader):
         self._graph_exporter = OrtoolsGraphExporter()
         self._index_manager = index_manager
         self._routing_model = routing_model

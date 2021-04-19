@@ -10,14 +10,14 @@ from common.graph.operational.export_ortools_graph import OrtoolsGraphExporter
 from matching.initial_solution import Routes, Route
 from matching.matcher_input import MatcherInput
 from matching.ortools.ortools_index_manager_wrapper import OrToolsIndexManagerWrapper
-from matching.ortools.ortools_matcher import Reloader
 from matching.ortools.ortools_matcher_constraints import OrToolsDimensionDescription
+from matching.ortools.ortools_reloader import ORToolsReloader
 
 
 class ORToolsSolutionHandler:
     def __init__(self, graph_exporter: OrtoolsGraphExporter, index_manager: OrToolsIndexManagerWrapper,
                  routing_model: RoutingModel, matcher_input: MatcherInput,
-                 reloader: Reloader,
+                 reloader: ORToolsReloader,
                  start_depots_graph_indices: [int], end_depots_graph_indices: [int]):
         self._graph_exporter = graph_exporter
         self._index_manager = index_manager
