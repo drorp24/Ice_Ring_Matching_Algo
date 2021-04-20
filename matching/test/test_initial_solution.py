@@ -14,7 +14,7 @@ from common.entities.base_entities.entity_distribution.package_distribution impo
 from common.entities.base_entities.entity_distribution.priority_distribution import PriorityDistribution
 from common.entities.base_entities.entity_distribution.temporal_distribution import TimeDeltaDistribution, \
     TimeWindowDistribution, DateTimeDistribution
-from common.entities.base_entities.fleet.empty_drone_delivery_board_generation import build_empty_drone_delivery_board
+from common.entities.base_entities.fleet.delivering_drones_board_generation import build_delivering_drones_board
 from common.entities.base_entities.fleet.fleet_property_sets import DroneFormationTypePolicy, \
     PackageConfigurationPolicy, DroneSetProperties
 from common.entities.base_entities.package import PackageType
@@ -42,21 +42,24 @@ class BasicInitialSolutionTest(TestCase):
         cls.supplier_category_distribution = BasicInitialSolutionTest.create_supplier_category()
 
     def test_initial_solution(self):
-        empty_drone_delivery_board = BasicInitialSolutionTest.create_empty_drone_delivery_board(
-            amount=6,
-            max_route_time_entire_board=1440,
-            velocity_entire_board=10.0)
-
         supplier_category = self.supplier_category_distribution.choose_rand(random=Random(10),
                                                                             amount={DeliveryRequest: 50,
                                                                                     DroneLoadingDock: 1})
+
+        delivering_drones_board = BasicInitialSolutionTest.create_delivering_drones_board(
+            amount=6,
+            max_route_time_entire_board=1440,
+            velocity_entire_board=10.0,
+            loading_docks=supplier_category.drone_loading_docks
+        )
+
         time_overlapping_dependent_graph = create_time_overlapping_dependent_graph_model(supplier_category,
                                                                                          edge_cost_factor=25.0,
                                                                                          edge_travel_time_factor=25.0)
 
         match_config_initial = BasicInitialSolutionTest.create_match_config(local_search_strategy="GUIDED_LOCAL_SEARCH",
                                                                             reload_per_vehicle=3)
-        matcher_input = MatcherInput(graph=time_overlapping_dependent_graph, empty_board=empty_drone_delivery_board,
+        matcher_input = MatcherInput(graph=time_overlapping_dependent_graph, delivering_drones_board=delivering_drones_board,
                                      config=match_config_initial)
 
         routes = ORToolsInitialSolution.calc(matcher_input=matcher_input)
@@ -64,14 +67,15 @@ class BasicInitialSolutionTest(TestCase):
             self.assertEqual(len(set(route)), len(route))
 
     def test_set_initial_solution(self):
-        empty_drone_delivery_board = BasicInitialSolutionTest.create_empty_drone_delivery_board(
+        supplier_category = self.supplier_category_distribution.choose_rand(random=Random(10),
+                                                                            amount={DeliveryRequest: 37,
+                                                                                    DroneLoadingDock: 1})
+        delivering_drones_board = BasicInitialSolutionTest.create_delivering_drones_board(
+            loading_docks=supplier_category.drone_loading_docks,
             amount=6,
             max_route_time_entire_board=1440,
             velocity_entire_board=10.0)
 
-        supplier_category = self.supplier_category_distribution.choose_rand(random=Random(10),
-                                                                            amount={DeliveryRequest: 37,
-                                                                                    DroneLoadingDock: 1})
         time_overlapping_dependent_graph = create_time_overlapping_dependent_graph_model(supplier_category,
                                                                                          edge_cost_factor=25.0,
                                                                                          edge_travel_time_factor=25.0)
@@ -79,7 +83,7 @@ class BasicInitialSolutionTest(TestCase):
         match_config_auto_noreuse = BasicInitialSolutionTest.create_match_config(local_search_strategy="AUTOMATIC",
                                                                                  reload_per_vehicle=0)
         matcher_input_auto_noreuse = MatcherInput(graph=time_overlapping_dependent_graph,
-                                                  empty_board=empty_drone_delivery_board,
+                                                  delivering_drones_board=delivering_drones_board,
                                                   config=match_config_auto_noreuse)
 
         delivery_board_auto_noreuse = calc_assignment(matcher_input=matcher_input_auto_noreuse)
@@ -88,7 +92,7 @@ class BasicInitialSolutionTest(TestCase):
                                                                             reload_per_vehicle=3)
 
         matcher_input_initial_reuse = MatcherInput(graph=time_overlapping_dependent_graph,
-                                                   empty_board=empty_drone_delivery_board,
+                                                   delivering_drones_board=delivering_drones_board,
                                                    config=match_config_initial)
 
         initial_routes = ORToolsInitialSolution.calc(matcher_input=matcher_input_initial_reuse)
@@ -96,7 +100,7 @@ class BasicInitialSolutionTest(TestCase):
         match_config_auto_reuse = BasicInitialSolutionTest.create_match_config(local_search_strategy="AUTOMATIC",
                                                                                reload_per_vehicle=3)
         matcher_input_auto_reuse = MatcherInput(graph=time_overlapping_dependent_graph,
-                                                empty_board=empty_drone_delivery_board,
+                                                delivering_drones_board=delivering_drones_board,
                                                 config=match_config_auto_reuse)
 
         delivery_board_using_initial_routes = calc_assignment_from_init_solution(matcher_input=matcher_input_auto_reuse,
@@ -119,7 +123,8 @@ class BasicInitialSolutionTest(TestCase):
                 travel_time_constraints=TravelTimeConstraints(max_waiting_time=0,
                                                               max_route_time=1440,
                                                               count_time_from_zero=False,
-                                                              reloading_time=120),
+                                                              reloading_time=120,
+                                                              important_earliest_coeff=1),
                 session_time_constraints=SessionTimeConstraints(max_session_time=60),
                 priority_constraints=PriorityConstraints(True, priority_cost_coefficient=1000)),
             unmatched_penalty=10000,
@@ -173,7 +178,8 @@ class BasicInitialSolutionTest(TestCase):
         return TimeWindowDistribution(DateTimeDistribution(default_dt_options), default_time_delta_distrib)
 
     @staticmethod
-    def create_empty_drone_delivery_board(
+    def create_delivering_drones_board(
+            loading_docks: [DroneLoadingDock],
             drone_formation_policy=DroneFormationTypePolicy(
                 {DroneFormationType.PAIR: 1, DroneFormationType.QUAD: 0}),
             package_configurations_policy=PackageConfigurationPolicy({PackageConfiguration.LARGE_X2: 1,
@@ -182,9 +188,11 @@ class BasicInitialSolutionTest(TestCase):
                                                                       PackageConfiguration.TINY_X16: 0}),
             drone_type: DroneType = DroneType.drone_type_1,
             amount: int = 30, max_route_time_entire_board: int = 400, velocity_entire_board: float = 10.0):
-        drone_set_properties = DroneSetProperties(drone_type=drone_type,
+        drone_set_properties = DroneSetProperties(drone_type=loading_docks[0].drone_type,
                                                   package_configuration_policy=package_configurations_policy,
                                                   drone_formation_policy=drone_formation_policy,
-                                                  drone_amount=amount)
-        return build_empty_drone_delivery_board(drone_set_properties, max_route_time_entire_board,
+                                                  drone_amount=amount,
+                                                  start_loading_dock=loading_docks[0],
+                                                  end_loading_dock=loading_docks[0])
+        return build_delivering_drones_board(drone_set_properties, max_route_time_entire_board,
                                                 velocity_entire_board)

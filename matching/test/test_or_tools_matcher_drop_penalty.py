@@ -6,8 +6,8 @@ from unittest import TestCase
 
 from common.entities.base_entities.delivery_request import DeliveryRequest
 from common.entities.base_entities.drone import DroneType
-from common.entities.base_entities.drone_delivery import DroneDelivery, MatchedDroneLoadingDock, EmptyDroneDelivery
-from common.entities.base_entities.drone_delivery_board import DroneDeliveryBoard, EmptyDroneDeliveryBoard, \
+from common.entities.base_entities.drone_delivery import DroneDelivery, MatchedDroneLoadingDock, DeliveringDrones
+from common.entities.base_entities.drone_delivery_board import DroneDeliveryBoard, DeliveringDronesBoard, \
     UnmatchedDeliveryRequest
 from common.entities.base_entities.drone_formation import DroneFormations, PackageConfigurationOption, \
     DroneFormationType
@@ -43,26 +43,22 @@ class ORToolsMatcherDropPenaltyTestCase(TestCase):
         cls.delivery_requests = cls._create_delivery_requests()
         cls.loading_dock = cls._create_loading_dock()
         cls.graph = cls._create_graph(cls.delivery_requests, cls.loading_dock)
-        cls.empty_board = cls._create_empty_board()
+        cls.delivering_drones_board = cls._create_delivering_drones_board(cls.loading_dock)
         cls.match_config = cls._create_match_config()
-        cls.match_input = MatcherInput(cls.graph, cls.empty_board, cls.match_config)
+        cls.match_input = MatcherInput(cls.graph, cls.delivering_drones_board, cls.match_config)
 
     def test_matcher_when_drop_penalty_zero_then_no_matched_requests(self):
         matcher = ORToolsMatcher(self.match_input)
         actual_delivery_board = matcher.match()
 
-        drone_delivery = DroneDelivery(id_=self.empty_board.empty_drone_deliveries[0].id,
-                                       drone_formation=self.empty_board.empty_drone_deliveries[
-                                           0].drone_formation,
+        drone_delivery = DroneDelivery(delivering_drones=self.delivering_drones_board.delivering_drones_list[0],
                                        matched_requests=[],
-                                       start_drone_loading_docks=MatchedDroneLoadingDock(
-                                           graph_index=0,
+                                       start_drone_loading_dock=MatchedDroneLoadingDock(
                                            drone_loading_dock=self.loading_dock,
                                            delivery_time_window=TimeWindowExtension(
                                                since=ZERO_TIME,
                                                until=ZERO_TIME)),
-                                       end_drone_loading_docks=MatchedDroneLoadingDock(
-                                           graph_index=0,
+                                       end_drone_loading_dock=MatchedDroneLoadingDock(
                                            drone_loading_dock=self.loading_dock,
                                            delivery_time_window=TimeWindowExtension(
                                                since=ZERO_TIME,
@@ -98,7 +94,8 @@ class ORToolsMatcherDropPenaltyTestCase(TestCase):
 
     @staticmethod
     def _create_loading_dock() -> DroneLoadingDock:
-        return DroneLoadingDock(EntityID.generate_uuid(),DroneLoadingStation(EntityID.generate_uuid(),create_point_2d(0, 0)),
+        return DroneLoadingDock(EntityID.generate_uuid(),
+                                DroneLoadingStation(EntityID.generate_uuid(), create_point_2d(0, 0)),
                                 DroneType.drone_type_1,
                                 TimeWindowExtension(
                                     since=ZERO_TIME,
@@ -115,11 +112,16 @@ class ORToolsMatcherDropPenaltyTestCase(TestCase):
         return graph
 
     @staticmethod
-    def _create_empty_board() -> EmptyDroneDeliveryBoard:
-        empty_drone_delivery_1 = EmptyDroneDelivery(EntityID(uuid.uuid4()), DroneFormations.get_drone_formation(
-            DroneFormationType.PAIR, PackageConfigurationOption.LARGE_PACKAGES, DroneType.drone_type_1))
+    def _create_delivering_drones_board(loading_dock: DroneLoadingDock) -> DeliveringDronesBoard:
+        delivering_drones_1 = DeliveringDrones(id_=EntityID(uuid.uuid4()),
+                                                  drone_formation=DroneFormations.get_drone_formation(
+                                                      DroneFormationType.PAIR,
+                                                      PackageConfigurationOption.LARGE_PACKAGES,
+                                                      DroneType.drone_type_1),
+                                                  start_loading_dock=loading_dock,
+                                                  end_loading_dock=loading_dock)
 
-        return EmptyDroneDeliveryBoard([empty_drone_delivery_1])
+        return DeliveringDronesBoard([delivering_drones_1])
 
     @staticmethod
     def _create_match_config() -> MatcherConfig:
@@ -132,7 +134,8 @@ class ORToolsMatcherDropPenaltyTestCase(TestCase):
                 travel_time_constraints=TravelTimeConstraints(max_waiting_time=10,
                                                               max_route_time=1440,
                                                               count_time_from_zero=False,
-                                                              reloading_time=0),
+                                                              reloading_time=0,
+                                                              important_earliest_coeff=1),
                 session_time_constraints=SessionTimeConstraints(max_session_time=300),
                 priority_constraints=PriorityConstraints(True, priority_cost_coefficient=1)),
             unmatched_penalty=0,

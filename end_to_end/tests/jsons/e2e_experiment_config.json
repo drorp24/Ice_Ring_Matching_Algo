@@ -20,7 +20,7 @@
     },
     "first_solution_strategy": "PATH_CHEAPEST_ARC",
     "local_search_strategy": "GUIDED_LOCAL_SEARCH",
-    "timeout_sec": 10
+    "timeout_sec": 60
   },
   "constraints": {
     "__class__": "ConstraintsConfig",
@@ -34,7 +34,8 @@
       "max_waiting_time": 0,
       "max_route_time": 1440,
       "count_time_from_zero": false,
-      "reloading_time": 120
+      "reloading_time": 120,
+      "important_earliest_coeff": 1
     },
     "session_time": {
       "__class__": "SessionTimeConstraints",
@@ -47,7 +48,7 @@
     }
   },
   "unmatched_penalty": 10000,
-  "reload_per_vehicle": 3,
+  "reload_per_vehicle": 2,
   "monitor": {
     "__class__": "MonitorConfig",
     "enabled": true,

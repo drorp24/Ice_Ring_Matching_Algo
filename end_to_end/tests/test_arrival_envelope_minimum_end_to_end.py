@@ -4,11 +4,12 @@ from pathlib import Path
 
 from common.entities.base_entities.drone import DroneType, PackageConfiguration
 from common.entities.base_entities.drone_formation import DroneFormationType
-from common.entities.base_entities.fleet.empty_drone_delivery_board_generation import generate_empty_delivery_board
+from common.entities.base_entities.fleet.delivering_drones_board_generation import generate_delivering_drones_board
 from common.entities.base_entities.fleet.fleet_property_sets import DroneSetProperties, DroneFormationTypePolicy, \
     PackageConfigurationPolicy
 from common.entities.base_entities.package import PackageType
-from end_to_end.arrival_envelope_minimum_end_to_end import create_time_overlapping_dependent_graph_model, calc_assignment
+from end_to_end.arrival_envelope_minimum_end_to_end import create_time_overlapping_dependent_graph_model, \
+    calc_assignment
 from end_to_end.supplier_category import SupplierCategory
 from matching.matcher_config import MatcherConfig
 from matching.matcher_input import MatcherInput
@@ -20,21 +21,25 @@ class BasicArrivalEnvelopeMinimumEnd2End(unittest.TestCase):
     def setUpClass(cls):
         cls.supplier_category = SupplierCategory.dict_to_obj(SupplierCategory.json_to_dict(
             Path('end_to_end/tests/jsons/test_supplier_category.json')))
-        cls.empty_drone_delivery_board = \
-            generate_empty_delivery_board(drone_set_properties=[BasicArrivalEnvelopeMinimumEnd2End._create_simple_drone_set_properties()],
-                                          max_route_time_entire_board=400,
-                                          velocity_entire_board=10)
         cls.matcher_config = MatcherConfig.dict_to_obj(
             MatcherConfig.json_to_dict(Path('end_to_end/tests/jsons/test_min_e2e_config.json')))
+        cls.delivering_drones_board = \
+            generate_delivering_drones_board(
+                drone_set_properties=[BasicArrivalEnvelopeMinimumEnd2End._create_simple_drone_set_properties(
+                    cls.supplier_category)],
+                max_route_time_entire_board=cls.matcher_config.constraints.travel_time.max_route_time,
+                velocity_entire_board=10)
 
-    @classmethod
-    def _create_simple_drone_set_properties(cls):
+    @staticmethod
+    def _create_simple_drone_set_properties(supplier_category: SupplierCategory):
         return DroneSetProperties(drone_type=DroneType.drone_type_1,
                                   drone_formation_policy=DroneFormationTypePolicy(
                                       {DroneFormationType.PAIR: 1.0, DroneFormationType.QUAD: 0.0}),
                                   package_configuration_policy=PackageConfigurationPolicy(
                                       {PackageConfiguration.LARGE_X2: 0.6, PackageConfiguration.MEDIUM_X4: 0.2,
                                        PackageConfiguration.SMALL_X8: 0.2, PackageConfiguration.TINY_X16: 0.0}),
+                                  start_loading_dock=supplier_category.drone_loading_docks[0],
+                                  end_loading_dock=supplier_category.drone_loading_docks[0],
                                   drone_amount=30)
 
     def test_create_graph_model(self):
@@ -48,7 +53,7 @@ class BasicArrivalEnvelopeMinimumEnd2End(unittest.TestCase):
                                                                           edge_cost_factor=0.1,
                                                                           edge_travel_time_factor=0.1)
         matcher_input = MatcherInput(graph=operational_graph,
-                                     empty_board=self.empty_drone_delivery_board,
+                                     delivering_drones_board=self.delivering_drones_board,
                                      config=self.matcher_config)
 
         delivery_board = calc_assignment(matcher_input=matcher_input)

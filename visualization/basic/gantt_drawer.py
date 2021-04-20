@@ -17,6 +17,15 @@ class GanttDrawer(ABC):
         raise NotImplementedError
 
     @abstractmethod
+    def set_row_color(self, row_number: int, row_color: Color, alpha: float) -> None:
+        raise NotImplementedError
+
+    @abstractmethod
+    def add_legend(self, new_labels: [str] = None, new_label_colors: [Color] = None, alpha: float = None,
+                   fontsize: int = 10, title: str = None) -> None:
+        raise NotImplementedError
+
+    @abstractmethod
     def get_num_rows(self):
         raise NotImplementedError
 

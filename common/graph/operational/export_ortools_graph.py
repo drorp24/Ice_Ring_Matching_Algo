@@ -1,13 +1,13 @@
 import sys
 from functools import lru_cache
-from typing import Tuple, List
+from typing import Tuple, List, Union
 import numpy as np
 
 from common.entities.base_entities.delivery_request import DeliveryRequest
 from common.entities.base_entities.drone_loading_dock import DroneLoadingDock
 from common.entities.base_entities.package import PackageType
 from common.entities.base_entities.temporal import DateTimeExtension
-from common.graph.operational.export_graph import GraphExporter, OperationalGraph
+from common.graph.operational.export_graph import GraphExporter, OperationalGraph, OperationalNode
 
 
 class OrtoolsGraphExporter(GraphExporter):
@@ -62,6 +62,14 @@ class OrtoolsGraphExporter(GraphExporter):
         if not isinstance(node, DroneLoadingDock):
             raise TypeError(f"The given index {index} is not of a drone loading dock node.")
         return node
+
+    @staticmethod
+    def get_node_graph_index(graph: OperationalGraph, node: Union[DroneLoadingDock, DeliveryRequest]) -> int:
+        try:
+            index = graph.get_node_index(OperationalNode(node))
+        except ValueError:
+            raise TypeError(f"Node not found: {node}")
+        return index
 
     @lru_cache()
     def export_package_type_demands(self, graph: OperationalGraph, package_type: PackageType) -> List[int]:
