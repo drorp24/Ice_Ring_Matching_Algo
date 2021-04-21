@@ -11,6 +11,7 @@ from matching.ortools.ortools_index_manager_wrapper import OrToolsIndexManagerWr
 from matching.ortools.ortools_matcher_constraints import ORToolsMatcherConstraints
 from matching.ortools.ortools_matcher_monitor import ORToolsMatcherMonitor
 from matching.ortools.ortools_matcher_objective import ORToolsMatcherObjective
+from matching.ortools.ortools_priority_evaluator import ORToolsPriorityEvaluator
 from matching.ortools.ortools_solution_handler import ORToolsSolutionHandler
 
 ''' Reloading depo consists of 2 nodes:
@@ -38,6 +39,8 @@ class ORToolsMatcher(Matcher):
         self._search_parameters = self._set_search_params()
         self._solution_handler = ORToolsSolutionHandler(self._graph_exporter, self._index_manager, self._routing_model,
                                                         self._matcher_input, self._arrive_indices, self._depart_indices)
+        self._priority_evaluator = ORToolsPriorityEvaluator(self._index_manager, self.matcher_input,
+                                                            self._reloading_virtual_depos_indices)
         self._set_objective()
         self._set_constraints()
         self._set_monitor()
@@ -81,8 +84,7 @@ class ORToolsMatcher(Matcher):
         return pywrapcp.RoutingModel(self._index_manager.get_internal())
 
     def _set_objective(self):
-        ORToolsMatcherObjective(self._index_manager, self._routing_model, self.matcher_input,
-                                self._reloading_virtual_depos_indices).add_priority()
+        ORToolsMatcherObjective(self._routing_model, self.matcher_input, self._priority_evaluator).add_priority()
 
     def _set_search_params(self) -> RoutingSearchParameters:
 
@@ -114,7 +116,7 @@ class ORToolsMatcher(Matcher):
 
         self.matcher_monitor = ORToolsMatcherMonitor(self._graph_exporter, self._index_manager, self._routing_model,
                                                      self._search_parameters, self.matcher_input,
-                                                     self._solution_handler)
+                                                     self._solution_handler, self._priority_evaluator)
         self.matcher_monitor.add_search_monitor()
 
     def _set_reloading_depos_for_each_formation(self, num_of_reloading_depo_nodes_per_formation):

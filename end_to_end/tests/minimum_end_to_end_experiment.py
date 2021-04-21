@@ -127,7 +127,7 @@ class BasicMinimumEnd2EndExperiment:
         start_time = datetime.now()
 
         supplier_category = self.supplier_category_distribution.choose_rand(random=Random(10),
-                                                                            amount={DeliveryRequest: 50,
+                                                                            amount={DeliveryRequest: 10,
                                                                                     DroneLoadingDock: 1})
         time_overlapping_dependent_graph = create_time_overlapping_dependent_graph_model(supplier_category, edge_cost_factor=25.0,
                                                                    edge_travel_time_factor=25.0)
