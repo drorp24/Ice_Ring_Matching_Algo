@@ -31,9 +31,8 @@ class ORToolsMatcher(Matcher):
                                                         self._matcher_input, self._reloader,
                                                         self._start_depots_graph_indices_of_vehicles,
                                                         self._end_depots_graph_indices_of_vehicles)
-                                                        self._matcher_input, self._arrive_indices, self._depart_indices)
         self._priority_evaluator = ORToolsPriorityEvaluator(self._index_manager, self.matcher_input,
-                                                            self._reloading_virtual_depos_indices)
+                                                            self._reloader)
         self._set_objective()
         self._set_constraints()
         self._set_monitor()
@@ -80,8 +79,7 @@ class ORToolsMatcher(Matcher):
         return pywrapcp.RoutingModel(self._index_manager.get_internal())
 
     def _set_objective(self):
-        objective = ORToolsMatcherObjective(self._index_manager, self._routing_model, self.matcher_input,
-                                            self._reloader, self._priority_evaluator)
+        objective = ORToolsMatcherObjective(self._routing_model, self.matcher_input, self._priority_evaluator)
         objective.add_priority()
 
     def _set_search_params(self) -> RoutingSearchParameters:

@@ -53,25 +53,21 @@ class ORToolsMatcherMonitorTestCase(TestCase):
         cls.loading_dock = cls._create_loading_dock()
         cls.graph_without_reloading = cls._create_graph(cls.delivery_requests_without_reloading, cls.loading_dock)
         cls.graph_with_reloading = cls._create_graph(cls.delivery_requests_with_reloading, cls.loading_dock)
-        cls.empty_board_without_reloading = cls._create_empty_board_without_reloading()
-        cls.empty_board_with_reloading = cls._create_empty_board_with_reloading()
+        cls.delivering_drones_board_without_reloading = cls._create_delivering_drones_board_without_reloading(cls.loading_dock)
+        cls.delivering_drones_board_with_reloading = cls._create_delivering_drones_board_with_reloading(cls.loading_dock)
         expected_drone_deliveries = cls._create_drone_deliveries(delivery_requests=cls.delivery_requests_without_reloading,
-                                                                 empty_board=cls.empty_board_without_reloading,
+                                                                 delivering_drones_board=cls.delivering_drones_board_without_reloading,
                                                                  loading_dock=cls.loading_dock)
         unmatched_delivery_request = UnmatchedDeliveryRequest(graph_index=2,
                                                               delivery_request=cls.delivery_requests_without_reloading[1])
         cls.expected_matched_board = DroneDeliveryBoard(
             drone_deliveries=expected_drone_deliveries,
             unmatched_delivery_requests=[unmatched_delivery_request])
-        cls.graph = cls._create_graph(cls.delivery_requests, cls.loading_dock)
-        cls.delivering_drones_board = cls._create_delivering_drones_board(cls.loading_dock)
 
     def test_matcher_with_monitor(self):
         num_of_iterations = 100
         config = self._create_match_config_without_reloading(enabled=True, max_iterations=num_of_iterations)
-        match_input = MatcherInput(self.graph_without_reloading, self.empty_board_without_reloading, config)
-        config = self._create_match_config(enabled=True, max_iterations=num_of_iterations)
-        match_input = MatcherInput(self.graph, self.delivering_drones_board, config)
+        match_input = MatcherInput(self.graph_without_reloading, self.delivering_drones_board_without_reloading, config)
         matcher = ORToolsMatcher(match_input)
         actual_delivery_board = matcher.match()
 
@@ -82,7 +78,7 @@ class ORToolsMatcherMonitorTestCase(TestCase):
     def test_matcher_with_monitor_without_iterations_limit(self):
         num_of_iterations = -1
         config = self._create_match_config_without_reloading(enabled=True, max_iterations=num_of_iterations)
-        match_input = MatcherInput(self.graph_without_reloading, self.empty_board_without_reloading, config)
+        match_input = MatcherInput(self.graph_without_reloading, self.delivering_drones_board_without_reloading, config)
         matcher = ORToolsMatcher(match_input)
         actual_delivery_board = matcher.match()
 
@@ -93,7 +89,7 @@ class ORToolsMatcherMonitorTestCase(TestCase):
     def test_matcher_with_monitor_total_priority(self):
         num_of_iterations = -1
         config = self._create_match_config_without_reloading(enabled=True, max_iterations=num_of_iterations)
-        match_input = MatcherInput(self.graph_without_reloading, self.empty_board_without_reloading, config)
+        match_input = MatcherInput(self.graph_without_reloading, self.delivering_drones_board_without_reloading, config)
         matcher = ORToolsMatcher(match_input)
         actual_delivery_board = matcher.match()
 
@@ -113,7 +109,7 @@ class ORToolsMatcherMonitorTestCase(TestCase):
     def test_matcher_with_monitor_unmatched_delivery_requests(self):
         num_of_iterations = -1
         config = self._create_match_config_without_reloading(enabled=True, max_iterations=num_of_iterations)
-        match_input = MatcherInput(self.graph_without_reloading, self.empty_board_without_reloading, config)
+        match_input = MatcherInput(self.graph_without_reloading, self.delivering_drones_board_without_reloading, config)
         matcher = ORToolsMatcher(match_input)
         actual_delivery_board = matcher.match()
 
@@ -130,7 +126,7 @@ class ORToolsMatcherMonitorTestCase(TestCase):
     def test_matcher_with_monitor_unmatched_delivery_requests_total_priority(self):
         num_of_iterations = -1
         config = self._create_match_config_without_reloading(enabled=True, max_iterations=num_of_iterations)
-        match_input = MatcherInput(self.graph_without_reloading, self.empty_board_without_reloading, config)
+        match_input = MatcherInput(self.graph_without_reloading, self.delivering_drones_board_without_reloading, config)
         matcher = ORToolsMatcher(match_input)
         actual_delivery_board = matcher.match()
 
@@ -149,7 +145,7 @@ class ORToolsMatcherMonitorTestCase(TestCase):
     def test_matcher_with_monitor_objective_value(self):
         num_of_iterations = -1
         config = self._create_match_config_without_reloading(enabled=True, max_iterations=num_of_iterations)
-        match_input = MatcherInput(self.graph_without_reloading, self.empty_board_without_reloading, config)
+        match_input = MatcherInput(self.graph_without_reloading, self.delivering_drones_board_without_reloading, config)
         matcher = ORToolsMatcher(match_input)
         actual_delivery_board = matcher.match()
 
@@ -174,7 +170,7 @@ class ORToolsMatcherMonitorTestCase(TestCase):
     def test_matcher_with_monitor_total_priority_with_reloading(self):
         num_of_iterations = -1
         config = self._create_match_config_with_reloading(enabled=True, max_iterations=num_of_iterations)
-        match_input = MatcherInput(self.graph_with_reloading, self.empty_board_with_reloading, config)
+        match_input = MatcherInput(self.graph_with_reloading, self.delivering_drones_board_with_reloading, config)
         matcher = ORToolsMatcher(match_input)
         actual_delivery_board = matcher.match()
 
@@ -187,7 +183,7 @@ class ORToolsMatcherMonitorTestCase(TestCase):
     def test_matcher_with_monitor_unmatched_delivery_requests_with_reloading(self):
         num_of_iterations = -1
         config = self._create_match_config_with_reloading(enabled=True, max_iterations=num_of_iterations)
-        match_input = MatcherInput(self.graph_with_reloading, self.empty_board_with_reloading, config)
+        match_input = MatcherInput(self.graph_with_reloading, self.delivering_drones_board_with_reloading, config)
         matcher = ORToolsMatcher(match_input)
         actual_delivery_board = matcher.match()
 
@@ -201,7 +197,7 @@ class ORToolsMatcherMonitorTestCase(TestCase):
     def test_matcher_with_monitor_unmatched_delivery_requests_total_priority_with_reloading(self):
         num_of_iterations = -1
         config = self._create_match_config_with_reloading(enabled=True, max_iterations=num_of_iterations)
-        match_input = MatcherInput(self.graph_with_reloading, self.empty_board_with_reloading, config)
+        match_input = MatcherInput(self.graph_with_reloading, self.delivering_drones_board_with_reloading, config)
         matcher = ORToolsMatcher(match_input)
         actual_delivery_board = matcher.match()
 
@@ -217,7 +213,7 @@ class ORToolsMatcherMonitorTestCase(TestCase):
     def test_matcher_with_monitor_objective_value_with_reloading(self):
         num_of_iterations = -1
         config = self._create_match_config_with_reloading(enabled=True, max_iterations=num_of_iterations)
-        match_input = MatcherInput(self.graph_with_reloading, self.empty_board_with_reloading, config)
+        match_input = MatcherInput(self.graph_with_reloading, self.delivering_drones_board_with_reloading, config)
         matcher = ORToolsMatcher(match_input)
         actual_delivery_board = matcher.match()
 
@@ -257,7 +253,7 @@ class ORToolsMatcherMonitorTestCase(TestCase):
 
     def test_matcher_without_monitor(self):
         config = self._create_match_config_without_reloading(enabled=False, max_iterations=0)
-        match_input = MatcherInput(self.graph_without_reloading, self.empty_board_without_reloading, config)
+        match_input = MatcherInput(self.graph_without_reloading, self.delivering_drones_board_without_reloading, config)
         matcher = ORToolsMatcher(match_input)
         actual_delivery_board = matcher.match()
         self.assertEqual(self.expected_matched_board, actual_delivery_board)
@@ -336,13 +332,7 @@ class ORToolsMatcherMonitorTestCase(TestCase):
         return graph
 
     @staticmethod
-    def _create_empty_board_without_reloading() -> EmptyDroneDeliveryBoard:
-        empty_drone_delivery_1 = EmptyDroneDelivery(EntityID(uuid.uuid4()), DroneFormations.get_drone_formation(
-            DroneFormationType.PAIR, PackageConfigurationOption.LARGE_PACKAGES, DroneType.drone_type_1))
-        return EmptyDroneDeliveryBoard([empty_drone_delivery_1])
-
-    @staticmethod
-    def _create_delivering_drones_board(loading_dock: DroneLoadingDock) -> DeliveringDronesBoard:
+    def _create_delivering_drones_board_without_reloading(loading_dock: DroneLoadingDock) -> DeliveringDronesBoard:
         delivering_drones_1 = DeliveringDrones(
             id_=EntityID(uuid.uuid4()),
             drone_formation=DroneFormations.get_drone_formation(
@@ -352,12 +342,19 @@ class ORToolsMatcherMonitorTestCase(TestCase):
         return DeliveringDronesBoard([delivering_drones_1])
 
     @staticmethod
-    def _create_empty_board_with_reloading() -> EmptyDroneDeliveryBoard:
-        empty_drone_delivery_1 = EmptyDroneDelivery(EntityID(uuid.uuid4()), DroneFormations.get_drone_formation(
-            DroneFormationType.PAIR, PackageConfigurationOption.LARGE_PACKAGES, DroneType.drone_type_1))
-        empty_drone_delivery_2 = EmptyDroneDelivery(EntityID(uuid.uuid4()), DroneFormations.get_drone_formation(
-            DroneFormationType.PAIR, PackageConfigurationOption.LARGE_PACKAGES, DroneType.drone_type_1))
-        return EmptyDroneDeliveryBoard([empty_drone_delivery_1, empty_drone_delivery_2])
+    def _create_delivering_drones_board_with_reloading(loading_dock: DroneLoadingDock) -> DeliveringDronesBoard:
+        delivering_drones_1 = DeliveringDrones(id_=EntityID(uuid.uuid4()),
+                                                  drone_formation=DroneFormations.get_drone_formation(
+            DroneFormationType.PAIR, PackageConfigurationOption.LARGE_PACKAGES, DroneType.drone_type_1),
+                                                  start_loading_dock=loading_dock,
+                                                  end_loading_dock=loading_dock)
+        delivering_drones_2 = DeliveringDrones(id_=EntityID(uuid.uuid4()),
+                                                  drone_formation=DroneFormations.get_drone_formation(
+            DroneFormationType.PAIR, PackageConfigurationOption.LARGE_PACKAGES, DroneType.drone_type_1),
+                                                  start_loading_dock=loading_dock,
+                                                  end_loading_dock=loading_dock)
+        return DeliveringDronesBoard([delivering_drones_1, delivering_drones_2])
+
 
     @staticmethod
     def _create_match_config_without_reloading(enabled: bool, max_iterations: int,
@@ -394,7 +391,8 @@ class ORToolsMatcherMonitorTestCase(TestCase):
                 travel_time_constraints=TravelTimeConstraints(max_waiting_time=0,
                                                               max_route_time=1440,
                                                               count_time_from_zero=False,
-                                                              reloading_time=30),
+                                                              reloading_time=30,
+                                                              important_earliest_coeff=1),
                 session_time_constraints=SessionTimeConstraints(max_session_time=60),
                 priority_constraints=PriorityConstraints(True, priority_cost_coefficient=100)),
             unmatched_penalty=10000,
