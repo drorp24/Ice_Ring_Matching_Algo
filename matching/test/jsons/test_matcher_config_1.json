@@ -32,7 +32,8 @@
         "max_waiting_time": 10,
         "max_route_time": 1440,
         "count_time_from_zero": false,
-        "reloading_time": 0
+        "reloading_time": 0,
+        "important_earliest_coeff": 1
     },
       "session_time": {
         "__class__": "SessionTimeConstraints",

@@ -29,22 +29,13 @@ class PriorityConstraints(JsonableBaseEntity):
 
 
 class TravelTimeConstraints(JsonableBaseEntity):
-    def __init__(self, max_waiting_time: int, max_route_time: int, count_time_from_zero: bool, reloading_time: int):
+    def __init__(self, max_waiting_time: int, max_route_time: int, count_time_from_zero: bool,
+                 reloading_time: int, important_earliest_coeff: int):
         self._max_waiting_time = max_waiting_time
         self._max_route_time = max_route_time
         self._count_time_from_zero = count_time_from_zero
         self._reloading_time = reloading_time
-
-    @classmethod
-    def dict_to_obj(cls, dict_input):
-        assert (dict_input['__class__'] == cls.__name__)
-
-        return TravelTimeConstraints(
-            max_waiting_time=dict_input["max_waiting_time"],
-            max_route_time=dict_input["max_route_time"],
-            count_time_from_zero=dict_input["count_time_from_zero"],
-            reloading_time=dict_input["reloading_time"]
-        )
+        self._important_earliest_coeff = important_earliest_coeff
 
     @property
     def max_waiting_time(self):
@@ -62,11 +53,27 @@ class TravelTimeConstraints(JsonableBaseEntity):
     def reloading_time(self):
         return self._reloading_time
 
+    @property
+    def important_earliest_coeff(self):
+        return self._important_earliest_coeff
+
     def __eq__(self, other):
         return (self.max_waiting_time == other.max_waiting_time) and \
                (self.max_route_time == other.max_route_time) and \
                (self.count_time_from_zero == other.count_time_from_zero) and \
                (self.reloading_time == other.reloading_time)
+
+    @classmethod
+    def dict_to_obj(cls, dict_input):
+        assert (dict_input['__class__'] == cls.__name__)
+
+        return TravelTimeConstraints(
+            max_waiting_time=dict_input["max_waiting_time"],
+            max_route_time=dict_input["max_route_time"],
+            count_time_from_zero=dict_input["count_time_from_zero"],
+            reloading_time=dict_input["reloading_time"],
+            important_earliest_coeff=dict_input["important_earliest_coeff"]
+        )
 
 
 class SessionTimeConstraints(JsonableBaseEntity):

@@ -6,6 +6,7 @@ from common.entities.base_entities.drone import PackageConfiguration, DroneType
 from common.entities.base_entities.drone_formation import DroneFormationType
 from common.entities.base_entities.entity_distribution.delivery_requestion_dataset_builder import \
     build_delivery_request_distribution
+from common.entities.base_entities.entity_distribution.drone_distribution import DroneTypeDistribution
 from common.entities.base_entities.entity_distribution.drone_loading_dock_distribution import \
     DroneLoadingDockDistribution
 from common.entities.base_entities.entity_distribution.drone_loading_station_distribution import \
@@ -14,7 +15,8 @@ from common.entities.base_entities.entity_distribution.package_distribution impo
 from common.entities.base_entities.entity_distribution.priority_distribution import PriorityDistribution
 from common.entities.base_entities.entity_distribution.temporal_distribution import TimeDeltaDistribution, \
     TimeWindowDistribution, DateTimeDistribution
-from common.entities.base_entities.fleet.empty_drone_delivery_board_generation import build_empty_drone_delivery_board
+from common.entities.base_entities.fleet.delivering_drones_board_generation import \
+    generate_delivering_drones_board
 from common.entities.base_entities.fleet.fleet_property_sets import DroneFormationTypePolicy, \
     PackageConfigurationPolicy, DroneSetProperties
 from common.entities.base_entities.package import PackageType
@@ -22,8 +24,8 @@ from common.entities.base_entities.temporal import DateTimeExtension, TimeDeltaE
 from end_to_end.distribution.supplier_category_distribution import SupplierCategoryDistribution
 from end_to_end.minimum_end_to_end import *
 from geometry.distribution.geo_distribution import NormalPointDistribution, UniformPointInBboxDistribution
-from geometry.geo_factory import create_point_2d
 from geometry.geo2d import Point2D
+from geometry.geo_factory import create_point_2d
 from matching.matcher_config import MatcherConfig
 from visualization.basic.drawer2d import Drawer2DCoordinateSys
 from visualization.basic.pltdrawer2d import create_drawer_2d, MapImage
@@ -69,19 +71,22 @@ def create_single_package_distribution():
     return package_distribution
 
 
-def _create_empty_drone_delivery_board(
+def _create_drone_set_properties(
+        loading_dock: DroneLoadingDock,
         drone_formation_policy=DroneFormationTypePolicy({DroneFormationType.PAIR: 1, DroneFormationType.QUAD: 0}),
         package_configurations_policy=PackageConfigurationPolicy({PackageConfiguration.LARGE_X2: 1,
                                                                   PackageConfiguration.MEDIUM_X4: 0,
                                                                   PackageConfiguration.SMALL_X8: 0,
                                                                   PackageConfiguration.TINY_X16: 0}),
-        drone_type: DroneType = DroneType.drone_type_1,
-        amount: int = 30, max_route_time_entire_board: int = 400, velocity_entire_board: float = 10.0):
-    drone_set_properties = DroneSetProperties(drone_type=drone_type,
-                                              package_configuration_policy=package_configurations_policy,
-                                              drone_formation_policy=drone_formation_policy,
-                                              drone_amount=amount)
-    return build_empty_drone_delivery_board(drone_set_properties, max_route_time_entire_board, velocity_entire_board)
+        amount: int = 30):
+    drone_set_properties = DroneSetProperties(
+        drone_type=loading_dock.drone_type,
+        package_configuration_policy=package_configurations_policy,
+        drone_formation_policy=drone_formation_policy,
+        start_loading_dock=loading_dock,
+        end_loading_dock=loading_dock,
+        drone_amount=amount)
+    return drone_set_properties
 
 
 class BasicMinimumEnd2EndExperiment:
@@ -94,9 +99,11 @@ class BasicMinimumEnd2EndExperiment:
                 delivery_requests_distribution=_create_delivery_request_distribution(
                     create_point_2d(35.46, 33.25), 0.2, 0.3, 10, 20),
                 drone_loading_docks_distribution=DroneLoadingDockDistribution(
+                    drone_type_distribution=DroneTypeDistribution({DroneType.drone_type_1: 0.5,
+                                                                   DroneType.drone_type_3: 0.5}),
                     drone_loading_station_distributions=DroneLoadingStationDistribution(
                         drone_station_locations_distribution=UniformPointInBboxDistribution(35.19336,
-                                                                                            35.19336,
+                                                                                            35.59336,
                                                                                             32.6675,
                                                                                             32.6675
                                                                                             )),
@@ -121,23 +128,25 @@ class BasicMinimumEnd2EndExperiment:
 
     def test_small_supplier_category(self):
         start_time = datetime.now()
-        empty_drone_delivery_board = _create_empty_drone_delivery_board(amount=6, max_route_time_entire_board=1440,
-                                                                        velocity_entire_board=10.0)
-        print("--- _create_empty_drone_delivery_board run time: %s  ---" % (datetime.now() - start_time))
+        supplier_category = self.supplier_category_distribution.choose_rand(random=Random(10),
+                                                                            amount={DeliveryRequest: 74,
+                                                                                    DroneLoadingDock: 2})
+        delivering_drones_board = self._create_delivering_drones_board(supplier_category)
+        print("--- _create_delivering_drones_board run time: %s  ---" % (datetime.now() - start_time))
         start_time = datetime.now()
 
-        supplier_category = self.supplier_category_distribution.choose_rand(random=Random(10),
-                                                                            amount={DeliveryRequest: 10,
-                                                                                    DroneLoadingDock: 1})
-        time_overlapping_dependent_graph = create_time_overlapping_dependent_graph_model(supplier_category, edge_cost_factor=25.0,
-                                                                   edge_travel_time_factor=25.0)
+        time_overlapping_dependent_graph = create_time_overlapping_dependent_graph_model(
+            supplier_category=supplier_category,
+            edge_cost_factor=25.0,
+            edge_travel_time_factor=25.0)
 
         print("--- create_time_overlapping_dependent_graph_model run time: %s  ---" % (datetime.now() - start_time))
         start_time = datetime.now()
 
         match_config_file_path = Path('end_to_end/tests/jsons/e2e_experiment_config.json')
         match_config = MatcherConfig.dict_to_obj(MatcherConfig.json_to_dict(match_config_file_path))
-        matcher_input = MatcherInput(graph=time_overlapping_dependent_graph, empty_board=empty_drone_delivery_board,
+        matcher_input = MatcherInput(graph=time_overlapping_dependent_graph,
+                                     delivering_drones_board=delivering_drones_board,
                                      config=match_config)
 
         delivery_board = calc_assignment(matcher_input=matcher_input)
@@ -146,11 +155,23 @@ class BasicMinimumEnd2EndExperiment:
         print(delivery_board)
 
         self._draw_matched_scenario(delivery_board, time_overlapping_dependent_graph, supplier_category, self.mapImage,
-                                    aggregate_by_edd=True)
+                                    aggregate_by_delivering_drones=True)
+
+    @staticmethod
+    def _create_delivering_drones_board(supplier_category):
+        drone_set_properties_1 = _create_drone_set_properties(
+            loading_dock=supplier_category.drone_loading_docks[0], amount=6)
+        drone_set_properties_2 = _create_drone_set_properties(
+            loading_dock=supplier_category.drone_loading_docks[1], amount=6)
+        delivering_drones_board = generate_delivering_drones_board(
+            [drone_set_properties_1, drone_set_properties_2],
+            max_route_time_entire_board=1440,
+            velocity_entire_board=10.0)
+        return delivering_drones_board
 
     @staticmethod
     def _draw_matched_scenario(delivery_board, graph, supplier_category, map_image,
-                               aggregate_by_edd: bool = True):
+                               aggregate_by_delivering_drones: bool = True):
         dr_drawer = create_drawer_2d(Drawer2DCoordinateSys.GEOGRAPHIC, map_image)
         operational_drawer2d.add_operational_graph(dr_drawer, graph, draw_internal=True,
                                                    draw_edges=False)
@@ -158,24 +179,27 @@ class BasicMinimumEnd2EndExperiment:
         board_map_drawer = create_drawer_2d(Drawer2DCoordinateSys.GEOGRAPHIC, map_image)
         operational_drawer2d.add_delivery_board(board_map_drawer, delivery_board, draw_unmatched=True)
         board_map_drawer.draw(False)
-        if aggregate_by_edd:
-            formations = set((delivery.id, delivery.drone_formation) for delivery in delivery_board.drone_deliveries)
+        if aggregate_by_delivering_drones:
+            delivering_drones_list = set(delivery.delivering_drones
+                                         for delivery in delivery_board.drone_deliveries)
             row_names = ["Unmatched Out"] + \
-                        [str(formation[0])[-7:-2] + " [" + str(formation[1].drone_formation_type.name) + "] * " +
-                         str(formation[1].drone_package_configuration.package_type_map)
-                         for formation in formations]
+                        [str(delivering_drones.id)[-7:-2] + " [" + str(
+                            delivering_drones.drone_formation.drone_formation_type.name) + "] * " +
+                         str(delivering_drones.drone_formation.drone_package_configuration.package_type_map)
+                         for delivering_drones in delivering_drones_list]
         else:
             row_names = ["Unmatched Out"] + \
-                        ["[" + str(delivery.drone_formation.drone_formation_type.name) + "] * " +
-                         str(delivery.drone_formation.drone_package_configuration.package_type_map)
+                        ["[" + str(delivery.delivering_drones.drone_formation.drone_formation_type.name) + "] * " +
+                         str(delivery.delivering_drones.drone_formation.drone_package_configuration.package_type_map)
                          for delivery in delivery_board.drone_deliveries]
         board_gantt_drawer = create_gantt_drawer(zero_time=supplier_category.zero_time,
                                                  hours_period=24,
                                                  row_names=row_names,
                                                  rows_title='Formation Type x Package Type Amounts',
-                                                 )
-        if aggregate_by_edd:
-            operational_gantt_drawer.add_delivery_board_with_row_per_edd(board_gantt_drawer, delivery_board, True)
+                                                 alternating_row_color=False)
+        if aggregate_by_delivering_drones:
+            operational_gantt_drawer.add_delivery_board_with_row_per_delivering_drones(board_gantt_drawer,
+                                                                                       delivery_board, True)
         else:
             operational_gantt_drawer.add_delivery_board_with_row_per_drone_delivery(board_gantt_drawer, delivery_board,
                                                                                     True)
