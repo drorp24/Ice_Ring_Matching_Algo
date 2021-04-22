@@ -951,8 +951,8 @@
         "id": {"__class__": "EntityID", "uuid": "8010b7af8df0e2793a2ea41bf6ba81eb","internal_type": "UUID"},
         "location": {
           "__class__": "_ShapelyPoint2D",
-          "x": 35.11,
-          "y": 31.79
+          "x": 94.65514585085286,
+          "y": 47.933356530527135
         }
       },
       "drone_type": {"__enum__": "DroneType.drone_type_1"},

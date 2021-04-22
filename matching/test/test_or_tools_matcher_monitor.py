@@ -384,7 +384,7 @@ class ORToolsMatcherMonitorTestCase(TestCase):
                                             iterations_between_monitoring: int = 1) -> MatcherConfig:
         return MatcherConfig(
             zero_time=ZERO_TIME,
-            solver=ORToolsSolverConfig(SolverVendor.OR_TOOLS, first_solution_strategy="PATH_CHEAPEST_ARC",
+            solver=ORToolsSolverConfig(first_solution_strategy="PATH_CHEAPEST_ARC",
                                        local_search_strategy="GUIDED_LOCAL_SEARCH", timeout_sec=10),
             constraints=ConstraintsConfig(
                 capacity_constraints=CapacityConstraints(count_capacity_from_zero=True, capacity_cost_coefficient=5),

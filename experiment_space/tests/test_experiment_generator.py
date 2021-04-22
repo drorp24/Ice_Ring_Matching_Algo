@@ -23,7 +23,7 @@ class BasicExperimentGeneratorTest(unittest.TestCase):
         default_graph_creation_algorithm = FullyConnectedGraphAlgorithm()
         cls.base_experiment = Experiment(supplier_category=supplier_category,
                                          matcher_config=matcher_config,
-                                         drone_set_properties=drone_set_properties,
+                                         drone_set_properties_list=[drone_set_properties],
                                          graph_creation_algorithm=default_graph_creation_algorithm)
 
     def test_experiment_generator_cartesian_samples_without_changes_maps_back_to_self(self):

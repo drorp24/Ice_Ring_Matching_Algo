@@ -1,5 +1,5 @@
 import unittest
-from datetime import timedelta, date, time
+from datetime import timedelta
 from pathlib import Path
 from random import Random
 
@@ -7,6 +7,7 @@ from ortools.constraint_solver.routing_enums_pb2 import FirstSolutionStrategy
 
 from common.entities.base_entities.drone import DroneType, PackageConfiguration
 from common.entities.base_entities.drone_formation import DroneFormationType
+from common.entities.base_entities.drone_loading_dock import DroneLoadingDock
 from common.entities.base_entities.entity_distribution.delivery_requestion_dataset_builder import \
     build_delivery_request_distribution
 from common.entities.base_entities.entity_distribution.drone_loading_dock_distribution import \
@@ -17,11 +18,10 @@ from common.entities.base_entities.entity_distribution.package_distribution impo
 from common.entities.base_entities.entity_distribution.priority_distribution import PriorityDistribution
 from common.entities.base_entities.entity_distribution.temporal_distribution import TimeDeltaDistribution, \
     TimeWindowDistribution, DateTimeDistribution
-from common.entities.base_entities.fleet.empty_drone_delivery_board_generation import generate_empty_delivery_board
 from common.entities.base_entities.fleet.fleet_property_sets import DroneSetProperties, DroneFormationTypePolicy, \
     PackageConfigurationPolicy, BoardLevelProperties
 from common.entities.base_entities.package import PackageType
-from common.entities.base_entities.temporal import TimeDeltaExtension, DateTimeExtension
+from common.entities.base_entities.temporal import TimeDeltaExtension
 from experiment_space.analyzer.quantitative_analyzers import MatchedDeliveryRequestsAnalyzer, \
     UnmatchedDeliveryRequestsAnalyzer, MatchPercentageDeliveryRequestAnalyzer, TotalWorkTimeAnalyzer, \
     AmountMatchedPerPackageTypeAnalyzer, MatchingEfficiencyAnalyzer, MatchingPriorityEfficiencyAnalyzer
@@ -38,7 +38,6 @@ from geometry.geo_factory import create_point_2d
 from matching.matcher_config import MatcherConfig
 from visualization.basic.pltdrawer2d import MapImage
 
-ZERO_TIME = DateTimeExtension(dt_date=date(2021, 1, 1), dt_time=time(0, 0, 0))
 SHOW_VISUALS = True
 
 
@@ -46,16 +45,16 @@ class EndToEndMultipleExperimentRun(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.drone_set_properties_even = EndToEndMultipleExperimentRun._create_even_drone_set_properties()
-        cls.drone_set_properties_heavily_weighted = EndToEndMultipleExperimentRun._create_even_drone_set_properties()
         cls.matcher_config = MatcherConfig.dict_to_obj(
             MatcherConfig.json_to_dict(Path('experiment_space/tests/jsons/test_e2e_experiment_config.json')))
 
-    # @unittest.skip
+    @unittest.skip
     def test_calc_north_scenario_visualization(self):
         sampled_supplier_category = self._create_sampled_supplier_category_north()
         experiment = Experiment(supplier_category=sampled_supplier_category,
-                                drone_set_properties=EndToEndMultipleExperimentRun._create_large_drone_set_properties(
+                                drone_set_properties_list=EndToEndMultipleExperimentRun.
+                                _create_large_drone_set_properties_list(
+                                    loading_docks=sampled_supplier_category.drone_loading_docks,
                                     drone_amount=6),
                                 matcher_config=self.matcher_config,
                                 graph_creation_algorithm=FullyConnectedGraphAlgorithm(edge_cost_factor=25.0,
@@ -69,7 +68,8 @@ class EndToEndMultipleExperimentRun(unittest.TestCase):
     def test_calc_center_scenario_visualization(self):
         sampled_supplier_category = self._create_sampled_supplier_category_center()
         experiment = Experiment(supplier_category=sampled_supplier_category,
-                                drone_set_properties=self.drone_set_properties_even,
+                                drone_set_properties_list=self._create_even_drone_set_properties_list(
+                                    sampled_supplier_category.drone_loading_docks),
                                 matcher_config=self.matcher_config,
                                 graph_creation_algorithm=FullyConnectedGraphAlgorithm())
         map_image = MapImage(map_background_path=Path("visualization/basic/gush_dan_background.png"),
@@ -80,7 +80,8 @@ class EndToEndMultipleExperimentRun(unittest.TestCase):
     def test_calc_center_scenario_with_different_first_solution_strategies(self):
         sampled_supplier_category = self._create_sampled_supplier_category_north()
         base_experiment = Experiment(supplier_category=sampled_supplier_category,
-                                     drone_set_properties=self.drone_set_properties_heavily_weighted,
+                                     drone_set_properties_list=self._create_even_drone_set_properties_list(
+                                         sampled_supplier_category.drone_loading_docks),
                                      matcher_config=self.matcher_config,
                                      graph_creation_algorithm=FullyConnectedGraphAlgorithm())
         experiment_options = create_options_class(base_experiment,
@@ -113,7 +114,8 @@ class EndToEndMultipleExperimentRun(unittest.TestCase):
     def test_calc_center_scenario_with_different_fleet_sizes(self):
         sampled_supplier_category = self._create_sampled_supplier_category_north()
         base_experiment = Experiment(supplier_category=sampled_supplier_category,
-                                     drone_set_properties=self.drone_set_properties_heavily_weighted,
+                                     drone_set_properties_list=self._create_even_drone_set_properties_list(
+                                         sampled_supplier_category.drone_loading_docks),
                                      matcher_config=self.matcher_config,
                                      graph_creation_algorithm=FullyConnectedGraphAlgorithm())
 
@@ -133,7 +135,7 @@ class EndToEndMultipleExperimentRun(unittest.TestCase):
 
         results = Experiment.run_multi_match_analysis_pipeline(experiments, analyzers)
 
-        labeled_experiment_analysis = [(str(res[0].drone_set_properties.drone_amount), res[1])
+        labeled_experiment_analysis = [(str(res[0].drone_set_properties_list.drone_amount), res[1])
                                        for res in results]
 
         draw_labeled_analysis_graph(experiment_analysis=labeled_experiment_analysis,
@@ -143,7 +145,7 @@ class EndToEndMultipleExperimentRun(unittest.TestCase):
                                     ylabel='Match Percentage')
 
     @staticmethod
-    def _run_end_to_end_visual_experiment(experiment: Experiment, show_visuals: bool, map_image: None):
+    def _run_end_to_end_visual_experiment(experiment: Experiment, show_visuals: bool, map_image: MapImage = None):
         graph = experiment.graph_creation_algorithm.create(experiment.supplier_category)
         result_drone_delivery_board = experiment.run_match()
         analyzers_to_run = [MatchedDeliveryRequestsAnalyzer,
@@ -179,34 +181,43 @@ class EndToEndMultipleExperimentRun(unittest.TestCase):
                 drone_loading_station_distributions=DroneLoadingStationDistribution(
                     drone_station_locations_distribution=UniformPointInBboxDistribution(35.11, 35.11, 31.79, 31.79)),
                 time_window_distributions=_create_standard_full_day_test_time())).choose_rand(Random(42), amount={
-            DeliveryRequest: 25})[0]
+                    DeliveryRequest: 25})[0]
 
     @classmethod
-    def _create_even_drone_set_properties(cls):
-        return DroneSetProperties(drone_type=DroneType.drone_type_1,
-                                  drone_formation_policy=DroneFormationTypePolicy(
-                                      {DroneFormationType.PAIR: 0.5, DroneFormationType.QUAD: 0.5}),
-                                  package_configuration_policy=PackageConfigurationPolicy(
-                                      {PackageConfiguration.LARGE_X2: 1.0}),
-                                  drone_amount=30)
+    def _create_even_drone_set_properties_list(cls, loading_docks: [DroneLoadingDock]):
+        return [DroneSetProperties(drone_type=DroneType.drone_type_1,
+                                   drone_formation_policy=DroneFormationTypePolicy(
+                                       {DroneFormationType.PAIR: 0.5, DroneFormationType.QUAD: 0.5}),
+                                   package_configuration_policy=PackageConfigurationPolicy(
+                                       {PackageConfiguration.LARGE_X2: 1.0}),
+                                   start_loading_dock=loading_dock,
+                                   end_loading_dock=loading_dock,
+                                   drone_amount=30)
+                for loading_dock in loading_docks]
 
     @classmethod
-    def _create_uneven_drone_set_properties(cls):
-        return DroneSetProperties(drone_type=DroneType.drone_type_1,
-                                  drone_formation_policy=DroneFormationTypePolicy(
-                                      {DroneFormationType.PAIR: 0.95, DroneFormationType.QUAD: 0.05}),
-                                  package_configuration_policy=PackageConfigurationPolicy(
-                                      {PackageConfiguration.LARGE_X2: 1.0}),
-                                  drone_amount=30)
+    def _create_uneven_drone_set_properties_list(cls, loading_docks: [DroneLoadingDock]):
+        return [DroneSetProperties(drone_type=DroneType.drone_type_1,
+                                   drone_formation_policy=DroneFormationTypePolicy(
+                                       {DroneFormationType.PAIR: 0.95, DroneFormationType.QUAD: 0.05}),
+                                   package_configuration_policy=PackageConfigurationPolicy(
+                                       {PackageConfiguration.LARGE_X2: 1.0}),
+                                   start_loading_dock=loading_dock,
+                                   end_loading_dock=loading_dock,
+                                   drone_amount=30)
+                for loading_dock in loading_docks]
 
     @classmethod
-    def _create_large_drone_set_properties(cls, drone_amount: int):
-        return DroneSetProperties(drone_type=DroneType.drone_type_1,
-                                  drone_formation_policy=DroneFormationTypePolicy(
-                                      {DroneFormationType.PAIR: 1.0, DroneFormationType.QUAD: 0.0}),
-                                  package_configuration_policy=PackageConfigurationPolicy(
-                                      {PackageConfiguration.LARGE_X2: 1.0}),
-                                  drone_amount=drone_amount)
+    def _create_large_drone_set_properties_list(cls, loading_docks: [DroneLoadingDock], drone_amount: int):
+        return [DroneSetProperties(drone_type=DroneType.drone_type_1,
+                                   drone_formation_policy=DroneFormationTypePolicy(
+                                       {DroneFormationType.PAIR: 1.0, DroneFormationType.QUAD: 0.0}),
+                                   package_configuration_policy=PackageConfigurationPolicy(
+                                       {PackageConfiguration.LARGE_X2: 1.0}),
+                                   start_loading_dock=loading_dock,
+                                   end_loading_dock=loading_dock,
+                                   drone_amount=drone_amount)
+                for loading_dock in loading_docks]
 
     @staticmethod
     def _create_custom_drone_loading_dock_distribution(drone_station_location):
@@ -266,25 +277,3 @@ class EndToEndMultipleExperimentRun(unittest.TestCase):
             priority_distribution=PriorityDistribution(list(range(1, lowest_priority))),
             time_window_distribution=time_window_distribution)
         return delivery_request_distribution
-
-    @staticmethod
-    def _create_basic_package_configuration():
-        return PackageConfigurationPolicy({PackageConfiguration.LARGE_X2: 0.9,
-                                           PackageConfiguration.MEDIUM_X4: 0.1,
-                                           PackageConfiguration.SMALL_X8: 0,
-                                           PackageConfiguration.TINY_X16: 0})
-
-    @staticmethod
-    def _create_basic_empty_drone_delivery_board(
-            drone_formation_policy=DroneFormationTypePolicy({DroneFormationType.PAIR: 1, DroneFormationType.QUAD: 0}),
-            package_configurations_policy=None,
-            drone_type: DroneType = DroneType.drone_type_1,
-            amount: int = 30,
-            max_route_time_entire_board: int = 400,
-            velocity_entire_board: float = 10.0):
-        board_level_properties = BoardLevelProperties(max_route_time_entire_board, velocity_entire_board)
-        drone_set_properties = DroneSetProperties(drone_type=drone_type,
-                                                  package_configuration_policy=package_configurations_policy,
-                                                  drone_formation_policy=drone_formation_policy,
-                                                  drone_amount=amount)
-        return generate_empty_delivery_board(drone_set_properties, board_level_properties)

@@ -13,11 +13,10 @@ from common.entities.base_entities.fleet.delivering_drones_board_generation impo
 from common.entities.base_entities.fleet.fleet_configuration_attribution import FleetConfigurationAttribution
 from common.entities.base_entities.fleet.fleet_partition import FleetPartition
 from common.entities.base_entities.fleet.fleet_property_sets import DroneSetProperties, DroneFormationTypePolicy, \
-    PackageConfigurationPolicy
+    PackageConfigurationPolicy, BoardLevelProperties
 from common.entities.base_entities.temporal import TimeWindowExtension, TimeDeltaExtension
 from common.entities.base_entities.tests.test_drone_delivery import ZERO_TIME
 from geometry.geo_factory import create_point_2d
-    PackageConfigurationPolicy, BoardLevelProperties
 
 
 class TestFleetConfigurationAttribution(unittest.TestCase):

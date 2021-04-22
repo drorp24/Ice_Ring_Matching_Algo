@@ -58,10 +58,11 @@ class DeliveringDrones(JsonableBaseEntity):
 
     def __eq__(self, other):
         return all([self.id == other.id,
-                   self.drone_formation == other.drone_formation,
-                   self.start_loading_dock == other.start_loading_dock,
-                   self.end_loading_dock == other.end_loading_dock,
-                   self.board_level_properties == other.board_level_properties
+                    self.drone_formation == other.drone_formation,
+                    self.start_loading_dock == other.start_loading_dock,
+                    self.end_loading_dock == other.end_loading_dock,
+                    self.board_level_properties == other.board_level_properties])
+
     def __hash__(self):
         return hash((
             self.id,
@@ -74,14 +75,15 @@ class DeliveringDrones(JsonableBaseEntity):
     @classmethod
     def dict_to_obj(cls, dict_input):
         assert (dict_input['__class__'] == cls.__name__)
-        return EmptyDroneDelivery(id_=EntityID.dict_to_obj(dict_input['id']),
-                                  drone_formation=DroneFormation.dict_to_obj(dict_input['drone_formation']),
-                                  start_loading_dock=DroneLoadingDock.dict_to_obj(dict_input['start_loading_dock']),
-                                  end_loading_dock=DroneLoadingDock.dict_to_obj(dict_input['end_loading_dock']),
-                                  board_level_properties=BoardLevelProperties.dict_to_obj(
-                                      dict_input['board_level_properties']))
+        return DeliveringDrones(id_=EntityID.dict_to_obj(dict_input['id']),
+                                drone_formation=DroneFormation.dict_to_obj(dict_input['drone_formation']),
+                                start_loading_dock=DroneLoadingDock.dict_to_obj(dict_input['start_loading_dock']),
+                                end_loading_dock=DroneLoadingDock.dict_to_obj(dict_input['end_loading_dock']),
+                                board_level_properties=BoardLevelProperties.dict_to_obj(
+                                    dict_input['board_level_properties']))
 
-               @dataclass
+
+@dataclass
 class MatchedDroneLoadingDock(JsonableBaseEntity):
     drone_loading_dock: DroneLoadingDock
     delivery_time_window: TimeWindowExtension

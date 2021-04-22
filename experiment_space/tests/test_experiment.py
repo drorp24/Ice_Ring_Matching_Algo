@@ -37,7 +37,7 @@ class BasicExperimentTest(unittest.TestCase):
 
         cls.experiment = Experiment(supplier_category=cls.supplier_category,
                                     matcher_config=cls.matcher_config,
-                                    drone_set_properties=cls.drone_set_properties,
+                                    drone_set_properties_list=[cls.drone_set_properties],
                                     graph_creation_algorithm=cls.default_graph_creation_algorithm)
 
     @classmethod

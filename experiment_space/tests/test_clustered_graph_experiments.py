@@ -4,8 +4,6 @@ from datetime import time, date, timedelta, datetime
 from pathlib import Path
 from random import Random
 
-from common.entities.base_entities.drone import PackageConfiguration, DroneType
-from common.entities.base_entities.drone_delivery_board import DroneDeliveryBoard
 from common.entities.base_entities.drone import PackageConfiguration
 from common.entities.base_entities.drone_formation import DroneFormationType
 from common.entities.base_entities.entity_distribution.delivery_requestion_dataset_builder import \
@@ -21,7 +19,6 @@ from common.entities.base_entities.entity_distribution.temporal_distribution imp
 from common.entities.base_entities.entity_distribution.zone_delivery_request_distribution import \
     ZoneDeliveryRequestDistribution
 from common.entities.base_entities.entity_id import EntityID
-from common.entities.base_entities.fleet.delivering_drones_board_generation import build_delivering_drones_board
 from common.entities.base_entities.fleet.fleet_property_sets import DroneFormationTypePolicy, \
     PackageConfigurationPolicy, DroneSetProperties
 from common.entities.base_entities.package import PackageType
@@ -125,9 +122,7 @@ class BasicMinimumEnd2EndClusteredDrsTest(unittest.TestCase):
         if PRINT_LOGS:
             print("--- assert expected values run time: %s  ---" % (datetime.now() - start_time))
 
-        delivery_board = self._run_match(clustered_connected_graph, drone_deliveries_amount,
-                                         supplier_category.drone_loading_docks[0])
-        delivery_board = self._run_match_experiment(graph_algorithm, drone_deliveries_amount, supplier_category.drone_loading_docks[0])
+        delivery_board = self._run_match_experiment(graph_algorithm, drone_deliveries_amount, supplier_category)
         analysis = Experiment.run_analysis_suite(delivery_board, [MatchedDeliveryRequestsAnalyzer])
         self.assertGreater(analysis[MatchedDeliveryRequestsAnalyzer.__name__], 0)
 
@@ -136,11 +131,10 @@ class BasicMinimumEnd2EndClusteredDrsTest(unittest.TestCase):
 
     def _run_match_experiment(self, graph_creation_algorithm, drone_deliveries_amount,
                               supplier_category) -> DroneDeliveryBoard:
-        empty_drone_delivery_board = _create_drone_set_properties(amount=drone_deliveries_amount,
-                                                                  max_route_time_entire_board=45,
-                                                                  velocity_entire_board=10.0)
+        drone_set_properties = _create_drone_set_properties(loading_dock=supplier_category.drone_loading_docks[0],
+                                                            amount=drone_deliveries_amount)
         start_time = datetime.now()
-        delivery_board = Experiment(drone_set_properties=empty_drone_delivery_board,
+        delivery_board = Experiment(drone_set_properties_list=[drone_set_properties],
                                     matcher_config=self.match_config,
                                     graph_creation_algorithm=graph_creation_algorithm,
                                     supplier_category=supplier_category).run_match()
@@ -194,22 +188,21 @@ def _create_uniformly_large_package_distribution():
     return package_distribution
 
 
-def _create_delivering_drones_board(
+def _create_drone_set_properties(
         loading_dock: DroneLoadingDock,
         drone_formation_policy=DroneFormationTypePolicy({DroneFormationType.PAIR: 1, DroneFormationType.QUAD: 0}),
         package_configurations_policy=PackageConfigurationPolicy({PackageConfiguration.LARGE_X2: 0.9,
                                                                   PackageConfiguration.MEDIUM_X4: 0.1,
                                                                   PackageConfiguration.SMALL_X8: 0,
                                                                   PackageConfiguration.TINY_X16: 0}),
-        amount: int = 30, max_route_time_entire_board: int = 400, velocity_entire_board: float = 10.0):
+        amount: int = 30):
     drone_set_properties = DroneSetProperties(drone_type=loading_dock.drone_type,
                                               package_configuration_policy=package_configurations_policy,
                                               drone_formation_policy=drone_formation_policy,
                                               start_loading_dock=loading_dock,
                                               end_loading_dock=loading_dock,
                                               drone_amount=amount)
-    return build_delivering_drones_board(drone_set_properties, max_route_time_entire_board,
-                                            velocity_entire_board)
+    return drone_set_properties
 
 
 def _create_supplier_category_distribution(zone_amount: int = 1, max_centroids_per_polygon: int = 1,

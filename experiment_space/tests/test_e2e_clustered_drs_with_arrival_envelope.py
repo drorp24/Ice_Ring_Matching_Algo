@@ -7,10 +7,9 @@ from random import Random
 from typing import List
 
 from common.entities.base_entities.delivery_request import DeliveryRequest
-from common.entities.base_entities.drone import PackageConfiguration, DroneType
+from common.entities.base_entities.drone import PackageConfiguration
 from common.entities.base_entities.drone_delivery_board import DroneDeliveryBoard
 from common.entities.base_entities.drone_formation import DroneFormationType
-from common.entities.base_entities.drone_loading_station import DroneLoadingStation
 from common.entities.base_entities.drone_loading_dock import DroneLoadingDock
 from common.entities.base_entities.entity_distribution.delivery_requestion_dataset_builder import \
     build_zone_delivery_request_distribution
@@ -26,7 +25,6 @@ from common.entities.base_entities.entity_distribution.zone_delivery_request_dis
     ZoneDeliveryRequestDistribution
 from common.entities.base_entities.entity_id import EntityID
 from common.entities.base_entities.fleet.delivering_drones_board_generation import build_delivering_drones_board
-from common.entities.base_entities.fleet.empty_drone_delivery_board_generation import generate_empty_delivery_board
 from common.entities.base_entities.fleet.fleet_property_sets import DroneFormationTypePolicy, \
     PackageConfigurationPolicy, DroneSetProperties, BoardLevelProperties
 from common.entities.base_entities.package import PackageType
@@ -35,9 +33,6 @@ from common.entities.base_entities.zone import Zone
 from common.graph.operational.graph_utils import sort_delivery_requests_by_zone, split_delivery_requests_into_clusters
 from experiment_space.distribution.supplier_category_distribution import SupplierCategoryDistribution
 from experiment_space.graph_creation_algorithm import ClusteredDeliveryRequestGraphAlgorithm
-from common.entities.base_entities.temporal import DateTimeExtension, TimeDeltaExtension, TimeWindowExtension
-from end_to_end.distribution.supplier_category_distribution import SupplierCategoryDistribution
-from end_to_end.arrival_envelope_minimum_end_to_end import *
 from geometry.distribution.geo_distribution import UniformPointInBboxDistribution, \
     NormalPointsInMultiPolygonDistribution
 from geometry.geo_factory import create_point_2d, create_polygon_2d, create_multipolygon_2d
@@ -107,18 +102,12 @@ class BasicMinimumEnd2EndClusteredDrsTest(unittest.TestCase):
             random=Random(10),
             amount={
                 DeliveryRequest: drs_amount,
-                DroneLoadingDock: docks_amount})
+                DroneLoadingDock: docks_amount})[0]
 
-        clustered_connected_graph = create_clustered_delivery_requests_graph_model(
-            supplier_category=supplier_category,
+        clustered_connected_graph = ClusteredDeliveryRequestGraphAlgorithm(
             edge_cost_factor=0.1,
             edge_travel_time_factor=0.1,
-            max_clusters_per_zone=max_clusters_per_zone)
-                DroneLoadingDock: docks_amount})[0]
-        clustered_connected_graph = ClusteredDeliveryRequestGraphAlgorithm(edge_cost_factor=0.1,
-                                                                           edge_travel_time_factor=0.1,
-                                                                           max_clusters_per_zone=max_clusters_per_zone) \
-            .create(supplier_category)
+            max_clusters_per_zone=max_clusters_per_zone).create(supplier_category)
 
         print("--- clustered_connected_graph run time: %s  ---" % (datetime.now() - start_time))
         start_time = datetime.now()
@@ -142,14 +131,16 @@ class BasicMinimumEnd2EndClusteredDrsTest(unittest.TestCase):
 
         delivery_board = self._run_match(clustered_connected_graph, drone_deliveries_amount,
                                          supplier_category.drone_loading_docks[0])
-        # print(delivery_board)
 
         if draw_match:
-            self._draw_matched_supplier_category(clustered_connected_graph, delivery_board, supplier_category,
-                                                 self.mapImage)
+            self._draw_matched_supplier_category(
+                clustered_connected_graph=clustered_connected_graph,
+                delivery_board=delivery_board,
+                supplier_category=supplier_category,
+                map_image=self.mapImage)
 
     @staticmethod
-    def _draw_matched_supplier_category(self, clustered_connected_graph, delivery_board, supplier_category, map_image):
+    def _draw_matched_supplier_category(clustered_connected_graph, delivery_board, supplier_category, map_image):
         dr_drawer = create_drawer_2d(Drawer2DCoordinateSys.GEOGRAPHIC, map_image)
         operational_drawer2d.add_operational_graph(dr_drawer, clustered_connected_graph, draw_internal=True,
                                                    draw_edges=False)
@@ -172,9 +163,9 @@ class BasicMinimumEnd2EndClusteredDrsTest(unittest.TestCase):
 
     def _run_match(self, clustered_connected_graph, drone_deliveries_amount, loading_dock) -> DroneDeliveryBoard:
         delivering_drones_board = _create_delivering_drones_board(amount=drone_deliveries_amount,
-                                                                        loading_dock=loading_dock,
-                                                                        max_route_time_entire_board=45,
-                                                                        velocity_entire_board=10.0)
+                                                                  loading_dock=loading_dock,
+                                                                  max_route_time_entire_board=45,
+                                                                  velocity_entire_board=10.0)
 
         matcher_input = MatcherInput(graph=clustered_connected_graph, delivering_drones_board=delivering_drones_board,
                                      config=self.match_config)
@@ -251,8 +242,9 @@ def _create_delivering_drones_board(
                                               start_loading_dock=loading_dock,
                                               end_loading_dock=loading_dock,
                                               drone_amount=amount)
-    return build_delivering_drones_board(drone_set_properties, max_route_time_entire_board,
-                                            velocity_entire_board)
+    return build_delivering_drones_board(drone_set_properties,
+                                         BoardLevelProperties(max_route_time_entire_board,
+                                                              velocity_entire_board))
 
 
 def _create_supplier_category_distribution(zone_amount: int = 1, max_centroids_per_polygon: int = 1,

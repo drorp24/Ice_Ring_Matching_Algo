@@ -34,7 +34,8 @@
       "max_waiting_time": 10000,
       "max_route_time": 30000000,
       "count_time_from_zero": false,
-      "reloading_time": 0
+      "reloading_time": 0,
+      "important_earliest_coeff": 1
     },
     "priority": {
       "__class__": "PriorityConstraints",

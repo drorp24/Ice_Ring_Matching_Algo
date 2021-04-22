@@ -23,8 +23,8 @@ class BasicArrivalEnvelopeMinimumEnd2End(unittest.TestCase):
         cls.supplier_category = SupplierCategory.dict_to_obj(SupplierCategory.json_to_dict(
             Path('experiment_space/tests/jsons/test_supplier_category.json')))
         cls.delivering_drones_board = \
-            generate_empty_delivery_board(
-                drone_set_properties=[BasicArrivalEnvelopeMinimumEnd2End._create_simple_drone_set_properties(
+            generate_delivering_drones_board(
+                drone_set_properties_list=[BasicArrivalEnvelopeMinimumEnd2End._create_simple_drone_set_properties(
                     cls.supplier_category.drone_loading_docks[0])],
                 board_level_properties=BoardLevelProperties(max_route_time_entire_board=400,
                                                             velocity_entire_board=10))
