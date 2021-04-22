@@ -19,20 +19,8 @@ class ORToolsSolverConfig(SolverConfig, JsonableBaseEntity):
     # 'GENERIC_TABU_SEARCH']
 
     def __init__(self, first_solution_strategy: str, local_search_strategy: str, timeout_sec: int):
-        super().__init__(SolverVendor.OR_TOOLS, first_solution_strategy, local_search_strategy, timeout_sec)
-        self._timeout_sec = self.validate_timeout_sec(timeout_sec)
-
-    @property
-    def first_solution_strategy(self) -> str:
-        return super().first_solution_strategy
-
-    @property
-    def local_search_strategy(self) -> str:
-        return super().local_search_strategy
-
-    @property
-    def timeout_sec(self) -> int:
-        return super().timeout_sec
+        super().__init__(SolverVendor.OR_TOOLS, first_solution_strategy, local_search_strategy,
+                         self.validate_timeout_sec(timeout_sec))
 
     def get_first_solution_strategy_as_int(self) -> int:
         return FirstSolutionStrategy.DESCRIPTOR.enum_values_by_name.get(
