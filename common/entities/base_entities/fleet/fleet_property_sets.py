@@ -3,6 +3,7 @@ from dataclasses import dataclass
 from common.entities.base_entities.base_entity import JsonableBaseEntity
 from common.entities.base_entities.drone import DroneType, PackageConfiguration
 from common.entities.base_entities.drone_formation import DroneFormationType
+from common.entities.base_entities.drone_loading_dock import DroneLoadingDock
 
 
 @dataclass
@@ -52,6 +53,8 @@ class DroneSetProperties(JsonableBaseEntity):
     drone_type: DroneType
     drone_formation_policy: DroneFormationTypePolicy
     package_configuration_policy: PackageConfigurationPolicy
+    start_loading_dock: DroneLoadingDock
+    end_loading_dock: DroneLoadingDock
     drone_amount: int
 
     @classmethod
@@ -61,6 +64,8 @@ class DroneSetProperties(JsonableBaseEntity):
             drone_formation_policy=DroneFormationTypePolicy.dict_to_obj(dict_input['drone_formation_policy']),
             package_configuration_policy=PackageConfigurationPolicy.dict_to_obj(
                 dict_input['package_configuration_policy']),
+            start_loading_dock=DroneLoadingDock.dict_to_obj(dict_input['start_loading_dock']),
+            end_loading_dock=DroneLoadingDock.dict_to_obj(dict_input['end_loading_dock']),
             drone_amount=dict_input['drone_amount']
         )
 

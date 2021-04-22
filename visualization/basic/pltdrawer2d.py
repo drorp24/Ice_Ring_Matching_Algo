@@ -87,12 +87,15 @@ class PltDrawer2D(Drawer2D):
 
     def draw(self, block=True) -> None:
         self._ax.axis('scaled')
-        self._fig.tight_layout()
+        if self._coordinate_sys is Drawer2DCoordinateSys.CARTESIAN:
+            self._fig.tight_layout()
         self._fig.show()
         plt.show(block=block)
 
     def save_plot_to_png(self, file_name: Path) -> None:
         self._ax.axis('scaled')
+        if self._coordinate_sys is Drawer2DCoordinateSys.CARTESIAN:
+            self._fig.tight_layout()
         plt.savefig(file_name)
 
     def _init_according_to_coordinate_system(self, mapImage: MapImage):
@@ -135,4 +138,4 @@ class PltDrawer2D(Drawer2D):
         else:
             plt.legend(handles=[
                 Patch(label=new_labels[i], color=new_label_colors[i].get_rgb()) for i, label in enumerate(new_labels)],
-                loc="upper left", ncol=3, fontsize=fontsize)
+                      loc="upper left", bbox_to_anchor=(1.01, 1), ncol=3, fontsize=fontsize)

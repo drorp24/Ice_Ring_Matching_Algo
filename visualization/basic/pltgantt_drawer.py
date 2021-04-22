@@ -2,6 +2,7 @@ from datetime import timedelta
 from pathlib import Path
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib.patches import Patch
 from matplotlib.ticker import FixedLocator, NullFormatter, FixedFormatter
 
 from common.entities.base_entities.temporal import DateTimeExtension, TimeWindowExtension, TimeDeltaExtension, \
@@ -16,12 +17,13 @@ BACKGROUND_ALPHA = 0.1
 
 
 def create_gantt_drawer(zero_time: DateTimeExtension, hours_period: int, row_names: [str],
-                        rows_title: str) -> GanttDrawer:
-    return PltGanttDrawer(zero_time, hours_period, row_names, rows_title)
+                        rows_title: str, alternating_row_color: bool = True) -> GanttDrawer:
+    return PltGanttDrawer(zero_time, hours_period, row_names, rows_title, alternating_row_color)
 
 
 class PltGanttDrawer(GanttDrawer):
-    def __init__(self, zero_time: DateTimeExtension, hours_period: int, row_names: [str], rows_title: str):
+    def __init__(self, zero_time: DateTimeExtension, hours_period: int, row_names: [str], rows_title: str,
+                 alternating_row_color: bool = True):
         self._zero_time = zero_time
         self._hours_period = hours_period
         self._fig, self._ax = plt.subplots()
@@ -32,7 +34,8 @@ class PltGanttDrawer(GanttDrawer):
         self._set_plot_limits()
         self._set_xtick_locations_and_labels()
         self._set_ytick_locations_and_labels()
-        self._set_alternating_row_color()
+        if alternating_row_color:
+            self._set_alternating_row_color()
         self._ax.set_xlabel('Hours since ' + self._zero_time.str_format_time())
         self._ax.set_ylabel(rows_title, labelpad=10)
         self._ax.grid(b=True)
@@ -74,6 +77,13 @@ class PltGanttDrawer(GanttDrawer):
                       edgecolor=edgecolor.get_rgb(),
                       linewidth=2)
 
+    def add_legend(self, new_labels: [str] = None, new_label_colors: [Color] = None, alpha: float = None,
+                   fontsize: int = 10, title: str = None) -> None:
+        if new_labels is not None:
+            self._add_legend_with_new_labels(new_labels, new_label_colors, alpha, fontsize, title)
+        else:
+            plt.legend(bbox_to_anchor=(1.01, 1), loc="upper left", ncol=3)
+
     def get_num_rows(self):
         return len(self._row_names)
 
@@ -90,6 +100,16 @@ class PltGanttDrawer(GanttDrawer):
     def save_plot_to_png(self, file_name: Path) -> None:
         self._ax.axis('scaled')
         plt.savefig(file_name)
+
+    @staticmethod
+    def _add_legend_with_new_labels(new_labels: [str], new_label_colors: [Color], alpha: float, fontsize: int,
+                                    title: str = None):
+        if len(new_labels) != len(new_label_colors):
+            raise ValueError('new_labels count must match new_label_colors count')
+        else:
+            plt.legend(handles=[Patch(label=new_labels[i], color=new_label_colors[i].get_rgb_with_alpha(alpha))
+                                for i, label in enumerate(new_labels)],
+                       loc="lower left", bbox_to_anchor=(0.0, 1.01), ncol=3, fontsize=fontsize, title=title)
 
     def _set_plot_limits(self):
         self._ax.set_ylim(0, len(self._row_names) * self._row_y_factor)
@@ -112,10 +132,14 @@ class PltGanttDrawer(GanttDrawer):
             tick.tick2line.set_markersize(0)
 
     def _set_alternating_row_color(self):
+        row_color = Color.Grey
         for i, name in enumerate(self._row_names):
             if i % 2:
-                self._ax.axhspan(i * self._row_y_factor, (i + 1) * self._row_y_factor,
-                                 facecolor=Color.Grey.get_rgb_with_alpha(BACKGROUND_ALPHA / 2))
+                self.set_row_color(i + 1, row_color, BACKGROUND_ALPHA / 2)
+
+    def set_row_color(self, row_number: int, row_color: Color, alpha: float):
+        self._ax.axhspan((row_number - 1) * self._row_y_factor, row_number * self._row_y_factor,
+                         facecolor=row_color.get_rgb_with_alpha(alpha))
 
     def _calc_y(self, row: int, inner_row: int, bar_height: float) -> float:
         bar_center = bar_height / 2

@@ -4,41 +4,41 @@ from functools import lru_cache
 from common.entities.base_entities.base_entity import JsonableBaseEntity
 from common.entities.base_entities.delivery_request import DeliveryRequest
 from common.entities.base_entities.drone import PackageTypeAmountMap
-from common.entities.base_entities.drone_delivery import DroneDelivery, EmptyDroneDelivery
+from common.entities.base_entities.drone_delivery import DroneDelivery, DeliveringDrones
 from common.entities.base_entities.package import PackageType
 
 
-class EmptyDroneDeliveryBoard(JsonableBaseEntity):
-    def __init__(self, empty_drone_deliveries: [EmptyDroneDelivery]):
-        self._empty_drone_deliveries = empty_drone_deliveries
+class DeliveringDronesBoard(JsonableBaseEntity):
+    def __init__(self, delivering_drones_list: [DeliveringDrones]):
+        self._delivering_drones_list = delivering_drones_list
 
     @property
-    def empty_drone_deliveries(self) -> [EmptyDroneDelivery]:
-        return self._empty_drone_deliveries
+    def delivering_drones_list(self) -> [DeliveringDrones]:
+        return self._delivering_drones_list
 
     def amount_of_formations(self) -> int:
-        return len(self._empty_drone_deliveries)
+        return len(self._delivering_drones_list)
 
     def get_package_type_amount_per_drone_delivery(self, package_type: PackageType) -> [int]:
         return [drone_delivery.drone_formation.get_package_type_amount(package_type) for drone_delivery in
-                self._empty_drone_deliveries]
+                self._delivering_drones_list]
 
     def package_types(self) -> [PackageType]:
-        return set([edd.drone_formation.get_package_type() for edd in self._empty_drone_deliveries])
+        return set([delivering_drones.drone_formation.get_package_type() for delivering_drones in self._delivering_drones_list])
 
     def max_route_times_in_minutes(self) -> [int]:
-        return [edd.drone_formation.max_route_times_in_minutes() for edd in self._empty_drone_deliveries]
+        return [delivering_drones.drone_formation.max_route_times_in_minutes() for delivering_drones in self._delivering_drones_list]
 
     def __eq__(self, other):
-        return self.empty_drone_deliveries == other.empty_drone_deliveries
+        return self.delivering_drones_list == other.delivering_drones_list
 
     @classmethod
     def dict_to_obj(cls, dict_input):
         assert (dict_input['__class__'] == cls.__name__)
-        return EmptyDroneDeliveryBoard(
-            empty_drone_deliveries=[EmptyDroneDelivery.dict_to_obj(empty_drone_delivery_dict)
-                                    for empty_drone_delivery_dict
-                                    in dict_input['empty_drone_deliveries']])
+        return DeliveringDronesBoard(
+            delivering_drones_list=[DeliveringDrones.dict_to_obj(delivering_drones_dict)
+                                    for delivering_drones_dict
+                                    in dict_input['delivering_drones_list']])
 
 
 @dataclass

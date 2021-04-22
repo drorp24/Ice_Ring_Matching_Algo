@@ -8,6 +8,7 @@ from matching.matcher_input import MatcherInput
 from matching.monitor import Monitor, MonitorData, current_milli_time
 from matching.ortools.ortools_index_manager_wrapper import OrToolsIndexManagerWrapper
 from matching.ortools.ortools_matcher_constraints import OrToolsDimensionDescription
+from matching.ortools.ortools_priority_evaluator import ORToolsPriorityEvaluator
 from matching.ortools.ortools_solution_handler import ORToolsSolutionHandler
 from visualization.basic.line_chart_drawer import LineChartDrawer
 
@@ -15,7 +16,7 @@ from visualization.basic.line_chart_drawer import LineChartDrawer
 class ORToolsMatcherMonitor:
     def __init__(self, graph_exporter: OrtoolsGraphExporter, index_manager: OrToolsIndexManagerWrapper,
                  routing_model: RoutingModel, search_parameters: RoutingSearchParameters, matcher_input: MatcherInput,
-                 solution_handler: ORToolsSolutionHandler):
+                 solution_handler: ORToolsSolutionHandler, priority_evaluator:ORToolsPriorityEvaluator):
 
         self._graph_exporter = graph_exporter
         self._index_manager = index_manager
@@ -29,6 +30,7 @@ class ORToolsMatcherMonitor:
             self._calc_initial_unmatched_delivery_requests()
         self._monitor = Monitor()
         self._priority_dimension = self._routing_model.GetDimensionOrDie('priority')
+        self._priority_evaluator = priority_evaluator
         self._print_status = False
 
     @property
@@ -172,14 +174,10 @@ class ORToolsMatcherMonitor:
                 continue
             if not self.best_solution_collector.Solution(0).Value(self._routing_model.ActiveVar(node_index)):
                 unmatched_delivery_requests += 1
-                unmatched_delivery_requests_total_priority += self._get_priority(node_index)
+                unmatched_delivery_requests_total_priority += self._priority_evaluator.priority_evaluator(node_index)
 
         return unmatched_delivery_requests, unmatched_delivery_requests_total_priority
 
     def _calc_initial_unmatched_delivery_requests(self):
         priorities = self._graph_exporter.export_priorities(self._graph)
         return len(priorities) - 1, sum(priorities)
-
-    def _get_priority(self, from_index):
-        from_node = self._index_manager.index_to_node(from_index)
-        return self._graph_exporter.export_priorities(self._graph)[from_node]
