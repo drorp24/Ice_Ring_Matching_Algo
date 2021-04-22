@@ -1,0 +1,64 @@
+{
+  "__class__": "MatcherConfig",
+  "zero_time": {
+    "__class__": "DateTimeExtension",
+    "date": {
+      "day": 1,
+      "month": 1,
+      "year": 2021
+    },
+    "time": {
+      "hour": 0,
+      "minute": 0,
+      "second": 0
+    }
+  },
+  "solver": {
+    "__class__": "ORToolsSolverConfig",
+    "vendor": {
+      "__enum__": "SolverVendor.OR_TOOLS"
+    },
+    "first_solution_strategy": "path_cheapest_arc",
+    "local_search_strategy": "automatic",
+    "timeout_sec": 60
+  },
+  "constraints": {
+    "__class__": "ConstraintsConfig",
+    "capacity": {
+      "__class__": "CapacityConstraints",
+      "count_capacity_from_zero": true,
+      "capacity_cost_coefficient": 1
+    },
+    "travel_time": {
+      "__class__": "TravelTimeConstraints",
+      "max_waiting_time": 10000,
+      "max_route_time": 30000000,
+      "count_time_from_zero": false,
+      "reloading_time": 0,
+      "important_earliest_coeff": 1
+    },
+    "priority": {
+      "__class__": "PriorityConstraints",
+      "count_priority_from_zero": true,
+      "priority_cost_coefficient": 1
+    },
+    "session_time": {
+      "__class__": "SessionTimeConstraints",
+      "max_session_time": 1000
+    }
+  },
+  "unmatched_penalty": 1000,
+  "reload_per_vehicle": 1,
+  "monitor": {
+    "__class__": "MonitorConfig",
+    "enabled": false,
+    "iterations_between_monitoring": 1000,
+    "max_iterations": 0,
+    "save_plot": true,
+    "show_plot": true,
+    "separate_charts": true,
+    "output_directory" : "outputs"
+  }
+}
+
+

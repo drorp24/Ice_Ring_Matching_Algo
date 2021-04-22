@@ -1,0 +1,108 @@
+{
+  "__class__": "DroneSetProperties",
+  "drone_amount": 10,
+  "drone_formation_policy": {
+    "__class__": "DroneFormationTypePolicy",
+    "policy": {
+      "PAIR": 0.9,
+      "QUAD": 0.1
+    }
+  },
+  "drone_type": {
+    "__enum__": "DroneType.drone_type_1"
+  },
+  "package_configuration_policy": {
+    "__class__": "PackageConfigurationPolicy",
+    "policy": {
+      "LARGE_X2": 1.0
+    }
+  },
+  "start_loading_dock": {
+      "__class__": "DroneLoadingDock",
+      "id": {"__class__": "EntityID", "uuid": "8010b7af8df0e2793a2ea41bf6ba81eb","internal_type": "UUID"},
+      "drone_loading_station": {
+        "__class__": "DroneLoadingStation",
+        "id": {"__class__": "EntityID", "uuid": "8010b7af8df0e2793a2ea41bf6ba81eb","internal_type": "UUID"},
+        "location": {
+          "__class__": "_ShapelyPoint2D",
+          "x": 94.65514585085286,
+          "y": 47.933356530527135
+        }
+      },
+      "drone_type": {"__enum__": "DroneType.drone_type_1"},
+      "priority": 0,
+      "time_window": {
+        "__class__": "TimeWindowExtension",
+        "since": {
+          "__class__": "DateTimeExtension",
+          "date": {
+            "day": 1,
+            "month": 1,
+            "year": 2021
+          },
+          "time": {
+            "hour": 6,
+            "minute": 0,
+            "second": 0
+          }
+        },
+        "until": {
+          "__class__": "DateTimeExtension",
+          "date": {
+            "day": 2,
+            "month": 1,
+            "year": 2021
+          },
+          "time": {
+            "hour": 2,
+            "minute": 59,
+            "second": 0
+          }
+        }
+      }
+    },
+  "end_loading_dock": {
+      "__class__": "DroneLoadingDock",
+      "id": {"__class__": "EntityID", "uuid": "8010b7af8df0e2793a2ea41bf6ba81eb","internal_type": "UUID"},
+      "drone_loading_station": {
+        "__class__": "DroneLoadingStation",
+        "id": {"__class__": "EntityID", "uuid": "8010b7af8df0e2793a2ea41bf6ba81eb","internal_type": "UUID"},
+        "location": {
+          "__class__": "_ShapelyPoint2D",
+          "x": 94.65514585085286,
+          "y": 47.933356530527135
+        }
+      },
+      "drone_type": {"__enum__": "DroneType.drone_type_1"},
+      "priority": 0,
+      "time_window": {
+        "__class__": "TimeWindowExtension",
+        "since": {
+          "__class__": "DateTimeExtension",
+          "date": {
+            "day": 1,
+            "month": 1,
+            "year": 2021
+          },
+          "time": {
+            "hour": 6,
+            "minute": 0,
+            "second": 0
+          }
+        },
+        "until": {
+          "__class__": "DateTimeExtension",
+          "date": {
+            "day": 2,
+            "month": 1,
+            "year": 2021
+          },
+          "time": {
+            "hour": 2,
+            "minute": 59,
+            "second": 0
+          }
+        }
+      }
+    }
+}

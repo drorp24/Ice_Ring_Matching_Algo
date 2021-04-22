@@ -2,6 +2,8 @@ import unittest
 from datetime import time, date, timedelta
 from random import Random
 
+from common.entities.base_entities.delivery_request import DeliveryRequest
+from common.entities.base_entities.drone_loading_dock import DroneLoadingDock
 from common.entities.base_entities.entity_distribution.delivery_request_distribution import DeliveryRequestDistribution
 from common.entities.base_entities.entity_distribution.delivery_requestion_dataset_builder import \
     build_delivery_request_distribution
@@ -15,8 +17,12 @@ from common.entities.base_entities.entity_distribution.temporal_distribution imp
     TimeWindowDistribution, DateTimeDistribution, ExactTimeWindowDistribution
 from common.entities.base_entities.package import PackageType
 from common.entities.base_entities.temporal import DateTimeExtension, TimeDeltaExtension, TimeWindowExtension
-from end_to_end.distribution.supplier_category_distribution import SupplierCategoryDistribution
-from end_to_end.minimum_end_to_end import *
+from common.graph.operational.arrival_envelope_graph_creator import build_package_dependent_connected_graph
+from common.graph.operational.graph_creator import build_package_and_time_dependent_connected_graph
+from common.graph.operational.graph_utils import has_overlapping_time_window
+from common.graph.operational.operational_graph import OperationalGraph
+from experiment_space.distribution.supplier_category_distribution import SupplierCategoryDistribution
+from experiment_space.supplier_category import SupplierCategory
 from geometry.distribution.geo_distribution import UniformPointInBboxDistribution, \
     NormalPointDistribution
 from geometry.geo2d import Point2D
@@ -36,7 +42,7 @@ class BasicDeliveryRequestGraphFilterTest(unittest.TestCase):
             random=Random(10),
             amount={
                 DeliveryRequest: BasicDeliveryRequestGraphFilterTest.drs_amount,
-                DroneLoadingDock: cls.docks_amount})
+                DroneLoadingDock: cls.docks_amount})[0]
 
         cls.package_packages_dependent_graph = cls._create_package_dependent_graph_model(
             cls.supplier_category,

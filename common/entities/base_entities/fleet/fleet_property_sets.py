@@ -68,3 +68,29 @@ class DroneSetProperties(JsonableBaseEntity):
             end_loading_dock=DroneLoadingDock.dict_to_obj(dict_input['end_loading_dock']),
             drone_amount=dict_input['drone_amount']
         )
+
+    def __eq__(self, other):
+        return self.drone_type == other.drone_type \
+               and self.drone_formation_policy == other.drone_formation_policy \
+               and self.package_configuration_policy == other.package_configuration_policy \
+               and self.drone_amount == other.drone_amount
+
+
+@dataclass
+class BoardLevelProperties(JsonableBaseEntity):
+    max_route_time_entire_board: int = 1440
+    velocity_entire_board: float = 10.0
+
+    def __eq__(self, other):
+        return self.max_route_time_entire_board == other.max_route_time_entire_board \
+               and self.velocity_entire_board == other.velocity_entire_board
+
+    def __hash__(self):
+        return hash((self.max_route_time_entire_board, self.velocity_entire_board, ))
+
+    @classmethod
+    def dict_to_obj(cls, dict_input):
+        return BoardLevelProperties(
+            max_route_time_entire_board=dict_input['max_route_time_entire_board'],
+            velocity_entire_board=dict_input['velocity_entire_board']
+        )

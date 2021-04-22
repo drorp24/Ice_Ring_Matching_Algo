@@ -38,7 +38,7 @@ class PackageTypeAmountMap(JsonableBaseEntity):
         return PackageTypeAmountMap({PackageType[package_type_amount[0]]: package_type_amount[1]
                                      for package_type_amount in dict_input['package_type_to_amounts'].items()})
 
-    def add_to_map(self, other_package_types_amounts: PackageTypeAmountMap):
+    def add_packages_to_map(self, other_package_types_amounts: PackageTypeAmountMap):
         other_amounts = other_package_types_amounts.package_type_to_amounts
         for key, val in other_amounts.items():
             if key not in self._package_type_to_amounts.keys():
