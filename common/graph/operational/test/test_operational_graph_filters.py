@@ -36,7 +36,7 @@ class BasicDeliveryRequestGraphFilterTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.docks_amount = 1
-        cls.draw_graph = True
+        cls.draw_graph = False
 
         cls.supplier_category = cls.create_supplier_category_distribution(
             zone_amount=3,
@@ -130,18 +130,18 @@ class BasicDeliveryRequestGraphFilterTest(unittest.TestCase):
         d.draw()
 
     @staticmethod
-    def create_standard_full_day_test_time():
+    def create_standard_full_day_test_time()->TimeWindowDistribution:
         return TimeWindowDistribution(DateTimeDistribution([ZERO_TIME]),
                                       TimeDeltaDistribution([TimeDeltaExtension(timedelta(hours=23, minutes=59))]))
 
     @staticmethod
-    def create_multi_package_distribution():
+    def create_multi_package_distribution()->PackageDistribution:
         package_type_distribution_dict = {PackageType.MEDIUM: 0.3, PackageType.LARGE: 0.7}
         package_distribution = PackageDistribution(package_distribution_dict=package_type_distribution_dict)
         return package_distribution
 
     @staticmethod
-    def create_exact_time_window_distribution():
+    def create_exact_time_window_distribution()->ExactTimeWindowDistribution:
         time_window_1 = TimeWindowExtension(
             since=ZERO_TIME,
             until=ZERO_TIME.add_time_delta(TimeDeltaExtension(timedelta(minutes=30))))
@@ -213,7 +213,7 @@ class BasicDeliveryRequestGraphFilterTest(unittest.TestCase):
     def create_supplier_category_distribution(zone_amount: int = 1, max_centroids_per_polygon: int = 1,
                                               sigma_lon: float = 1,
                                               sigma_lat: float = 1,
-                                              dr_timewindow: int = 3):
+                                              dr_timewindow: int = 3)->SupplierCategoryDistribution:
         return SupplierCategoryDistribution(
             zero_time_distribution=DateTimeDistribution([ZERO_TIME]),
             delivery_requests_distribution=
