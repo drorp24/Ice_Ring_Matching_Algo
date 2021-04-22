@@ -127,7 +127,7 @@ class BasicMinimumEnd2EndClusteredDrsTest(unittest.TestCase):
         self.assertGreater(analysis[MatchedDeliveryRequestsAnalyzer.__name__], 0)
 
         if draw_match:
-            draw_matched_scenario(delivery_board, clustered_graph, supplier_category, self.mapImage)
+            draw_matched_scenario(delivery_board, clustered_graph, supplier_category, self.mapImage, aggregate_by_delivering_drones=False)
 
     def _run_match_experiment(self, graph_creation_algorithm, drone_deliveries_amount,
                               supplier_category) -> DroneDeliveryBoard:

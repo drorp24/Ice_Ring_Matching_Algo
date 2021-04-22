@@ -10,10 +10,10 @@ from visualization.basic.pltgantt_drawer import create_gantt_drawer
 from visualization.operational import operational_drawer2d, operational_gantt_drawer
 
 
-def draw_matched_scenario(delivery_board, graph, supplier_category, map_image):
+def draw_matched_scenario(delivery_board, graph, supplier_category, map_image, aggregate_by_delivering_drones):
     draw_operational_graph_on_map(graph, map_image, should_block=False)
     draw_matches_on_map(delivery_board, map_image, should_block=False)
-    draw_match_gantt(delivery_board, supplier_category, should_block=True)
+    draw_match_gantt(delivery_board, supplier_category, aggregate_by_delivering_drones, should_block=True)
 
 
 def draw_multianalysis_graph(experiment_analysis_results: List[Dict], analyzers: List[Analyzer],
@@ -21,7 +21,7 @@ def draw_multianalysis_graph(experiment_analysis_results: List[Dict], analyzers:
     indexed_results = [(str(i), result) for i, result in enumerate(experiment_analysis_results)]
     xlabel = 'index' if xlabel is None else xlabel
     ylabel = sum([a.__name__ + ' ' for a in analyzers]) if ylabel is None else ylabel
-    title = sum([a.__name__ + ' ' for a in analyzers]) + ' per Experiment' if title is None else title
+    title = str(sum([a.__name__ + ' ' for a in analyzers])) + ' per Experiment' if title is None else title
     draw_labeled_analysis_graph(indexed_results, analyzers, title, xlabel, ylabel, color)
 
 
@@ -58,20 +58,20 @@ def draw_labeled_analysis_bar_chart(labeled_experiment_analysis: List[Tuple[str,
     plt.show()
 
 
-def draw_match_gantt(delivery_board, supplier_category, should_block):
-    num_of_edds = len(set([delivery.id for delivery in delivery_board.drone_deliveries]))
-    aggregate_by_edd = len(delivery_board.drone_deliveries) > num_of_edds
-    if aggregate_by_edd:
-        row_names = _get_row_name_per_empty_drone_delivery(delivery_board)
+def draw_match_gantt(delivery_board, supplier_category, aggregate_by_delivering_drones, should_block):
+    if aggregate_by_delivering_drones:
+        row_names = _get_row_name_per_delivering_drones(delivery_board)
     else:
         row_names = _get_row_name_per_drone_delivery(delivery_board)
 
     board_gantt_drawer = create_gantt_drawer(zero_time=supplier_category.zero_time,
                                              hours_period=24,
                                              row_names=row_names,
-                                             rows_title='Formation Type x Package Type Amounts')
-    if aggregate_by_edd:
-        operational_gantt_drawer.add_delivery_board_with_row_per_edd(board_gantt_drawer, delivery_board, True)
+                                             rows_title='Formation Type x Package Type Amounts',
+                                             alternating_row_color=False)
+    if aggregate_by_delivering_drones:
+        operational_gantt_drawer.add_delivery_board_with_row_per_delivering_drones(board_gantt_drawer,
+                                                                                   delivery_board, True)
     else:
         operational_gantt_drawer.add_delivery_board_with_row_per_drone_delivery(board_gantt_drawer, delivery_board,
                                                                                 draw_unmatched=True)
@@ -111,12 +111,13 @@ def _get_row_name_per_drone_delivery(delivery_board):
             for delivery in delivery_board.drone_deliveries]
 
 
-def _get_row_name_per_empty_drone_delivery(delivery_board):
-    formations = set((delivery.id, delivery.drone_formation) for delivery in delivery_board.drone_deliveries)
+def _get_row_name_per_delivering_drones(delivery_board):
+    delivering_drones_list = set(delivery.delivering_drones for delivery in delivery_board.drone_deliveries)
     return ["Unmatched Out"] + \
-           [_get_short_formation_id(str(formation[0])) + " [" + str(formation[1].drone_formation_type.name) + "] * " +
-            str(formation[1].drone_package_configuration.package_type_map)
-            for formation in formations]
+           [_get_short_formation_id(str(delivering_drones.id))
+            + " [" + str(delivering_drones.drone_formation.drone_formation_type.name) + "] * " +
+            str(delivering_drones.drone_formation.drone_package_configuration.package_type_map)
+            for delivering_drones in delivering_drones_list]
 
 
 def _get_short_formation_id(formation_id: str):

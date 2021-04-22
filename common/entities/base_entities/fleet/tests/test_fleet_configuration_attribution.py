@@ -20,7 +20,7 @@ from geometry.geo_factory import create_point_2d
 
 
 class TestFleetConfigurationAttribution(unittest.TestCase):
-    delivering_drones_board_json_path = Path('common/entities/base_entities/fleet/tests/empty_drone_test_file.json')
+    delivering_drones_board_json_path = Path('common/entities/base_entities/fleet/tests/delivering_drones_test_file.json')
 
     @classmethod
     def setUpClass(cls):

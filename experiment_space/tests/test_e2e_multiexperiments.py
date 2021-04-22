@@ -10,6 +10,7 @@ from common.entities.base_entities.drone_formation import DroneFormationType
 from common.entities.base_entities.drone_loading_dock import DroneLoadingDock
 from common.entities.base_entities.entity_distribution.delivery_requestion_dataset_builder import \
     build_delivery_request_distribution
+from common.entities.base_entities.entity_distribution.drone_distribution import DroneTypeDistribution
 from common.entities.base_entities.entity_distribution.drone_loading_dock_distribution import \
     DroneLoadingDockDistribution
 from common.entities.base_entities.entity_distribution.drone_loading_station_distribution import \
@@ -48,7 +49,7 @@ class EndToEndMultipleExperimentRun(unittest.TestCase):
         cls.matcher_config = MatcherConfig.dict_to_obj(
             MatcherConfig.json_to_dict(Path('experiment_space/tests/jsons/test_e2e_experiment_config.json')))
 
-    @unittest.skip
+    # @unittest.skip
     def test_calc_north_scenario_visualization(self):
         sampled_supplier_category = self._create_sampled_supplier_category_north()
         experiment = Experiment(supplier_category=sampled_supplier_category,
@@ -148,6 +149,7 @@ class EndToEndMultipleExperimentRun(unittest.TestCase):
     def _run_end_to_end_visual_experiment(experiment: Experiment, show_visuals: bool, map_image: MapImage = None):
         graph = experiment.graph_creation_algorithm.create(experiment.supplier_category)
         result_drone_delivery_board = experiment.run_match()
+        print(result_drone_delivery_board)
         analyzers_to_run = [MatchedDeliveryRequestsAnalyzer,
                             UnmatchedDeliveryRequestsAnalyzer,
                             MatchPercentageDeliveryRequestAnalyzer,
@@ -158,7 +160,8 @@ class EndToEndMultipleExperimentRun(unittest.TestCase):
         print(analysis_results)
         if show_visuals:
             draw_matched_scenario(delivery_board=result_drone_delivery_board, graph=graph,
-                                  supplier_category=experiment.supplier_category, map_image=map_image)
+                                  supplier_category=experiment.supplier_category, map_image=map_image,
+                                  aggregate_by_delivering_drones=True)
         return analysis_results
 
     @classmethod
@@ -167,10 +170,16 @@ class EndToEndMultipleExperimentRun(unittest.TestCase):
             zero_time_distribution=DateTimeDistribution([ZERO_TIME]),
             delivery_requests_distribution=cls._create_custom_delivery_request_distribution_north(),
             drone_loading_docks_distribution=DroneLoadingDockDistribution(
+                drone_type_distribution=DroneTypeDistribution({DroneType.drone_type_1: 0.5,
+                                                               DroneType.drone_type_3: 0.5}),
                 drone_loading_station_distributions=DroneLoadingStationDistribution(
-                    drone_station_locations_distribution=UniformPointInBboxDistribution(35.19, 35.19, 32.66, 32.66)),
-                time_window_distributions=_create_standard_full_day_test_time())).choose_rand(Random(42), amount={
-                    DeliveryRequest: 50})[0]
+                    drone_station_locations_distribution=UniformPointInBboxDistribution(35.19336,
+                                                                                        35.59336,
+                                                                                        32.6675,
+                                                                                        32.6675
+                                                                                        )),
+                time_window_distributions=_create_standard_full_day_test_time())).choose_rand(Random(10), amount={
+                    DeliveryRequest: 74, DroneLoadingDock: 2})[0]
 
     @classmethod
     def _create_sampled_supplier_category_center(cls):
@@ -209,7 +218,7 @@ class EndToEndMultipleExperimentRun(unittest.TestCase):
 
     @classmethod
     def _create_large_drone_set_properties_list(cls, loading_docks: [DroneLoadingDock], drone_amount: int):
-        return [DroneSetProperties(drone_type=DroneType.drone_type_1,
+        return [DroneSetProperties(drone_type=loading_dock.drone_type,
                                    drone_formation_policy=DroneFormationTypePolicy(
                                        {DroneFormationType.PAIR: 1.0, DroneFormationType.QUAD: 0.0}),
                                    package_configuration_policy=PackageConfigurationPolicy(
