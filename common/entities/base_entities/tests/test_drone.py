@@ -50,12 +50,12 @@ class BasicDroneConfigurationTypeGenerationTests(unittest.TestCase):
         amounts_1 = PackageTypeAmountMap({PackageType.SMALL: 8, PackageType.LARGE: 3})
         amounts_2 = PackageTypeAmountMap({PackageType.SMALL: 3, PackageType.LARGE: 5})
         expected_output_amount = PackageTypeAmountMap({PackageType.SMALL: 11, PackageType.LARGE: 8})
-        amounts_1.add_to_map(amounts_2)
+        amounts_1.add_packages_to_map(amounts_2)
         self.assertEqual(expected_output_amount, amounts_1)
 
     def test_adding_package_type_amounts_with_non_overlapping_values(self):
         amounts_1 = PackageTypeAmountMap({PackageType.SMALL: 8, PackageType.LARGE: 3})
         amounts_2 = PackageTypeAmountMap({PackageType.LARGE: 5, PackageType.MEDIUM: 22})
         expected_output_amount = PackageTypeAmountMap({PackageType.SMALL: 8, PackageType.LARGE: 8, PackageType.MEDIUM: 22})
-        amounts_1.add_to_map(amounts_2)
+        amounts_1.add_packages_to_map(amounts_2)
         self.assertEqual(expected_output_amount, amounts_1)

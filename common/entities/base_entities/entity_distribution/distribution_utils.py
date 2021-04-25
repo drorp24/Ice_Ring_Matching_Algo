@@ -22,6 +22,11 @@ def choose_rand_by_attrib(internal_sample_dict: Dict[str, Distribution],
     return dict(map(lambda x: (x[0], x[1].choose_rand(random=random, amount=amount)), internal_sample_dict.items()))
 
 
+def choose_rand_from_list_by_attrib(options_dict: Dict[object, List],
+                                    random: Random, amount: int = 1) -> Dict[object, list]:
+    return dict(map(lambda x: (x[0], random.choices(x[1], k=amount)), options_dict.items()))
+
+
 def convert_list_dict_to_individual_dicts(attrib_to_lists: Dict) -> List[Dict[str, object]]:
     keys = list(attrib_to_lists.keys())
     amount_of_vals_per_key = len(attrib_to_lists[keys[0]])

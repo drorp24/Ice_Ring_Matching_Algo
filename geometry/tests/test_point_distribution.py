@@ -108,7 +108,7 @@ class BasicPointTestCase(unittest.TestCase):
         self.assertTrue(all([p in self.polygon1 or self.polygon3 for p in points]))
 
     @staticmethod
-    def _plot_points_distribution(self, points: List[Point2D]):
+    def _plot_points_distribution(points: List[Point2D]):
         x = [p.x for p in points]
         y = [p.y for p in points]
         fig, ax = plt.subplots()

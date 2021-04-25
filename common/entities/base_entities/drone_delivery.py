@@ -7,18 +7,14 @@ from common.entities.base_entities.drone import PackageTypeAmountMap
 from common.entities.base_entities.drone_formation import DroneFormation
 from common.entities.base_entities.drone_loading_dock import DroneLoadingDock
 from common.entities.base_entities.entity_id import EntityID
+from common.entities.base_entities.fleet.fleet_property_sets import BoardLevelProperties
 from common.entities.base_entities.package import PackageType
 from common.entities.base_entities.temporal import TimeWindowExtension
 
-DEFAULT_MAX_ROUTE_TIME_IN_MINUTES = 1440
-DEFAULT_VELOCITY_METER_PER_SEC = 10.0
-
 
 class DeliveringDrones(JsonableBaseEntity):
-    def __init__(self, id_: EntityID, drone_formation: DroneFormation,
-                 start_loading_dock: DroneLoadingDock, end_loading_dock: DroneLoadingDock,
-                 max_route_time_in_minutes: int = DEFAULT_MAX_ROUTE_TIME_IN_MINUTES,
-                 velocity_meter_per_sec: float = DEFAULT_VELOCITY_METER_PER_SEC):
+    def __init__(self, id_: EntityID, drone_formation: DroneFormation, start_loading_dock: DroneLoadingDock,
+                 end_loading_dock: DroneLoadingDock, board_level_properties=BoardLevelProperties()):
         if drone_formation.get_drone_type() != start_loading_dock.drone_type:
             raise TypeError(f"The Drone formation's drone_type {drone_formation.get_drone_type()} "
                             f"is not equal to start_loading_dock's drone_type {start_loading_dock.drone_type}")
@@ -29,8 +25,7 @@ class DeliveringDrones(JsonableBaseEntity):
         self._drone_formation = drone_formation
         self._start_loading_dock = start_loading_dock
         self._end_loading_dock = end_loading_dock
-        self._max_route_time_in_minutes = max_route_time_in_minutes  # TODO: Change to real endurance
-        self._velocity_meter_per_sec = velocity_meter_per_sec  # TODO: Change to real velocity
+        self._board_level_properties = board_level_properties
 
     @property
     def id(self) -> EntityID:
@@ -49,23 +44,24 @@ class DeliveringDrones(JsonableBaseEntity):
         return self._end_loading_dock
 
     @property
-    def max_route_time_in_minutes(self) -> int:
-        return self._max_route_time_in_minutes
+    def board_level_properties(self) -> BoardLevelProperties:
+        return self._board_level_properties
 
-    @property
-    def velocity_meter_per_sec(self) -> float:
-        return self._velocity_meter_per_sec
+    def get_max_route_time_in_minutes(self) -> int:
+        return self._board_level_properties.max_route_time_entire_board
+
+    def get_velocity_meter_per_sec(self) -> float:
+        return self._board_level_properties.velocity_entire_board
 
     def get_formation_max_range_in_meters(self) -> float:
-        return self.velocity_meter_per_sec * self.max_route_time_in_minutes * 60.0
+        return self.get_velocity_meter_per_sec() * self.get_max_route_time_in_minutes() * 60.0
 
     def __eq__(self, other):
         return all([self.id == other.id,
-                   self.drone_formation == other.drone_formation,
-                   self.start_loading_dock == other.start_loading_dock,
-                   self.end_loading_dock == other.end_loading_dock,
-                   self.max_route_time_in_minutes == other.max_route_time_in_minutes,
-                   self.velocity_meter_per_sec == other.velocity_meter_per_sec])
+                    self.drone_formation == other.drone_formation,
+                    self.start_loading_dock == other.start_loading_dock,
+                    self.end_loading_dock == other.end_loading_dock,
+                    self.board_level_properties == other.board_level_properties])
 
     def __hash__(self):
         return hash((
@@ -73,8 +69,7 @@ class DeliveringDrones(JsonableBaseEntity):
             self.drone_formation,
             self.start_loading_dock,
             self.end_loading_dock,
-            self.max_route_time_in_minutes,
-            self.velocity_meter_per_sec
+            self.board_level_properties
         ))
 
     @classmethod
@@ -84,9 +79,8 @@ class DeliveringDrones(JsonableBaseEntity):
                                 drone_formation=DroneFormation.dict_to_obj(dict_input['drone_formation']),
                                 start_loading_dock=DroneLoadingDock.dict_to_obj(dict_input['start_loading_dock']),
                                 end_loading_dock=DroneLoadingDock.dict_to_obj(dict_input['end_loading_dock']),
-                                max_route_time_in_minutes=int(dict_input['max_route_time_in_minutes']),
-                                velocity_meter_per_sec=float(dict_input['velocity_meter_per_sec']),
-                                )
+                                board_level_properties=BoardLevelProperties.dict_to_obj(
+                                    dict_input['board_level_properties']))
 
 
 @dataclass
@@ -178,7 +172,7 @@ class DroneDelivery(JsonableBaseEntity):
             dr = matched_request.delivery_request
             delivery_option_of_interest = dr.delivery_options[matched_request.matched_delivery_option_index]
             delivery_option_package_type_amount = delivery_option_of_interest.get_package_type_amount_map()
-            amount_per_package_type.add_to_map(delivery_option_package_type_amount)
+            amount_per_package_type.add_packages_to_map(delivery_option_package_type_amount)
         return amount_per_package_type
 
     @lru_cache()

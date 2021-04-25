@@ -54,9 +54,17 @@ class ORToolsMatcher(Matcher):
 
     def match(self) -> DroneDeliveryBoard:
         solution = self._routing_model.SolveWithParameters(self._search_parameters)
-        if self._matcher_input.config.monitor.enabled:
-            self.matcher_monitor.handle_monitor_data()
-        return self._solution_handler.create_drone_delivery_board(solution)
+        if ORToolsMatcher.is_solution_valid(solution):
+            if self._matcher_input.config.monitor.enabled:
+                self.matcher_monitor.handle_monitor_data()
+            return self._solution_handler.create_drone_delivery_board(solution)
+        else:
+            return DroneDeliveryBoard([], [UnmatchedDeliveryRequest(i, node.internal_node) for i, node in enumerate(self.matcher_input.graph.nodes) if
+                                           isinstance(node.internal_node, DeliveryRequest)])
+
+    @staticmethod
+    def is_solution_valid(solution):
+        return solution is not None
 
     def match_to_routes(self) -> Routes:
         solution = self._routing_model.SolveWithParameters(self._search_parameters)
@@ -99,7 +107,6 @@ class ORToolsMatcher(Matcher):
     def _set_constraints(self):
         matcher_constraints = ORToolsMatcherConstraints(self._index_manager, self._routing_model, self.matcher_input,
                                                         self._reloader)
-        #  TODO: should be reload depos for every formation type (size and package)
         matcher_constraints.add_demand()
         matcher_constraints.add_travel_cost()
         matcher_constraints.add_travel_time()

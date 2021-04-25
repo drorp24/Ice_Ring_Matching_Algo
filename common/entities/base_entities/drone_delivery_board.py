@@ -82,7 +82,7 @@ class DroneDeliveryBoard(JsonableBaseEntity):
     def get_total_amount_per_package_type(self) -> PackageTypeAmountMap:
         amount_per_package_type = PackageTypeAmountMap({package: 0 for package in PackageType})
         for drone_delivery in self._drone_deliveries:
-            amount_per_package_type.add_to_map(drone_delivery.get_total_package_type_amount_map())
+            amount_per_package_type.add_packages_to_map(drone_delivery.get_total_package_type_amount_map())
         return amount_per_package_type
 
     @lru_cache()

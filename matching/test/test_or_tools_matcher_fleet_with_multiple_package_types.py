@@ -31,7 +31,6 @@ from matching.matcher_input import MatcherInput
 from matching.monitor_config import MonitorConfig
 from matching.ortools.ortools_matcher import ORToolsMatcher
 from matching.ortools.ortools_solver_config import ORToolsSolverConfig
-from matching.solver_config import SolverVendor
 
 ZERO_TIME = DateTimeExtension(dt_date=date(2020, 1, 23), dt_time=time(11, 30, 0))
 
@@ -119,7 +118,7 @@ class ORToolsMatcherFleetWithMultiplePackageType(TestCase):
     def _create_match_config() -> MatcherConfig:
         return MatcherConfig(
             zero_time=ZERO_TIME,
-            solver=ORToolsSolverConfig(SolverVendor.OR_TOOLS, first_solution_strategy="path_cheapest_arc",
+            solver=ORToolsSolverConfig(first_solution_strategy="path_cheapest_arc",
                                        local_search_strategy="automatic", timeout_sec=30),
             constraints=ConstraintsConfig(
                 capacity_constraints=CapacityConstraints(count_capacity_from_zero=True, capacity_cost_coefficient=1),

@@ -66,7 +66,6 @@ class TravelTimeConstraints(JsonableBaseEntity):
     @classmethod
     def dict_to_obj(cls, dict_input):
         assert (dict_input['__class__'] == cls.__name__)
-
         return TravelTimeConstraints(
             max_waiting_time=dict_input["max_waiting_time"],
             max_route_time=dict_input["max_route_time"],
@@ -104,7 +103,6 @@ class CapacityConstraints(JsonableBaseEntity):
     @classmethod
     def dict_to_obj(cls, dict_input):
         assert (dict_input['__class__'] == cls.__name__)
-
         return CapacityConstraints(
             count_capacity_from_zero=dict_input["count_capacity_from_zero"],
             capacity_cost_coefficient=dict_input["capacity_cost_coefficient"]
