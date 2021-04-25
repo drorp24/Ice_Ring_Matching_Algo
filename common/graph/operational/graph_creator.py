@@ -91,19 +91,6 @@ def build_time_overlapping_dependent_connected_graph(graph: OperationalGraph,
         graph.add_operational_edges(edges)
 
 
-def build_package_dependent_connected_graph(graph: OperationalGraph,
-                                            edge_cost_factor: float = 1.0,
-                                            edge_travel_time_factor: float = 1.0,
-                                            delivery_option_index: int = 0):
-    for selected_node_index, selected_node in enumerate(graph.nodes):
-        destinations = filter_nodes_with_at_least_one_identical_package_type(selected_node=selected_node,
-                                                                             optional_nodes=graph.nodes[
-                                                                                            selected_node_index:],
-                                                                             delivery_option_index=delivery_option_index)
-        edges = _create_directed_from_edges(selected_node, destinations, edge_cost_factor, edge_travel_time_factor)
-        graph.add_operational_edges(edges)
-
-
 def build_package_and_time_dependent_connected_graph(graph: OperationalGraph,
                                                      edge_cost_factor: float = 1.0,
                                                      edge_travel_time_factor: float = 1.0,

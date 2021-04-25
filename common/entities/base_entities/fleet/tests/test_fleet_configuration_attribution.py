@@ -13,14 +13,14 @@ from common.entities.base_entities.fleet.delivering_drones_board_generation impo
 from common.entities.base_entities.fleet.fleet_configuration_attribution import FleetConfigurationAttribution
 from common.entities.base_entities.fleet.fleet_partition import FleetPartition
 from common.entities.base_entities.fleet.fleet_property_sets import DroneSetProperties, DroneFormationTypePolicy, \
-    PackageConfigurationPolicy
+    PackageConfigurationPolicy, BoardLevelProperties
 from common.entities.base_entities.temporal import TimeWindowExtension, TimeDeltaExtension
 from common.entities.base_entities.tests.test_drone_delivery import ZERO_TIME
 from geometry.geo_factory import create_point_2d
 
 
 class TestFleetConfigurationAttribution(unittest.TestCase):
-    delivering_drones_board_json_path = Path('common/entities/base_entities/fleet/tests/empty_drone_test_file.json')
+    delivering_drones_board_json_path = Path('common/entities/base_entities/fleet/tests/delivering_drones_test_file.json')
 
     @classmethod
     def setUpClass(cls):
@@ -85,14 +85,14 @@ class TestFleetConfigurationAttribution(unittest.TestCase):
 
     def test_delivering_drones_board(self):
         delivering_drones_board = generate_delivering_drones_board(
-            [self.drone_set_properties_1, self.drone_set_properties_2], 400, 10)
+            [self.drone_set_properties_1, self.drone_set_properties_2], BoardLevelProperties(400, 10))
         self.assertIsInstance(delivering_drones_board, DeliveringDronesBoard)
         self.assertEqual(len(delivering_drones_board.delivering_drones_list), 24)
         self.assertIsInstance(delivering_drones_board.delivering_drones_list[0].drone_formation, DroneFormation)
 
     def test_delivering_drones_board_to_json_and_back_to_delivering_drones_board(self):
         delivering_drones_board = generate_delivering_drones_board(
-            [self.drone_set_properties_1, self.drone_set_properties_2], 400, 10)
+            [self.drone_set_properties_1, self.drone_set_properties_2], BoardLevelProperties(400, 10))
         delivering_drones_board.to_json(self.delivering_drones_board_json_path)
 
         delivering_drones_board_from_json = \

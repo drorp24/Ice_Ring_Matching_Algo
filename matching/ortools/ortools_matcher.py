@@ -12,6 +12,7 @@ from matching.ortools.ortools_matcher_constraints import ORToolsMatcherConstrain
 from matching.ortools.ortools_matcher_monitor import ORToolsMatcherMonitor
 from matching.ortools.ortools_matcher_objective import ORToolsMatcherObjective
 from matching.ortools.ortools_reloader import ORToolsReloader
+from matching.ortools.ortools_priority_evaluator import ORToolsPriorityEvaluator
 from matching.ortools.ortools_solution_handler import ORToolsSolutionHandler
 
 
@@ -30,6 +31,8 @@ class ORToolsMatcher(Matcher):
                                                         self._matcher_input, self._reloader,
                                                         self._start_depots_graph_indices_of_vehicles,
                                                         self._end_depots_graph_indices_of_vehicles)
+        self._priority_evaluator = ORToolsPriorityEvaluator(self._index_manager, self.matcher_input,
+                                                            self._reloader)
         self._set_objective()
         self._set_constraints()
         self._set_monitor()
@@ -51,9 +54,17 @@ class ORToolsMatcher(Matcher):
 
     def match(self) -> DroneDeliveryBoard:
         solution = self._routing_model.SolveWithParameters(self._search_parameters)
-        if self._matcher_input.config.monitor.enabled:
-            self.matcher_monitor.handle_monitor_data()
-        return self._solution_handler.create_drone_delivery_board(solution)
+        if ORToolsMatcher.is_solution_valid(solution):
+            if self._matcher_input.config.monitor.enabled:
+                self.matcher_monitor.handle_monitor_data()
+            return self._solution_handler.create_drone_delivery_board(solution)
+        else:
+            return DroneDeliveryBoard([], [UnmatchedDeliveryRequest(i, node.internal_node) for i, node in enumerate(self.matcher_input.graph.nodes) if
+                                           isinstance(node.internal_node, DeliveryRequest)])
+
+    @staticmethod
+    def is_solution_valid(solution):
+        return solution is not None
 
     def match_to_routes(self) -> Routes:
         solution = self._routing_model.SolveWithParameters(self._search_parameters)
@@ -76,8 +87,7 @@ class ORToolsMatcher(Matcher):
         return pywrapcp.RoutingModel(self._index_manager.get_internal())
 
     def _set_objective(self):
-        objective = ORToolsMatcherObjective(self._index_manager, self._routing_model, self.matcher_input,
-                                            self._reloader)
+        objective = ORToolsMatcherObjective(self._routing_model, self.matcher_input, self._priority_evaluator)
         objective.add_priority()
 
     def _set_search_params(self) -> RoutingSearchParameters:
@@ -97,7 +107,6 @@ class ORToolsMatcher(Matcher):
     def _set_constraints(self):
         matcher_constraints = ORToolsMatcherConstraints(self._index_manager, self._routing_model, self.matcher_input,
                                                         self._reloader)
-        #  TODO: should be reload depos for every formation type (size and package)
         matcher_constraints.add_demand()
         matcher_constraints.add_travel_cost()
         matcher_constraints.add_travel_time()
@@ -111,7 +120,7 @@ class ORToolsMatcher(Matcher):
 
         self.matcher_monitor = ORToolsMatcherMonitor(self._graph_exporter, self._index_manager, self._routing_model,
                                                      self._search_parameters, self.matcher_input,
-                                                     self._solution_handler)
+                                                     self._solution_handler, self._priority_evaluator)
         self.matcher_monitor.add_search_monitor()
 
     def _set_reloading_depos_for_each_formation(self):

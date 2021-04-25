@@ -8,5 +8,4 @@ def create_solver_config(solver_config: Dict) -> SolverConfig:
     solver_vendor = SolverVendor.dict_to_obj(solver_config["vendor"])
     if solver_vendor == SolverVendor.OR_TOOLS:
         return ORToolsSolverConfig.dict_to_obj(solver_config)
-
     raise TypeError(f"Solver vendor do not supported")

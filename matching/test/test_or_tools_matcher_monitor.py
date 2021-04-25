@@ -1,3 +1,4 @@
+import unittest
 import uuid
 from datetime import timedelta, date, time
 from random import Random
@@ -30,6 +31,7 @@ from matching.constraint_config import ConstraintsConfig, PriorityConstraints, C
     SessionTimeConstraints, TravelTimeConstraints
 from matching.matcher_config import MatcherConfig
 from matching.matcher_input import MatcherInput
+from matching.monitor import MonitorData
 from matching.monitor_config import MonitorConfig
 from matching.ortools.ortools_matcher import ORToolsMatcher
 from matching.ortools.ortools_solver_config import ORToolsSolverConfig
@@ -42,67 +44,221 @@ class ORToolsMatcherMonitorTestCase(TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.delivery_requests = cls._create_delivery_requests()
+        cls.delivery_requests_without_reloading = cls._create_delivery_requests_without_reloading()
+        cls.delivery_requests_with_reloading = cls._create_delivery_requests(11)
         cls.loading_dock = cls._create_loading_dock()
-        cls.graph = cls._create_graph(cls.delivery_requests, cls.loading_dock)
-        cls.delivering_drones_board = cls._create_delivering_drones_board(cls.loading_dock)
-
-    def test_matcher_with_monitor(self):
-        num_of_iterations = 100
-        config = self._create_match_config(enabled=True, max_iterations=num_of_iterations)
-        match_input = MatcherInput(self.graph, self.delivering_drones_board, config)
-        matcher = ORToolsMatcher(match_input)
-        actual_delivery_board = matcher.match()
-
-        expected_drone_deliveries = self._create_drone_deliveries(delivery_requests=self.delivery_requests,
-                                                                  delivering_drones_board=self.delivering_drones_board,
-                                                                  loading_dock=self.loading_dock)
-        unmatched_delivery_request = UnmatchedDeliveryRequest(graph_index=2, delivery_request=self.delivery_requests[1])
-        expected_matched_board = DroneDeliveryBoard(
+        cls.graph_without_reloading = cls._create_graph(cls.delivery_requests_without_reloading, cls.loading_dock)
+        cls.graph_with_reloading = cls._create_graph(cls.delivery_requests_with_reloading, cls.loading_dock)
+        cls.delivering_drones_board_without_reloading = cls._create_delivering_drones_board_without_reloading(
+            cls.loading_dock)
+        cls.delivering_drones_board_with_reloading = cls._create_delivering_drones_board_with_reloading(
+            cls.loading_dock)
+        expected_drone_deliveries = cls._create_drone_deliveries(
+            delivery_requests=cls.delivery_requests_without_reloading,
+            delivering_drones_board=cls.delivering_drones_board_without_reloading,
+            loading_dock=cls.loading_dock)
+        unmatched_delivery_request = UnmatchedDeliveryRequest(graph_index=2,
+                                                              delivery_request=cls.delivery_requests_without_reloading[
+                                                                  1])
+        cls.expected_matched_board = DroneDeliveryBoard(
             drone_deliveries=expected_drone_deliveries,
             unmatched_delivery_requests=[unmatched_delivery_request])
 
-        self.assertEqual(expected_matched_board, actual_delivery_board)
+    def test_matcher_with_monitor(self):
+        num_of_iterations = 100
+        config = self._create_match_config_without_reloading(enabled=True, max_iterations=num_of_iterations)
+        match_input = MatcherInput(self.graph_without_reloading, self.delivering_drones_board_without_reloading, config)
+        matcher = ORToolsMatcher(match_input)
+        actual_delivery_board = matcher.match()
+
+        self.assertEqual(self.expected_matched_board, actual_delivery_board)
         self.assertEqual(matcher.matcher_monitor.monitor.num_of_iterations, num_of_iterations)
         self.assertGreater(matcher.matcher_monitor.monitor.best_objective_value, 0)
 
     def test_matcher_with_monitor_without_iterations_limit(self):
         num_of_iterations = -1
-        config = self._create_match_config(enabled=True, max_iterations=num_of_iterations)
-        match_input = MatcherInput(self.graph, self.delivering_drones_board, config)
+        config = self._create_match_config_without_reloading(enabled=True, max_iterations=num_of_iterations)
+        match_input = MatcherInput(self.graph_without_reloading, self.delivering_drones_board_without_reloading, config)
         matcher = ORToolsMatcher(match_input)
         actual_delivery_board = matcher.match()
 
-        expected_drone_deliveries = self._create_drone_deliveries(delivery_requests=self.delivery_requests,
-                                                                  delivering_drones_board=self.delivering_drones_board,
-                                                                  loading_dock=self.loading_dock)
-        unmatched_delivery_request = UnmatchedDeliveryRequest(graph_index=2, delivery_request=self.delivery_requests[1])
-        expected_matched_board = DroneDeliveryBoard(
-            drone_deliveries=expected_drone_deliveries,
-            unmatched_delivery_requests=[unmatched_delivery_request])
-
-        self.assertEqual(expected_matched_board, actual_delivery_board)
+        self.assertEqual(self.expected_matched_board, actual_delivery_board)
         self.assertGreater(matcher.matcher_monitor.monitor.num_of_iterations, 0)
         self.assertGreater(matcher.matcher_monitor.monitor.best_objective_value, 0)
 
-    def test_matcher_without_monitor(self):
-        config = self._create_match_config(enabled=False, max_iterations=0)
-        match_input = MatcherInput(self.graph, self.delivering_drones_board, config)
+    def test_matcher_with_monitor_total_priority(self):
+        num_of_iterations = -1
+        config = self._create_match_config_without_reloading(enabled=True, max_iterations=num_of_iterations)
+        match_input = MatcherInput(self.graph_without_reloading, self.delivering_drones_board_without_reloading, config)
         matcher = ORToolsMatcher(match_input)
         actual_delivery_board = matcher.match()
 
-        expected_drone_deliveries = self._create_drone_deliveries(delivery_requests=self.delivery_requests,
-                                                                  delivering_drones_board=self.delivering_drones_board,
-                                                                  loading_dock=self.loading_dock)
-        unmatched_delivery_request = UnmatchedDeliveryRequest(graph_index=2, delivery_request=self.delivery_requests[1])
-        expected_matched_board = DroneDeliveryBoard(
-            drone_deliveries=expected_drone_deliveries,
-            unmatched_delivery_requests=[unmatched_delivery_request])
+        self.assertEqual(self.expected_matched_board, actual_delivery_board)
+        self.assertGreater(len(matcher.matcher_monitor.monitor.data.values), 0)
 
-        self.assertEqual(expected_matched_board, actual_delivery_board)
+        expected_total_priority = self._get_total_priority(config, self.expected_matched_board)
+
+        last_stored_total_priority = matcher.matcher_monitor.monitor.data[MonitorData.total_priority.name].values[-1]
+
+        self.assertEqual(expected_total_priority, last_stored_total_priority)
+
+    def test_matcher_with_monitor_unmatched_delivery_requests(self):
+        num_of_iterations = -1
+        config = self._create_match_config_without_reloading(enabled=True, max_iterations=num_of_iterations)
+        match_input = MatcherInput(self.graph_without_reloading, self.delivering_drones_board_without_reloading, config)
+        matcher = ORToolsMatcher(match_input)
+        actual_delivery_board = matcher.match()
+
+        self.assertEqual(self.expected_matched_board, actual_delivery_board)
+        self.assertGreater(len(matcher.matcher_monitor.monitor.data.values), 0)
+
+        expected_unmatched_delivery_requests = len(self.expected_matched_board.unmatched_delivery_requests)
+
+        last_stored_unmatched_delivery_requests = \
+            matcher.matcher_monitor.monitor.data[MonitorData.total_unmatched_delivery_requests.name].values[-1]
+
+        self.assertEqual(expected_unmatched_delivery_requests, last_stored_unmatched_delivery_requests)
+
+    def test_matcher_with_monitor_unmatched_delivery_requests_total_priority(self):
+        num_of_iterations = -1
+        config = self._create_match_config_without_reloading(enabled=True, max_iterations=num_of_iterations)
+        match_input = MatcherInput(self.graph_without_reloading, self.delivering_drones_board_without_reloading, config)
+        matcher = ORToolsMatcher(match_input)
+        actual_delivery_board = matcher.match()
+
+        self.assertEqual(self.expected_matched_board, actual_delivery_board)
+        self.assertGreater(len(matcher.matcher_monitor.monitor.data.values), 0)
+
+        expected_unmatched_delivery_requests_total_priority = self._get_unmatched_delivery_requests_total_priority(
+            config, self.expected_matched_board)
+
+        last_stored_unmatched_delivery_requests_total_priority = \
+            matcher.matcher_monitor.monitor.data[MonitorData.unmatched_delivery_requests_total_priority.name].values[-1]
+
+        self.assertEqual(expected_unmatched_delivery_requests_total_priority,
+                         last_stored_unmatched_delivery_requests_total_priority)
+
+    def test_matcher_with_monitor_objective_value(self):
+        num_of_iterations = -1
+        config = self._create_match_config_without_reloading(enabled=True, max_iterations=num_of_iterations)
+        match_input = MatcherInput(self.graph_without_reloading, self.delivering_drones_board_without_reloading, config)
+        matcher = ORToolsMatcher(match_input)
+        actual_delivery_board = matcher.match()
+
+        self.assertEqual(self.expected_matched_board, actual_delivery_board)
+        self.assertGreater(len(matcher.matcher_monitor.monitor.data.values), 0)
+
+        expected_total_priority = self._get_total_priority(config, self.expected_matched_board)
+        expected_unmatched_delivery_requests = len(self.expected_matched_board.unmatched_delivery_requests)
+
+        expected_minimize_delivery_time_of_high_priority = \
+            self._get_minimize_delivery_time_of_high_priority(config,
+                                                              self.expected_matched_board,
+                                                              self.delivery_requests_without_reloading)
+
+        expected_objective = expected_unmatched_delivery_requests * config.unmatched_penalty + \
+            expected_total_priority + expected_minimize_delivery_time_of_high_priority
+
+        last_stored_objective = matcher.matcher_monitor.monitor.data[MonitorData.objective.name].values[-1]
+
+        self.assertEqual(expected_objective, last_stored_objective)
+
+    def test_matcher_with_monitor_total_priority_with_reloading(self):
+        num_of_iterations = -1
+        config = self._create_match_config_with_reloading(enabled=True, max_iterations=num_of_iterations)
+        match_input = MatcherInput(self.graph_with_reloading, self.delivering_drones_board_with_reloading, config)
+        matcher = ORToolsMatcher(match_input)
+        actual_delivery_board = matcher.match()
+
+        expected_total_priority = self._get_total_priority(config, actual_delivery_board)
+
+        last_stored_total_priority = matcher.matcher_monitor.monitor.data[MonitorData.total_priority.name].values[-1]
+
+        self.assertEqual(expected_total_priority, last_stored_total_priority)
+
+    def test_matcher_with_monitor_unmatched_delivery_requests_with_reloading(self):
+        num_of_iterations = -1
+        config = self._create_match_config_with_reloading(enabled=True, max_iterations=num_of_iterations)
+        match_input = MatcherInput(self.graph_with_reloading, self.delivering_drones_board_with_reloading, config)
+        matcher = ORToolsMatcher(match_input)
+        actual_delivery_board = matcher.match()
+
+        expected_unmatched_delivery_requests = len(actual_delivery_board.unmatched_delivery_requests)
+
+        last_stored_unmatched_delivery_requests = \
+            matcher.matcher_monitor.monitor.data[MonitorData.total_unmatched_delivery_requests.name].values[-1]
+
+        self.assertEqual(expected_unmatched_delivery_requests, last_stored_unmatched_delivery_requests)
+
+    def test_matcher_with_monitor_unmatched_delivery_requests_total_priority_with_reloading(self):
+        num_of_iterations = -1
+        config = self._create_match_config_with_reloading(enabled=True, max_iterations=num_of_iterations)
+        match_input = MatcherInput(self.graph_with_reloading, self.delivering_drones_board_with_reloading, config)
+        matcher = ORToolsMatcher(match_input)
+        actual_delivery_board = matcher.match()
+
+        expected_unmatched_delivery_requests_total_priority = self._get_unmatched_delivery_requests_total_priority(
+            config, actual_delivery_board)
+
+        last_stored_unmatched_delivery_requests_total_priority = \
+            matcher.matcher_monitor.monitor.data[MonitorData.unmatched_delivery_requests_total_priority.name].values[-1]
+
+        self.assertEqual(expected_unmatched_delivery_requests_total_priority,
+                         last_stored_unmatched_delivery_requests_total_priority)
+
+    @unittest.skip  #TODO: Need to be fixed - BUG 27682
+    def test_matcher_with_monitor_objective_value_with_reloading(self):
+        num_of_iterations = -1
+        config = self._create_match_config_with_reloading(enabled=True, max_iterations=num_of_iterations)
+        match_input = MatcherInput(self.graph_with_reloading, self.delivering_drones_board_with_reloading, config)
+        matcher = ORToolsMatcher(match_input)
+        actual_delivery_board = matcher.match()
+
+        self.assertGreater(len(matcher.matcher_monitor.monitor.data.values), 0)
+
+        total_priority = self._get_total_priority(config, actual_delivery_board)
+        unmatched_delivery_requests = len(actual_delivery_board.unmatched_delivery_requests)
+
+        minimize_delivery_time_of_high_priority = \
+            self._get_minimize_delivery_time_of_high_priority(config,
+                                                              actual_delivery_board,
+                                                              self.delivery_requests_with_reloading)
+
+        returns_not_empty = config.constraints.capacity.capacity_cost_coefficient * \
+            self._get_num_of_packages_on_return(actual_delivery_board, 4)
+        expected_objective = unmatched_delivery_requests * config.unmatched_penalty + \
+            total_priority + minimize_delivery_time_of_high_priority + returns_not_empty
+
+        last_stored_objective = matcher.matcher_monitor.monitor.data[MonitorData.objective.name].values[-1]
+
+        self.assertEqual(expected_objective, last_stored_objective)
 
     @staticmethod
-    def _create_delivery_requests() -> List[DeliveryRequest]:
+    def _get_minimize_delivery_time_of_high_priority(config, board, delivery_requests):
+        expected_minimize_delivery_time_of_high_priority = 0
+        max_priority = max([dr.priority for dr in delivery_requests])
+        for drone_delivery in board.drone_deliveries:
+            for matched_request in drone_delivery.matched_requests:
+                coefficient = int(max_priority / (matched_request.delivery_request.priority + 1))
+                expected_minimize_delivery_time_of_high_priority += coefficient * \
+                    matched_request.delivery_time_window.since.get_time_delta(
+                                                                        config.zero_time).in_minutes()
+        return expected_minimize_delivery_time_of_high_priority
+
+    @staticmethod
+    def _get_num_of_packages_on_return(board, max_num_of_packages):
+        return sum(
+            [max_num_of_packages - len(drone_delivery.matched_requests) for drone_delivery in board.drone_deliveries])
+
+    def test_matcher_without_monitor(self):
+        config = self._create_match_config_without_reloading(enabled=False, max_iterations=0)
+        match_input = MatcherInput(self.graph_without_reloading, self.delivering_drones_board_without_reloading, config)
+        matcher = ORToolsMatcher(match_input)
+        actual_delivery_board = matcher.match()
+        self.assertEqual(self.expected_matched_board, actual_delivery_board)
+
+    @staticmethod
+    def _create_delivery_requests_without_reloading() -> List[DeliveryRequest]:
         dist = build_delivery_request_distribution(
             relative_pdp_location_distribution=ExactPointLocationDistribution([
                 create_point_2d(0, 5),
@@ -126,6 +282,37 @@ class ORToolsMatcherMonitorTestCase(TestCase):
         return dist.choose_rand(Random(42), amount={DeliveryRequest: 3})
 
     @staticmethod
+    def _create_delivery_requests(num_of_deliveries: int) -> List[DeliveryRequest]:
+        dist = build_delivery_request_distribution(
+            relative_pdp_location_distribution=ExactPointLocationDistribution([
+                create_point_2d(0, 5),
+                create_point_2d(0, 5),
+                create_point_2d(0, 10),
+                create_point_2d(0, 10),
+                create_point_2d(0, 15),
+                create_point_2d(0, 15),
+                create_point_2d(0, 20),
+                create_point_2d(0, 20),
+                create_point_2d(0, -5),
+                create_point_2d(0, -5),
+                create_point_2d(0, -10),
+                create_point_2d(0, -10),
+                create_point_2d(0, -15),
+                create_point_2d(0, -15),
+                create_point_2d(0, -20),
+                create_point_2d(0, -20),
+            ]),
+            time_window_distribution=ExactTimeWindowDistribution(num_of_deliveries * [
+                TimeWindowExtension(
+                    since=ZERO_TIME,
+                    until=ZERO_TIME.add_time_delta(TimeDeltaExtension(timedelta(hours=2)))),
+            ]),
+            package_type_distribution=PackageDistribution({PackageType.LARGE: 1}),
+            priority_distribution=ExactPriorityDistribution(list(range(1, num_of_deliveries + 1)))
+        )
+        return dist.choose_rand(Random(42), amount={DeliveryRequest: num_of_deliveries})
+
+    @staticmethod
     def _create_loading_dock() -> DroneLoadingDock:
         return DroneLoadingDock(EntityID.generate_uuid(),
                                 DroneLoadingStation(EntityID.generate_uuid(), create_point_2d(0, 0)),
@@ -133,7 +320,7 @@ class ORToolsMatcherMonitorTestCase(TestCase):
                                 TimeWindowExtension(
                                     since=ZERO_TIME,
                                     until=ZERO_TIME.add_time_delta(
-                                        TimeDeltaExtension(timedelta(hours=1)))))
+                                        TimeDeltaExtension(timedelta(hours=5)))))
 
     @staticmethod
     def _create_graph(delivery_requests: List[DeliveryRequest], loading_dock: DroneLoadingDock) -> OperationalGraph:
@@ -144,7 +331,7 @@ class ORToolsMatcherMonitorTestCase(TestCase):
         return graph
 
     @staticmethod
-    def _create_delivering_drones_board(loading_dock: DroneLoadingDock) -> DeliveringDronesBoard:
+    def _create_delivering_drones_board_without_reloading(loading_dock: DroneLoadingDock) -> DeliveringDronesBoard:
         delivering_drones_1 = DeliveringDrones(
             id_=EntityID(uuid.uuid4()),
             drone_formation=DroneFormations.get_drone_formation(
@@ -154,11 +341,27 @@ class ORToolsMatcherMonitorTestCase(TestCase):
         return DeliveringDronesBoard([delivering_drones_1])
 
     @staticmethod
-    def _create_match_config(enabled: bool, max_iterations: int,
-                             iterations_between_monitoring: int = 1) -> MatcherConfig:
+    def _create_delivering_drones_board_with_reloading(loading_dock: DroneLoadingDock) -> DeliveringDronesBoard:
+        delivering_drones_1 = DeliveringDrones(id_=EntityID(uuid.uuid4()),
+                                               drone_formation=DroneFormations.get_drone_formation(
+                                                   DroneFormationType.PAIR, PackageConfigurationOption.LARGE_PACKAGES,
+                                                   DroneType.drone_type_1),
+                                               start_loading_dock=loading_dock,
+                                               end_loading_dock=loading_dock)
+        delivering_drones_2 = DeliveringDrones(id_=EntityID(uuid.uuid4()),
+                                               drone_formation=DroneFormations.get_drone_formation(
+                                                   DroneFormationType.PAIR, PackageConfigurationOption.LARGE_PACKAGES,
+                                                   DroneType.drone_type_1),
+                                               start_loading_dock=loading_dock,
+                                               end_loading_dock=loading_dock)
+        return DeliveringDronesBoard([delivering_drones_1, delivering_drones_2])
+
+    @staticmethod
+    def _create_match_config_without_reloading(enabled: bool, max_iterations: int,
+                                               iterations_between_monitoring: int = 1) -> MatcherConfig:
         return MatcherConfig(
             zero_time=ZERO_TIME,
-            solver=ORToolsSolverConfig(SolverVendor.OR_TOOLS, first_solution_strategy="path_cheapest_arc",
+            solver=ORToolsSolverConfig(first_solution_strategy="path_cheapest_arc",
                                        local_search_strategy="automatic", timeout_sec=30),
             constraints=ConstraintsConfig(
                 capacity_constraints=CapacityConstraints(count_capacity_from_zero=True, capacity_cost_coefficient=1),
@@ -173,10 +376,35 @@ class ORToolsMatcherMonitorTestCase(TestCase):
             reload_per_vehicle=0,
             monitor=MonitorConfig(enabled=enabled, iterations_between_monitoring=iterations_between_monitoring,
                                   max_iterations=max_iterations,
-                                  save_plot=False, show_plot=False, output_directory=''))
+                                  save_plot=False, show_plot=False, output_directory='')
+        )
 
     @staticmethod
-    def _create_drone_deliveries(delivery_requests: List[DeliveryRequest], delivering_drones_board: DeliveringDronesBoard,
+    def _create_match_config_with_reloading(enabled: bool, max_iterations: int,
+                                            iterations_between_monitoring: int = 1) -> MatcherConfig:
+        return MatcherConfig(
+            zero_time=ZERO_TIME,
+            solver=ORToolsSolverConfig(first_solution_strategy="PATH_CHEAPEST_ARC",
+                                       local_search_strategy="GUIDED_LOCAL_SEARCH", timeout_sec=10),
+            constraints=ConstraintsConfig(
+                capacity_constraints=CapacityConstraints(count_capacity_from_zero=True, capacity_cost_coefficient=5),
+                travel_time_constraints=TravelTimeConstraints(max_waiting_time=0,
+                                                              max_route_time=1440,
+                                                              count_time_from_zero=False,
+                                                              reloading_time=30,
+                                                              important_earliest_coeff=1),
+                session_time_constraints=SessionTimeConstraints(max_session_time=60),
+                priority_constraints=PriorityConstraints(True, priority_cost_coefficient=100)),
+            unmatched_penalty=10000,
+            reload_per_vehicle=1,
+            monitor=MonitorConfig(enabled=enabled, iterations_between_monitoring=iterations_between_monitoring,
+                                  max_iterations=max_iterations,
+                                  save_plot=False, show_plot=False, output_directory='')
+        )
+
+    @staticmethod
+    def _create_drone_deliveries(delivery_requests: List[DeliveryRequest],
+                                 delivering_drones_board: DeliveringDronesBoard,
                                  loading_dock: DroneLoadingDock) -> List[DroneDelivery]:
         drone_delivery_1 = DroneDelivery(delivering_drones=delivering_drones_board.delivering_drones_list[0],
                                          matched_requests=[MatchedDeliveryRequest(
@@ -212,3 +440,14 @@ class ORToolsMatcherMonitorTestCase(TestCase):
                                                      TimeDeltaExtension(timedelta(minutes=30)))))
                                          )
         return [drone_delivery_1]
+
+    @staticmethod
+    def _get_unmatched_delivery_requests_total_priority(config, board):
+        return config.constraints.priority.priority_cost_coefficient * \
+               sum([unmatched_delivery_request.delivery_request.priority for unmatched_delivery_request in
+                    board.unmatched_delivery_requests])
+
+    @staticmethod
+    def _get_total_priority(config, board):
+        return board.get_total_priority() * \
+               config.constraints.priority.priority_cost_coefficient
