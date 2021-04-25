@@ -2,7 +2,8 @@ from ortools.constraint_solver import pywrapcp
 from ortools.constraint_solver.pywrapcp import RoutingModel
 from ortools.constraint_solver.routing_parameters_pb2 import RoutingSearchParameters
 
-from common.entities.base_entities.drone_delivery_board import DroneDeliveryBoard
+from common.entities.base_entities.delivery_request import DeliveryRequest
+from common.entities.base_entities.drone_delivery_board import DroneDeliveryBoard, UnmatchedDeliveryRequest
 from common.graph.operational.export_ortools_graph import OrtoolsGraphExporter
 from matching.initial_solution import Routes
 from matching.matcher import Matcher
@@ -59,8 +60,11 @@ class ORToolsMatcher(Matcher):
                 self.matcher_monitor.handle_monitor_data()
             return self._solution_handler.create_drone_delivery_board(solution)
         else:
-            return DroneDeliveryBoard([], [UnmatchedDeliveryRequest(i, node.internal_node) for i, node in enumerate(self.matcher_input.graph.nodes) if
-                                           isinstance(node.internal_node, DeliveryRequest)])
+            return DroneDeliveryBoard(
+                drone_deliveries=[],
+                unmatched_delivery_requests=[UnmatchedDeliveryRequest(i, node.internal_node)
+                                             for i, node in enumerate(self.matcher_input.graph.nodes)
+                                             if isinstance(node.internal_node, DeliveryRequest)])
 
     @staticmethod
     def is_solution_valid(solution):
