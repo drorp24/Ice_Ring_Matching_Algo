@@ -1,6 +1,7 @@
 import unittest
 from datetime import time, date, timedelta
 from random import Random
+from typing import List
 
 from common.entities.base_entities.delivery_request import DeliveryRequest
 from common.entities.base_entities.drone_loading_dock import DroneLoadingDock
@@ -20,9 +21,10 @@ from common.entities.base_entities.entity_distribution.zone_delivery_request_dis
 from common.entities.base_entities.entity_id import EntityID
 from common.entities.base_entities.package import PackageType
 from common.entities.base_entities.temporal import DateTimeExtension, TimeDeltaExtension, TimeWindowExtension
-from common.graph.operational.arrival_envelope_graph_creator import build_package_dependent_connected_graph
-from common.graph.operational.graph_creator import build_package_and_time_dependent_connected_graph
-from common.graph.operational.graph_utils import has_overlapping_time_window
+from common.entities.base_entities.zone import Zone
+from common.graph.operational.graph_creator import build_package_time_dependent_connected_graph, \
+    build_package_dependent_connected_graph, create_package_time_zones_dependent_graph_model
+from common.graph.operational.graph_utils import has_overlapping_time_window, sort_delivery_requests_by_zone
 from common.graph.operational.operational_graph import OperationalGraph
 from experiment_space.distribution.supplier_category_distribution import SupplierCategoryDistribution
 from experiment_space.supplier_category import SupplierCategory
