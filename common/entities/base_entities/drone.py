@@ -185,7 +185,7 @@ class DroneTypeToPackageConfigurationOptions:
     @classmethod
     def get_drone_configuration(cls, drone_type: DroneType,
                                 configuration: PackageConfiguration) -> DronePackageConfiguration:
-        return DronePackageConfiguration(drone_type=drone_type, package_type_map=configuration,
+        return DronePackageConfiguration(drone_type=drone_type, package_type_map=configuration.value,
                                          max_session_time=cls.drone_configurations_map[drone_type][configuration])
 
 
@@ -200,6 +200,5 @@ class DroneConfigurations:
     @classmethod
     def get_drone_configuration(cls, drone_type: DroneType,
                                 configuration: PackageConfiguration) -> DronePackageConfiguration:
-        max_session_time = DroneTypeToPackageConfigurationOptions.drone_configurations_map[drone_type][configuration]
-        return DronePackageConfiguration(drone_type=drone_type, package_type_map=configuration.value,
-                                         max_session_time=max_session_time)
+        return DroneTypeToPackageConfigurationOptions.get_drone_configuration(drone_type=drone_type,
+                                                                              configuration=configuration)
