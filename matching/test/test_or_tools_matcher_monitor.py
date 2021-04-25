@@ -376,7 +376,8 @@ class ORToolsMatcherMonitorTestCase(TestCase):
             reload_per_vehicle=0,
             monitor=MonitorConfig(enabled=enabled, iterations_between_monitoring=iterations_between_monitoring,
                                   max_iterations=max_iterations,
-                                  save_plot=False, show_plot=False, output_directory='')
+                                  save_plot=False, show_plot=False, output_directory=''),
+            submatch_time_window_minutes=30
         )
 
     @staticmethod
@@ -399,7 +400,8 @@ class ORToolsMatcherMonitorTestCase(TestCase):
             reload_per_vehicle=1,
             monitor=MonitorConfig(enabled=enabled, iterations_between_monitoring=iterations_between_monitoring,
                                   max_iterations=max_iterations,
-                                  save_plot=False, show_plot=False, output_directory='')
+                                  save_plot=False, show_plot=False, output_directory=''),
+            submatch_time_window_minutes=1440
         )
 
     @staticmethod

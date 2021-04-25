@@ -187,6 +187,12 @@ class OperationalGraph(JsonableBaseEntity):
     def get_node_index(self, node: OperationalNode) -> int:
         return self.nodes.index(node)
 
+    def remove_delivery_requests(self, delivery_requests: [DeliveryRequest]):
+        self.remove_operational_nodes([OperationalNode(dr) for dr in delivery_requests])
+
+    def remove_operational_nodes(self, operational_nodes: [OperationalNode]):
+        self._internal_graph.remove_nodes_from(operational_nodes)
+
     def _zero_nodes_travel_time_to_themselves(self, travel_times: np.ndarray) -> None:
         for i in range(len(self._internal_graph.nodes)):
             travel_times[i, i] = 0

@@ -186,7 +186,8 @@ class ORToolsMatcherDifferentLoadingDockIndexTestCase(TestCase):
                 priority_constraints=PriorityConstraints(True, priority_cost_coefficient=1)),
             unmatched_penalty=10000,
             reload_per_vehicle=0,
-            monitor=MonitorConfig(enabled=False)
+            monitor=MonitorConfig(enabled=False),
+            submatch_time_window_minutes=300
         )
 
     @staticmethod

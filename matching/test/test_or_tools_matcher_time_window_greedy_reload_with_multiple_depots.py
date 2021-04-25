@@ -28,28 +28,38 @@ from matching.constraint_config import ConstraintsConfig, CapacityConstraints, T
     PriorityConstraints, SessionTimeConstraints
 from matching.matcher_config import MatcherConfig
 from matching.matcher_input import MatcherInput
+from matching.matching_master import MatchingMaster
 from matching.monitor_config import MonitorConfig
 from matching.ortools.ortools_matcher import ORToolsMatcher
 from matching.ortools.ortools_solver_config import ORToolsSolverConfig
-from matching.solver_config import SolverVendor
 
 ZERO_TIME = DateTimeExtension(dt_date=date(2020, 1, 23), dt_time=time(11, 30, 0))
 
 
-class ORToolsMatcherDisabledReloadWithMultipleDepotsTestCase(TestCase):
+class ORToolsMatcherTimeWindowGreedyReloadWithMultipleDepotsTestCase(TestCase):
     @classmethod
     def setUpClass(cls):
         cls.delivery_requests = cls._create_delivery_requests()
         cls.loading_docks = cls._create_loading_docks()
         cls.graph = cls._create_graph(cls.delivery_requests, cls.loading_docks)
-        cls.delivering_drones_board = cls._create_delivering_drones_board_with_delivering_drones_with_different_loading_docks(cls.loading_docks)
+        cls.delivering_drones_board = \
+            cls._create_delivering_drones_board_with_delivering_drones_with_different_loading_docks(cls.loading_docks)
         cls.match_input = MatcherInput(cls.graph, cls.delivering_drones_board, cls._create_match_config())
+        cls.tw_match_input = MatcherInput(cls.graph, cls.delivering_drones_board, cls._create_match_config_with_tw())
 
-    def test_matcher_when_delivering_drones_have_different_loading_docks(self):
+    def test_matcher_when_delivering_drones_have_different_loading_docks_then_time_window_greedy_reload_successful(
+            self):
         matcher = ORToolsMatcher(self.match_input)
         actual_delivery_board = matcher.match()
+        tw_matcher = MatchingMaster(self.tw_match_input)
+        tw_actual_delivery_board = tw_matcher.match()
+
         self._assert_all_requests_matched(actual_delivery_board)
         self._assert_drone_deliveries_have_different_loading_docks(actual_delivery_board)
+        self._assert_all_requests_matched(tw_actual_delivery_board)
+        self._assert_drone_deliveries_have_different_loading_docks(tw_actual_delivery_board)
+        self.assertLess(actual_delivery_board.get_total_work_time_in_minutes(),
+                        tw_actual_delivery_board.get_total_work_time_in_minutes())
 
     def _assert_all_requests_matched(self, actual_delivery_board: DroneDeliveryBoard):
         self.assertEqual(len(self.delivery_requests),
@@ -59,7 +69,7 @@ class ORToolsMatcherDisabledReloadWithMultipleDepotsTestCase(TestCase):
     def _assert_drone_deliveries_have_different_loading_docks(self, actual_delivery_board: DroneDeliveryBoard):
         matched_start_loading_docks = [delivery.start_drone_loading_dock.drone_loading_dock for delivery in
                                        actual_delivery_board.drone_deliveries]
-        self.assertNotEqual(matched_start_loading_docks[0], matched_start_loading_docks[1])
+        self.assertNotEqual(len(set(matched_start_loading_docks)), len(matched_start_loading_docks))
 
     @staticmethod
     def _create_delivery_requests() -> List[DeliveryRequest]:
@@ -69,26 +79,31 @@ class ORToolsMatcherDisabledReloadWithMultipleDepotsTestCase(TestCase):
                 create_point_2d(0, 5),
                 create_point_2d(0, 10),
                 create_point_2d(0, 10),
+                create_point_2d(0, 15),
+                create_point_2d(0, 15),
+                create_point_2d(0, 20),
+                create_point_2d(0, 20),
                 create_point_2d(0, -5),
                 create_point_2d(0, -5),
                 create_point_2d(0, -10),
                 create_point_2d(0, -10),
+                create_point_2d(0, -15),
+                create_point_2d(0, -15),
+                create_point_2d(0, -20),
+                create_point_2d(0, -20),
             ]),
-            time_window_distribution=ExactTimeWindowDistribution(8 * [
+            time_window_distribution=ExactTimeWindowDistribution(16 * [
                 TimeWindowExtension(
                     since=ZERO_TIME,
                     until=ZERO_TIME.add_time_delta(TimeDeltaExtension(timedelta(hours=2)))),
             ]),
             package_type_distribution=PackageDistribution({PackageType.LARGE: 1}),
-            priority_distribution=ExactPriorityDistribution(list(range(1, 9)))
+            priority_distribution=ExactPriorityDistribution(list(range(1, 17)))
         )
-        return dist.choose_rand(Random(42), amount={DeliveryRequest: 8})
+        return dist.choose_rand(Random(42), amount={DeliveryRequest: 16})
 
     @staticmethod
     def _create_loading_docks() -> [DroneLoadingDock]:
-        # drone_type_distribution = DroneTypeDistribution({DroneType.drone_type_1: 1})
-        # return DroneLoadingDockDistribution(
-        #     drone_type_distribution=drone_type_distribution).choose_rand(random=Random(42), amount=2)
         dock1 = DroneLoadingDock(EntityID.generate_uuid(),
                                  DroneLoadingStation(EntityID.generate_uuid(), create_point_2d(0, 0)),
                                  DroneType.drone_type_1,
@@ -96,10 +111,9 @@ class ORToolsMatcherDisabledReloadWithMultipleDepotsTestCase(TestCase):
                                      since=ZERO_TIME,
                                      until=ZERO_TIME.add_time_delta(
                                          TimeDeltaExtension(timedelta(hours=5)))))
-
         dock2 = DroneLoadingDock(EntityID.generate_uuid(),
-                                 DroneLoadingStation(EntityID.generate_uuid(), create_point_2d(0, 0)),
-                                 DroneType.drone_type_1,
+                                 DroneLoadingStation(EntityID.generate_uuid(), create_point_2d(0, 10)),
+                                 DroneType.drone_type_3,
                                  TimeWindowExtension(
                                      since=ZERO_TIME,
                                      until=ZERO_TIME.add_time_delta(
@@ -118,19 +132,19 @@ class ORToolsMatcherDisabledReloadWithMultipleDepotsTestCase(TestCase):
     def _create_delivering_drones_board_with_delivering_drones_with_different_loading_docks(
             loading_docks: [DroneLoadingDock]) -> DeliveringDronesBoard:
         delivering_drones_1 = DeliveringDrones(id_=EntityID(uuid.uuid4()),
-                                                  drone_formation=DroneFormations.get_drone_formation(
-                                                      DroneFormationType.PAIR,
-                                                      PackageConfigurationOption.LARGE_PACKAGES,
-                                                      DroneType.drone_type_1),
-                                                  start_loading_dock=loading_docks[0],
-                                                  end_loading_dock=loading_docks[0])
+                                               drone_formation=DroneFormations.get_drone_formation(
+                                                   DroneFormationType.PAIR,
+                                                   PackageConfigurationOption.LARGE_PACKAGES,
+                                                   DroneType.drone_type_1),
+                                               start_loading_dock=loading_docks[0],
+                                               end_loading_dock=loading_docks[0])
         delivering_drones_2 = DeliveringDrones(id_=EntityID(uuid.uuid4()),
-                                                  drone_formation=DroneFormations.get_drone_formation(
-                                                      DroneFormationType.PAIR,
-                                                      PackageConfigurationOption.LARGE_PACKAGES,
-                                                      DroneType.drone_type_1),
-                                                  start_loading_dock=loading_docks[1],
-                                                  end_loading_dock=loading_docks[1])
+                                               drone_formation=DroneFormations.get_drone_formation(
+                                                   DroneFormationType.PAIR,
+                                                   PackageConfigurationOption.LARGE_PACKAGES,
+                                                   DroneType.drone_type_3),
+                                               start_loading_dock=loading_docks[1],
+                                               end_loading_dock=loading_docks[1])
         return DeliveringDronesBoard([delivering_drones_1, delivering_drones_2])
 
     @staticmethod
@@ -142,14 +156,35 @@ class ORToolsMatcherDisabledReloadWithMultipleDepotsTestCase(TestCase):
             constraints=ConstraintsConfig(
                 capacity_constraints=CapacityConstraints(count_capacity_from_zero=True, capacity_cost_coefficient=1),
                 travel_time_constraints=TravelTimeConstraints(max_waiting_time=0,
-                                                              max_route_time=1440,
+                                                              max_route_time=300,
                                                               count_time_from_zero=False,
-                                                              reloading_time=0,
+                                                              reloading_time=30,
+                                                              important_earliest_coeff=1),
+                session_time_constraints=SessionTimeConstraints(max_session_time=60),
+                priority_constraints=PriorityConstraints(True, priority_cost_coefficient=100)),
+            unmatched_penalty=10000,
+            reload_per_vehicle=1,
+            monitor=MonitorConfig(enabled=False),
+            submatch_time_window_minutes=300
+        )
+
+    @staticmethod
+    def _create_match_config_with_tw() -> MatcherConfig:
+        return MatcherConfig(
+            zero_time=ZERO_TIME,
+            solver=ORToolsSolverConfig(first_solution_strategy="PATH_CHEAPEST_ARC",
+                                       local_search_strategy="GUIDED_LOCAL_SEARCH", timeout_sec=10),
+            constraints=ConstraintsConfig(
+                capacity_constraints=CapacityConstraints(count_capacity_from_zero=True, capacity_cost_coefficient=1),
+                travel_time_constraints=TravelTimeConstraints(max_waiting_time=0,
+                                                              max_route_time=300,
+                                                              count_time_from_zero=False,
+                                                              reloading_time=30,
                                                               important_earliest_coeff=1),
                 session_time_constraints=SessionTimeConstraints(max_session_time=60),
                 priority_constraints=PriorityConstraints(True, priority_cost_coefficient=100)),
             unmatched_penalty=10000,
             reload_per_vehicle=0,
             monitor=MonitorConfig(enabled=False),
-            submatch_time_window_minutes=1440
+            submatch_time_window_minutes=100
         )

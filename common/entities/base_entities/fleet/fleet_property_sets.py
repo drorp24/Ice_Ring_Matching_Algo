@@ -86,7 +86,7 @@ class BoardLevelProperties(JsonableBaseEntity):
                and self.velocity_entire_board == other.velocity_entire_board
 
     def __hash__(self):
-        return hash((self.max_route_time_entire_board, self.velocity_entire_board, ))
+        return hash((self.max_route_time_entire_board, self.velocity_entire_board))
 
     @classmethod
     def dict_to_obj(cls, dict_input):

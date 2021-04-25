@@ -159,11 +159,12 @@ class ORToolsMatcherConstraints:
 
     def _add_time_window_constraints_for_each_vehicle_start_node(self, time_dimension: RoutingDimension,
                                                                  time_windows: List[Tuple[int, int]]):
-        for i, drone_delivery in enumerate(self._matcher_input.delivering_drones_board.delivering_drones_list):
-            start_index = self._routing_model.Start(i)
+        for vehicle, delivering_drones in enumerate(self._matcher_input.delivering_drones_board.delivering_drones_list):
+            start_index = self._routing_model.Start(vehicle)
             graph_index = self._index_manager.index_to_node(start_index)
-            time_dimension.CumulVar(start_index).SetRange(time_windows[graph_index][0],
-                                                          time_windows[graph_index][1])
+            dock = delivering_drones.start_loading_dock
+            relative_time_window = dock.time_window.get_relative_time_in_min(self._matcher_input.config.zero_time)
+            time_dimension.CumulVar(start_index).SetRange(int(relative_time_window[0]), int(relative_time_window[1]))
 
     def _add_time_window_constraints_for_each_delivery_except_depot(self, time_dimension: RoutingDimension,
                                                                     time_windows: List[Tuple[int, int]]):
@@ -178,8 +179,8 @@ class ORToolsMatcherConstraints:
             dock = self._matcher_input.delivering_drones_board.delivering_drones_list[
                 vehicle_of_node].start_loading_dock
             original_depo = self._graph_exporter.get_node_graph_index(self._matcher_input.graph, dock)
-            time_dimension.CumulVar(index).SetRange(
-                self._time_windows[original_depo][0], self._time_windows[original_depo][1])
+            relative_time_window = dock.time_window.get_relative_time_in_min(self._matcher_input.config.zero_time)
+            time_dimension.CumulVar(index).SetRange(int(relative_time_window[0]), int(relative_time_window[1]))
 
     def _create_travel_cost_evaluator(self):
 

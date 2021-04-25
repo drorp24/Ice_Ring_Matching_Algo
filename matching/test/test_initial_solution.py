@@ -132,7 +132,8 @@ class BasicInitialSolutionTest(TestCase):
                 priority_constraints=PriorityConstraints(True, priority_cost_coefficient=1000)),
             unmatched_penalty=10000,
             reload_per_vehicle=reload_per_vehicle,
-            monitor=MonitorConfig(enabled=False)
+            monitor=MonitorConfig(enabled=False),
+            submatch_time_window_minutes=1440
         )
 
     @staticmethod
