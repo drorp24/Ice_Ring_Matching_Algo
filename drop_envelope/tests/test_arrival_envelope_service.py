@@ -55,10 +55,12 @@ class BasicArrivalEnvelopeService(unittest.TestCase):
         dr_envelope = {dr: DeliveryRequestPotentialEnvelope.from_delivery_request(dr) for dr in self.dr_dataset_random}
         dld_envelope = {dld: LoadingDockPotentialEnvelope(drone_loading_dock=dld) for dld in self.dld_dataset_random}
         envelopes = dict(list(dr_envelope.items()) + list(dld_envelope.items()))
-        service = MockPotentialEnvelopeService(envelopes)
-        drs = list(filter(lambda node: isinstance(node, DeliveryRequest), list(service.potential_envelopes.keys())))
-        dlds = list(filter(lambda node: isinstance(node, DroneLoadingDock), list(service.potential_envelopes.keys())))
-        self.assertEqual(len(service.potential_envelopes), 13)
+        service = MockPotentialArrivalEnvelopeService(envelopes)
+        drs = list(filter(lambda node: isinstance(node, DeliveryRequest), list(service.potential_arrival_envelopes.keys())))
+        dlds = list(filter(lambda node: isinstance(node, DroneLoadingDock), list(service.potential_arrival_envelopes.keys())))
+        dldr_data=list(map(lambda dr: service.get_potential_arrival_envelope(dr), self.dr_dataset_random))
+        self.assertEqual(len(service.potential_arrival_envelopes), 13)
+        self.assertEqual(len(dldr_data), 10)
         self.assertEqual(len(drs), 10)
         self.assertEqual(len(dlds), 3)
 
@@ -66,10 +68,10 @@ class BasicArrivalEnvelopeService(unittest.TestCase):
         graph = OperationalGraph()
         graph.add_delivery_requests(self.dr_dataset_random)
         graph.add_drone_loading_docks(self.dld_dataset_random)
-        service = MockPotentialEnvelopeService.from_operational_nodes(graph.nodes)
-        drs = list(filter(lambda node: isinstance(node, DeliveryRequest), list(service.potential_envelopes.keys())))
-        dlds = list(filter(lambda node: isinstance(node, DroneLoadingDock), list(service.potential_envelopes.keys())))
-        self.assertEqual(len(service.potential_envelopes), 13)
+        service = MockPotentialArrivalEnvelopeService.from_operational_nodes(graph.nodes)
+        drs = list(filter(lambda node: isinstance(node, DeliveryRequest), list(service.potential_arrival_envelopes.keys())))
+        dlds = list(filter(lambda node: isinstance(node, DroneLoadingDock), list(service.potential_arrival_envelopes.keys())))
+        self.assertEqual(len(service.potential_arrival_envelopes), 13)
         self.assertEqual(len(drs), 10)
         self.assertEqual(len(dlds), 3)
 
@@ -77,7 +79,6 @@ class BasicArrivalEnvelopeService(unittest.TestCase):
         graph = OperationalGraph()
         graph.add_delivery_requests(self.dr_dataset_random)
         graph.add_drone_loading_docks(self.dld_dataset_random)
-        # service = MockPotentialEnvelopeService.from_operational_nodes(graph.nodes)
         service = MockPotentialArrivalEnvelopeService.from_operational_nodes(graph.nodes)
         sdr_arrival_envelopes = list(map(lambda dr: service.get_potential_arrival_envelope(dr), self.dr_dataset_random))
         dr_arrival_envelopes = list(map(lambda dr: DeliveryRequestPotentialEnvelope.from_delivery_request(dr).
