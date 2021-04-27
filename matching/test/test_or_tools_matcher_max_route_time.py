@@ -103,7 +103,6 @@ class ORToolsMatcherMaxRouteTimeTestCase(TestCase):
                                                               count_time_from_zero=False,
                                                               reloading_time=0,
                                                               important_earliest_coeff=1),
-                session_time_constraints=SessionTimeConstraints(max_session_time=MAX_OPERATION_TIME),
                 priority_constraints=PriorityConstraints(True, priority_cost_coefficient=100)),
             unmatched_penalty=100000,
             reload_per_vehicle=0,

@@ -128,7 +128,6 @@ class BasicInitialSolutionTest(TestCase):
                                                               count_time_from_zero=False,
                                                               reloading_time=120,
                                                               important_earliest_coeff=1),
-                session_time_constraints=SessionTimeConstraints(max_session_time=60),
                 priority_constraints=PriorityConstraints(True, priority_cost_coefficient=1000)),
             unmatched_penalty=10000,
             reload_per_vehicle=reload_per_vehicle,

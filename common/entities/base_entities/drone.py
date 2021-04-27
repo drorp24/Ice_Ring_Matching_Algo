@@ -160,22 +160,22 @@ class DroneTypeToPackageConfigurationOptions:
     #      }
 
     drone_configurations_map: {DroneType: {PackageConfiguration: int}} = \
-        {DroneType.drone_type_1: {PackageConfiguration.LARGE_X2: 90,
-                                  PackageConfiguration.MEDIUM_X4: 90,
-                                  PackageConfiguration.SMALL_X8: 90,
-                                  PackageConfiguration.TINY_X16: 90},
-         DroneType.drone_type_2: {PackageConfiguration.LARGE_X4: 90,
-                                  PackageConfiguration.MEDIUM_X8: 90,
-                                  PackageConfiguration.SMALL_X16: 90,
-                                  PackageConfiguration.TINY_X32: 90},
-         DroneType.drone_type_3: {PackageConfiguration.LARGE_X2: 90,
-                                  PackageConfiguration.MEDIUM_X4: 90,
-                                  PackageConfiguration.SMALL_X8: 90,
-                                  PackageConfiguration.TINY_X16: 90},
-         DroneType.drone_type_4: {PackageConfiguration.LARGE_X2: 90,
-                                  PackageConfiguration.MEDIUM_X4: 90,
-                                  PackageConfiguration.SMALL_X8: 90,
-                                  PackageConfiguration.TINY_X16: 90}}
+        {DroneType.drone_type_1: {PackageConfiguration.LARGE_X2: 400,
+                                  PackageConfiguration.MEDIUM_X4: 400,
+                                  PackageConfiguration.SMALL_X8: 400,
+                                  PackageConfiguration.TINY_X16: 400},
+         DroneType.drone_type_2: {PackageConfiguration.LARGE_X4: 400,
+                                  PackageConfiguration.MEDIUM_X8: 400,
+                                  PackageConfiguration.SMALL_X16: 400,
+                                  PackageConfiguration.TINY_X32: 400},
+         DroneType.drone_type_3: {PackageConfiguration.LARGE_X2: 400,
+                                  PackageConfiguration.MEDIUM_X4: 400,
+                                  PackageConfiguration.SMALL_X8: 400,
+                                  PackageConfiguration.TINY_X16: 400},
+         DroneType.drone_type_4: {PackageConfiguration.LARGE_X2: 400,
+                                  PackageConfiguration.MEDIUM_X4: 400,
+                                  PackageConfiguration.SMALL_X8: 400,
+                                  PackageConfiguration.TINY_X16: 400}}
 
     @classmethod
     def add_configuration_option(cls, configuration_option: {DroneType: {PackageConfiguration: int}}):

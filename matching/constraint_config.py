@@ -123,10 +123,9 @@ class CapacityConstraints(JsonableBaseEntity):
 
 class ConstraintsConfig(JsonableBaseEntity):
     def __init__(self, capacity_constraints: CapacityConstraints, travel_time_constraints: TravelTimeConstraints,
-                 session_time_constraints: SessionTimeConstraints, priority_constraints: PriorityConstraints):
+                 priority_constraints: PriorityConstraints):
         self._capacity_constraints = capacity_constraints
         self._travel_time_constraints = travel_time_constraints
-        self._session_time_constraints = session_time_constraints
         self._priority_constraints = priority_constraints
 
     @classmethod
@@ -136,7 +135,6 @@ class ConstraintsConfig(JsonableBaseEntity):
         return ConstraintsConfig(
             capacity_constraints=CapacityConstraints.dict_to_obj(dict_input["capacity"]),
             travel_time_constraints=TravelTimeConstraints.dict_to_obj(dict_input["travel_time"]),
-            session_time_constraints=SessionTimeConstraints.dict_to_obj(dict_input["session_time"]),
             priority_constraints=PriorityConstraints.dict_to_obj(dict_input["priority"]))
 
     @property
@@ -148,15 +146,10 @@ class ConstraintsConfig(JsonableBaseEntity):
         return self._travel_time_constraints
 
     @property
-    def session_time(self) -> SessionTimeConstraints:
-        return self._session_time_constraints
-
-    @property
     def priority(self) -> PriorityConstraints:
         return self._priority_constraints
 
     def __eq__(self, other):
         return (self.capacity == other.capacity) and \
                (self.travel_time == other.travel_time) and \
-               (self.session_time == other.session_time) and \
                (self.priority == other.priority)
