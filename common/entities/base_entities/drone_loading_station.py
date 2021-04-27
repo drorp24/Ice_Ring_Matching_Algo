@@ -9,8 +9,8 @@ from geometry.utils import Shapeable
 
 class DroneLoadingStation(JsonableBaseEntity, Shapeable):
 
-    def __init__(self, id: EntityID, location: Point2D):
-        self._id = id
+    def __init__(self, id_: EntityID, location: Point2D):
+        self._id = id_
         self._location = location
 
     @property
@@ -38,13 +38,16 @@ class DroneLoadingStation(JsonableBaseEntity, Shapeable):
     def __hash__(self):
         return hash((self.id, self._location))
 
-    def __deepcopy__(self, memodict={}):
-        new_copy = DroneLoadingStation(deepcopy(self.id, memodict), deepcopy(self.location, memodict))
+    def __deepcopy__(self, memodict=None):
+        if memodict is None:
+            memodict = {}
+        # noinspection PyArgumentList
+        new_copy = DroneLoadingStation(self.id, deepcopy(self.location, memodict))
         memodict[id(self)] = new_copy
         return new_copy
 
     @classmethod
     def dict_to_obj(cls, dict_input):
         assert (dict_input['__class__'] == cls.__name__)
-        return DroneLoadingStation(id=EntityID.dict_to_obj(dict_input['id']),
+        return DroneLoadingStation(id_=EntityID.dict_to_obj(dict_input['id']),
                                    location=convert_dict_to_point_2d(dict_input['location']))

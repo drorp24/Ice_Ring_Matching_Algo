@@ -77,7 +77,9 @@ class TimeWindowExtension(JsonableBaseEntity):
     def __contains__(self, temporal: Union[DateTimeExtension, TimeWindowExtension]):
         return temporal.get_internal() in self.get_internal()
 
-    def __deepcopy__(self, memodict={}):
+    def __deepcopy__(self, memodict=None):
+        if memodict is None:
+            memodict = {}
         new_copy = TimeWindowExtension(self.since, self.until)
         memodict[id(self)] = new_copy
         return new_copy
@@ -122,7 +124,10 @@ class DateTimeExtension(BaseEntity):
     def __hash__(self):
         return self.get_internal().__hash__()
 
-    def __deepcopy__(self, memodict={}):
+    def __deepcopy__(self, memodict=None):
+        if memodict is None:
+            memodict = {}
+        # noinspection PyArgumentList
         new_copy = DateTimeExtension.from_dt(deepcopy(self._date_time, memodict))
         memodict[id(self)] = new_copy
         return new_copy

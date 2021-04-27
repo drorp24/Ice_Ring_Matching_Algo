@@ -99,7 +99,7 @@ def _create_dr_distribution():
 
 
 def create_no_zero_dist_dr_data_set() -> List[DeliveryRequest]:
-    pdp_1 = PackageDeliveryPlan(id=EntityID(UUID(int=42)),
+    pdp_1 = PackageDeliveryPlan(id_=EntityID(UUID(int=42)),
                                 drop_point=create_point_2d(10, 20),
                                 azimuth=Angle(135, AngleUnit.DEGREE),
                                 pitch=Angle(90, AngleUnit.DEGREE),
@@ -108,20 +108,20 @@ def create_no_zero_dist_dr_data_set() -> List[DeliveryRequest]:
     do_1 = DeliveryOption(customer_deliveries=[
         CustomerDelivery(customer_delivery_id=EntityID(UUID(int=31)), package_delivery_plans=[pdp_1])],
         delivery_options_id=EntityID(UUID(int=11)))
-    dr_1 = DeliveryRequest(id=EntityID.generate_uuid(), delivery_options=[do_1],
+    dr_1 = DeliveryRequest(id_=EntityID.generate_uuid(), delivery_options=[do_1],
                            time_window=TimeWindowExtension(
                                DateTimeExtension(dt_date=date(2021, 1, 1), dt_time=time(6, 0, 0)),
                                DateTimeExtension(dt_date=date(2021, 1, 1), dt_time=time(6, 0, 0))),
                            priority=1)
 
-    pdp_2 = PackageDeliveryPlan(id=EntityID(UUID(int=44)),
+    pdp_2 = PackageDeliveryPlan(id_=EntityID(UUID(int=44)),
                                 drop_point=create_point_2d(30, 40),
                                 azimuth=Angle(45, AngleUnit.DEGREE),
                                 pitch=Angle(45, AngleUnit.DEGREE),
                                 package_type=PackageType.TINY)
     do_2 = DeliveryOption(delivery_options_id=EntityID(UUID(int=12)), customer_deliveries=[
         CustomerDelivery(customer_delivery_id=EntityID(UUID(int=32)), package_delivery_plans=[pdp_2])])
-    dr_2 = DeliveryRequest(id=EntityID.generate_uuid(), delivery_options=[do_2],
+    dr_2 = DeliveryRequest(id_=EntityID.generate_uuid(), delivery_options=[do_2],
                            time_window=TimeWindowExtension(
                                DateTimeExtension(dt_date=date(2021, 1, 1), dt_time=time(6, 0, 0)),
                                DateTimeExtension(dt_date=date(2021, 1, 1), dt_time=time(6, 0, 0))),
@@ -130,7 +130,7 @@ def create_no_zero_dist_dr_data_set() -> List[DeliveryRequest]:
 
 
 def create_inf_dist_dr_data_set() -> List[DeliveryRequest]:
-    pdp_1 = PackageDeliveryPlan(id=EntityID(UUID(int=42)),
+    pdp_1 = PackageDeliveryPlan(id_=EntityID(UUID(int=42)),
                                 drop_point=create_point_2d(10, 20),
                                 azimuth=Angle(270, AngleUnit.DEGREE),
                                 pitch=Angle(270, AngleUnit.DEGREE),
@@ -138,20 +138,20 @@ def create_inf_dist_dr_data_set() -> List[DeliveryRequest]:
 
     do_1 = DeliveryOption(delivery_options_id=EntityID(UUID(int=11)), customer_deliveries=[
         CustomerDelivery(customer_delivery_id=EntityID(UUID(int=31)), package_delivery_plans=[pdp_1])])
-    dr_1 = DeliveryRequest(id=EntityID.generate_uuid(), delivery_options=[do_1],
+    dr_1 = DeliveryRequest(id_=EntityID.generate_uuid(), delivery_options=[do_1],
                            time_window=TimeWindowExtension(
                                DateTimeExtension(dt_date=date(2021, 1, 1), dt_time=time(6, 0, 0)),
                                DateTimeExtension(dt_date=date(2021, 1, 1), dt_time=time(6, 0, 0))),
                            priority=1)
 
-    pdp_2 = PackageDeliveryPlan(id=EntityID(UUID(int=44)),
+    pdp_2 = PackageDeliveryPlan(id_=EntityID(UUID(int=44)),
                                 drop_point=create_point_2d(30, 40),
                                 azimuth=Angle(45, AngleUnit.DEGREE),
                                 pitch=Angle(45, AngleUnit.DEGREE),
                                 package_type=PackageType.TINY)
     do_2 = DeliveryOption(delivery_options_id=EntityID(UUID(int=12)), customer_deliveries=[
         CustomerDelivery(customer_delivery_id=EntityID(UUID(int=32)), package_delivery_plans=[pdp_2])])
-    dr_2 = DeliveryRequest(id=EntityID.generate_uuid(), delivery_options=[do_2],
+    dr_2 = DeliveryRequest(id_=EntityID.generate_uuid(), delivery_options=[do_2],
                            time_window=TimeWindowExtension(
                                DateTimeExtension(dt_date=date(2021, 1, 1), dt_time=time(6, 0, 0)),
                                DateTimeExtension(dt_date=date(2021, 1, 1), dt_time=time(6, 0, 0))),

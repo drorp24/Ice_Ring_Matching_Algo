@@ -73,11 +73,15 @@ class DeliveringDrones(JsonableBaseEntity):
             self.board_level_properties
         ))
 
-    def __deepcopy__(self, memodict={}):
-        new_copy = DeliveringDrones(deepcopy(self.id, memodict), self.drone_formation,
+    def __deepcopy__(self, memodict=None):
+        if memodict is None:
+            memodict = {}
+        # noinspection PyArgumentList
+        new_copy = DeliveringDrones(self.id, self.drone_formation,
                                     deepcopy(self.start_loading_dock, memodict),
                                     deepcopy(self.end_loading_dock, memodict),
-                                    self.board_level_properties)
+                                    deepcopy(self.board_level_properties, memodict)
+                                    )
         memodict[id(self)] = new_copy
         return new_copy
 
@@ -98,7 +102,7 @@ class MatchedDroneLoadingDock(JsonableBaseEntity):
     delivery_time_window: TimeWindowExtension
 
     def __str__(self):
-        return '[MatchedDroneLoadingDock(id=' + str(
+        return '[MatchedDroneLoadingDock(id_=' + str(
             self.drone_loading_dock.id.uuid) + ', min_time=' + self.delivery_time_window.since.str_format_time() + \
                ', max_time=' + self.delivery_time_window.until.str_format_time() + ')]'
 
@@ -190,7 +194,7 @@ class DroneDelivery(JsonableBaseEntity):
 
     def __str__(self):
         if len(self._matched_requests) == 0:
-            return "\n[DroneDelivery id={id} - origin {origin_capacity} No match found]".format(
+            return "\n[DroneDelivery id_={id} - origin {origin_capacity} No match found]".format(
                 id=self.delivering_drones.id,
                 origin_capacity=self.delivering_drones.drone_formation.get_package_type_amount_map(), )
 

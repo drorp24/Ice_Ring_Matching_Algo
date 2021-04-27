@@ -38,7 +38,8 @@ class DeliveryOption(JsonableBaseEntity, Localizable, PackageHolder):
 
     def get_package_type_amount(self, package_type: PackageType) -> int:
         customer_deliveries = self.customer_deliveries
-        demands = [customer_delivery.get_package_type_amount(package_type) for customer_delivery in customer_deliveries ]
+        demands = [customer_delivery.get_package_type_amount(package_type)
+                   for customer_delivery in customer_deliveries]
         return sum(demands)
 
     def get_package_type_amount_map(self) -> PackageTypeAmountMap:
@@ -59,7 +60,10 @@ class DeliveryOption(JsonableBaseEntity, Localizable, PackageHolder):
     def __hash__(self):
         return hash(tuple(self.customer_deliveries))
 
-    def __deepcopy__(self, memodict={}):
-        new_copy = CustomerDelivery(deepcopy(self._customer_deliveries, memodict), deepcopy(self._id, memodict))
+    def __deepcopy__(self, memodict=None):
+        if memodict is None:
+            memodict = {}
+        # noinspection PyArgumentList
+        new_copy = DeliveryOption(deepcopy(self._customer_deliveries, memodict), self._id)
         memodict[id(self)] = new_copy
         return new_copy

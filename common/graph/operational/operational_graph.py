@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from copy import deepcopy
+from functools import lru_cache
 
 import numpy as np
 from dataclasses import dataclass
@@ -10,6 +11,7 @@ from networkx import DiGraph, subgraph, to_numpy_array
 from common.entities.base_entities.base_entity import JsonableBaseEntity
 from common.entities.base_entities.delivery_request import DeliveryRequest
 from common.entities.base_entities.drone_loading_dock import DroneLoadingDock
+from common.entities.base_entities.entity_id import EntityID
 from common.entities.base_entities.temporal import TimeWindowExtension, Temporal
 from common.utils.class_controller import name_to_class, get_all_module_class_names_from_globals
 from geometry.geo2d import Polygon2D
@@ -52,7 +54,10 @@ class OperationalNode(JsonableBaseEntity):
     def __hash__(self):
         return hash(tuple([self._internal]))
 
-    def __deepcopy__(self, memodict={}):
+    def __deepcopy__(self, memodict=None):
+        if memodict is None:
+            memodict = {}
+        # noinspection PyArgumentList
         new_copy = OperationalNode(deepcopy(self._internal, memodict))
         memodict[id(self)] = new_copy
         return new_copy
@@ -159,7 +164,8 @@ class OperationalGraph(JsonableBaseEntity):
         self.add_operational_nodes([OperationalNode(dr) for dr in delivery_requests])
 
     def add_operational_nodes(self, operational_nodes: [OperationalNode]):
-        self._internal_graph.add_nodes_from(operational_nodes)
+        self._internal_graph.add_nodes_from([(operational_node, {"id_": operational_node.internal_node.id})
+                                             for operational_node in operational_nodes])
 
     def add_operational_edges(self, operational_edges: [OperationalEdge]):
         self._internal_graph.add_edges_from(list(map(lambda oe: oe.to_internal_tuple(), operational_edges)))
@@ -194,6 +200,12 @@ class OperationalGraph(JsonableBaseEntity):
     def get_node_index(self, node: OperationalNode) -> int:
         return self.nodes.index(node)
 
+    @lru_cache()
+    def get_node_index_by_id(self, id_: EntityID) -> int:
+        nodes_to_idx = dict(self._internal_graph.nodes(data="id_"))
+        index = list(nodes_to_idx.values()).index(id_)
+        return index
+
     def remove_delivery_requests(self, delivery_requests: [DeliveryRequest]):
         self.remove_operational_nodes([OperationalNode(dr) for dr in delivery_requests])
 
@@ -219,9 +231,11 @@ class OperationalGraph(JsonableBaseEntity):
     def __eq__(self, other):
         return self.nodes == other.nodes and self.edges == other.edges
 
-    def __deepcopy__(self, memodict={}):
+    def __deepcopy__(self, memodict=None):
+        if memodict is None:
+            memodict = {}
         new_copy = OperationalGraph()
-        new_copy._internal_graph = deepcopy(self._internal_graph, memodict)
+        new_copy._internal_graph = deepcopy(self._internal_graph)
         memodict[id(self)] = new_copy
         return new_copy
 

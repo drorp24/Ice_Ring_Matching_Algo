@@ -88,6 +88,13 @@ class BoardLevelProperties(JsonableBaseEntity):
     def __hash__(self):
         return hash((self.max_route_time_entire_board, self.velocity_entire_board))
 
+    def __deepcopy__(self, memodict=None):
+        if memodict is None:
+            memodict = {}
+        new_copy = BoardLevelProperties(self.max_route_time_entire_board, self.velocity_entire_board)
+        memodict[id(self)] = new_copy
+        return new_copy
+
     @classmethod
     def dict_to_obj(cls, dict_input):
         return BoardLevelProperties(

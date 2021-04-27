@@ -51,6 +51,14 @@ class MonitorConfig(JsonableBaseEntity):
                (self.separate_charts == other.separate_charts) and \
                (self.output_directory == other.output_directory)
 
+    def __deepcopy__(self, memodict=None):
+        if memodict is None:
+            memodict = {}
+        new_copy = MonitorConfig(self._enabled, self._iterations_between_monitoring, self._max_iterations,
+                                 self._save_plot, self._show_plot, self._separate_charts, self._output_directory)
+        memodict[id(self)] = new_copy
+        return new_copy
+
     @classmethod
     def dict_to_obj(cls, dict_input):
         assert (dict_input['__class__'] == cls.__name__)

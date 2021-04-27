@@ -36,8 +36,8 @@ class PackageDeliveryPlanDistribution(Distribution):
         self._pitch_distribution = pitch_distribution
         self._package_type_distribution = package_type_distribution
 
-    def choose_rand(self, random: Random, base_loc: Point2D = create_zero_point_2d(), amount: Union[int, Range] = 1) -> \
-            List[PackageDeliveryPlan]:
+    def choose_rand(self, random: Random, base_loc: Point2D = create_zero_point_2d(), amount: Union[int, Range] = 1) \
+            -> List[PackageDeliveryPlan]:
         amount = extract_amount_in_range(amount, random)
         sampled_distributions = self._calc_samples_from_distributions(amount, random)
         PackageDeliveryPlanDistribution._update_the_location_of_sampled_points(base_loc, sampled_distributions)
@@ -50,8 +50,8 @@ class PackageDeliveryPlanDistribution(Distribution):
 
     def _calc_samples_from_distributions(self, amount, random):
         return choose_rand_by_attrib(
-            internal_sample_dict=
-            {'id': self._id_distribution,
+            internal_sample_dict={
+             'id': self._id_distribution,
              'drop_point': self._relative_drop_point_distribution,
              'azimuth': self._azimuth_distribution,
              'pitch': self._pitch_distribution,

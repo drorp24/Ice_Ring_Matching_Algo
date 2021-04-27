@@ -1,4 +1,4 @@
-from copy import copy, deepcopy
+from copy import deepcopy
 from datetime import timedelta
 
 from common.entities.base_entities.delivery_request import DeliveryRequest
@@ -13,7 +13,8 @@ class MatchingMaster:
         self._matcher_input = matcher_input
 
     def match(self) -> DroneDeliveryBoard:
-        if self._matcher_input.config.submatch_time_window_minutes < self._matcher_input.config.constraints.travel_time.max_route_time:
+        if self._matcher_input.config.submatch_time_window_minutes \
+                < self._matcher_input.config.constraints.travel_time.max_route_time:
             ret_board = self._match_using_time_greedy()
         else:
             ret_board = ORToolsMatcher(self._matcher_input).match()
@@ -22,7 +23,10 @@ class MatchingMaster:
 
     def _match_using_time_greedy(self):
             drone_deliveries = []
-            updating_matcher_input = deepcopy(self._matcher_input)
+            copy_of_delivering_drones_board = deepcopy(self._matcher_input.delivering_drones_board)
+            copy_of_graph = deepcopy(self._matcher_input.graph)
+            updating_matcher_input = MatcherInput(copy_of_graph, copy_of_delivering_drones_board,
+                                                  self._matcher_input.config)
             time_windows_num = int(self._matcher_input.config.constraints.travel_time.max_route_time \
                                    / self._matcher_input.config.submatch_time_window_minutes)
             start_match_time_delta_in_minutes = 0

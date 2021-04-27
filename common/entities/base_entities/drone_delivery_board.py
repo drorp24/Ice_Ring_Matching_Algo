@@ -25,15 +25,20 @@ class DeliveringDronesBoard(JsonableBaseEntity):
                 self._delivering_drones_list]
 
     def package_types(self) -> [PackageType]:
-        return set([delivering_drones.drone_formation.get_package_type() for delivering_drones in self._delivering_drones_list])
+        return set([delivering_drones.drone_formation.get_package_type()
+                    for delivering_drones in self._delivering_drones_list])
 
     def max_route_times_in_minutes(self) -> [int]:
-        return [delivering_drones.drone_formation.max_route_times_in_minutes() for delivering_drones in self._delivering_drones_list]
+        return [delivering_drones.drone_formation.max_route_times_in_minutes()
+                for delivering_drones in self._delivering_drones_list]
 
     def __eq__(self, other):
         return self.delivering_drones_list == other.delivering_drones_list
 
-    def __deepcopy__(self, memodict={}):
+    def __deepcopy__(self, memodict=None):
+        if memodict is None:
+            memodict = {}
+        # noinspection PyArgumentList
         new_copy = DeliveringDronesBoard(deepcopy(self._delivering_drones_list, memodict))
         memodict[id(self)] = new_copy
         return new_copy

@@ -11,8 +11,8 @@ from geometry.utils import Localizable
 
 class PackageDeliveryPlan(JsonableBaseEntity, Localizable):
 
-    def __init__(self, id: EntityID, drop_point: Point2D, azimuth: Angle, pitch: Angle, package_type: PackageType):
-        self._id = id
+    def __init__(self, id_: EntityID, drop_point: Point2D, azimuth: Angle, pitch: Angle, package_type: PackageType):
+        self._id = id_
         self._drop_point = drop_point
         self._azimuth = azimuth
         self._pitch = pitch
@@ -44,7 +44,7 @@ class PackageDeliveryPlan(JsonableBaseEntity, Localizable):
     @classmethod
     def dict_to_obj(cls, dict_input):
         assert (dict_input['__class__'] == cls.__name__)
-        return PackageDeliveryPlan(id=EntityID.dict_to_obj(dict_input['id']),
+        return PackageDeliveryPlan(id_=EntityID.dict_to_obj(dict_input['id']),
                                    drop_point=convert_dict_to_point_2d(dict_input['drop_point']),
                                    azimuth=Angle.dict_to_obj(dict_input['azimuth']),
                                    pitch=Angle.dict_to_obj(dict_input['pitch']),
@@ -63,6 +63,9 @@ class PackageDeliveryPlan(JsonableBaseEntity, Localizable):
                (self.pitch == other.pitch) and \
                (self.package_type == other.package_type)
 
-    def __deepcopy__(self, memodict={}):
-        memodict[id(self)] = self
+    def __deepcopy__(self, memodict=None):
+        if memodict is None:
+            memodict = {}
+        new_copy = PackageDeliveryPlan(self.id, self.drop_point, self.azimuth, self.pitch, self.package_type)
+        memodict[id(self)] = new_copy
         return self

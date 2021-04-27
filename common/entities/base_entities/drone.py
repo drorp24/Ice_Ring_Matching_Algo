@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from copy import deepcopy, copy
+from copy import copy
 from enum import Enum
 
 from common.entities.base_entities.base_entity import JsonableBaseEntity
@@ -81,7 +81,9 @@ class PackageTypeAmountMap(JsonableBaseEntity):
                 'package_type_to_amounts': {package_type[0].name: package_type[1] for package_type in
                                             self.package_type_to_amounts.items()}}
 
-    def __deepcopy__(self, memodict={}):
+    def __deepcopy__(self, memodict=None):
+        if memodict is None:
+            memodict = {}
         new_copy = PackageTypeAmountMap(copy(self._package_type_to_amounts))
         memodict[id(self)] = new_copy
         return new_copy
@@ -114,7 +116,9 @@ class DronePackageConfiguration(JsonableBaseEntity):
         return self.drone_type == other.drone_type \
                and self.package_type_map == other.package_type_map
 
-    def __deepcopy__(self, memodict={}):
+    def __deepcopy__(self, memodict=None):
+        if memodict is None:
+            memodict = {}
         new_copy = DronePackageConfiguration(self._drone_type, self.package_type_map)
         memodict[id(self)] = new_copy
         return new_copy

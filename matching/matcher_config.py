@@ -1,3 +1,5 @@
+from copy import deepcopy
+
 from common.entities.base_entities.base_entity import JsonableBaseEntity
 from common.entities.base_entities.temporal import DateTimeExtension
 from matching.constraint_config import ConstraintsConfig
@@ -54,6 +56,17 @@ class MatcherConfig(JsonableBaseEntity):
                     self.reload_per_vehicle == other.reload_per_vehicle,
                     self.monitor == other.monitor,
                     self.submatch_time_window_minutes == other.submatch_time_window_minutes])
+
+    def __deepcopy__(self, memodict=None):
+        if memodict is None:
+            memodict = {}
+        # noinspection PyArgumentList
+        new_copy = type(self)(deepcopy(self.zero_time, memodict), deepcopy(self.solver, memodict),
+                              deepcopy(self.constraints, memodict), deepcopy(self.unmatched_penalty, memodict),
+                              self.reload_per_vehicle, deepcopy(self.monitor, memodict),
+                              self.submatch_time_window_minutes)
+        memodict[id(self)] = new_copy
+        return new_copy
 
     @classmethod
     def dict_to_obj(cls, dict_input):
