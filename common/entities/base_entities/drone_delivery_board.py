@@ -29,7 +29,7 @@ class DeliveringDronesBoard(JsonableBaseEntity):
                     for delivering_drones in self._delivering_drones_list])
 
     def max_route_times_in_minutes(self) -> [int]:
-        return [delivering_drones.drone_formation.max_route_times_in_minutes()
+        return [delivering_drones.get_max_route_time_in_minutes()
                 for delivering_drones in self._delivering_drones_list]
 
     def __eq__(self, other):

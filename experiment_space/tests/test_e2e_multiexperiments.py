@@ -36,7 +36,11 @@ from experiment_space.visualization.experiment_visualizer import draw_matched_sc
 from geometry.distribution.geo_distribution import UniformPointInBboxDistribution, NormalPointDistribution
 from geometry.geo2d import Point2D
 from geometry.geo_factory import create_point_2d
+from matching.constraint_config import ConstraintsConfig, CapacityConstraints, TravelTimeConstraints, \
+    SessionTimeConstraints, PriorityConstraints
 from matching.matcher_config import MatcherConfig
+from matching.monitor_config import MonitorConfig
+from matching.ortools.ortools_solver_config import ORToolsSolverConfig
 from visualization.basic.pltdrawer2d import MapImage
 
 SHOW_VISUALS = True
@@ -61,6 +65,40 @@ class EndToEndMultipleExperimentRun(unittest.TestCase):
                                 graph_creation_algorithm=FullyConnectedGraphAlgorithm(edge_cost_factor=25.0,
                                                                                       edge_travel_time_factor=25.0),
                                 board_level_properties=BoardLevelProperties())
+        map_image = MapImage(map_background_path=Path("visualization/basic/North_map.png"),
+                             west_lon=34.907, east_lon=35.905, south_lat=32.489, north_lat=33.932)
+        self._run_end_to_end_visual_experiment(experiment, SHOW_VISUALS, map_image)
+
+    # @unittest.skip
+    def test_calc_north_scenario_with_time_greedy_visualization(self):
+        sampled_supplier_category = self._create_sampled_supplier_category_north()
+        matcher_config = MatcherConfig(
+            zero_time=ZERO_TIME,
+            solver=ORToolsSolverConfig(first_solution_strategy="PATH_CHEAPEST_ARC",
+                                       local_search_strategy="GUIDED_LOCAL_SEARCH", timeout_sec=30),
+            constraints=ConstraintsConfig(
+                capacity_constraints=CapacityConstraints(count_capacity_from_zero=True, capacity_cost_coefficient=10000),
+                travel_time_constraints=TravelTimeConstraints(max_waiting_time=0,
+                                                              max_route_time=540,
+                                                              count_time_from_zero=False,
+                                                              reloading_time=120,
+                                                              important_earliest_coeff=1),
+                session_time_constraints=SessionTimeConstraints(max_session_time=60),
+                priority_constraints=PriorityConstraints(True, priority_cost_coefficient=1000)),
+            unmatched_penalty=10000,
+            reload_per_vehicle=0,
+            monitor=MonitorConfig(enabled=False),
+            submatch_time_window_minutes=180
+        )
+        experiment = Experiment(supplier_category=sampled_supplier_category,
+                                drone_set_properties_list=EndToEndMultipleExperimentRun.
+                                _create_large_drone_set_properties_list(
+                                    loading_docks=sampled_supplier_category.drone_loading_docks,
+                                    drone_amount=6),
+                                matcher_config=matcher_config,
+                                graph_creation_algorithm=FullyConnectedGraphAlgorithm(edge_cost_factor=25.0,
+                                                                                      edge_travel_time_factor=25.0),
+                                board_level_properties=BoardLevelProperties(max_route_time_entire_board=180))
         map_image = MapImage(map_background_path=Path("visualization/basic/North_map.png"),
                              west_lon=34.907, east_lon=35.905, south_lat=32.489, north_lat=33.932)
         self._run_end_to_end_visual_experiment(experiment, SHOW_VISUALS, map_image)

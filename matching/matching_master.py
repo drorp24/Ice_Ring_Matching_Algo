@@ -4,6 +4,7 @@ from datetime import timedelta
 from common.entities.base_entities.delivery_request import DeliveryRequest
 from common.entities.base_entities.drone_delivery_board import DroneDeliveryBoard, UnmatchedDeliveryRequest
 from common.entities.base_entities.temporal import TimeDeltaExtension, TimeWindowExtension
+from matching.matcher_factory import create_matcher
 from matching.matcher_input import MatcherInput
 from matching.ortools.ortools_matcher import ORToolsMatcher
 
@@ -27,20 +28,20 @@ class MatchingMaster:
         copy_of_graph = deepcopy(self._matcher_input.graph)
         updating_matcher_input = MatcherInput(copy_of_graph, copy_of_delivering_drones_board,
                                               self._matcher_input.config)
-        time_windows_num = int(self._matcher_input.config.constraints.travel_time.max_route_time
+        full_time_windows_num = int(self._matcher_input.config.constraints.travel_time.max_route_time
                                / self._matcher_input.config.submatch_time_window_minutes)
         self._update_delivering_drones_max_route_time(updating_matcher_input.delivering_drones_board,
                                                       self._matcher_input.config.submatch_time_window_minutes)
         start_match_time_delta_in_minutes = 0
-        for i in range(time_windows_num):
+        for i in range(full_time_windows_num):
             self._run_intermediate_match(drone_deliveries, start_match_time_delta_in_minutes, updating_matcher_input)
             start_match_time_delta_in_minutes = self._matcher_input.config.submatch_time_window_minutes
 
         last_start_match_time_delta_in_minutes = self._matcher_input.config.constraints.travel_time.max_route_time \
-            - time_windows_num * self._matcher_input.config.submatch_time_window_minutes
+            - full_time_windows_num * self._matcher_input.config.submatch_time_window_minutes
         self._update_delivering_drones_max_route_time(updating_matcher_input.delivering_drones_board,
                                                       last_start_match_time_delta_in_minutes)
-        self._run_intermediate_match(drone_deliveries, start_match_time_delta_in_minutes, updating_matcher_input)
+        self._run_intermediate_match(drone_deliveries, last_start_match_time_delta_in_minutes, updating_matcher_input)
         return DroneDeliveryBoard(drone_deliveries=drone_deliveries,
                                   unmatched_delivery_requests=[UnmatchedDeliveryRequest(i, node.internal_node)
                                                                for i, node in
@@ -50,7 +51,7 @@ class MatchingMaster:
     def _run_intermediate_match(self, drone_deliveries, start_match_time_delta_in_minutes, updating_matcher_input):
         self._update_delivering_drones_start_dock_time_window(start_match_time_delta_in_minutes,
                                                               updating_matcher_input)
-        intermediate_delivery_board = ORToolsMatcher(updating_matcher_input).match()
+        intermediate_delivery_board = create_matcher(updating_matcher_input).match()
         if len(intermediate_delivery_board.drone_deliveries) > 0:
             drone_deliveries.extend(intermediate_delivery_board.drone_deliveries)
         self._remove_matched_requests_from_graph(intermediate_delivery_board, updating_matcher_input)
