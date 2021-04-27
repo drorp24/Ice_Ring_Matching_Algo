@@ -60,7 +60,8 @@
     "show_plot": true,
     "separate_charts": true,
     "output_directory" : "outputs"
-  }
+  },
+  "submatch_time_window_minutes": 400
 }
 
 
