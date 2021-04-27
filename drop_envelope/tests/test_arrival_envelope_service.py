@@ -10,9 +10,9 @@ from common.entities.base_entities.entity_distribution.drone_loading_dock_distri
     DroneLoadingDockDistribution
 from common.entities.base_entities.entity_distribution.package_distribution import PackageDistribution
 from common.entities.base_entities.package import PackageType
-from common.graph.operational.operational_graph import OperationalNode, OperationalGraph
+from common.graph.operational.operational_graph import OperationalGraph
 from common.math.angle import ChoicesAngleDistribution, Angle, AngleUnit
-from drop_envelope.arrival_envelope_service import MockPotentialEnvelopeService
+from drop_envelope.arrival_envelope_service import MockPotentialEnvelopeService, MockPotentialArrivalEnvelopeService
 from drop_envelope.delivery_request_envelope import DeliveryRequestPotentialEnvelope
 from drop_envelope.loading_dock_envelope import LoadingDockPotentialEnvelope
 from drop_envelope.slide_service import MockSlidesServiceWrapper
@@ -77,18 +77,20 @@ class BasicArrivalEnvelopeService(unittest.TestCase):
         graph = OperationalGraph()
         graph.add_delivery_requests(self.dr_dataset_random)
         graph.add_drone_loading_docks(self.dld_dataset_random)
-        service = MockPotentialEnvelopeService.from_operational_nodes(graph.nodes)
+        # service = MockPotentialEnvelopeService.from_operational_nodes(graph.nodes)
+        service = MockPotentialArrivalEnvelopeService.from_operational_nodes(graph.nodes)
         sdr_arrival_envelopes = list(map(lambda dr: service.get_potential_arrival_envelope(dr), self.dr_dataset_random))
         dr_arrival_envelopes = list(map(lambda dr: DeliveryRequestPotentialEnvelope.from_delivery_request(dr).
                                         get_potential_arrival_envelope(MockSlidesServiceWrapper.
-                                                                       get_drone_azimuth_level_values(), Angle(value=90, unit=AngleUnit.DEGREE)),
+                                                                       get_drone_azimuth_level_values(),
+                                                                       Angle(value=90, unit=AngleUnit.DEGREE)),
                                         self.dr_dataset_random))
         self.assertEqual(sdr_arrival_envelopes, dr_arrival_envelopes)
         sdld_arrival_envelopes = list(
             map(lambda dld: service.get_potential_arrival_envelope(dld), self.dld_dataset_random))
         dld_arrival_envelopes = list(
             map(lambda dld: LoadingDockPotentialEnvelope(dld).
-                get_potential_arrival_envelope(MockSlidesServiceWrapper.get_drone_azimuth_level_values(), Angle(value=90, unit=AngleUnit.DEGREE)),
+                get_potential_arrival_envelope(MockSlidesServiceWrapper.get_drone_azimuth_level_values(),
+                                               Angle(value=90, unit=AngleUnit.DEGREE)),
                 self.dld_dataset_random))
         self.assertEqual(sdld_arrival_envelopes, dld_arrival_envelopes)
-
