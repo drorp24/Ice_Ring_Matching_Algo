@@ -70,6 +70,11 @@ class Angle(JsonableBaseEntity):
     def __hash__(self):
         return hash(self.degrees)
 
+    def __deepcopy__(self, memodict={}):
+        new_copy = Angle(self.__value, self.__unit)
+        memodict[id(self)] = new_copy
+        return new_copy
+
 
 def _calc_first_cycle_equivalent(angle: Angle):
     # convert the angle to be between 0 [deg] and 360 [deg]

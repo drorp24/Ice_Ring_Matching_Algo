@@ -1,3 +1,4 @@
+from copy import deepcopy
 from dataclasses import dataclass
 from functools import lru_cache
 
@@ -31,6 +32,11 @@ class DeliveringDronesBoard(JsonableBaseEntity):
 
     def __eq__(self, other):
         return self.delivering_drones_list == other.delivering_drones_list
+
+    def __deepcopy__(self, memodict={}):
+        new_copy = DeliveringDronesBoard(deepcopy(self._delivering_drones_list, memodict))
+        memodict[id(self)] = new_copy
+        return new_copy
 
     @classmethod
     def dict_to_obj(cls, dict_input):

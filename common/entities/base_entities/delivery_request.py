@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from copy import deepcopy
 from datetime import date, time, timedelta
 
 from common.entities.base_entities.base_entity import JsonableBaseEntity
@@ -60,6 +61,12 @@ class DeliveryRequest(JsonableBaseEntity, Localizable, Temporal):
 
     def __hash__(self):
         return hash((self.id,tuple(self.delivery_options), self.time_window, self.priority))
+
+    def __deepcopy__(self, memodict={}):
+        new_copy = DeliveryRequest(deepcopy(self.id, memodict), deepcopy(self.delivery_options, memodict),
+                                   deepcopy(self.time_window, memodict), self.priority)
+        memodict[id(self)] = new_copy
+        return new_copy
 
 
 def create_default_time_window_for_delivery_request():

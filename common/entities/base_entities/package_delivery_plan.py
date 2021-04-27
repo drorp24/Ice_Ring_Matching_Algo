@@ -62,3 +62,7 @@ class PackageDeliveryPlan(JsonableBaseEntity, Localizable):
                (self.azimuth == other.azimuth) and \
                (self.pitch == other.pitch) and \
                (self.package_type == other.package_type)
+
+    def __deepcopy__(self, memodict={}):
+        memodict[id(self)] = self
+        return self

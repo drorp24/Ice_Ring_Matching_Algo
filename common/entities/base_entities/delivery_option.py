@@ -1,4 +1,5 @@
 import itertools
+from copy import deepcopy
 from typing import List
 
 from common.entities.base_entities.base_entity import JsonableBaseEntity
@@ -57,3 +58,8 @@ class DeliveryOption(JsonableBaseEntity, Localizable, PackageHolder):
 
     def __hash__(self):
         return hash(tuple(self.customer_deliveries))
+
+    def __deepcopy__(self, memodict={}):
+        new_copy = CustomerDelivery(deepcopy(self._customer_deliveries, memodict), deepcopy(self._id, memodict))
+        memodict[id(self)] = new_copy
+        return new_copy

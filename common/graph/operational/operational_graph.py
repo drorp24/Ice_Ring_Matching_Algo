@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from copy import deepcopy
+
 import numpy as np
 from dataclasses import dataclass
 from typing import List, Union
@@ -49,6 +51,11 @@ class OperationalNode(JsonableBaseEntity):
 
     def __hash__(self):
         return hash(tuple([self._internal]))
+
+    def __deepcopy__(self, memodict={}):
+        new_copy = OperationalNode(deepcopy(self._internal, memodict))
+        memodict[id(self)] = new_copy
+        return new_copy
 
 
 @dataclass
@@ -211,6 +218,12 @@ class OperationalGraph(JsonableBaseEntity):
 
     def __eq__(self, other):
         return self.nodes == other.nodes and self.edges == other.edges
+
+    def __deepcopy__(self, memodict={}):
+        new_copy = OperationalGraph()
+        new_copy._internal_graph = deepcopy(self._internal_graph, memodict)
+        memodict[id(self)] = new_copy
+        return new_copy
 
 
 def assert_node_is_temporal(internal_node) -> None:

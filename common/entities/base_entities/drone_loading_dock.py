@@ -1,3 +1,4 @@
+from copy import copy
 from datetime import date, time, timedelta
 from typing import List
 
@@ -65,6 +66,11 @@ class DroneLoadingDock(JsonableBaseEntity, Localizable, Temporal, ShapeableColle
 
     def __hash__(self):
         return hash((self.id, self._drone_loading_station, self._drone_type, self._time_window))
+
+    def __deepcopy__(self, memodict={}):
+        new_copy = DroneLoadingDock(self.id, self._drone_loading_station, self._drone_type, self._time_window)
+        memodict[id(self)] = new_copy
+        return new_copy
 
     def get_shapeables(self) -> List[Shapeable]:
         return [self.drone_loading_station]

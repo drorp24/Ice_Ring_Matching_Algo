@@ -31,6 +31,11 @@ class PotentialDropEnvelope(JsonableBaseEntity):
     def calc_delta_between_radii(self) -> float:
         return self.maximal_radius_meters - self.minimal_radius_meters
 
+    def __deepcopy__(self, memodict={}):
+        new_copy = PotentialDropEnvelope(self.minimal_radius_meters, self.maximal_radius_meters)
+        memodict[id(self)] = new_copy
+        return new_copy
+
 
 class Package(JsonableBaseEntity):
 
@@ -62,6 +67,10 @@ class Package(JsonableBaseEntity):
 
     def __str__(self):
         return 'package of weight ' + str(self._weight)
+
+    def __deepcopy__(self, memodict={}):
+        memodict[id(self)] = self
+        return self
 
 
 class PackageType(Enum):

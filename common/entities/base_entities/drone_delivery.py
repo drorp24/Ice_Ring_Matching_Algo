@@ -1,3 +1,4 @@
+from copy import deepcopy
 from dataclasses import dataclass
 from functools import lru_cache
 
@@ -71,6 +72,14 @@ class DeliveringDrones(JsonableBaseEntity):
             self.end_loading_dock,
             self.board_level_properties
         ))
+
+    def __deepcopy__(self, memodict={}):
+        new_copy = DeliveringDrones(deepcopy(self.id, memodict), self.drone_formation,
+                                    deepcopy(self.start_loading_dock, memodict),
+                                    deepcopy(self.end_loading_dock, memodict),
+                                    self.board_level_properties)
+        memodict[id(self)] = new_copy
+        return new_copy
 
     @classmethod
     def dict_to_obj(cls, dict_input):

@@ -35,3 +35,8 @@ class EntityID(JsonableBaseEntity):
 
     def __eq__(self, other):
         return self.uuid == other.uuid
+
+    def __deepcopy__(self, memodict={}):
+        new_copy = EntityID(self._uuid)
+        memodict[id(self)] = new_copy
+        return new_copy
