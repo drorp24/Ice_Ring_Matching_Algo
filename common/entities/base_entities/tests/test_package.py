@@ -46,9 +46,17 @@ class BasicPackageTestCase(unittest.TestCase):
 
     def test_package_weights(self):
         self.assertEqual(PackageType.TINY.value.weight, 1)
+        self.assertEqual(PackageType.TINY.value.maximal_radius_meters, 1000)
+        self.assertEqual(PackageType.TINY.value.minimal_radius_meters, 100)
         self.assertEqual(PackageType.SMALL.value.weight, 2)
+        self.assertEqual(PackageType.SMALL.value.maximal_radius_meters, 1000)
+        self.assertEqual(PackageType.SMALL.value.minimal_radius_meters, 100)
         self.assertEqual(PackageType.MEDIUM.value.weight, 4)
+        self.assertEqual(PackageType.MEDIUM.value.maximal_radius_meters, 1000)
+        self.assertEqual(PackageType.MEDIUM.value.minimal_radius_meters, 100)
         self.assertEqual(PackageType.LARGE.value.weight, 8)
+        self.assertEqual(PackageType.LARGE.value.maximal_radius_meters, 1000)
+        self.assertEqual(PackageType.LARGE.value.minimal_radius_meters, 100)
 
     def test_2_package_not_equal(self):
         self.assertNotEqual(self.p1.value, self.p2.value)
