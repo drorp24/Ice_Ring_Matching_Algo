@@ -99,6 +99,10 @@ class DronePackageConfiguration(JsonableBaseEntity):
     def max_session_time(self) -> int:
         return self._max_session_time
 
+    @max_session_time.setter
+    def max_session_time(self, max_session_time: int):
+        self._max_session_time = max_session_time
+
     def get_package_type_amount(self, package_type: PackageType) -> int:
         return self.package_type_map.get_package_type_amount(package_type)
 
@@ -176,6 +180,12 @@ class DroneTypeToPackageConfigurationOptions:
                                 configuration: PackageConfiguration) -> DronePackageConfiguration:
         return DronePackageConfiguration(drone_type=drone_type, package_type_map=configuration.value,
                                          max_session_time=cls.drone_configurations_map[drone_type][configuration])
+
+    @classmethod
+    def update_max_session_time(cls, drone_type: DroneType,
+                                configuration: PackageConfiguration,
+                                max_session_time: int):
+        cls.drone_configurations_map[drone_type][configuration] = max_session_time
 
 
 class DroneConfigurations:
