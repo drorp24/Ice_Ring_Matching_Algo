@@ -29,9 +29,10 @@ class MatchingMaster:
         updating_matcher_input = MatcherInput(copy_of_graph, copy_of_delivering_drones_board,
                                               self._matcher_input.config)
         full_time_windows_num = int(self._matcher_input.config.constraints.travel_time.max_route_time
-                               / self._matcher_input.config.submatch_time_window_minutes)
+                                    / self._matcher_input.config.submatch_time_window_minutes)
         self._update_delivering_drones_max_route_time(updating_matcher_input.delivering_drones_board,
                                                       self._matcher_input.config.submatch_time_window_minutes)
+        self._set_end_loading_docks_initial_time_window(updating_matcher_input.delivering_drones_board)
         start_match_time_delta_in_minutes = 0
         for i in range(full_time_windows_num):
             self._run_intermediate_match(drone_deliveries, start_match_time_delta_in_minutes, updating_matcher_input)
@@ -61,21 +62,48 @@ class MatchingMaster:
         for delivering_drones in delivering_drones_board.delivering_drones_list:
             delivering_drones.board_level_properties.max_route_time_entire_board = new_max_route_time
 
+    def _set_end_loading_docks_initial_time_window(self, delivering_drones_board):
+        loading_docks = set(delivering_drones.end_loading_dock for delivering_drones in
+                            delivering_drones_board.delivering_drones_list)
+        original_loading_docks = list(set(delivering_drones.end_loading_dock for delivering_drones in
+                                          self._matcher_input.delivering_drones_board.delivering_drones_list))
+        for i, loading_dock in enumerate(loading_docks):
+            new_until = self._matcher_input.config.zero_time.add_time_delta(
+                TimeDeltaExtension(
+                    timedelta(
+                        minutes=self._matcher_input.config.submatch_time_window_minutes)))
+            if new_until > original_loading_docks[i].time_window.until:
+                new_until = original_loading_docks[i].time_window.until
+
+            loading_dock._time_window = \
+                TimeWindowExtension(since=loading_dock.time_window.since,
+                                    until=new_until)
+
     @staticmethod
     def _remove_matched_requests_from_graph(intermediate_delivery_board, updating_matcher_input):
         for delivery in intermediate_delivery_board.drone_deliveries:
             updating_matcher_input.graph.remove_delivery_requests(
                 [matched_request.delivery_request for matched_request in delivery.matched_requests])
 
-    @staticmethod
-    def _update_delivering_drones_start_dock_time_window(start_match_time_delta_in_minutes,
+    def _update_delivering_drones_start_dock_time_window(self, start_match_time_delta_in_minutes,
                                                          updating_matcher_input):
-        for delivering_drones in updating_matcher_input.delivering_drones_board.delivering_drones_list:
-            new_since = delivering_drones.start_loading_dock.time_window.since.add_time_delta(
+        loading_docks = set(delivering_drones.start_loading_dock for delivering_drones in
+                            updating_matcher_input.delivering_drones_board.delivering_drones_list)
+        original_loading_docks = list(set(delivering_drones.start_loading_dock for delivering_drones in
+                                          self._matcher_input.delivering_drones_board.delivering_drones_list))
+        for i, loading_dock in enumerate(loading_docks):
+            new_until = loading_dock.time_window.until.add_time_delta(
                 TimeDeltaExtension(
                     timedelta(minutes=start_match_time_delta_in_minutes)))
-            if new_since > delivering_drones.start_loading_dock.time_window.until:
-                new_since = delivering_drones.start_loading_dock.time_window.until
-            delivering_drones._start_loading_dock._time_window = \
+            if new_until > original_loading_docks[i].time_window.until:
+                new_until = original_loading_docks[i].time_window.until
+
+            new_since = loading_dock.time_window.since.add_time_delta(
+                TimeDeltaExtension(
+                    timedelta(minutes=start_match_time_delta_in_minutes)))
+            if new_since > new_until:
+                new_since = new_until
+
+            loading_dock._time_window = \
                 TimeWindowExtension(since=new_since,
-                                    until=delivering_drones.start_loading_dock.time_window.until)
+                                    until=new_until)
