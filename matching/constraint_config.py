@@ -75,26 +75,6 @@ class TravelTimeConstraints(JsonableBaseEntity):
         )
 
 
-class SessionTimeConstraints(JsonableBaseEntity):
-    def __init__(self, max_session_time: int):
-        self._max_session_time = max_session_time
-
-    @classmethod
-    def dict_to_obj(cls, dict_input):
-        assert (dict_input['__class__'] == cls.__name__)
-
-        return SessionTimeConstraints(
-            max_session_time=dict_input["max_session_time"],
-        )
-
-    @property
-    def max_session_time(self):
-        return self._max_session_time
-
-    def __eq__(self, other):
-        return self.max_session_time == other.max_session_time
-
-
 class CapacityConstraints(JsonableBaseEntity):
     def __init__(self, count_capacity_from_zero: bool, capacity_cost_coefficient: int):
         self._count_capacity_from_zero = count_capacity_from_zero
