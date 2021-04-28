@@ -12,7 +12,7 @@ from common.entities.base_entities.entity_distribution.package_distribution impo
 from common.entities.base_entities.package import PackageType
 from common.graph.operational.operational_graph import OperationalGraph
 from common.math.angle import ChoicesAngleDistribution, Angle, AngleUnit
-from drop_envelope.arrival_envelope_service import MockPotentialEnvelopeService, MockPotentialArrivalEnvelopeService
+from drop_envelope.arrival_envelope_service import MockPotentialArrivalEnvelopeService
 from drop_envelope.delivery_request_envelope import DeliveryRequestPotentialEnvelope
 from drop_envelope.loading_dock_envelope import LoadingDockPotentialEnvelope
 from drop_envelope.slide_service import MockSlidesServiceWrapper
@@ -68,7 +68,7 @@ class BasicArrivalEnvelopeService(unittest.TestCase):
         graph = OperationalGraph()
         graph.add_delivery_requests(self.dr_dataset_random)
         graph.add_drone_loading_docks(self.dld_dataset_random)
-        service = MockPotentialArrivalEnvelopeService.from_operational_nodes(graph.nodes)
+        service = MockPotentialArrivalEnvelopeService.from_nodes(graph.nodes)
         drs = list(filter(lambda node: isinstance(node, DeliveryRequest), list(service.potential_arrival_envelopes.keys())))
         dlds = list(filter(lambda node: isinstance(node, DroneLoadingDock), list(service.potential_arrival_envelopes.keys())))
         self.assertEqual(len(service.potential_arrival_envelopes), 13)
@@ -79,7 +79,7 @@ class BasicArrivalEnvelopeService(unittest.TestCase):
         graph = OperationalGraph()
         graph.add_delivery_requests(self.dr_dataset_random)
         graph.add_drone_loading_docks(self.dld_dataset_random)
-        service = MockPotentialArrivalEnvelopeService.from_operational_nodes(graph.nodes)
+        service = MockPotentialArrivalEnvelopeService.from_nodes(graph.nodes)
         sdr_arrival_envelopes = list(map(lambda dr: service.get_potential_arrival_envelope(dr), self.dr_dataset_random))
         dr_arrival_envelopes = list(map(lambda dr: DeliveryRequestPotentialEnvelope.from_delivery_request(dr).
                                         get_potential_arrival_envelope(MockSlidesServiceWrapper.
