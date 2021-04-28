@@ -72,10 +72,10 @@ class PackageType(Enum):
         return self.value.weight
 
     def get_rmin(self):
-        return PackageType.TINY.value.rmin
+        return self.value.minimal_radius_meters
 
     def get_rmax(self):
-        return PackageType.TINY.value.rmax
+        return self.value.maximal_radius_meters
 
     def __dict__(self):
         return {'__enum__': str(self)}
@@ -88,7 +88,7 @@ class PackageType(Enum):
 
     def __eq__(self, other: PackageType):
         return all([self.name == other.name, self.calc_weight() == other.calc_weight(),
-                    self.calc_potential_drop_envelope() == other.calc_potential_drop_envelope()])
+                    self.get_rmin() == other.get_rmin(),self.get_rmax() == other.get_rmax()])
 
     def __lt__(self, other: PackageType):
         return self.name < other.name
