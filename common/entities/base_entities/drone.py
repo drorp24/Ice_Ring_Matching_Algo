@@ -148,17 +148,6 @@ class PackageConfiguration(Enum):
 
 
 class DroneTypeToPackageConfigurationOptions:
-    # drone_configurations_map: {DroneType: [PackageConfiguration]} = \
-    #     {DroneType.drone_type_1: [PackageConfiguration.LARGE_X2, PackageConfiguration.MEDIUM_X4,
-    #                               PackageConfiguration.SMALL_X8, PackageConfiguration.TINY_X16],
-    #      DroneType.drone_type_2: [PackageConfiguration.LARGE_X4, PackageConfiguration.MEDIUM_X8,
-    #                               PackageConfiguration.SMALL_X16, PackageConfiguration.TINY_X32],
-    #      DroneType.drone_type_3: [PackageConfiguration.LARGE_X2, PackageConfiguration.MEDIUM_X4,
-    #                               PackageConfiguration.SMALL_X8, PackageConfiguration.TINY_X16],
-    #      DroneType.drone_type_4: [PackageConfiguration.LARGE_X2, PackageConfiguration.MEDIUM_X4,
-    #                               PackageConfiguration.SMALL_X8, PackageConfiguration.TINY_X16]
-    #      }
-
     drone_configurations_map: {DroneType: {PackageConfiguration: int}} = \
         {DroneType.drone_type_1: {PackageConfiguration.LARGE_X2: 400,
                                   PackageConfiguration.MEDIUM_X4: 400,
@@ -190,13 +179,6 @@ class DroneTypeToPackageConfigurationOptions:
 
 
 class DroneConfigurations:
-    # drone_configurations_map: {DroneType: {PackageConfiguration: DronePackageConfiguration}} = \
-    #     {drone_type: {
-    #         configuration: DroneTypeToPackageConfigurationOptions.get_drone_configuration(drone_type, configuration)
-    #         for configuration in configurations}
-    #         for drone_type, configurations in
-    #         DroneTypeToPackageConfigurationOptions.drone_configurations_map.items()}
-
     @classmethod
     def get_drone_configuration(cls, drone_type: DroneType,
                                 configuration: PackageConfiguration) -> DronePackageConfiguration:

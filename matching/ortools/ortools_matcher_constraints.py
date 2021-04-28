@@ -76,19 +76,6 @@ class ORToolsMatcherConstraints:
         self._allow_only_depos_to_have_waiting_time(session_time_dimension)
         self._add_vehicle_start_node_index_transit_and_slack_vars_to_solution(session_time_dimension)
 
-
-        # session_time_callback_index = self._routing_model.RegisterTransitCallback(self._create_session_evaluator())
-        # self._routing_model.AddDimension(
-        #     session_time_callback_index,
-        #     self._matcher_input.config.constraints.session_time.max_session_time,
-        #     self._matcher_input.config.constraints.session_time.max_session_time,
-        #     True,
-        #     OrToolsDimensionDescription.session_time.value)
-        #
-        # session_time_dimension = self._routing_model.GetDimensionOrDie(OrToolsDimensionDescription.session_time.value)
-        # self._allow_only_depos_to_have_waiting_time(session_time_dimension)
-        # self._add_vehicle_start_node_index_transit_and_slack_vars_to_solution(session_time_dimension)
-
     def add_demand(self):
         demand_dimension_name_prefix = OrToolsDimensionDescription.capacity.value + "_"
         for package_type in PackageType:
