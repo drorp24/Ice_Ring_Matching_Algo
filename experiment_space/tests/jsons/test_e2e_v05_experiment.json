@@ -1,0 +1,18 @@
+{
+  "__class__": "ImportedJsonParser",
+  "board_level_properties": {
+    "__class__": "BoardLevelProperties",
+    "max_route_time_entire_board": 1440,
+    "velocity_entire_board": 10.0
+  },
+  "delivery_requests_file_path": "experiment_space/tests/jsons/exported/DeliveryRequests.json",
+  "drone_loading_docks_file_path": "experiment_space/tests/jsons/exported/DroneLoadingDocks.json",
+  "drone_set_properties_list_path": "experiment_space/tests/jsons/exported/fleet_allocations_input.json",
+  "graph_creation_algorithm": {
+    "__class__": "FullyConnectedGraphAlgorithm",
+    "edge_cost_factor": 0.0000588235,
+    "edge_travel_time_factor":0.0000588235
+  },
+  "matcher_config_path": "experiment_space/tests/jsons/exported/configuration_file.json",
+  "zones_file_path": "experiment_space/tests/jsons/exported/Zones.json"
+}
