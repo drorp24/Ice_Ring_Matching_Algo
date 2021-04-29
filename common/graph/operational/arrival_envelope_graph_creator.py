@@ -13,7 +13,7 @@ from common.graph.operational.graph_utils import sort_delivery_requests_by_zone,
     filter_nodes_with_time_overlapping
 from common.graph.operational.operational_graph import OperationalGraph, OperationalEdge, OperationalEdgeAttribs, \
     OperationalNode
-from drop_envelope.arrival_envelope_service import MockPotentialArrivalEnvelopeService
+from drop_envelope.envelopes_service import EnvelopesService
 
 
 def create_clustered_delivery_requests_graph(delivery_requests: [DeliveryRequest],
@@ -24,7 +24,7 @@ def create_clustered_delivery_requests_graph(delivery_requests: [DeliveryRequest
                                              max_clusters: int = 1
                                              ) -> OperationalGraph:
     delivery_requests_by_zone = sort_delivery_requests_by_zone(delivery_requests, zones)
-    arrival_envelope_service = MockPotentialArrivalEnvelopeService.from_nodes(delivery_requests + drone_loading_docks)
+    arrival_envelope_service = EnvelopesService.from_nodes(delivery_requests + drone_loading_docks)
     delivery_requests_clusters = list(itertools.chain.from_iterable((
         map(lambda item: list(
             split_delivery_requests_into_clusters(delivery_requests=item[1], max_clusters=max_clusters).values()),
@@ -41,7 +41,7 @@ def create_clustered_delivery_requests_graph(delivery_requests: [DeliveryRequest
     return graph
 
 
-def add_locally_connected_dr_graph(graph, arrival_envelope_service: MockPotentialArrivalEnvelopeService,
+def add_locally_connected_dr_graph(graph, arrival_envelope_service: EnvelopesService,
                                    dr_connection_options: [DeliveryRequest],
                                    edge_cost_factor: float = 1.0,
                                    edge_travel_time_factor: float = 1.0,
@@ -63,7 +63,7 @@ def add_locally_connected_dr_graph(graph, arrival_envelope_service: MockPotentia
 
 
 def _create_directed_from_edges(origin_node: OperationalNode, destinations: List[OperationalNode],
-                                arrival_envelope_service: MockPotentialArrivalEnvelopeService,
+                                arrival_envelope_service: EnvelopesService,
                                 edge_cost_factor: float = 1.0, edge_travel_time_factor: float = 1.0) -> \
         List[OperationalEdge]:
     edges = list(map(lambda y:
@@ -96,7 +96,7 @@ def build_time_overlapping_dependent_connected_graph(graph: OperationalGraph,
                                                      edge_cost_factor: float = 1.0,
                                                      edge_travel_time_factor: float = 1.0):
     nodes = list(graph.nodes)
-    arrival_envelope_service = MockPotentialArrivalEnvelopeService.from_nodes(nodes)
+    arrival_envelope_service = EnvelopesService.from_nodes(nodes)
     for selected_node_index, origin_node in enumerate(nodes):
         destinations = filter_nodes_with_time_overlapping(selected_node=origin_node,
                                                           optional_nodes=graph.nodes[selected_node_index:])
@@ -109,7 +109,7 @@ def build_package_dependent_connected_graph(graph: OperationalGraph,
                                             edge_cost_factor: float = 1.0,
                                             edge_travel_time_factor: float = 1.0,
                                             delivery_option_index: int = 0):
-    arrival_envelope_service = MockPotentialArrivalEnvelopeService.from_nodes(list(graph.nodes))
+    arrival_envelope_service = EnvelopesService.from_nodes(list(graph.nodes))
     for selected_node_index, selected_node in enumerate(graph.nodes):
         destinations = filter_nodes_with_at_least_one_identical_package_type(selected_node=selected_node,
                                                                              optional_nodes=graph.nodes[
@@ -124,7 +124,7 @@ def build_package_and_time_dependent_connected_graph(graph: OperationalGraph,
                                                      edge_cost_factor: float = 1.0,
                                                      edge_travel_time_factor: float = 1.0,
                                                      delivery_option_index: int = 0):
-    arrival_envelope_service = MockPotentialArrivalEnvelopeService.from_nodes(list(graph.nodes))
+    arrival_envelope_service = EnvelopesService.from_nodes(list(graph.nodes))
     for selected_node_index, selected_node in enumerate(graph.nodes):
         destinations_by_packages = filter_nodes_with_at_least_one_identical_package_type(selected_node=selected_node,
                                                                                          optional_nodes=graph.nodes[
@@ -146,7 +146,7 @@ def build_fully_connected_graph(graph: OperationalGraph,
                                 edge_cost_factor: float = 1.0,
                                 edge_travel_time_factor: float = 1.0):
     nodes = list(graph.nodes)
-    arrival_envelope_service = MockPotentialArrivalEnvelopeService.from_nodes(nodes)
+    arrival_envelope_service = EnvelopesService.from_nodes(nodes)
     for i, origin_node in enumerate(nodes):
         destinations = list(filter(lambda x: x != origin_node,
                                    nodes[i:]))
@@ -159,7 +159,7 @@ def add_fully_connected_loading_docks(graph: OperationalGraph, drone_loading_doc
                                       edge_cost_factor: float = 1.0,
                                       edge_travel_time_factor: float = 1.0):
     graph.add_operational_nodes([OperationalNode(dld) for dld in drone_loading_docks])
-    arrival_envelope_service = MockPotentialArrivalEnvelopeService.from_nodes(graph.nodes)
+    arrival_envelope_service = EnvelopesService.from_nodes(graph.nodes)
     dr_in_graph = get_delivery_requests_from_graph(graph)
     edges = []
     for dld in drone_loading_docks:
@@ -171,7 +171,7 @@ def add_fully_connected_loading_docks(graph: OperationalGraph, drone_loading_doc
 
 
 def create_two_way_directed_edges(node_content_1, node_content_2,
-                                  arrival_envelope_service: MockPotentialArrivalEnvelopeService,
+                                  arrival_envelope_service: EnvelopesService,
                                   edge_cost_factor: float = 1.0,
                                   edge_travel_time_factor: float = 1.0
                                   ) -> [OperationalEdge]:

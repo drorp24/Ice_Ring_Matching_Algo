@@ -9,7 +9,7 @@ from common.entities.base_entities.temporal import Temporal
 from common.entities.base_entities.zone import Zone
 from common.graph.operational.operational_graph import OperationalNode
 from common.tools.clustering_alg import fit_k_means
-from drop_envelope.arrival_envelope_service import MockPotentialArrivalEnvelopeService
+from drop_envelope.envelopes_service import EnvelopesService
 from geometry.utils import Localizable
 from visualization.basic.pltdrawer2d import create_drawer_2d
 from visualization.operational.operational_drawer2d import add_operational_graph
@@ -71,7 +71,7 @@ def calc_travel_time_in_min(start: Localizable, end: Localizable, edge_travel_ti
     return calc_distance(end, start) * edge_travel_time_factor
 
 
-def calc_arrival_envelope_cost(arrival_envelope_service: MockPotentialArrivalEnvelopeService,
+def calc_arrival_envelope_cost(arrival_envelope_service: EnvelopesService,
                                start: Union[DeliveryRequest, DroneLoadingDock],
                                end: Union[DeliveryRequest, DroneLoadingDock],
                                edge_cost_factor: float = 1.0) -> float:
@@ -80,7 +80,7 @@ def calc_arrival_envelope_cost(arrival_envelope_service: MockPotentialArrivalEnv
     return edge_cost_factor * arrival_envelope_cost(arrival_envelope_start, arrival_envelope_end)
 
 
-def calc_arrival_envelope_travel_time(arrival_envelope_service: MockPotentialArrivalEnvelopeService,
+def calc_arrival_envelope_travel_time(arrival_envelope_service: EnvelopesService,
                                       start: Union[DeliveryRequest, DroneLoadingDock],
                                       end: Union[DeliveryRequest, DroneLoadingDock],
                                       edge_travel_time_factor: float = 1.0) -> float:
