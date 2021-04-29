@@ -6,7 +6,7 @@ from common.math.angle import Angle
 from drop_envelope.azimuth_quantization import get_azimuth_quantization_values
 from drop_envelope.drop_envelope import DropEnvelope, DropEnvelopeProperties
 from drop_envelope.envelope_collections import ShapeableCollection
-from drop_envelope.slide_service import _SlidesService, MockSlidesServiceWrapper
+from drop_envelope.slide_service import MockSlidesServiceWrapper
 from geometry.geo2d import Point2D, Polygon2D
 from geometry.utils import Shapeable
 
@@ -19,16 +19,23 @@ class PotentialDropEnvelopes(ShapeableCollection):
         self._drop_azimuth = drop_azimuth
         self._internal_envelopes = drop_envelopes
 
+    def __eq__(self, other):
+        return all([self.drop_point == other.drop_point,
+                   self.drop_azimuth == other.drop_azimuth,
+                   self.envelopes == other.envelopes])
+
+    def __hash__(self):
+        return hash(tuple((str(self.drop_point), str(self.drop_azimuth), tuple(self.envelopes))))
+
     @classmethod
     def from_drop_envelope_properties(cls, drop_azimuth: Optional.of(Angle), package_type: PackageType,
                                       drop_point: Point2D):
-
         drone_azimuths = get_azimuth_quantization_values(MockSlidesServiceWrapper.drone_azimuth_level_amount)
         drop_envelopes = [DropEnvelope(DropEnvelopeProperties(
-                package_type=package_type,
-                drop_azimuth=drone_azimuth if drop_azimuth.is_empty() else drop_azimuth.get(),
-                drop_point=drop_point,
-                drone_azimuth=drone_azimuth)) for drone_azimuth in drone_azimuths]
+            package_type=package_type,
+            drop_azimuth=drone_azimuth if drop_azimuth.is_empty() else drop_azimuth.get(),
+            drop_point=drop_point,
+            drone_azimuth=drone_azimuth)) for drone_azimuth in drone_azimuths]
         drop_envelopes = list(filter(lambda drop_envelope: isinstance(drop_envelope.internal_envelope, Polygon2D),
                                      drop_envelopes))
         return PotentialDropEnvelopes(drop_point=drop_point,
