@@ -41,7 +41,7 @@ def add_delivery_option(drawer: Drawer2D, do: DeliveryOption, draw_internal=True
 
 
 def add_delivery_request(drawer: Drawer2D, dr: DeliveryRequest, draw_internal=True, color: Color = Color.Green, radius=0.05):
-    drawer.add_point2d(dr.calc_location(),radius=radius, edgecolor=color, facecolor=color, linewidth=1)
+    drawer.add_point2d(dr.calc_location(),radius=radius, edgecolor=color, facecolor=color, linewidth=6)
     if draw_internal:
         for do in dr.delivery_options:
             drawer.add_point2d(do.calc_location(), edgecolor=color, linewidth=2)
