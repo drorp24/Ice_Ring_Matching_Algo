@@ -3,6 +3,7 @@ from typing import List
 import cartopy.crs as ccrs
 import matplotlib.pyplot as plt
 import numpy as np
+import utm as UTM
 from matplotlib.patches import Polygon, Circle, PathPatch, Path, Patch
 
 from geometry.geo2d import Point2D, Polygon2D, LineString2D, LinearRing2D
@@ -34,9 +35,14 @@ class PltDrawer2D(Drawer2D):
 
     def add_point2d(self, point2d: Point2D, radius=0.05, edgecolor: Color = Color.Blue, facecolor: Color = Color.Blue,
                     facecolor_alpha=1, linewidth=2, label=None) -> None:
+        point_2d_x = point2d.x
+        point_2d_y = point2d.y
         if self._coordinate_sys is Drawer2DCoordinateSys.GEOGRAPHIC:
             radius *= GEOGRAPHIC_RADIUS_SIZE_RATIO
-        point = Circle((point2d.x, point2d.y), radius=radius,
+        if self._coordinate_sys is Drawer2DCoordinateSys.GEOGRAPHIC_UTM:
+            point_2d_y, point_2d_x = UTM.to_latlon(point_2d_x, point_2d_y, zone_number=36, zone_letter="R")
+
+        point = Circle((point_2d_x, point_2d_y), radius=radius,
                        edgecolor=edgecolor.get_rgb(),
                        facecolor=facecolor.get_rgb_with_alpha(facecolor_alpha),
                        linewidth=linewidth, label=label)
@@ -104,7 +110,7 @@ class PltDrawer2D(Drawer2D):
             plt.title('90\xb0', fontsize=14)
             plt.xlabel('270\xb0', fontsize=14)
             plt.ylabel('180\xb0', fontsize=14)
-        elif self._coordinate_sys is Drawer2DCoordinateSys.GEOGRAPHIC:
+        elif self._coordinate_sys is Drawer2DCoordinateSys.GEOGRAPHIC or self._coordinate_sys is Drawer2DCoordinateSys.GEOGRAPHIC_UTM:
             self._fig = plt.figure()
             self._ax = plt.axes(projection=ccrs.PlateCarree())
             if mapImage is not None:
@@ -138,4 +144,4 @@ class PltDrawer2D(Drawer2D):
         else:
             plt.legend(handles=[
                 Patch(label=new_labels[i], color=new_label_colors[i].get_rgb()) for i, label in enumerate(new_labels)],
-                      loc="upper left", bbox_to_anchor=(1.01, 1), ncol=3, fontsize=fontsize)
+                loc="upper left", bbox_to_anchor=(1.01, 1), ncol=3, fontsize=fontsize)
