@@ -49,7 +49,7 @@ class DeliveryRequest(JsonableBaseEntity, Localizable, Temporal):
             delivery_options=[DeliveryOption.dict_to_obj(do_dict) for do_dict in
                               dict_input['delivery_options']],
             time_window=TimeWindowExtension.dict_to_obj(dict_input['time_window']),
-            priority=dict_input['priority'])
+            priority=int(dict_input['priority']))
 
     def __eq__(self, other: DeliveryRequest):
         return all([self.__class__ == other.__class__,
