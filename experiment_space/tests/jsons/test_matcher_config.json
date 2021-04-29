@@ -41,10 +41,6 @@
       "__class__": "PriorityConstraints",
       "count_priority_from_zero": true,
       "priority_cost_coefficient": 1
-    },
-    "session_time": {
-      "__class__": "SessionTimeConstraints",
-      "max_session_time": 1000
     }
   },
   "unmatched_penalty": 1000,

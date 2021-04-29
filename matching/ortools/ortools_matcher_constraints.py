@@ -63,11 +63,12 @@ class ORToolsMatcherConstraints:
         self._add_vehicle_start_node_index_transit_and_slack_vars_to_solution(travel_time_dimension)
 
     def add_session_time(self):
+
         session_time_callback_index = self._routing_model.RegisterTransitCallback(self._create_session_evaluator())
-        self._routing_model.AddDimension(
+        self._routing_model.AddDimensionWithVehicleCapacity(
             session_time_callback_index,
-            self._matcher_input.config.constraints.session_time.max_session_time,
-            self._matcher_input.config.constraints.session_time.max_session_time,
+            max(self._matcher_input.delivering_drones_board.get_max_session_time_per_drone_delivery()),
+            self._matcher_input.delivering_drones_board.get_max_session_time_per_drone_delivery(),
             True,
             OrToolsDimensionDescription.session_time.value)
 
@@ -275,7 +276,7 @@ class ORToolsMatcherConstraints:
             if _from_node == _to_node:
                 return 0
             if _from_node in self._reloader.arrive_indices and _to_node == (_from_node + 1):
-                return -self._matcher_input.config.constraints.session_time.max_session_time
+                return -max(self._matcher_input.delivering_drones_board.get_max_session_time_per_drone_delivery())
             if _from_node in self._reloader.arrive_indices and _to_node != (_from_node + 1):
                 return sys.maxsize
             if _to_node in self._reloader.depart_indices and _from_node != (_to_node - 1):

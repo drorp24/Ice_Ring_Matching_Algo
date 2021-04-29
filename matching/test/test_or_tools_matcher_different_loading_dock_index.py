@@ -182,7 +182,6 @@ class ORToolsMatcherDifferentLoadingDockIndexTestCase(TestCase):
                                                               count_time_from_zero=False,
                                                               reloading_time=0,
                                                               important_earliest_coeff=1),
-                session_time_constraints=SessionTimeConstraints(max_session_time=300),
                 priority_constraints=PriorityConstraints(True, priority_cost_coefficient=1)),
             unmatched_penalty=10000,
             reload_per_vehicle=0,

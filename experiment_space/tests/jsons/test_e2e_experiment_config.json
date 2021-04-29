@@ -37,10 +37,6 @@
       "reloading_time": 120,
       "important_earliest_coeff": 1
     },
-    "session_time": {
-      "__class__": "SessionTimeConstraints",
-      "max_session_time": 60
-    },
     "priority": {
       "__class__": "PriorityConstraints",
       "count_priority_from_zero": true,
