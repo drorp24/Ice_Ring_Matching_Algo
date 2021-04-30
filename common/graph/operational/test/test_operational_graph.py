@@ -173,22 +173,6 @@ class BasicDeliveryRequestGraphTestCases(unittest.TestCase):
         self.assertEqual(returned_edges[6].start_node, edges[6].start_node)
         self.assertEqual(returned_edges[6].end_node, edges[6].end_node)
 
-    def test_drone_loading_dock_set_internal_graph(self):
-        drg1 = OperationalGraph()
-        drg1.add_drone_loading_docks(self.dld_dataset_random)
-        drg2 = OperationalGraph()
-        drg2.set_internal_graph(drg1.get_internal_graph())
-        self.assertFalse(drg1.is_empty())
-        self.assertEqual(_get_dr_from_dr_graph(drg1), _get_dr_from_dr_graph(drg2))
-
-    def test_delivery_request_set_internal_graph(self):
-        drg1 = OperationalGraph()
-        drg1.add_delivery_requests(self.dr_dataset_random)
-        drg2 = OperationalGraph()
-        drg2.set_internal_graph(drg1.get_internal_graph())
-        self.assertFalse(drg1.is_empty())
-        self.assertEqual(_get_dr_from_dr_graph(drg1), _get_dr_from_dr_graph(drg2))
-
     def test_calc_subgraph_in_time_window(self):
         drg_full_day = OperationalGraph()
         drg_full_day.add_delivery_requests(self.dr_dataset_morning)

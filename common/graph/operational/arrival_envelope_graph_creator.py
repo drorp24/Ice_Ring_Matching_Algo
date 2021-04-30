@@ -158,7 +158,7 @@ def build_fully_connected_graph(graph: OperationalGraph,
 def add_fully_connected_loading_docks(graph: OperationalGraph, drone_loading_docks: [DroneLoadingDock],
                                       edge_cost_factor: float = 1.0,
                                       edge_travel_time_factor: float = 1.0):
-    graph.add_operational_nodes([OperationalNode(dld) for dld in drone_loading_docks])
+    graph.add_drone_loading_docks(drone_loading_docks)
     arrival_envelope_service = MockPotentialEnvelopeService.from_operational_nodes(graph.nodes)
     dr_in_graph = get_delivery_requests_from_graph(graph)
     edges = []

@@ -1,4 +1,6 @@
 import unittest
+from copy import deepcopy
+from pathlib import Path
 from random import Random
 
 from common.entities.base_entities.delivery_request import DeliveryRequest
@@ -11,6 +13,7 @@ from common.graph.operational.operational_graph import OperationalNode, Operatio
 
 
 class BasicGraphNodeTestCases(unittest.TestCase):
+    temp_path = Path('matching/test/jsons/test_solver_config_1.json')
 
     @classmethod
     def setUpClass(cls):
@@ -33,6 +36,10 @@ class BasicGraphNodeTestCases(unittest.TestCase):
                                                              cls.example_node_delivery_request_1,
                                                              cls.example_node_drone_loading_dock])
         cls.example_operational_graph.add_operational_edges([cls.example_op_edge])
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.temp_path.unlink()
 
     def test_delivery_request_operational_node_to_dict(self):
         op_node_dict = self.example_node_delivery_request_0.__dict__()
@@ -62,3 +69,12 @@ class BasicGraphNodeTestCases(unittest.TestCase):
         self.assertTrue(example_operational_graph_dict['__class__'] is OperationalGraph.__name__)
         obj1 = OperationalGraph.dict_to_obj(example_operational_graph_dict)
         self.assertEqual(obj1, self.example_operational_graph)
+
+    def test_operational_graph_is_jsonable(self):
+        self.example_operational_graph.to_json(self.temp_path)
+        operational_graph_from_json = OperationalGraph.from_json(OperationalGraph, self.temp_path)
+        self.assertEqual(self.example_operational_graph, operational_graph_from_json)
+
+    def test_operational_graph_deepcopy(self):
+        graph_copy = deepcopy(self.example_operational_graph)
+        self.assertEqual(self.example_operational_graph, graph_copy)

@@ -41,28 +41,18 @@ class OrtoolsGraphExporter(GraphExporter):
         return arr
 
     def export_basis_nodes_indices(self, graph: OperationalGraph) -> List[int]:
-        nodes = graph.nodes
-        nodes_indices = [i for i, node in enumerate(nodes) if isinstance(node.internal_node, DroneLoadingDock)]
-        return nodes_indices
+        return graph.get_all_loading_docks_indices()
 
     def export_delivery_request_nodes_indices(self, graph: OperationalGraph) -> List[int]:
-        nodes = graph.nodes
-        nodes_indices = [i for i, node in enumerate(nodes) if isinstance(node.internal_node, DeliveryRequest)]
-        return nodes_indices
+        return graph.get_all_delivery_requests_indices()
 
     @staticmethod
     def get_delivery_request(graph: OperationalGraph, index: int) -> DeliveryRequest:
-        node = list(graph.nodes)[index].internal_node
-        if not isinstance(node, DeliveryRequest):
-            raise TypeError(f"The given index {index} is not of a delivery request node.")
-        return node
+        return graph.get_delivery_request(index)
 
     @staticmethod
     def get_drone_loading_dock(graph: OperationalGraph, index: int) -> DroneLoadingDock:
-        node = list(graph.nodes)[index].internal_node
-        if not isinstance(node, DroneLoadingDock):
-            raise TypeError(f"The given index {index} is not of a drone loading dock node.")
-        return node
+        return graph.get_loading_dock(index)
 
     @staticmethod
     def get_node_graph_index(graph: OperationalGraph, node: Union[DroneLoadingDock, DeliveryRequest]) -> int:
