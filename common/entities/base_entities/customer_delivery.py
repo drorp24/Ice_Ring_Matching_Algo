@@ -26,7 +26,7 @@ class CustomerDelivery(JsonableBaseEntity, Localizable, PackageHolder):
         return self._package_delivery_plans
 
     def calc_location(self) -> Point2D:
-        return calc_centroid([pdp.drop_point for pdp in self._package_delivery_plans])
+        return calc_centroid(tuple(pdp.drop_point for pdp in self._package_delivery_plans))
 
     def calc_bounds(self) -> Polygon2D:
         return calc_convex_hull_polygon([pdp.drop_point for pdp in self._package_delivery_plans])

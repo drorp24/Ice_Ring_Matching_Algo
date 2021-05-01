@@ -4,6 +4,7 @@ from datetime import timedelta
 from common.entities.base_entities.delivery_request import DeliveryRequest
 from common.entities.base_entities.drone_delivery_board import DroneDeliveryBoard, UnmatchedDeliveryRequest
 from common.entities.base_entities.temporal import TimeDeltaExtension, TimeWindowExtension
+from common.graph.operational.operational_graph import OperationalNode
 from matching.matcher_factory import create_matcher
 from matching.matcher_input import MatcherInput
 from matching.ortools.ortools_matcher import ORToolsMatcher
@@ -81,9 +82,11 @@ class MatchingMaster:
 
     @staticmethod
     def _remove_matched_requests_from_graph(intermediate_delivery_board, updating_matcher_input):
+        matched_nodes = []
         for delivery in intermediate_delivery_board.drone_deliveries:
-            updating_matcher_input.graph.remove_delivery_requests(
-                [matched_request.delivery_request for matched_request in delivery.matched_requests])
+            for matched_request in delivery.matched_requests:
+                matched_nodes.append(OperationalNode(matched_request.delivery_request))
+        updating_matcher_input.graph = updating_matcher_input.graph.create_subgraph_without_nodes(matched_nodes)
 
     def _update_delivering_drones_start_dock_time_window(self, start_match_time_delta_in_minutes,
                                                          updating_matcher_input):

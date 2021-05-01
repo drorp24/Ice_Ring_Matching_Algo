@@ -40,7 +40,7 @@ class DeliveryRequest(JsonableBaseEntity, Localizable, Temporal):
         return self._priority
 
     def calc_location(self) -> Point2D:
-        return calc_centroid([do.calc_location() for do in self.delivery_options])
+        return calc_centroid(tuple(do.calc_location() for do in self.delivery_options))
 
     @classmethod
     def dict_to_obj(cls, dict_input):

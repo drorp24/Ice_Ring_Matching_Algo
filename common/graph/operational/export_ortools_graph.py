@@ -40,6 +40,7 @@ class OrtoolsGraphExporter(GraphExporter):
         arr = np.where(arr == np.iinfo(np.int64).min, sys.maxsize, arr)
         return arr
 
+    @lru_cache()
     def export_basis_nodes_indices(self, graph: OperationalGraph) -> List[int]:
         return graph.get_all_loading_docks_indices()
 

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from functools import reduce
+from functools import reduce, lru_cache
 from typing import List, Union
 
 from matplotlib.patches import Ellipse
@@ -41,7 +41,7 @@ def convert_to_point(vector: Vector2D) -> Point2D:
 def create_vector_2d(x: float, y: float) -> Vector2D:
     return _MathVector2D(x, y)
 
-
+@lru_cache()
 def convert_to_vector(point: Point2D) -> Vector2D:
     return create_vector_2d(point.x, point.y)
 
@@ -76,8 +76,8 @@ def create_line_string_2d(points: List[Point2D]) -> LineString2D:
 def create_linear_ring_2d(points: List[Point2D]) -> LinearRing2D:
     return _ShapelyLinearRing2D(points)
 
-
-def calc_centroid(points: [Point2D]) -> Point2D:
+@lru_cache()
+def calc_centroid(points: tuple(Point2D)) -> Point2D:
     l = (reduce(lambda p, j: p + j, points).to_vector() * (1.0 / points.__len__())).to_point()
     return l
 

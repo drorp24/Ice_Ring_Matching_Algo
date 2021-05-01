@@ -226,6 +226,21 @@ class OperationalGraph(JsonableBaseEntity):
         subgraph._internal_graph = extracted_subgraph
         return subgraph
 
+    def create_subgraph_without_nodes(self, nodes_to_remove: [OperationalNode]):
+        internal_nodes_to_remove = [node.internal_node for node in nodes_to_remove]
+        subgraph = OperationalGraph()
+        new_nodes = []
+        for node in self._get_all_internal_nodes_map().values():
+            if node not in internal_nodes_to_remove:
+                new_nodes.append(node.id)
+                if type(node) is DeliveryRequest:
+                    subgraph._delivery_requests_map[node.id] = node
+                elif type(node) is DroneLoadingDock:
+                    subgraph._loading_docks_map[node.id] = node
+        extracted_subgraph = self._extract_internal_subgraph_of_nodes(new_nodes)
+        subgraph._internal_graph = extracted_subgraph
+        return subgraph
+
     def to_cost_numpy_array(self, nonedge: float, dtype) -> np.ndarray:
         costs = to_numpy_array(self._internal_graph, weight="cost", nonedge=nonedge, dtype=dtype)
         if nonedge != 0:
@@ -259,15 +274,16 @@ class OperationalGraph(JsonableBaseEntity):
         index = list(self._internal_graph.nodes(data=False)).index(id_)
         return index
 
-    def get_nodes_indices_by_ids(self, ids: [EntityID]) -> [int]:
+    @lru_cache()
+    def get_nodes_indices_by_ids(self, ids: tuple(EntityID)) -> [int]:
         graph_ids = list(self._internal_graph.nodes(data=False))
         return [graph_ids.index(id_) for id_ in ids]
 
     def get_all_delivery_requests_indices(self) -> [int]:
-        return self.get_nodes_indices_by_ids(list(self._delivery_requests_map.keys()))
+        return self.get_nodes_indices_by_ids(tuple(self._delivery_requests_map.keys()))
 
     def get_all_loading_docks_indices(self) -> [int]:
-        return self.get_nodes_indices_by_ids(list(self._loading_docks_map.keys()))
+        return self.get_nodes_indices_by_ids(tuple(self._loading_docks_map.keys()))
 
     def remove_delivery_requests(self, delivery_requests: [DeliveryRequest]):
         for dr in delivery_requests:

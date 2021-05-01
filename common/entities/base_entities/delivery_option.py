@@ -34,7 +34,7 @@ class DeliveryOption(JsonableBaseEntity, Localizable, PackageHolder):
             customer_delivery.package_delivery_plans for customer_delivery in self.customer_deliveries))
 
     def calc_location(self) -> Point2D:
-        return calc_centroid([cd.calc_location() for cd in self.customer_deliveries])
+        return calc_centroid(tuple(cd.calc_location() for cd in self.customer_deliveries))
 
     def get_package_type_amount(self, package_type: PackageType) -> int:
         customer_deliveries = self.customer_deliveries

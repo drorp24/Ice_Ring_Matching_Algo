@@ -351,6 +351,7 @@ class ORToolsMatcherConstraints:
              exec_globals, exec_locals)
         return exec_locals[callback_name]
 
+    @lru_cache()
     def _are_nodes_consecutive_depos(self, from_node, to_node) -> bool:
         depots = self._graph_exporter.export_basis_nodes_indices(self._matcher_input.graph) \
                  + self._reloader.reloading_virtual_depos_indices

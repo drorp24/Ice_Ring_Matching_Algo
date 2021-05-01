@@ -1,6 +1,9 @@
+import cProfile
+import pstats
 import unittest
-from datetime import timedelta
+from datetime import timedelta, datetime
 from pathlib import Path
+from pstats import Stats, SortKey
 from random import Random
 
 from ortools.constraint_solver.routing_enums_pb2 import FirstSolutionStrategy
@@ -19,10 +22,12 @@ from common.entities.base_entities.entity_distribution.package_distribution impo
 from common.entities.base_entities.entity_distribution.priority_distribution import PriorityDistribution
 from common.entities.base_entities.entity_distribution.temporal_distribution import TimeDeltaDistribution, \
     TimeWindowDistribution, DateTimeDistribution
+from common.entities.base_entities.entity_id import EntityID
 from common.entities.base_entities.fleet.fleet_property_sets import DroneSetProperties, DroneFormationTypePolicy, \
     PackageConfigurationPolicy, BoardLevelProperties
 from common.entities.base_entities.package import PackageType
 from common.entities.base_entities.temporal import TimeDeltaExtension
+from common.graph.operational.operational_graph import OperationalGraph
 from experiment_space.analyzer.quantitative_analyzers import MatchedDeliveryRequestsAnalyzer, \
     UnmatchedDeliveryRequestsAnalyzer, MatchPercentageDeliveryRequestAnalyzer, TotalWorkTimeAnalyzer, \
     AmountMatchedPerPackageTypeAnalyzer, MatchingEfficiencyAnalyzer, MatchingPriorityEfficiencyAnalyzer
@@ -50,36 +55,46 @@ class EndToEndMultipleExperimentRun(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
+        # cls.pr = cProfile.Profile()
+        # cls.pr.enable()
         cls.matcher_config = MatcherConfig.dict_to_obj(
             MatcherConfig.json_to_dict(Path('experiment_space/tests/jsons/test_e2e_experiment_config.json')))
 
-    # @unittest.skip
+    @classmethod
+    def tearDownClass(cls):
+        pass
+        # cls.pr.disable()
+        # pstats.Stats(cls.pr).sort_stats(SortKey.CUMULATIVE).print_stats()
+        # pstats.Stats(cls.pr).sort_stats(SortKey.TIME).print_stats()
+        # print("\n\n\n\n--->>>")
+
+    @unittest.skip
     def test_calc_north_scenario_visualization(self):
         sampled_supplier_category = self._create_sampled_supplier_category_north()
         experiment = Experiment(supplier_category=sampled_supplier_category,
                                 drone_set_properties_list=EndToEndMultipleExperimentRun.
                                 _create_large_drone_set_properties_list(
                                     loading_docks=sampled_supplier_category.drone_loading_docks,
-                                    drone_amount=6),
+                                    drone_amount=12),
                                 matcher_config=self.matcher_config,
                                 graph_creation_algorithm=FullyConnectedGraphAlgorithm(edge_cost_factor=25.0,
                                                                                       edge_travel_time_factor=25.0),
                                 board_level_properties=BoardLevelProperties())
         map_image = MapImage(map_background_path=Path("visualization/basic/North_map.png"),
                              west_lon=34.907, east_lon=35.905, south_lat=32.489, north_lat=33.932)
-        self._run_end_to_end_visual_experiment(experiment, SHOW_VISUALS, map_image)
+        self._run_end_to_end_visual_experiment(experiment, False, map_image)
 
-    # @unittest.skip
+    @unittest.skip
     def test_calc_north_scenario_with_time_greedy_visualization(self):
         sampled_supplier_category = self._create_sampled_supplier_category_north()
         matcher_config = MatcherConfig(
             zero_time=ZERO_TIME,
             solver=ORToolsSolverConfig(first_solution_strategy="PATH_CHEAPEST_ARC",
-                                       local_search_strategy="GUIDED_LOCAL_SEARCH", timeout_sec=30),
+                                       local_search_strategy="GUIDED_LOCAL_SEARCH", timeout_sec=60),
             constraints=ConstraintsConfig(
                 capacity_constraints=CapacityConstraints(count_capacity_from_zero=True, capacity_cost_coefficient=10000),
                 travel_time_constraints=TravelTimeConstraints(max_waiting_time=0,
-                                                              max_route_time=540,
+                                                              max_route_time=720,
                                                               count_time_from_zero=False,
                                                               reloading_time=120,
                                                               important_earliest_coeff=1),
@@ -87,21 +102,27 @@ class EndToEndMultipleExperimentRun(unittest.TestCase):
                 priority_constraints=PriorityConstraints(True, priority_cost_coefficient=1000)),
             unmatched_penalty=10000,
             reload_per_vehicle=0,
-            monitor=MonitorConfig(enabled=False),
-            submatch_time_window_minutes=180
+            monitor=MonitorConfig(enabled=False,
+                iterations_between_monitoring=10,
+                max_iterations=-1,
+                save_plot=True,
+                show_plot=True,
+                separate_charts=True,
+                output_directory="outputs"),
+            submatch_time_window_minutes=240
         )
         experiment = Experiment(supplier_category=sampled_supplier_category,
                                 drone_set_properties_list=EndToEndMultipleExperimentRun.
-                                _create_large_drone_set_properties_list(
+                                _create_medium_drone_set_properties_list(
                                     loading_docks=sampled_supplier_category.drone_loading_docks,
-                                    drone_amount=6),
+                                    drone_amount=12),
                                 matcher_config=matcher_config,
                                 graph_creation_algorithm=FullyConnectedGraphAlgorithm(edge_cost_factor=25.0,
                                                                                       edge_travel_time_factor=25.0),
-                                board_level_properties=BoardLevelProperties(max_route_time_entire_board=180))
+                                board_level_properties=BoardLevelProperties(max_route_time_entire_board=240))
         map_image = MapImage(map_background_path=Path("visualization/basic/North_map.png"),
                              west_lon=34.907, east_lon=35.905, south_lat=32.489, north_lat=33.932)
-        self._run_end_to_end_visual_experiment(experiment, SHOW_VISUALS, map_image)
+        self._run_end_to_end_visual_experiment(experiment, True, map_image)
 
     @unittest.skip
     def test_calc_center_scenario_visualization(self):
@@ -216,8 +237,12 @@ class EndToEndMultipleExperimentRun(unittest.TestCase):
                                                                                         32.6675,
                                                                                         32.6675
                                                                                         )),
-                time_window_distributions=_create_standard_full_day_test_time())).choose_rand(Random(10), amount={
-                    DeliveryRequest: 74, DroneLoadingDock: 2})[0]
+                time_window_distributions=_create_standard_full_day_test_time(),
+                ids=[EntityID("aa"), EntityID("bb"), EntityID("cc"), EntityID("dd"), EntityID("ee"), EntityID("ff")]
+            )
+        ).choose_rand(
+            Random(10),
+            amount={DeliveryRequest: 700, DroneLoadingDock: 6})[0]
 
     @classmethod
     def _create_sampled_supplier_category_center(cls):
@@ -266,6 +291,18 @@ class EndToEndMultipleExperimentRun(unittest.TestCase):
                                    drone_amount=drone_amount)
                 for loading_dock in loading_docks]
 
+    @classmethod
+    def _create_medium_drone_set_properties_list(cls, loading_docks: [DroneLoadingDock], drone_amount: int):
+        return [DroneSetProperties(drone_type=loading_dock.drone_type,
+                                   drone_formation_policy=DroneFormationTypePolicy(
+                                       {DroneFormationType.PAIR: 0.0, DroneFormationType.QUAD: 4.0}),
+                                   package_configuration_policy=PackageConfigurationPolicy(
+                                       {PackageConfiguration.MEDIUM_X4: 1}),
+                                   start_loading_dock=loading_dock,
+                                   end_loading_dock=loading_dock,
+                                   drone_amount=drone_amount)
+                for loading_dock in loading_docks]
+
     @staticmethod
     def _create_custom_drone_loading_dock_distribution(drone_station_location):
         return DroneLoadingDockDistribution(
@@ -308,9 +345,15 @@ class EndToEndMultipleExperimentRun(unittest.TestCase):
         return package_distribution
 
     @staticmethod
+    def _create_medium_package_only_distribution():
+        package_type_distribution_dict = {PackageType.MEDIUM: 1}
+        package_distribution = PackageDistribution(package_distribution_dict=package_type_distribution_dict)
+        return package_distribution
+
+    @staticmethod
     def _create_delivery_request_distribution(center_point: Point2D, sigma_lon: float, sigma_lat: float,
                                               lowest_priority: int = 10, dr_timewindow: int = 3):
-        package_distribution = EndToEndMultipleExperimentRun._create_large_package_only_distribution()
+        package_distribution = EndToEndMultipleExperimentRun._create_medium_package_only_distribution()
         zero_time = ZERO_TIME
         time_delta_distrib = TimeDeltaDistribution([TimeDeltaExtension(timedelta(hours=dr_timewindow, minutes=0))])
         dt_options = [zero_time.add_time_delta(TimeDeltaExtension(timedelta(hours=x))) for x in

@@ -58,7 +58,7 @@ def _set_row_color_per_dock(delivering_drones_list, drawer):
     loading_docks_row_colors = set()
     for i, delivering_drones in enumerate(delivering_drones_list):
         row_color = MATCHED_REQUEST_BAR_COLORS[
-            int(delivering_drones.start_loading_dock.id.uuid) % len(MATCHED_REQUEST_BAR_COLORS)]
+            hash(delivering_drones.start_loading_dock.id.uuid) % len(MATCHED_REQUEST_BAR_COLORS)]
         row_number = i + 1 + UNMATCHED_ROW_NUMBER
         drawer.set_row_color(row_number, row_color, ROW_BACKGROUND_ALPHA)
         loading_dock_idx.add(delivering_drones.start_loading_dock.id.uuid)
