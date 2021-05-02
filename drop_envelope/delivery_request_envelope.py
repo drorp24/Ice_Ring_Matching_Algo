@@ -14,6 +14,13 @@ class DeliveryRequestPotentialEnvelope(PotentialEnvelopeCollection):
         self._potential_drop_envelopes = potential_drop_envelopes
         self._centroid = centroid
 
+    def __eq__(self, other):
+        return self.potential_drop_envelopes == other.potential_drop_envelopes and \
+               self.centroid == other.centroid
+
+    def __hash__(self):
+        return hash(tuple((tuple(self.potential_drop_envelopes),self.centroid)))
+
     @classmethod
     def from_delivery_request(cls, delivery_request: DeliveryRequest, chosen_delivery_option_index: int = 0):
         package_delivery_plans = delivery_request.delivery_options[chosen_delivery_option_index].package_delivery_plans

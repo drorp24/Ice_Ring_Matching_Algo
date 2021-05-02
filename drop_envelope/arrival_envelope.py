@@ -87,6 +87,9 @@ class PotentialArrivalEnvelope:
     def __eq__(self, other):
         return self.arrival_envelopes == other.arrival_envelopes and self.centroid == other.centroid
 
+    def __hash__(self):
+        return hash((self.arrival_envelopes.values(),self.centroid))
+
     def get_arrival_envelope(self, arrival_azimuth: Angle) -> ArrivalEnvelope:
         return self.arrival_envelopes[arrival_azimuth]
 
