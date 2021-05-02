@@ -27,8 +27,7 @@ from common.graph.operational.graph_creator import build_fully_connected_graph
 from common.graph.operational.operational_graph import OperationalGraph
 from geometry.distribution.geo_distribution import ExactPointLocationDistribution
 from geometry.geo_factory import create_point_2d
-from matching.constraint_config import ConstraintsConfig, PriorityConstraints, CapacityConstraints, \
-    SessionTimeConstraints, TravelTimeConstraints
+from matching.constraint_config import ConstraintsConfig, PriorityConstraints, CapacityConstraints, TravelTimeConstraints
 from matching.matcher_config import MatcherConfig
 from matching.matcher_input import MatcherInput
 from matching.monitor import MonitorData

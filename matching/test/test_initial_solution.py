@@ -26,8 +26,7 @@ from experiment_space.graph_creation_algorithm import calc_assignment_from_init_
 from geometry.distribution.geo_distribution import NormalPointDistribution, UniformPointInBboxDistribution
 from geometry.geo2d import Point2D
 from geometry.geo_factory import create_point_2d
-from matching.constraint_config import ConstraintsConfig, CapacityConstraints, TravelTimeConstraints, \
-    SessionTimeConstraints, PriorityConstraints
+from matching.constraint_config import ConstraintsConfig, CapacityConstraints, TravelTimeConstraints, PriorityConstraints
 from matching.matcher_config import MatcherConfig
 from matching.matcher_factory import create_matcher
 from matching.matcher_input import MatcherInput

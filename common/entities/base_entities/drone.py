@@ -173,7 +173,7 @@ class DroneTypeToPackageConfigurationOptions:
     @classmethod
     def add_configuration_option(cls, configuration_option: {DroneType: {PackageConfiguration: int}}):
         for key in configuration_option:
-            cls.drone_configurations_map[key] = configuration_option[key]
+            cls.drone_configurations_map[key].update(configuration_option[key])
 
     @classmethod
     def get_drone_configuration(cls, drone_type: DroneType,
