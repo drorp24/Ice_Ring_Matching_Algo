@@ -4,8 +4,7 @@ from unittest import TestCase
 
 from common.entities.base_entities.base_entity import JsonableBaseEntity
 from common.entities.base_entities.temporal import DateTimeExtension
-from matching.constraint_config import CapacityConstraints, PriorityConstraints, \
-    SessionTimeConstraints, TravelTimeConstraints
+from matching.constraint_config import CapacityConstraints, PriorityConstraints, TravelTimeConstraints
 from matching.matcher_config import ConstraintsConfig, MatcherConfig
 from matching.matcher_factory import SolverVendor
 from matching.monitor_config import MonitorConfig
@@ -28,7 +27,6 @@ class MatchConfigTestCase(TestCase):
                                                               count_time_from_zero=False,
                                                               reloading_time=0,
                                                               important_earliest_coeff=1),
-                session_time_constraints=SessionTimeConstraints(max_session_time=300),
                 priority_constraints=PriorityConstraints(True, priority_cost_coefficient=1000)),
             unmatched_penalty=100000,
             reload_per_vehicle=0,
