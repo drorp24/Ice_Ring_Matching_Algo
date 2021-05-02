@@ -25,7 +25,7 @@ from common.graph.operational.operational_graph import OperationalGraph
 from geometry.distribution.geo_distribution import ExactPointLocationDistribution
 from geometry.geo_factory import create_point_2d
 from matching.constraint_config import ConstraintsConfig, CapacityConstraints, TravelTimeConstraints, \
-    PriorityConstraints, SessionTimeConstraints
+    PriorityConstraints
 from matching.matcher_config import MatcherConfig
 from matching.matcher_input import MatcherInput
 from matching.monitor_config import MonitorConfig
@@ -127,7 +127,6 @@ class ORToolsMatcherFleetWithMultiplePackageType(TestCase):
                                                               count_time_from_zero=False,
                                                               reloading_time=0,
                                                               important_earliest_coeff=1),
-                session_time_constraints=SessionTimeConstraints(max_session_time=300),
                 priority_constraints=PriorityConstraints(True, priority_cost_coefficient=100)),
             unmatched_penalty=100000,
             reload_per_vehicle=0,

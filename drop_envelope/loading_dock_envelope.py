@@ -10,6 +10,12 @@ class LoadingDockPotentialEnvelope(PotentialEnvelopeCollection):
     def __init__(self, drone_loading_dock: DroneLoadingDock):
         self._loading_dock = drone_loading_dock
 
+    def __hash__(self):
+        return hash(self.loading_dock)
+
+    def __eq__(self, other):
+        return self.loading_dock == other.loading_dock
+
     @property
     def loading_dock(self) -> DroneLoadingDock:
         return self._loading_dock
@@ -19,4 +25,3 @@ class LoadingDockPotentialEnvelope(PotentialEnvelopeCollection):
 
     def get_centroid(self) -> Point2D:
         return self.loading_dock.calc_location()
-
