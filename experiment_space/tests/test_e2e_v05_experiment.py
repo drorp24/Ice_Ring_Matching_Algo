@@ -37,7 +37,7 @@ class BasicV05End2EndExperiment(unittest.TestCase):
         if cls.experiment_json_from_parser_path.exists():
             cls.experiment_json_from_parser_path.unlink()
 
-    def test_calc_north_scenario_visualization(self):
+    def test_calc_v05_visualization(self):
 
         map_image = MapImage(map_background_path=Path("visualization/basic/all_map.png"),
                              west_lon=34.31, east_lon=36.135, south_lat=29.5, north_lat=33.78)
