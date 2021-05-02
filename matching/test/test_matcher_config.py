@@ -4,8 +4,7 @@ from unittest import TestCase
 
 from common.entities.base_entities.base_entity import JsonableBaseEntity
 from common.entities.base_entities.temporal import DateTimeExtension
-from matching.constraint_config import CapacityConstraints, PriorityConstraints, \
-    SessionTimeConstraints, TravelTimeConstraints
+from matching.constraint_config import CapacityConstraints, PriorityConstraints, TravelTimeConstraints
 from matching.matcher_config import ConstraintsConfig, MatcherConfig
 from matching.matcher_factory import SolverVendor
 from matching.monitor_config import MonitorConfig
