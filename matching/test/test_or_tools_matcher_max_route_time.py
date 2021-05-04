@@ -106,7 +106,8 @@ class ORToolsMatcherMaxRouteTimeTestCase(TestCase):
                 priority_constraints=PriorityConstraints(True, priority_cost_coefficient=100)),
             unmatched_penalty=100000,
             reload_per_vehicle=0,
-            monitor=MonitorConfig(enabled=False)
+            monitor=MonitorConfig(enabled=False),
+            submatch_time_window_minutes=MAX_OPERATION_TIME
         )
 
     def _create_2_delivery_requests_with_big_time_window_difference(self):

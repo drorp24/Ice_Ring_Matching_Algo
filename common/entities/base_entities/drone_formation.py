@@ -85,6 +85,13 @@ class DroneFormation(JsonableBaseEntity, PackageHolder):
         return self.drone_formation_type == other.drone_formation_type \
                and self.drone_package_configuration == other.drone_package_configuration
 
+    def __deepcopy__(self, memodict=None):
+        if memodict is None:
+            memodict = {}
+        new_copy = DroneFormation(self._drone_formation_type, self._drone_package_configuration)
+        memodict[id(self)] = new_copy
+        return new_copy
+
     @classmethod
     def dict_to_obj(cls, dict_input):
         assert (dict_input['__class__'] == cls.__name__)

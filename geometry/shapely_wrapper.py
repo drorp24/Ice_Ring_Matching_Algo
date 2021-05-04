@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from copy import deepcopy
 from typing import List, Tuple, Union
 
 from shapely.geometry import Point, Polygon, LineString, LinearRing, MultiPolygon
@@ -28,6 +29,14 @@ class _ShapelyGeometry(JsonableBaseEntity):
 
     def is_empty(self) -> bool:
         return self.__shapely_obj.is_empty or isinstance(self, _ShapelyEmptyGeometry)
+
+    def __deepcopy__(self, memodict=None):
+        if memodict is None:
+            memodict = {}
+        # noinspection PyArgumentList
+        new_copy = _ShapelyGeometry(deepcopy(self.__shapely_obj, memodict))
+        memodict[id(self)] = new_copy
+        return new_copy
 
 
 class _ShapelyEmptyGeometry(_ShapelyGeometry, EmptyGeometry2D):

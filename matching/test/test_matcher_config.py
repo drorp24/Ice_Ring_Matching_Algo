@@ -36,7 +36,8 @@ class MatchConfigTestCase(TestCase):
                                   save_plot=True,
                                   show_plot=True,
                                   separate_charts=True,
-                                  output_directory="outputs")
+                                  output_directory="outputs"),
+            submatch_time_window_minutes=1440
         )
 
     @classmethod

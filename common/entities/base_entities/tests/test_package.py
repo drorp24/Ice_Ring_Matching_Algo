@@ -27,14 +27,14 @@ class BasicPackageTestCase(unittest.TestCase):
         cls.p4 = PackageType.LARGE
         point = create_point_2d(1, 2)
         cls.id_test_1 = EntityID(UUID(int=42))
-        cls.pdp_1 = PackageDeliveryPlan(id=cls.id_test_1,
+        cls.pdp_1 = PackageDeliveryPlan(id_=cls.id_test_1,
                                         drop_point=point,
                                         azimuth=Angle(30, AngleUnit.DEGREE),
                                         pitch=Angle(80, AngleUnit.DEGREE),
                                         package_type=PackageType.TINY)
 
         cls.id_test_2 = EntityID(UUID(int=43))
-        cls.pdp_2 = PackageDeliveryPlan(id=cls.id_test_2,
+        cls.pdp_2 = PackageDeliveryPlan(id_=cls.id_test_2,
                                         drop_point=point,
                                         azimuth=Angle(40, AngleUnit.DEGREE),
                                         pitch=Angle(50, AngleUnit.DEGREE),
@@ -65,7 +65,7 @@ class BasicPackageTestCase(unittest.TestCase):
         self.assertEqual(self.pdp_1.package_type.value.weight, 1)
 
     def test_2_package_delivery_plans_equal(self):
-        expected_pdp = PackageDeliveryPlan(id=self.id_test_1,
+        expected_pdp = PackageDeliveryPlan(id_=self.id_test_1,
                                            drop_point=create_point_2d(1, 2),
                                            azimuth=Angle(30, AngleUnit.DEGREE),
                                            pitch=Angle(80, AngleUnit.DEGREE),
@@ -73,7 +73,7 @@ class BasicPackageTestCase(unittest.TestCase):
         self.assertEqual(self.pdp_1, expected_pdp)
 
     def test_2_package_delivery_plans_not_equal(self):
-        expected_pdp = PackageDeliveryPlan(id=self.id_test_1,
+        expected_pdp = PackageDeliveryPlan(id_=self.id_test_1,
                                            drop_point=create_point_2d(1, 2),
                                            azimuth=Angle(31, AngleUnit.DEGREE),
                                            pitch=Angle(80, AngleUnit.DEGREE),
@@ -81,13 +81,13 @@ class BasicPackageTestCase(unittest.TestCase):
         self.assertNotEqual(self.pdp_1, expected_pdp)
 
     def test_package_delivery_plans_list(self):
-        expected_pdp_1 = PackageDeliveryPlan(id=self.id_test_1,
+        expected_pdp_1 = PackageDeliveryPlan(id_=self.id_test_1,
                                              drop_point=create_point_2d(1, 2),
                                              azimuth=Angle(30, AngleUnit.DEGREE),
                                              pitch=Angle(80, AngleUnit.DEGREE),
                                              package_type=PackageType.TINY)
 
-        expected_pdp_2 = PackageDeliveryPlan(id=self.id_test_2,
+        expected_pdp_2 = PackageDeliveryPlan(id_=self.id_test_2,
                                              drop_point=create_point_2d(1, 2),
                                              azimuth=Angle(40, AngleUnit.DEGREE),
                                              pitch=Angle(50, AngleUnit.DEGREE),

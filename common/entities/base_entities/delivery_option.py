@@ -1,4 +1,5 @@
 import itertools
+from copy import deepcopy
 from typing import List
 
 from common.entities.base_entities.base_entity import JsonableBaseEntity
@@ -33,11 +34,12 @@ class DeliveryOption(JsonableBaseEntity, Localizable, PackageHolder):
             customer_delivery.package_delivery_plans for customer_delivery in self.customer_deliveries))
 
     def calc_location(self) -> Point2D:
-        return calc_centroid([cd.calc_location() for cd in self.customer_deliveries])
+        return calc_centroid(tuple(cd.calc_location() for cd in self.customer_deliveries))
 
     def get_package_type_amount(self, package_type: PackageType) -> int:
         customer_deliveries = self.customer_deliveries
-        demands = [customer_delivery.get_package_type_amount(package_type) for customer_delivery in customer_deliveries ]
+        demands = [customer_delivery.get_package_type_amount(package_type)
+                   for customer_delivery in customer_deliveries]
         return sum(demands)
 
     def get_package_type_amount_map(self) -> PackageTypeAmountMap:
@@ -57,3 +59,11 @@ class DeliveryOption(JsonableBaseEntity, Localizable, PackageHolder):
 
     def __hash__(self):
         return hash(tuple(self.customer_deliveries))
+
+    def __deepcopy__(self, memodict=None):
+        if memodict is None:
+            memodict = {}
+        # noinspection PyArgumentList
+        new_copy = DeliveryOption(deepcopy(self._customer_deliveries, memodict), self._id)
+        memodict[id(self)] = new_copy
+        return new_copy

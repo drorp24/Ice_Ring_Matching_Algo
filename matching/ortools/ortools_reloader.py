@@ -54,6 +54,14 @@ class ORToolsReloader:
     def get_vehicle_reloading_depots(self, vehicle_index) -> [int]:
         return self._reloading_depots_per_vehicle[vehicle_index]
 
+    def get_vehicle_arrive_indices(self, vehicle_index) -> [int]:
+        starting_index = 0
+        return self._reloading_depots_per_vehicle[vehicle_index][starting_index::NUM_OF_NODES_IN_RELOADING_DEPO]
+
+    def get_vehicle_depart_indices(self, vehicle_index) -> [int]:
+        starting_index = 1
+        return self._reloading_depots_per_vehicle[vehicle_index][starting_index::NUM_OF_NODES_IN_RELOADING_DEPO]
+
     def _calc_reload_arriving_nodes(self):
         starting_index = 0
         return self._reloading_virtual_depos_indices[starting_index::NUM_OF_NODES_IN_RELOADING_DEPO]

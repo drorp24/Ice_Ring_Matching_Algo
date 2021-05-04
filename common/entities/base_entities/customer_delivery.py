@@ -1,3 +1,4 @@
+from copy import deepcopy
 from typing import List
 
 from common.entities.base_entities.base_entity import JsonableBaseEntity
@@ -25,7 +26,7 @@ class CustomerDelivery(JsonableBaseEntity, Localizable, PackageHolder):
         return self._package_delivery_plans
 
     def calc_location(self) -> Point2D:
-        return calc_centroid([pdp.drop_point for pdp in self._package_delivery_plans])
+        return calc_centroid(tuple(pdp.drop_point for pdp in self._package_delivery_plans))
 
     def calc_bounds(self) -> Polygon2D:
         return calc_convex_hull_polygon([pdp.drop_point for pdp in self._package_delivery_plans])
@@ -39,6 +40,14 @@ class CustomerDelivery(JsonableBaseEntity, Localizable, PackageHolder):
 
     def __hash__(self):
         return hash(tuple(self.package_delivery_plans))
+
+    def __deepcopy__(self, memo=None):
+        if memo is None:
+            memo = {}
+        # noinspection PyArgumentList
+        new_copy = CustomerDelivery(deepcopy(self.package_delivery_plans, memo), self.id)
+        memo[id(self)] = new_copy
+        return new_copy
 
     @classmethod
     def dict_to_obj(cls, dict_input):

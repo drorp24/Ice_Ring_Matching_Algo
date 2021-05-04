@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
+from copy import deepcopy
 from datetime import datetime, date, time, timedelta
 from typing import Dict, Union, Tuple
 
@@ -76,6 +77,13 @@ class TimeWindowExtension(JsonableBaseEntity):
     def __contains__(self, temporal: Union[DateTimeExtension, TimeWindowExtension]):
         return temporal.get_internal() in self.get_internal()
 
+    def __deepcopy__(self, memodict=None):
+        if memodict is None:
+            memodict = {}
+        new_copy = TimeWindowExtension(self.since, self.until)
+        memodict[id(self)] = new_copy
+        return new_copy
+
 
 class DateTimeExtension(BaseEntity):
 
@@ -115,6 +123,14 @@ class DateTimeExtension(BaseEntity):
 
     def __hash__(self):
         return self.get_internal().__hash__()
+
+    def __deepcopy__(self, memodict=None):
+        if memodict is None:
+            memodict = {}
+        # noinspection PyArgumentList
+        new_copy = DateTimeExtension.from_dt(deepcopy(self._date_time, memodict))
+        memodict[id(self)] = new_copy
+        return new_copy
 
     def to_dict(self) -> Dict:
         date_dict = DateTimeExtension.extract_date_dict_from_datetime(self.get_internal())

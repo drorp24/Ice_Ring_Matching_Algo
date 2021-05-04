@@ -17,13 +17,13 @@ class BasicCellServiceTestCase(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.pdp_1 = PackageDeliveryPlan(id=EntityID(UUID(int=42)),
+        cls.pdp_1 = PackageDeliveryPlan(id_=EntityID(UUID(int=42)),
                                         drop_point=create_point_2d(1, 2),
                                         azimuth=Angle(30, AngleUnit.DEGREE),
                                         pitch=Angle(80, AngleUnit.DEGREE),
                                         package_type=PackageType.TINY)
 
-        cls.pdp_2 = PackageDeliveryPlan(id=EntityID(UUID(int=42)),
+        cls.pdp_2 = PackageDeliveryPlan(id_=EntityID(UUID(int=42)),
                                         drop_point=create_point_2d(1, 2),
                                         azimuth=Angle(30, AngleUnit.DEGREE),
                                         pitch=Angle(90, AngleUnit.DEGREE),

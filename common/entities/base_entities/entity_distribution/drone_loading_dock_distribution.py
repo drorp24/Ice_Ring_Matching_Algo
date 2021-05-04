@@ -1,9 +1,7 @@
 from random import Random
-from typing import Dict
 
 from common.entities.base_entities.drone_loading_dock import DroneLoadingDock, \
     create_default_time_window_for_drone_loading_dock
-from common.entities.base_entities.drone_loading_station import DroneLoadingStation
 from common.entities.base_entities.entity_id import EntityID
 from common.entities.base_entities.entity_distribution.drone_distribution import DroneTypeDistribution
 from common.entities.base_entities.entity_distribution.drone_loading_station_distribution import \
@@ -23,10 +21,12 @@ class DroneLoadingDockDistribution(Distribution):
     def __init__(self,
                  drone_type_distribution: DroneTypeDistribution = DEFAULT_DRONE_TYPE_DISTRIBUTIONS,
                  drone_loading_station_distributions: DroneLoadingStationDistribution = DEFAULT_DRONE_LOADING_STATION_DISTRIBUTIONS,
-                 time_window_distributions: TimeWindowDistribution = DEFAULT_TW_DLD_DISTRIB):
+                 time_window_distributions: TimeWindowDistribution = DEFAULT_TW_DLD_DISTRIB,
+                 ids: [EntityID] = None):
         self._drone_type_distributions = drone_type_distribution
         self._drone_loading_station_distributions = drone_loading_station_distributions
         self._time_window_distributions = time_window_distributions
+        self._ids = ids
 
     default_amount = 1
 
@@ -39,8 +39,12 @@ class DroneLoadingDockDistribution(Distribution):
                                                                                        amount=amount)
         time_windows = self._time_window_distributions.choose_rand(random=random, amount=amount)
         drone_types = self._drone_type_distributions.choose_rand(random=random, amount=amount)
-        return [DroneLoadingDock(EntityID.generate_uuid(), dl, pt, tw)
-                for (dl, pt, tw) in zip(drone_loading_stations, drone_types, time_windows)]
+        if self._ids is None:
+            self._ids = [EntityID.generate_uuid() for _ in range(amount)]
+        else:
+            assert (len(self._ids) == amount)
+        return [DroneLoadingDock(id_, dl, pt, tw)
+                for (id_, dl, pt, tw) in zip(self._ids, drone_loading_stations, drone_types, time_windows)]
 
     @classmethod
     def distribution_class(cls) -> type:

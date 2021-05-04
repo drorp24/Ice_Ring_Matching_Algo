@@ -138,7 +138,8 @@ class ORToolsMatcherDropPenaltyTestCase(TestCase):
                 priority_constraints=PriorityConstraints(True, priority_cost_coefficient=1)),
             unmatched_penalty=0,
             reload_per_vehicle=0,
-            monitor=MonitorConfig(enabled=False)
+            monitor=MonitorConfig(enabled=False),
+            submatch_time_window_minutes=1440
         )
 
     @staticmethod

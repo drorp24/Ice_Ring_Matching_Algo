@@ -1,6 +1,8 @@
+import cProfile
 import unittest
 from datetime import timedelta
 from pathlib import Path
+from pstats import Stats, SortKey
 from random import Random
 
 from ortools.constraint_solver.routing_enums_pb2 import FirstSolutionStrategy
@@ -19,6 +21,7 @@ from common.entities.base_entities.entity_distribution.package_distribution impo
 from common.entities.base_entities.entity_distribution.priority_distribution import PriorityDistribution
 from common.entities.base_entities.entity_distribution.temporal_distribution import TimeDeltaDistribution, \
     TimeWindowDistribution, DateTimeDistribution
+from common.entities.base_entities.entity_id import EntityID
 from common.entities.base_entities.fleet.fleet_property_sets import DroneSetProperties, DroneFormationTypePolicy, \
     PackageConfigurationPolicy, BoardLevelProperties
 from common.entities.base_entities.package import PackageType
@@ -36,22 +39,41 @@ from experiment_space.visualization.experiment_visualizer import draw_matched_sc
 from geometry.distribution.geo_distribution import UniformPointInBboxDistribution, NormalPointDistribution
 from geometry.geo2d import Point2D
 from geometry.geo_factory import create_point_2d
+from matching.constraint_config import ConstraintsConfig, CapacityConstraints, TravelTimeConstraints, \
+    PriorityConstraints
 from matching.matcher_config import MatcherConfig
+from matching.monitor_config import MonitorConfig
+from matching.ortools.ortools_solver_config import ORToolsSolverConfig
 from visualization.basic.pltdrawer2d import MapImage
 
 SHOW_VISUALS = True
+USE_PROFILE = False
 
 
 class EndToEndMultipleExperimentRun(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
+        if USE_PROFILE:
+            cls.pr = cProfile.Profile()
+            cls.pr.enable()
         cls.matcher_config = MatcherConfig.dict_to_obj(
             MatcherConfig.json_to_dict(Path('experiment_space/tests/jsons/test_e2e_experiment_config.json')))
 
+    @classmethod
+    def tearDownClass(cls):
+        if USE_PROFILE:
+            cls.pr.disable()
+            Stats(cls.pr).sort_stats(SortKey.CUMULATIVE).print_stats()
+            Stats(cls.pr).sort_stats(SortKey.TIME).print_stats()
+
     # @unittest.skip
     def test_calc_north_scenario_visualization(self):
-        sampled_supplier_category = self._create_sampled_supplier_category_north()
+        sampled_supplier_category = self._create_sampled_supplier_category_north(
+            requests_amount=74,
+            docks_amount=2,
+            dock_ids=[EntityID("aa"), EntityID("bb")]
+        )
         experiment = Experiment(supplier_category=sampled_supplier_category,
                                 drone_set_properties_list=EndToEndMultipleExperimentRun.
                                 _create_large_drone_set_properties_list(
@@ -64,6 +86,50 @@ class EndToEndMultipleExperimentRun(unittest.TestCase):
         map_image = MapImage(map_background_path=Path("visualization/basic/North_map.png"),
                              west_lon=34.907, east_lon=35.905, south_lat=32.489, north_lat=33.932)
         self._run_end_to_end_visual_experiment(experiment, SHOW_VISUALS, map_image)
+
+    @unittest.skip
+    def test_calc_north_scenario_with_time_greedy_visualization(self):
+        sampled_supplier_category = self._create_sampled_supplier_category_north(
+            requests_amount=700,
+            docks_amount=6,
+            dock_ids=[EntityID("aa"), EntityID("bb"), EntityID("cc"), EntityID("dd"), EntityID("ee"), EntityID("ff")],
+            only_package_type=PackageType.MEDIUM
+        )
+        matcher_config = MatcherConfig(
+            zero_time=ZERO_TIME,
+            solver=ORToolsSolverConfig(first_solution_strategy="PATH_CHEAPEST_ARC",
+                                       local_search_strategy="GUIDED_LOCAL_SEARCH", timeout_sec=30),
+            constraints=ConstraintsConfig(
+                capacity_constraints=CapacityConstraints(count_capacity_from_zero=True, capacity_cost_coefficient=10000),
+                travel_time_constraints=TravelTimeConstraints(max_waiting_time=0,
+                                                              max_route_time=720,
+                                                              count_time_from_zero=False,
+                                                              reloading_time=120,
+                                                              important_earliest_coeff=1),
+                priority_constraints=PriorityConstraints(True, priority_cost_coefficient=1000)),
+            unmatched_penalty=10000,
+            reload_per_vehicle=0,
+            monitor=MonitorConfig(enabled=False,
+                iterations_between_monitoring=10,
+                max_iterations=-1,
+                save_plot=True,
+                show_plot=True,
+                separate_charts=True,
+                output_directory="outputs"),
+            submatch_time_window_minutes=240
+        )
+        experiment = Experiment(supplier_category=sampled_supplier_category,
+                                drone_set_properties_list=EndToEndMultipleExperimentRun.
+                                _create_medium_drone_set_properties_list(
+                                    loading_docks=sampled_supplier_category.drone_loading_docks,
+                                    drone_amount=12),
+                                matcher_config=matcher_config,
+                                graph_creation_algorithm=FullyConnectedGraphAlgorithm(edge_cost_factor=25.0,
+                                                                                      edge_travel_time_factor=25.0),
+                                board_level_properties=BoardLevelProperties(max_route_time_entire_board=240))
+        map_image = MapImage(map_background_path=Path("visualization/basic/North_map.png"),
+                             west_lon=34.907, east_lon=35.905, south_lat=32.489, north_lat=33.932)
+        self._run_end_to_end_visual_experiment(experiment, True, map_image)
 
     @unittest.skip
     def test_calc_center_scenario_visualization(self):
@@ -148,7 +214,7 @@ class EndToEndMultipleExperimentRun(unittest.TestCase):
     @staticmethod
     def _run_end_to_end_visual_experiment(experiment: Experiment, show_visuals: bool, map_image: MapImage = None):
         graph = experiment.graph_creation_algorithm.create(experiment.supplier_category)
-        result_drone_delivery_board = experiment.run_match()
+        result_drone_delivery_board = experiment.run_match(graph)
         print(result_drone_delivery_board)
         analyzers_to_run = [MatchedDeliveryRequestsAnalyzer,
                             UnmatchedDeliveryRequestsAnalyzer,
@@ -165,10 +231,20 @@ class EndToEndMultipleExperimentRun(unittest.TestCase):
         return analysis_results
 
     @classmethod
-    def _create_sampled_supplier_category_north(cls):
+    def _create_sampled_supplier_category_north(cls, requests_amount: int = 74,
+                                                docks_amount: int = 2,
+                                                dock_ids: [EntityID] = [EntityID("aa"), EntityID("bb")],
+                                                only_package_type: PackageType = PackageType.LARGE):
+        if only_package_type is PackageType.LARGE:
+            delivery_requests_distribution_func = cls._create_custom_delivery_request_distribution_north_only_large
+        elif only_package_type is PackageType.MEDIUM:
+            delivery_requests_distribution_func = cls._create_custom_delivery_request_distribution_north_only_medium
+        else:
+            raise NotImplementedError
+
         return SupplierCategoryDistribution(
             zero_time_distribution=DateTimeDistribution([ZERO_TIME]),
-            delivery_requests_distribution=cls._create_custom_delivery_request_distribution_north(),
+            delivery_requests_distribution=delivery_requests_distribution_func(),
             drone_loading_docks_distribution=DroneLoadingDockDistribution(
                 drone_type_distribution=DroneTypeDistribution({DroneType.drone_type_1: 0.5,
                                                                DroneType.drone_type_3: 0.5}),
@@ -178,8 +254,12 @@ class EndToEndMultipleExperimentRun(unittest.TestCase):
                                                                                         32.6675,
                                                                                         32.6675
                                                                                         )),
-                time_window_distributions=_create_standard_full_day_test_time())).choose_rand(Random(10), amount={
-                    DeliveryRequest: 74, DroneLoadingDock: 2})[0]
+                time_window_distributions=_create_standard_full_day_test_time(),
+                ids=dock_ids
+            )
+        ).choose_rand(
+            Random(10),
+            amount={DeliveryRequest: requests_amount, DroneLoadingDock: docks_amount})[0]
 
     @classmethod
     def _create_sampled_supplier_category_center(cls):
@@ -228,6 +308,18 @@ class EndToEndMultipleExperimentRun(unittest.TestCase):
                                    drone_amount=drone_amount)
                 for loading_dock in loading_docks]
 
+    @classmethod
+    def _create_medium_drone_set_properties_list(cls, loading_docks: [DroneLoadingDock], drone_amount: int):
+        return [DroneSetProperties(drone_type=loading_dock.drone_type,
+                                   drone_formation_policy=DroneFormationTypePolicy(
+                                       {DroneFormationType.PAIR: 0.0, DroneFormationType.QUAD: 4.0}),
+                                   package_configuration_policy=PackageConfigurationPolicy(
+                                       {PackageConfiguration.MEDIUM_X4: 1}),
+                                   start_loading_dock=loading_dock,
+                                   end_loading_dock=loading_dock,
+                                   drone_amount=drone_amount)
+                for loading_dock in loading_docks]
+
     @staticmethod
     def _create_custom_drone_loading_dock_distribution(drone_station_location):
         return DroneLoadingDockDistribution(
@@ -239,8 +331,17 @@ class EndToEndMultipleExperimentRun(unittest.TestCase):
             time_window_distributions=_create_standard_full_day_test_time())
 
     @staticmethod
-    def _create_custom_delivery_request_distribution_north():
-        return EndToEndMultipleExperimentRun._create_delivery_request_distribution(
+    def _create_custom_delivery_request_distribution_north_only_large():
+        return EndToEndMultipleExperimentRun._create_large_package_only_delivery_request_distribution(
+            center_point=create_point_2d(35.46, 33.25),
+            sigma_lon=0.2,
+            sigma_lat=0.3,
+            lowest_priority=10,
+            dr_timewindow=20)
+
+    @staticmethod
+    def _create_custom_delivery_request_distribution_north_only_medium():
+        return EndToEndMultipleExperimentRun._create_medium_package_only_delivery_request_distribution(
             center_point=create_point_2d(35.46, 33.25),
             sigma_lon=0.2,
             sigma_lat=0.3,
@@ -249,7 +350,7 @@ class EndToEndMultipleExperimentRun(unittest.TestCase):
 
     @staticmethod
     def _create_custom_delivery_request_distribution_center():
-        return EndToEndMultipleExperimentRun._create_delivery_request_distribution(
+        return EndToEndMultipleExperimentRun._create_large_package_only_delivery_request_distribution(
             center_point=create_point_2d(35.11, 31.84),
             sigma_lat=0.04,
             sigma_lon=0.06,
@@ -270,7 +371,31 @@ class EndToEndMultipleExperimentRun(unittest.TestCase):
         return package_distribution
 
     @staticmethod
-    def _create_delivery_request_distribution(center_point: Point2D, sigma_lon: float, sigma_lat: float,
+    def _create_medium_package_only_distribution():
+        package_type_distribution_dict = {PackageType.MEDIUM: 1}
+        package_distribution = PackageDistribution(package_distribution_dict=package_type_distribution_dict)
+        return package_distribution
+
+    @staticmethod
+    def _create_medium_package_only_delivery_request_distribution(center_point: Point2D, sigma_lon: float, sigma_lat: float,
+                                              lowest_priority: int = 10, dr_timewindow: int = 3):
+        package_distribution = EndToEndMultipleExperimentRun._create_medium_package_only_distribution()
+        zero_time = ZERO_TIME
+        time_delta_distrib = TimeDeltaDistribution([TimeDeltaExtension(timedelta(hours=dr_timewindow, minutes=0))])
+        dt_options = [zero_time.add_time_delta(TimeDeltaExtension(timedelta(hours=x))) for x in
+                      range(24 - dr_timewindow)]
+
+        time_window_distribution = TimeWindowDistribution(DateTimeDistribution(dt_options), time_delta_distrib)
+
+        delivery_request_distribution = build_delivery_request_distribution(
+            package_type_distribution=package_distribution,
+            relative_dr_location_distribution=NormalPointDistribution(center_point, sigma_lon, sigma_lat),
+            priority_distribution=PriorityDistribution(list(range(1, lowest_priority))),
+            time_window_distribution=time_window_distribution)
+        return delivery_request_distribution
+
+    @staticmethod
+    def _create_large_package_only_delivery_request_distribution(center_point: Point2D, sigma_lon: float, sigma_lat: float,
                                               lowest_priority: int = 10, dr_timewindow: int = 3):
         package_distribution = EndToEndMultipleExperimentRun._create_large_package_only_distribution()
         zero_time = ZERO_TIME

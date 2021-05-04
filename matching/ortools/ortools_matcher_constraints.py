@@ -56,7 +56,8 @@ class ORToolsMatcherConstraints:
             OrToolsDimensionDescription.travel_time.value)
         travel_time_dimension = self._routing_model.GetDimensionOrDie(OrToolsDimensionDescription.travel_time.value)
         self._add_time_window_constraints_for_each_delivery_except_depot(travel_time_dimension, self._time_windows)
-        self._add_time_window_constraints_for_each_vehicle_start_node(travel_time_dimension, self._time_windows)
+        self._add_time_window_constraints_for_each_vehicle_start_node(travel_time_dimension)
+        self._add_time_window_constraints_for_each_vehicle_end_node(travel_time_dimension)
         self._set_max_route_time_for_each_vehicle(travel_time_dimension)
         self._set_waiting_time_for_each_node(travel_time_dimension)
         self._add_to_objective_minimize_delivery_time_of_high_priority(travel_time_dimension)
@@ -158,13 +159,21 @@ class ORToolsMatcherConstraints:
             self._routing_model.AddToAssignment(demand_dimension.TransitVar(index))
             self._routing_model.AddToAssignment(demand_dimension.SlackVar(index))
 
-    def _add_time_window_constraints_for_each_vehicle_start_node(self, time_dimension: RoutingDimension,
-                                                                 time_windows: List[Tuple[int, int]]):
-        for i, drone_delivery in enumerate(self._matcher_input.delivering_drones_board.delivering_drones_list):
-            start_index = self._routing_model.Start(i)
-            graph_index = self._index_manager.index_to_node(start_index)
-            time_dimension.CumulVar(start_index).SetRange(time_windows[graph_index][0],
-                                                          time_windows[graph_index][1])
+    def _add_time_window_constraints_for_each_vehicle_start_node(self, time_dimension: RoutingDimension):
+        for vehicle, delivering_drones in enumerate(self._matcher_input.delivering_drones_board.delivering_drones_list):
+            start_index = self._routing_model.Start(vehicle)
+            dock = delivering_drones.start_loading_dock
+            relative_time_window = dock.time_window.get_relative_time_in_min(self._matcher_input.config.zero_time)
+            time_dimension.CumulVar(start_index).SetRange(int(relative_time_window[0]),
+                                                          int(relative_time_window[1]))
+
+    def _add_time_window_constraints_for_each_vehicle_end_node(self, time_dimension: RoutingDimension):
+        for vehicle, delivering_drones in enumerate(self._matcher_input.delivering_drones_board.delivering_drones_list):
+            end_index = self._routing_model.End(vehicle)
+            dock = delivering_drones.end_loading_dock
+            relative_time_window = dock.time_window.get_relative_time_in_min(self._matcher_input.config.zero_time)
+            time_dimension.CumulVar(end_index).SetRange(int(relative_time_window[0]),
+                                                        int(relative_time_window[1]))
 
     def _add_time_window_constraints_for_each_delivery_except_depot(self, time_dimension: RoutingDimension,
                                                                     time_windows: List[Tuple[int, int]]):
@@ -178,9 +187,8 @@ class ORToolsMatcherConstraints:
             vehicle_of_node = self._reloader.get_reloading_depot_vehicle(node)
             dock = self._matcher_input.delivering_drones_board.delivering_drones_list[
                 vehicle_of_node].start_loading_dock
-            original_depo = self._graph_exporter.get_node_graph_index(self._matcher_input.graph, dock)
-            time_dimension.CumulVar(index).SetRange(
-                self._time_windows[original_depo][0], self._time_windows[original_depo][1])
+            relative_time_window = dock.time_window.get_relative_time_in_min(self._matcher_input.config.zero_time)
+            time_dimension.CumulVar(index).SetRange(int(relative_time_window[0]), int(relative_time_window[1]))
 
     def _create_travel_cost_evaluator(self):
 
@@ -344,6 +352,7 @@ class ORToolsMatcherConstraints:
              exec_globals, exec_locals)
         return exec_locals[callback_name]
 
+    @lru_cache()
     def _are_nodes_consecutive_depos(self, from_node, to_node) -> bool:
         depots = self._graph_exporter.export_basis_nodes_indices(self._matcher_input.graph) \
                  + self._reloader.reloading_virtual_depos_indices

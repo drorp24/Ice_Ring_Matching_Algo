@@ -56,13 +56,20 @@ def add_delivery_board_with_row_per_delivering_drones(drawer: GanttDrawer, board
 def _set_row_color_per_dock(delivering_drones_list, drawer):
     loading_dock_idx = set()
     loading_docks_row_colors = set()
+    docks_row_numbers = {}
     for i, delivering_drones in enumerate(delivering_drones_list):
-        row_color = MATCHED_REQUEST_BAR_COLORS[
-            hash(delivering_drones.start_loading_dock.id.uuid) % len(MATCHED_REQUEST_BAR_COLORS)]
         row_number = i + 1 + UNMATCHED_ROW_NUMBER
-        drawer.set_row_color(row_number, row_color, ROW_BACKGROUND_ALPHA)
         loading_dock_idx.add(delivering_drones.start_loading_dock.id.uuid)
+        row_numbers = docks_row_numbers.get(delivering_drones.start_loading_dock.id.uuid, None)
+        if row_numbers is None:
+            docks_row_numbers.update({delivering_drones.start_loading_dock.id.uuid: [row_number]})
+        else:
+            row_numbers.append(row_number)
+    for i, id in enumerate(loading_dock_idx):
+        row_color = MATCHED_REQUEST_BAR_COLORS[i + 10]
         loading_docks_row_colors.add(row_color)
+        for row_number in docks_row_numbers[id]:
+            drawer.set_row_color(row_number, row_color, ROW_BACKGROUND_ALPHA)
     drawer.add_legend(list(loading_dock_idx), list(loading_docks_row_colors), ROW_BACKGROUND_ALPHA, title="Docks")
 
 

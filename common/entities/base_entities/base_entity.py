@@ -27,7 +27,10 @@ class BaseEntity(object):
         if isinstance(attribs, UUID):
             return convert_uuid_to_str(attribs)
         if isinstance(attribs, list) or isinstance(attribs, set):
-            return [attribute.__dict__() for i, attribute in enumerate(attribs)]
+            try:
+                return [attribute.__dict__() for i, attribute in enumerate(attribs)]
+            except:
+                return attribs
         try:
             return attribs.__dict__()
         except:

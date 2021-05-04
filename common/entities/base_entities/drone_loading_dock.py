@@ -3,10 +3,10 @@ from typing import List
 
 from common.entities.base_entities.base_entity import JsonableBaseEntity
 from common.entities.base_entities.drone import DroneType
-from common.entities.base_entities.entity_id import EntityID
 from common.entities.base_entities.drone_loading_station import DroneLoadingStation
 from common.entities.base_entities.entity_distribution.temporal_distribution import TimeDeltaDistribution, \
     DateTimeDistribution, TimeWindowDistribution
+from common.entities.base_entities.entity_id import EntityID
 from common.entities.base_entities.temporal import TimeWindowExtension, Temporal, DateTimeExtension, TimeDeltaExtension
 from drop_envelope.envelope_collections import ShapeableCollection
 from geometry.geo2d import Point2D
@@ -15,10 +15,10 @@ from geometry.utils import Localizable, Shapeable
 
 class DroneLoadingDock(JsonableBaseEntity, Localizable, Temporal, ShapeableCollection):
 
-    def __init__(self, id: EntityID, drone_loading_station: DroneLoadingStation,
+    def __init__(self, id_: EntityID, drone_loading_station: DroneLoadingStation,
                  drone_type: DroneType,
                  time_window: TimeWindowExtension):
-        self._id = id
+        self._id = id_
         self._drone_loading_station = drone_loading_station
         self._drone_type = drone_type
         self._time_window = time_window
@@ -50,7 +50,7 @@ class DroneLoadingDock(JsonableBaseEntity, Localizable, Temporal, ShapeableColle
     def dict_to_obj(cls, dict_input):
         assert (dict_input['__class__'] == cls.__name__)
         return DroneLoadingDock(
-            id=EntityID.dict_to_obj(dict_input['id']),
+            id_=EntityID.dict_to_obj(dict_input['id']),
             drone_loading_station=DroneLoadingStation.dict_to_obj(dict_input['drone_loading_station']),
             drone_type=DroneType.dict_to_obj(dict_input['drone_type']),
             time_window=TimeWindowExtension.dict_to_obj(dict_input['time_window'])
@@ -64,6 +64,13 @@ class DroneLoadingDock(JsonableBaseEntity, Localizable, Temporal, ShapeableColle
 
     def __hash__(self):
         return hash((self.id, self._drone_loading_station, self._drone_type, self._time_window))
+
+    def __deepcopy__(self, memodict=None):
+        if memodict is None:
+            memodict = {}
+        new_copy = DroneLoadingDock(self.id, self._drone_loading_station, self._drone_type, self._time_window)
+        memodict[id(self)] = new_copy
+        return new_copy
 
     def get_shapeables(self) -> List[Shapeable]:
         return [self.drone_loading_station]
