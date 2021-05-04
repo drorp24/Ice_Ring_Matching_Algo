@@ -7,6 +7,7 @@ import utm as UTM
 from matplotlib.patches import Polygon, Circle, PathPatch, Path, Patch
 
 from geometry.geo2d import Point2D, Polygon2D, LineString2D, LinearRing2D
+from geometry.geo_factory import create_point_2d
 from visualization.basic.color import Color
 from visualization.basic.drawer2d import Drawer2D, Drawer2DCoordinateSys
 
@@ -66,7 +67,14 @@ class PltDrawer2D(Drawer2D):
 
     def add_polygon2d(self, polygon2d: Polygon2D, edgecolor: Color = Color.Red, facecolor: Color = Color.Red,
                       facecolor_alpha=0.2, linewidth=2, label=None) -> None:
-        polygon = Polygon(self._convert_to_numpy_points(polygon2d.points), closed=True,
+
+        points = polygon2d.points
+        if self._coordinate_sys is Drawer2DCoordinateSys.GEOGRAPHIC_UTM:
+            for i,point in enumerate(points):
+                y, x = UTM.to_latlon(point.x, point.y, zone_number=36, zone_letter="R")
+                points[i] = create_point_2d(x=x,y=y)
+
+        polygon = Polygon(self._convert_to_numpy_points(points), closed=True,
                           edgecolor=edgecolor.get_rgb(),
                           facecolor=facecolor.get_rgb_with_alpha(facecolor_alpha),
                           linewidth=linewidth, label=label)
