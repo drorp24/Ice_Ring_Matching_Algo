@@ -34,7 +34,7 @@ class PltDrawer2D(Drawer2D):
         self._patches_map = {}
 
     def add_point2d(self, point2d: Point2D, radius=0.05, edgecolor: Color = Color.Blue, facecolor: Color = Color.Blue,
-                    facecolor_alpha=1, linewidth=2, label=None) -> None:
+                    facecolor_alpha=1, linewidth=2, label=None):
         if self._coordinate_sys is Drawer2DCoordinateSys.GEOGRAPHIC:
             radius *= GEOGRAPHIC_RADIUS_SIZE_RATIO
         point = Circle((point2d.x, point2d.y), radius=radius,
@@ -43,8 +43,8 @@ class PltDrawer2D(Drawer2D):
                        linewidth=linewidth, label=label)
         return self._ax.add_patch(point)
 
-    def mpl_connect(self, patches_list):
-        for legline, origline in zip(self._leg.get_patches(), patches_list):
+    def mpl_connect(self, patches_list, legend):
+        for legline, origline in zip(legend.get_patches(), patches_list):
             legline.set_picker(True)
             self._patches_map[legline] = origline
         for legline, origline in self._patches_map.items():
@@ -99,11 +99,13 @@ class PltDrawer2D(Drawer2D):
     def add_text(self, text: str, point2d: Point2D, color: Color = Color.Black, fontsize: int = 10) -> None:
         self._ax.text(point2d.x, point2d.y, text, color=color.get_rgb(), fontsize=fontsize)
 
-    def add_legend(self, new_labels: [str] = None, new_label_colors: [Color] = None, fontsize: int = 10) -> None:
+    def add_legend(self, new_labels: [str] = None, new_label_colors: [Color] = None, fontsize: int = 10, patches_list = None) -> None:
         if new_labels is not None:
-            self._leg = self._add_legend_with_new_labels(new_labels, new_label_colors, fontsize)
+            leg = self._add_legend_with_new_labels(new_labels, new_label_colors, fontsize)
         else:
-            self._leg = plt.legend(bbox_to_anchor=(1.01, 1), loc="upper left", ncol=3)
+            leg = plt.legend(bbox_to_anchor=(1.01, 1), loc="upper left", ncol=3)
+        if patches_list is not None:
+            self.mpl_connect(patches_list=patches_list, legend=leg)
 
     def draw(self, block=True) -> None:
         self._ax.axis('scaled')

@@ -17,7 +17,7 @@ class Drawer2DCoordinateSys(Enum):
 class Drawer2D(ABC):
 
     @abstractmethod
-    def mpl_connect(self, patches_list):
+    def mpl_connect(self, patches_list, legend):
         raise NotImplementedError
 
     @abstractmethod
@@ -50,7 +50,7 @@ class Drawer2D(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def add_legend(self, new_labels: [str] = None, new_label_colors: [Color] = None, fontsize: int = 10) -> None:
+    def add_legend(self, new_labels: [str] = None, new_label_colors: [Color] = None, fontsize: int = 10, patches_list = None) -> None:
         raise NotImplementedError
 
     @abstractmethod
