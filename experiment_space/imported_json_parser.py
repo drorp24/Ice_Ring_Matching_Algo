@@ -58,8 +58,12 @@ class ImportedJsonParser(JsonableBaseEntity):
         drone_loading_docks_dict = DroneLoadingDock.json_to_dict(Path(self.drone_loading_docks_file_path))
         zones_dict = Zone.json_to_dict(Path(self.zones_file_path))
 
+        delivery_requests = list(set([DeliveryRequest.dict_to_obj(dr_dict) for dr_dict in delivery_requests_dict]))
+        for dr in [dr for dr in delivery_requests if len(dr.delivery_options) > 1]:
+            del dr.delivery_options[1:len(dr.delivery_options)]
+
         return SupplierCategory(
-            delivery_requests=[DeliveryRequest.dict_to_obj(dr_dict) for dr_dict in delivery_requests_dict],
+            delivery_requests=delivery_requests,
             drone_loading_docks=[DroneLoadingDock.dict_to_obj(dld_dict)
                                  for dld_dict in drone_loading_docks_dict],
             zero_time=self.export_matcher_config().zero_time,
