@@ -130,7 +130,8 @@ def add_drone_deliveries(drawer: Drawer2D, drone_deliveries: [DroneDelivery]):
             continue
         delivery_color = labels_handler.add_matched_delivery(delivery)
         labels_handler.delivery_patches.append(add_drone_delivery(drawer, delivery, delivery_color))
-    drawer.add_legend(labels_handler.matched_delivery_labels, labels_handler.selected_delivery_colors, patches_list=labels_handler.delivery_patches)
+    drawer.add_legend(labels_handler.matched_delivery_labels, labels_handler.selected_delivery_colors,
+                      patches_list=labels_handler.delivery_patches)
 
 
 def add_delivery_board(drawer: Drawer2D, board: DroneDeliveryBoard, draw_unmatched=True):
