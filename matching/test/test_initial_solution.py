@@ -26,8 +26,7 @@ from experiment_space.graph_creation_algorithm import calc_assignment_from_init_
 from geometry.distribution.geo_distribution import NormalPointDistribution, UniformPointInBboxDistribution
 from geometry.geo2d import Point2D
 from geometry.geo_factory import create_point_2d
-from matching.constraint_config import ConstraintsConfig, CapacityConstraints, TravelTimeConstraints, \
-    SessionTimeConstraints, PriorityConstraints
+from matching.constraint_config import ConstraintsConfig, CapacityConstraints, TravelTimeConstraints, PriorityConstraints
 from matching.matcher_config import MatcherConfig
 from matching.matcher_factory import create_matcher
 from matching.matcher_input import MatcherInput
@@ -129,7 +128,6 @@ class BasicInitialSolutionTest(TestCase):
                                                               count_time_from_zero=False,
                                                               reloading_time=120,
                                                               important_earliest_coeff=1),
-                session_time_constraints=SessionTimeConstraints(max_session_time=60),
                 priority_constraints=PriorityConstraints(True, priority_cost_coefficient=1000)),
             unmatched_penalty=10000,
             reload_per_vehicle=reload_per_vehicle,

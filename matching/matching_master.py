@@ -52,7 +52,8 @@ class MatchingMaster:
 
         last_start_match_time_delta_in_minutes = self._matcher_input.config.constraints.travel_time.max_route_time \
             - full_time_windows_num * self._matcher_input.config.submatch_time_window_minutes
-        if last_start_match_time_delta_in_minutes > self._matcher_input.config.constraints.session_time.max_session_time:
+        if last_start_match_time_delta_in_minutes > \
+                max(self._matcher_input.delivering_drones_board.get_max_session_time_per_drone_delivery()):
             self._update_delivering_drones_max_route_time(updating_matcher_input.delivering_drones_board,
                                                       last_start_match_time_delta_in_minutes)
             self._run_intermediate_match(drone_deliveries, last_start_match_time_delta_in_minutes, updating_matcher_input, full_time_windows_num -1)

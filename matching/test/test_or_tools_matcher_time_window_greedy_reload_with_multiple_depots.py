@@ -25,7 +25,7 @@ from common.graph.operational.operational_graph import OperationalGraph
 from geometry.distribution.geo_distribution import ExactPointLocationDistribution
 from geometry.geo_factory import create_point_2d
 from matching.constraint_config import ConstraintsConfig, CapacityConstraints, TravelTimeConstraints, \
-    PriorityConstraints, SessionTimeConstraints
+    PriorityConstraints
 from matching.matcher_config import MatcherConfig
 from matching.matcher_input import MatcherInput
 from matching.matching_master import MatchingMaster
@@ -58,7 +58,7 @@ class ORToolsMatcherTimeWindowGreedyReloadWithMultipleDepotsTestCase(TestCase):
         self._assert_drone_deliveries_have_different_loading_docks(actual_delivery_board)
         self._assert_all_requests_matched(tw_actual_delivery_board)
         self._assert_drone_deliveries_have_different_loading_docks(tw_actual_delivery_board)
-        self.assertLess(actual_delivery_board.get_total_work_time_in_minutes(),
+        self.assertLessEqual(actual_delivery_board.get_total_work_time_in_minutes(),
                         tw_actual_delivery_board.get_total_work_time_in_minutes())
 
     def _assert_all_requests_matched(self, actual_delivery_board: DroneDeliveryBoard):
@@ -160,7 +160,6 @@ class ORToolsMatcherTimeWindowGreedyReloadWithMultipleDepotsTestCase(TestCase):
                                                               count_time_from_zero=False,
                                                               reloading_time=30,
                                                               important_earliest_coeff=1),
-                session_time_constraints=SessionTimeConstraints(max_session_time=60),
                 priority_constraints=PriorityConstraints(True, priority_cost_coefficient=100)),
             unmatched_penalty=10000,
             reload_per_vehicle=1,
@@ -181,7 +180,6 @@ class ORToolsMatcherTimeWindowGreedyReloadWithMultipleDepotsTestCase(TestCase):
                                                               count_time_from_zero=False,
                                                               reloading_time=30,
                                                               important_earliest_coeff=1),
-                session_time_constraints=SessionTimeConstraints(max_session_time=60),
                 priority_constraints=PriorityConstraints(True, priority_cost_coefficient=100)),
             unmatched_penalty=10000,
             reload_per_vehicle=0,

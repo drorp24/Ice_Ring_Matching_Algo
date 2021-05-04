@@ -60,8 +60,11 @@ class ORToolsMatcher(Matcher):
                 self.matcher_monitor.handle_monitor_data()
             return self._solution_handler.create_drone_delivery_board(solution)
         else:
-            return DroneDeliveryBoard([], [UnmatchedDeliveryRequest(i, node.internal_node) for i, node in enumerate(self.matcher_input.graph.nodes) if
-                                           isinstance(node.internal_node, DeliveryRequest)])
+            return DroneDeliveryBoard(
+                drone_deliveries=[],
+                unmatched_delivery_requests=[UnmatchedDeliveryRequest(i, node.internal_node)
+                                             for i, node in enumerate(self.matcher_input.graph.nodes)
+                                             if isinstance(node.internal_node, DeliveryRequest)])
 
     @staticmethod
     def is_solution_valid(solution):
