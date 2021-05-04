@@ -212,8 +212,7 @@ class EndToEndMultipleExperimentRun(unittest.TestCase):
 
     @staticmethod
     def _run_end_to_end_visual_experiment(experiment: Experiment, show_visuals: bool, map_image: MapImage = None):
-        # graph = experiment.graph_creation_algorithm.create(experiment.supplier_category)
-        graph = OperationalGraph()
+        graph = experiment.graph_creation_algorithm.create(experiment.supplier_category)
         result_drone_delivery_board = experiment.run_match(graph)
         print(result_drone_delivery_board)
         analyzers_to_run = [MatchedDeliveryRequestsAnalyzer,
