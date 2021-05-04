@@ -1,13 +1,16 @@
 from copy import deepcopy
 from datetime import timedelta
+from pathlib import Path
 
 from common.entities.base_entities.delivery_request import DeliveryRequest
 from common.entities.base_entities.drone_delivery_board import DroneDeliveryBoard, UnmatchedDeliveryRequest
 from common.entities.base_entities.temporal import TimeDeltaExtension, TimeWindowExtension
 from common.graph.operational.operational_graph import OperationalNode
+from matching.initial_solution import Routes, Route
 from matching.matcher_factory import create_matcher
 from matching.matcher_input import MatcherInput
 from matching.ortools.ortools_matcher import ORToolsMatcher
+from matching.ortools.ortools_reloader import ORToolsReloader
 
 
 class MatchingMaster:
@@ -33,26 +36,27 @@ class MatchingMaster:
                                     / self._matcher_input.config.submatch_time_window_minutes)
         self._update_delivering_drones_max_route_time(updating_matcher_input.delivering_drones_board,
                                                       self._matcher_input.config.submatch_time_window_minutes)
-        self._set_end_loading_docks_initial_time_window(updating_matcher_input.delivering_drones_board)
         start_match_time_delta_in_minutes = 0
         for i in range(full_time_windows_num):
-            self._run_intermediate_match(drone_deliveries, start_match_time_delta_in_minutes, updating_matcher_input)
+            self._run_intermediate_match(drone_deliveries, start_match_time_delta_in_minutes, updating_matcher_input, i)
             start_match_time_delta_in_minutes = self._matcher_input.config.submatch_time_window_minutes
 
         last_start_match_time_delta_in_minutes = self._matcher_input.config.constraints.travel_time.max_route_time \
             - full_time_windows_num * self._matcher_input.config.submatch_time_window_minutes
-        self._update_delivering_drones_max_route_time(updating_matcher_input.delivering_drones_board,
+        if last_start_match_time_delta_in_minutes > self._matcher_input.config.constraints.session_time.max_session_time:
+            self._update_delivering_drones_max_route_time(updating_matcher_input.delivering_drones_board,
                                                       last_start_match_time_delta_in_minutes)
-        self._run_intermediate_match(drone_deliveries, last_start_match_time_delta_in_minutes, updating_matcher_input)
+            self._run_intermediate_match(drone_deliveries, last_start_match_time_delta_in_minutes, updating_matcher_input, full_time_windows_num -1)
         return DroneDeliveryBoard(drone_deliveries=drone_deliveries,
                                   unmatched_delivery_requests=[UnmatchedDeliveryRequest(i, node.internal_node)
                                                                for i, node in
                                                                enumerate(updating_matcher_input.graph.nodes)
                                                                if isinstance(node.internal_node, DeliveryRequest)])
 
-    def _run_intermediate_match(self, drone_deliveries, start_match_time_delta_in_minutes, updating_matcher_input):
+    def _run_intermediate_match(self, drone_deliveries, start_match_time_delta_in_minutes, updating_matcher_input, session_num):
         self._update_delivering_drones_start_dock_time_window(start_match_time_delta_in_minutes,
                                                               updating_matcher_input)
+        self._set_end_loading_docks_initial_time_window(updating_matcher_input.delivering_drones_board, session_num)
         intermediate_delivery_board = create_matcher(updating_matcher_input).match()
         if len(intermediate_delivery_board.drone_deliveries) > 0:
             drone_deliveries.extend(intermediate_delivery_board.drone_deliveries)
@@ -63,7 +67,7 @@ class MatchingMaster:
         for delivering_drones in delivering_drones_board.delivering_drones_list:
             delivering_drones.board_level_properties.max_route_time_entire_board = new_max_route_time
 
-    def _set_end_loading_docks_initial_time_window(self, delivering_drones_board):
+    def _set_end_loading_docks_initial_time_window(self, delivering_drones_board, session_num):
         loading_docks = set(delivering_drones.end_loading_dock for delivering_drones in
                             delivering_drones_board.delivering_drones_list)
         original_loading_docks = list(set(delivering_drones.end_loading_dock for delivering_drones in
@@ -72,7 +76,7 @@ class MatchingMaster:
             new_until = self._matcher_input.config.zero_time.add_time_delta(
                 TimeDeltaExtension(
                     timedelta(
-                        minutes=self._matcher_input.config.submatch_time_window_minutes)))
+                        minutes=(session_num + 1) * self._matcher_input.config.submatch_time_window_minutes - self._matcher_input.config.constraints.travel_time.reloading_time)))
             if new_until > original_loading_docks[i].time_window.until:
                 new_until = original_loading_docks[i].time_window.until
 

@@ -66,7 +66,6 @@ class EndToEndMultipleExperimentRun(unittest.TestCase):
         # cls.pr.disable()
         # pstats.Stats(cls.pr).sort_stats(SortKey.CUMULATIVE).print_stats()
         # pstats.Stats(cls.pr).sort_stats(SortKey.TIME).print_stats()
-        # print("\n\n\n\n--->>>")
 
     @unittest.skip
     def test_calc_north_scenario_visualization(self):
@@ -90,7 +89,7 @@ class EndToEndMultipleExperimentRun(unittest.TestCase):
         matcher_config = MatcherConfig(
             zero_time=ZERO_TIME,
             solver=ORToolsSolverConfig(first_solution_strategy="PATH_CHEAPEST_ARC",
-                                       local_search_strategy="GUIDED_LOCAL_SEARCH", timeout_sec=60),
+                                       local_search_strategy="GUIDED_LOCAL_SEARCH", timeout_sec=30),
             constraints=ConstraintsConfig(
                 capacity_constraints=CapacityConstraints(count_capacity_from_zero=True, capacity_cost_coefficient=10000),
                 travel_time_constraints=TravelTimeConstraints(max_waiting_time=0,
@@ -207,7 +206,7 @@ class EndToEndMultipleExperimentRun(unittest.TestCase):
     @staticmethod
     def _run_end_to_end_visual_experiment(experiment: Experiment, show_visuals: bool, map_image: MapImage = None):
         graph = experiment.graph_creation_algorithm.create(experiment.supplier_category)
-        result_drone_delivery_board = experiment.run_match()
+        result_drone_delivery_board = experiment.run_match(graph)
         print(result_drone_delivery_board)
         analyzers_to_run = [MatchedDeliveryRequestsAnalyzer,
                             UnmatchedDeliveryRequestsAnalyzer,

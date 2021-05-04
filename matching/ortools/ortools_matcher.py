@@ -27,7 +27,6 @@ class ORToolsMatcher(Matcher):
         self._end_depots_graph_indices_of_vehicles = self._get_end_depots_graph_indices_of_vehicles()
         self._index_manager = self._set_index_manager()
         self._routing_model = self._set_routing_model()
-        self._search_parameters = self._set_search_params()
         self._solution_handler = ORToolsSolutionHandler(self._graph_exporter, self._index_manager, self._routing_model,
                                                         self._matcher_input, self._reloader,
                                                         self._start_depots_graph_indices_of_vehicles,
@@ -36,8 +35,9 @@ class ORToolsMatcher(Matcher):
                                                             self._reloader)
         self._set_objective()
         self._set_constraints()
-        self._set_monitor()
         self._set_reloading_depos_for_each_formation()
+        self._close_model_with_search_params()
+        self._set_monitor()
 
     def _get_start_depots_graph_indices_of_vehicles(self):
         start_depots = [delivering_drones.start_loading_dock
@@ -69,13 +69,26 @@ class ORToolsMatcher(Matcher):
 
     def match_to_routes(self) -> Routes:
         solution = self._routing_model.SolveWithParameters(self._search_parameters)
-        return self._solution_handler.get_routes(solution=solution)
+        routes = self._solution_handler.get_routes(solution=solution)
+        for route in routes.as_list():
+            for i, index in enumerate(route):
+                route[i] = self._index_manager.index_to_node(index)
+        return routes
 
     def match_from_init_solution(self, initial_routes: Routes) -> DroneDeliveryBoard:
-        self._routing_model.CloseModelWithParameters(self._search_parameters)
+        for route in initial_routes.as_list():
+            for i, index in enumerate(route):
+                route[i] = self._index_manager.node_to_index(index)
         initial_solution = self._routing_model.ReadAssignmentFromRoutes(initial_routes.as_list(), False)
         solution = self._routing_model.SolveFromAssignmentWithParameters(initial_solution, self._search_parameters)
-        return self._solution_handler.create_drone_delivery_board(solution)
+        if ORToolsMatcher.is_solution_valid(solution):
+            if self._matcher_input.config.monitor.enabled:
+                self.matcher_monitor.handle_monitor_data()
+            return self._solution_handler.create_drone_delivery_board(solution)
+        else:
+            return DroneDeliveryBoard([], [UnmatchedDeliveryRequest(i, node.internal_node) for i, node in
+                                           enumerate(self.matcher_input.graph.nodes) if
+                                           isinstance(node.internal_node, DeliveryRequest)])
 
     def _set_index_manager(self) -> OrToolsIndexManagerWrapper:
         manager = pywrapcp.RoutingIndexManager(self._reloader.num_of_nodes,
@@ -91,19 +104,14 @@ class ORToolsMatcher(Matcher):
         objective = ORToolsMatcherObjective(self._routing_model, self.matcher_input, self._priority_evaluator)
         objective.add_priority()
 
-    def _set_search_params(self) -> RoutingSearchParameters:
-
+    def _close_model_with_search_params(self) -> None:
         self._search_parameters = pywrapcp.DefaultRoutingSearchParameters()
-
         self._search_parameters.first_solution_strategy = \
             self.matcher_input.config.solver.get_first_solution_strategy_as_int()
-
         self._search_parameters.local_search_metaheuristic = \
             self.matcher_input.config.solver.get_local_search_strategy_as_int()
-
         self._search_parameters.time_limit.seconds = self.matcher_input.config.solver.timeout_sec
-
-        return self._search_parameters
+        self._routing_model.CloseModelWithParameters(self._search_parameters)
 
     def _set_constraints(self):
         matcher_constraints = ORToolsMatcherConstraints(self._index_manager, self._routing_model, self.matcher_input,
@@ -118,10 +126,9 @@ class ORToolsMatcher(Matcher):
     def _set_monitor(self):
         if not self.matcher_input.config.monitor.enabled:
             return
-
         self.matcher_monitor = ORToolsMatcherMonitor(self._graph_exporter, self._index_manager, self._routing_model,
-                                                     self._search_parameters, self.matcher_input,
-                                                     self._solution_handler, self._priority_evaluator)
+                                                     self.matcher_input, self._solution_handler,
+                                                     self._priority_evaluator)
         self.matcher_monitor.add_search_monitor()
 
     def _set_reloading_depos_for_each_formation(self):

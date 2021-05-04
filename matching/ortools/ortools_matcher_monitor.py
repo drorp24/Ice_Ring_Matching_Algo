@@ -15,13 +15,12 @@ from visualization.basic.line_chart_drawer import LineChartDrawer
 
 class ORToolsMatcherMonitor:
     def __init__(self, graph_exporter: OrtoolsGraphExporter, index_manager: OrToolsIndexManagerWrapper,
-                 routing_model: RoutingModel, search_parameters: RoutingSearchParameters, matcher_input: MatcherInput,
+                 routing_model: RoutingModel, matcher_input: MatcherInput,
                  solution_handler: ORToolsSolutionHandler, priority_evaluator:ORToolsPriorityEvaluator):
 
         self._graph_exporter = graph_exporter
         self._index_manager = index_manager
         self._routing_model = routing_model
-        self._search_parameters = search_parameters
         self._solution_handler = solution_handler
         self._matcher_input = matcher_input
         self._monitor_config = matcher_input.config.monitor
@@ -38,8 +37,6 @@ class ORToolsMatcherMonitor:
         return self._monitor
 
     def add_search_monitor(self) -> None:
-        self._routing_model.CloseModelWithParameters(self._search_parameters)
-
         self._add_best_solution_collector()
         self._add_unmatched_delivery_requests_monitoring()
         self._add_priority_monitoring()

@@ -31,6 +31,7 @@ from matching.constraint_config import ConstraintsConfig, CapacityConstraints, T
 from matching.matcher_config import MatcherConfig
 from matching.matcher_factory import create_matcher
 from matching.matcher_input import MatcherInput
+from matching.matching_master import MatchingMaster
 from matching.monitor_config import MonitorConfig
 from matching.ortools.ortools_initial_solution import ORToolsInitialSolution
 from matching.ortools.ortools_solver_config import ORToolsSolverConfig
@@ -89,7 +90,7 @@ class BasicInitialSolutionTest(TestCase):
                                                   delivering_drones_board=delivering_drones_board,
                                                   config=match_config_auto_noreuse)
 
-        delivery_board_auto_noreuse = create_matcher(matcher_input=matcher_input_auto_noreuse).match()
+        delivery_board_auto_noreuse = MatchingMaster(matcher_input=matcher_input_auto_noreuse).match()
 
         match_config_initial = BasicInitialSolutionTest.create_match_config(local_search_strategy="GUIDED_LOCAL_SEARCH",
                                                                             reload_per_vehicle=3)

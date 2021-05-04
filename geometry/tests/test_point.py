@@ -41,9 +41,9 @@ class BasicPointMathTestCase(unittest.TestCase):
         self.assertEqual(result, 10)
 
     def test_calc_centroid(self):
-        result = calc_centroid(points=[self.p1, self.p1, self.p1, self.p2])
+        result = calc_centroid(points=(self.p1, self.p1, self.p1, self.p2))
         self.assertEqual(create_point_2d(2.5, 0), result)
 
     def test_calc_centroid_on_single_point(self):
-        result = calc_centroid(points=tuple(self.p1))
+        result = calc_centroid(points=(self.p1,))
         self.assertEqual(self.p1, result)
