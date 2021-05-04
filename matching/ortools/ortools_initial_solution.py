@@ -5,7 +5,9 @@ from matching.matcher_input import MatcherInput
 
 class ORToolsInitialSolution(InitialSolution):
 
-    @staticmethod
-    def calc(matcher_input: MatcherInput) -> Routes:
-        matcher = create_matcher(matcher_input)
-        return matcher.match_to_routes()
+    def __init__(self, matcher_input: MatcherInput):
+        super().__init__(matcher_input)
+        self.matcher = create_matcher(matcher_input)
+
+    def calc(self) -> Routes:
+        return self.matcher.match_to_routes()
