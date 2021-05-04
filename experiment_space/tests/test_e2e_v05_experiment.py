@@ -29,8 +29,7 @@ class BasicV05End2EndExperiment(unittest.TestCase):
         experiment_dict = Experiment.json_to_dict(cls.experiment_json_from_parser_path)
         cls.experiment = Experiment.dict_to_obj(experiment_dict)
 
-        print("#delivery_requests", len(cls.experiment.supplier_category.delivery_requests))
-        print("#drone_loading_docks", len(cls.experiment.supplier_category.drone_loading_docks))
+
 
     @classmethod
     def tearDownClass(cls):
@@ -47,6 +46,12 @@ class BasicV05End2EndExperiment(unittest.TestCase):
     @staticmethod
     def _run_end_to_end_visual_experiment(experiment: Experiment, show_visuals: bool, map_image: MapImage = None):
         graph = experiment.graph_creation_algorithm.create(experiment.supplier_category)
+
+
+        print("# delivery_requests from json", len(experiment.supplier_category.delivery_requests))
+        print("# drone_loading_docks from json", len(experiment.supplier_category.drone_loading_docks))
+        print("# graph nodes including docks", len(graph.nodes))
+
         result_drone_delivery_board = experiment.run_match()
         print(result_drone_delivery_board)
         analyzers_to_run = [MatchedDeliveryRequestsAnalyzer,
