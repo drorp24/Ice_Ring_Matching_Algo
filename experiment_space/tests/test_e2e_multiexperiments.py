@@ -67,7 +67,7 @@ class EndToEndMultipleExperimentRun(unittest.TestCase):
             Stats(cls.pr).sort_stats(SortKey.CUMULATIVE).print_stats()
             Stats(cls.pr).sort_stats(SortKey.TIME).print_stats()
 
-    # @unittest.skip
+    @unittest.skip
     def test_calc_north_scenario_visualization(self):
         sampled_supplier_category = self._create_sampled_supplier_category_north(
             requests_amount=74,
@@ -231,7 +231,7 @@ class EndToEndMultipleExperimentRun(unittest.TestCase):
 
     @classmethod
     def _create_sampled_supplier_category_north(cls, requests_amount: int = 74,
-                                                docks_amount: int = 2,
+                                                docks_amount: int = 6,
                                                 dock_ids = ["aa", "bb"]):
         return SupplierCategoryDistribution(
             zero_time_distribution=DateTimeDistribution([ZERO_TIME]),
