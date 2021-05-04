@@ -103,7 +103,8 @@ class ORToolsMatcherMaxSessionTimeTestCase(TestCase):
                 priority_constraints=PriorityConstraints(True, priority_cost_coefficient=100)),
             unmatched_penalty=100000,
             reload_per_vehicle=0,
-            monitor=MonitorConfig(enabled=False)
+            monitor=MonitorConfig(enabled=False),
+            submatch_time_window_minutes=MAX_OPERATION_TIME
         )
 
     @staticmethod
@@ -114,7 +115,7 @@ class ORToolsMatcherMaxSessionTimeTestCase(TestCase):
                                 TimeWindowExtension(
                                     since=ZERO_TIME,
                                     until=ZERO_TIME.add_time_delta(
-                                        TimeDeltaExtension(timedelta(hours=4)))))
+                                        TimeDeltaExtension(timedelta(hours=1440)))))
 
     def _create_delivery_request_with_given_max_session_time(self, max_session_time: int):
         dr1_range = max_session_time

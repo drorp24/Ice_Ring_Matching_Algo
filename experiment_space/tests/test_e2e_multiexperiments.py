@@ -1,7 +1,6 @@
 import cProfile
-import pstats
 import unittest
-from datetime import timedelta, datetime
+from datetime import timedelta
 from pathlib import Path
 from pstats import Stats, SortKey
 from random import Random
@@ -27,7 +26,6 @@ from common.entities.base_entities.fleet.fleet_property_sets import DroneSetProp
     PackageConfigurationPolicy, BoardLevelProperties
 from common.entities.base_entities.package import PackageType
 from common.entities.base_entities.temporal import TimeDeltaExtension
-from common.graph.operational.operational_graph import OperationalGraph
 from experiment_space.analyzer.quantitative_analyzers import MatchedDeliveryRequestsAnalyzer, \
     UnmatchedDeliveryRequestsAnalyzer, MatchPercentageDeliveryRequestAnalyzer, TotalWorkTimeAnalyzer, \
     AmountMatchedPerPackageTypeAnalyzer, MatchingEfficiencyAnalyzer, MatchingPriorityEfficiencyAnalyzer
@@ -42,30 +40,32 @@ from geometry.distribution.geo_distribution import UniformPointInBboxDistributio
 from geometry.geo2d import Point2D
 from geometry.geo_factory import create_point_2d
 from matching.constraint_config import ConstraintsConfig, CapacityConstraints, TravelTimeConstraints, \
-    SessionTimeConstraints, PriorityConstraints
+    PriorityConstraints
 from matching.matcher_config import MatcherConfig
 from matching.monitor_config import MonitorConfig
 from matching.ortools.ortools_solver_config import ORToolsSolverConfig
 from visualization.basic.pltdrawer2d import MapImage
 
 SHOW_VISUALS = True
+USE_PROFILE = False
 
 
 class EndToEndMultipleExperimentRun(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        # cls.pr = cProfile.Profile()
-        # cls.pr.enable()
+        if USE_PROFILE:
+            cls.pr = cProfile.Profile()
+            cls.pr.enable()
         cls.matcher_config = MatcherConfig.dict_to_obj(
             MatcherConfig.json_to_dict(Path('experiment_space/tests/jsons/test_e2e_experiment_config.json')))
 
     @classmethod
     def tearDownClass(cls):
-        pass
-        # cls.pr.disable()
-        # pstats.Stats(cls.pr).sort_stats(SortKey.CUMULATIVE).print_stats()
-        # pstats.Stats(cls.pr).sort_stats(SortKey.TIME).print_stats()
+        if USE_PROFILE:
+            cls.pr.disable()
+            Stats(cls.pr).sort_stats(SortKey.CUMULATIVE).print_stats()
+            Stats(cls.pr).sort_stats(SortKey.TIME).print_stats()
 
     @unittest.skip
     def test_calc_north_scenario_visualization(self):
@@ -97,7 +97,6 @@ class EndToEndMultipleExperimentRun(unittest.TestCase):
                                                               count_time_from_zero=False,
                                                               reloading_time=120,
                                                               important_earliest_coeff=1),
-                session_time_constraints=SessionTimeConstraints(max_session_time=60),
                 priority_constraints=PriorityConstraints(True, priority_cost_coefficient=1000)),
             unmatched_penalty=10000,
             reload_per_vehicle=0,
