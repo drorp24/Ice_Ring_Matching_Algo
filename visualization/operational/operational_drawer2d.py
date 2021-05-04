@@ -7,6 +7,7 @@ from common.entities.base_entities.drone_delivery import DroneDelivery
 from common.entities.base_entities.drone_delivery_board import DroneDeliveryBoard, UnmatchedDeliveryRequest
 from common.entities.base_entities.drone_loading_dock import DroneLoadingDock
 from common.entities.base_entities.package_delivery_plan import PackageDeliveryPlan
+from common.entities.base_entities.zone import Zone
 from common.graph.operational.operational_graph import OperationalGraph, OperationalEdge
 from geometry.geo_factory import create_line_string_2d
 from visualization.basic.color import Color
@@ -41,8 +42,9 @@ def add_delivery_option(drawer: Drawer2D, do: DeliveryOption, draw_internal=True
     return patch
 
 
-def add_delivery_request(drawer: Drawer2D, dr: DeliveryRequest, draw_internal=True, color: Color = Color.Green, radius=0.05):
-    drawer.add_point2d(dr.calc_location(),radius=radius, edgecolor=color, facecolor=color, linewidth=1)
+def add_delivery_request(drawer: Drawer2D, dr: DeliveryRequest, draw_internal=True, color: Color = Color.Green,
+                         radius=0.05):
+    drawer.add_point2d(dr.calc_location(), radius=radius, edgecolor=color, facecolor=color, linewidth=1)
     if draw_internal:
         for do in dr.delivery_options:
             drawer.add_point2d(do.calc_location(), edgecolor=color, linewidth=2)
@@ -55,11 +57,12 @@ def add_drone_loading_dock(drawer: Drawer2D, ds: DroneLoadingDock):
     drawer.add_point2d(ds.calc_location(), edgecolor=Color.Black, facecolor=Color.DodgerBlue, linewidth=5)
 
 
-def add_operational_graph(drawer: Drawer2D, op_gr: OperationalGraph, draw_internal=True, draw_edges: bool = True, radius=0.05):
+def add_operational_graph(drawer: Drawer2D, op_gr: OperationalGraph, draw_internal=True, draw_edges: bool = True,
+                          radius=0.05):
     if draw_internal:
         for node in op_gr.nodes:
             if node.internal_type is DeliveryRequest:
-                add_delivery_request(drawer, node.internal_node, False,radius=radius)
+                add_delivery_request(drawer, node.internal_node, False, radius=radius)
             elif node.internal_type is DroneLoadingDock:
                 add_drone_loading_dock(drawer, node.internal_node)
 
@@ -69,12 +72,16 @@ def add_operational_graph(drawer: Drawer2D, op_gr: OperationalGraph, draw_intern
                             edgecolor=_get_color_of_graph_edge(edge), linewidth=1) for edge in op_gr.edges]
 
 
+def add_zones(drawer: Drawer2D, zones: [Zone]):
+    list(map(lambda zone: drawer.add_polygon2d(zone.region,edgecolor=Color.DarkBlue, facecolor=Color.Blue), zones))
+
+
 def _get_color_of_graph_edge(edge: OperationalEdge):
     cond_color_map = {
         lambda edge_: edge.end_node.internal_type is DroneLoadingDock: Color.Red,
         lambda edge_: edge.start_node.internal_type is DroneLoadingDock: Color.Green,
         lambda edge_: edge.start_node.internal_type is DeliveryRequest
-        and edge.end_node.internal_type is DeliveryRequest: Color.Grey
+                      and edge.end_node.internal_type is DeliveryRequest: Color.Grey
     }
     for cond in cond_color_map:
         if cond(edge):

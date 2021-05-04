@@ -12,6 +12,8 @@ from visualization.basic.color import Color
 class Drawer2DCoordinateSys(Enum):
     CARTESIAN = auto()
     GEOGRAPHIC = auto()
+    GEOGRAPHIC_UTM = auto()
+
 
 
 class Drawer2D(ABC):

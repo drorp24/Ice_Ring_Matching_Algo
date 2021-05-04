@@ -59,7 +59,6 @@ class DroneLoadingDock(JsonableBaseEntity, Localizable, Temporal, ShapeableColle
     def __eq__(self, other):
         return self.__class__ == other.__class__ and \
                self.id == other.id and \
-               self.time_window == other.time_window and \
                self.drone_type == other.drone_type and \
                self.drone_loading_station == other.drone_loading_station
 
