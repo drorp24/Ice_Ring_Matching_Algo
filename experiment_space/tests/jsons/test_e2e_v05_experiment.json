@@ -9,7 +9,7 @@
   "drone_loading_docks_file_path": "experiment_space/tests/jsons/exported/DroneLoadingDocks.json",
   "drone_set_properties_list_path": "experiment_space/tests/jsons/exported/fleet_allocations_input.json",
   "graph_creation_algorithm": {
-    "__class__": "FullyConnectedGraphAlgorithm",
+    "__class__": "PackageTimeZonesDependentGraphAlgorithm",
     "edge_cost_factor": 0.0000588235,
     "edge_travel_time_factor":0.0000588235
   },
