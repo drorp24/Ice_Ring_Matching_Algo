@@ -15,6 +15,11 @@ class Drawer2DCoordinateSys(Enum):
 
 
 class Drawer2D(ABC):
+
+    @abstractmethod
+    def mpl_connect(self, patches_list):
+        raise NotImplementedError
+
     @abstractmethod
     def add_point2d(self, point2d: Point2D, radius=0.05, edgecolor: Color = Color.Blue, facecolor: Color = Color.Blue,
                     facecolor_alpha=1, linewidth=2, label=None) -> None:
