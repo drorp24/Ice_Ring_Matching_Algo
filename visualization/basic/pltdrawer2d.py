@@ -31,16 +31,36 @@ class PltDrawer2D(Drawer2D):
                  mapImage: MapImage = None):
         self._coordinate_sys = coordinate_sys
         self._init_according_to_coordinate_system(mapImage)
+        self._patches_map = {}
 
     def add_point2d(self, point2d: Point2D, radius=0.05, edgecolor: Color = Color.Blue, facecolor: Color = Color.Blue,
-                    facecolor_alpha=1, linewidth=2, label=None) -> None:
+                    facecolor_alpha=1, linewidth=2, label=None):
         if self._coordinate_sys is Drawer2DCoordinateSys.GEOGRAPHIC:
             radius *= GEOGRAPHIC_RADIUS_SIZE_RATIO
         point = Circle((point2d.x, point2d.y), radius=radius,
                        edgecolor=edgecolor.get_rgb(),
                        facecolor=facecolor.get_rgb_with_alpha(facecolor_alpha),
                        linewidth=linewidth, label=label)
-        self._ax.add_patch(point)
+        return self._ax.add_patch(point)
+
+    def mpl_connect(self, patches_list, legend):
+        for legline, origline in zip(legend.get_patches(), patches_list):
+            legline.set_picker(True)
+            self._patches_map[legline] = origline
+        for legline, origline in self._patches_map.items():
+            [axx.set_visible(False) for axx in origline]
+            legline.set_alpha(0.2)
+        def onpick(event):
+            legline = event.artist
+            origline = self._patches_map[legline]
+            visible = all([not axx.get_visible() for axx in origline])
+            [axx.set_visible(visible) for axx in origline]
+            # Change the alpha on the line in the legend so we can see what lines
+            # have been toggled.
+            legline.set_alpha(1.0 if visible else 0.2)
+            self._fig.canvas.draw()
+
+        self._fig.canvas.mpl_connect('pick_event', onpick)
 
     def add_line_string2d(self, line_string2d: LineString2D, edgecolor: Color = Color.Green,
                           facecolor: Color = Color.White, linewidth=2, label=None) -> None:
@@ -79,11 +99,13 @@ class PltDrawer2D(Drawer2D):
     def add_text(self, text: str, point2d: Point2D, color: Color = Color.Black, fontsize: int = 10) -> None:
         self._ax.text(point2d.x, point2d.y, text, color=color.get_rgb(), fontsize=fontsize)
 
-    def add_legend(self, new_labels: [str] = None, new_label_colors: [Color] = None, fontsize: int = 10) -> None:
+    def add_legend(self, new_labels: [str] = None, new_label_colors: [Color] = None, fontsize: int = 10, patches_list = None) -> None:
         if new_labels is not None:
-            self._add_legend_with_new_labels(new_labels, new_label_colors, fontsize)
+            leg = self._add_legend_with_new_labels(new_labels, new_label_colors, fontsize)
         else:
-            plt.legend(bbox_to_anchor=(1.01, 1), loc="upper left", ncol=3)
+            leg = plt.legend(bbox_to_anchor=(1.01, 1), loc="upper left", ncol=3)
+        if patches_list is not None:
+            self.mpl_connect(patches_list=patches_list, legend=leg)
 
     def draw(self, block=True) -> None:
         self._ax.axis('scaled')
@@ -136,6 +158,6 @@ class PltDrawer2D(Drawer2D):
         if len(new_labels) != len(new_label_colors):
             raise ValueError('new_labels count must match new_label_colors count')
         else:
-            plt.legend(handles=[
+            return plt.legend(fancybox=True, shadow=True,handles=[
                 Patch(label=new_labels[i], color=new_label_colors[i].get_rgb()) for i, label in enumerate(new_labels)],
                       loc="upper left", bbox_to_anchor=(1.01, 1), ncol=3, fontsize=fontsize)
