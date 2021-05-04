@@ -40,7 +40,7 @@ class BasicV05End2EndExperiment(unittest.TestCase):
     def test_calc_v05_visualization(self):
 
         map_image = MapImage(map_background_path=Path("visualization/basic/all_map.png"),
-                             west_lon=34.31, east_lon=36.135, south_lat=29.5, north_lat=33.78)
+                             west_lon=33.65216, east_lon=36.60633, south_lat=29.52792, north_lat=33.84980)
 
         self._run_end_to_end_visual_experiment(self.experiment, SHOW_VISUALS, map_image)
 
@@ -61,6 +61,7 @@ class BasicV05End2EndExperiment(unittest.TestCase):
             draw_matched_scenario(delivery_board=result_drone_delivery_board, graph=graph,
                                   supplier_category=experiment.supplier_category, map_image=map_image,
                                   aggregate_by_delivering_drones=True,
+                                  draw_zones=True,
                                   coordinate_sys=Drawer2DCoordinateSys.GEOGRAPHIC_UTM
                                   )
         return analysis_results
