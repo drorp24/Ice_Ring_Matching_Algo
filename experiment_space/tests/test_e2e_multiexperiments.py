@@ -67,9 +67,13 @@ class EndToEndMultipleExperimentRun(unittest.TestCase):
             Stats(cls.pr).sort_stats(SortKey.CUMULATIVE).print_stats()
             Stats(cls.pr).sort_stats(SortKey.TIME).print_stats()
 
-    @unittest.skip
+    # @unittest.skip
     def test_calc_north_scenario_visualization(self):
-        sampled_supplier_category = self._create_sampled_supplier_category_north()
+        sampled_supplier_category = self._create_sampled_supplier_category_north(
+            requests_amount=74,
+            docks_amount=2,
+            dock_ids=[EntityID("aa"), EntityID("bb")]
+        )
         experiment = Experiment(supplier_category=sampled_supplier_category,
                                 drone_set_properties_list=EndToEndMultipleExperimentRun.
                                 _create_large_drone_set_properties_list(
@@ -85,7 +89,11 @@ class EndToEndMultipleExperimentRun(unittest.TestCase):
 
     @unittest.skip
     def test_calc_north_scenario_with_time_greedy_visualization(self):
-        sampled_supplier_category = self._create_sampled_supplier_category_north()
+        sampled_supplier_category = self._create_sampled_supplier_category_north(
+            requests_amount=700,
+            docks_amount=6,
+            dock_ids=[EntityID("aa"), EntityID("bb"), EntityID("cc"), EntityID("dd"), EntityID("ee"), EntityID("ff")]
+        )
         matcher_config = MatcherConfig(
             zero_time=ZERO_TIME,
             solver=ORToolsSolverConfig(first_solution_strategy="PATH_CHEAPEST_ARC",
@@ -204,7 +212,8 @@ class EndToEndMultipleExperimentRun(unittest.TestCase):
 
     @staticmethod
     def _run_end_to_end_visual_experiment(experiment: Experiment, show_visuals: bool, map_image: MapImage = None):
-        graph = experiment.graph_creation_algorithm.create(experiment.supplier_category)
+        # graph = experiment.graph_creation_algorithm.create(experiment.supplier_category)
+        graph = OperationalGraph()
         result_drone_delivery_board = experiment.run_match(graph)
         print(result_drone_delivery_board)
         analyzers_to_run = [MatchedDeliveryRequestsAnalyzer,
@@ -222,7 +231,9 @@ class EndToEndMultipleExperimentRun(unittest.TestCase):
         return analysis_results
 
     @classmethod
-    def _create_sampled_supplier_category_north(cls):
+    def _create_sampled_supplier_category_north(cls, requests_amount: int = 74,
+                                                docks_amount: int = 2,
+                                                dock_ids = ["aa", "bb"]):
         return SupplierCategoryDistribution(
             zero_time_distribution=DateTimeDistribution([ZERO_TIME]),
             delivery_requests_distribution=cls._create_custom_delivery_request_distribution_north(),
@@ -236,11 +247,11 @@ class EndToEndMultipleExperimentRun(unittest.TestCase):
                                                                                         32.6675
                                                                                         )),
                 time_window_distributions=_create_standard_full_day_test_time(),
-                ids=[EntityID("aa"), EntityID("bb"), EntityID("cc"), EntityID("dd"), EntityID("ee"), EntityID("ff")]
+                ids=dock_ids
             )
         ).choose_rand(
             Random(10),
-            amount={DeliveryRequest: 700, DroneLoadingDock: 6})[0]
+            amount={DeliveryRequest: requests_amount, DroneLoadingDock: docks_amount})[0]
 
     @classmethod
     def _create_sampled_supplier_category_center(cls):
