@@ -12,9 +12,16 @@ from visualization.basic.color import Color
 class Drawer2DCoordinateSys(Enum):
     CARTESIAN = auto()
     GEOGRAPHIC = auto()
+    GEOGRAPHIC_UTM = auto()
+
 
 
 class Drawer2D(ABC):
+
+    @abstractmethod
+    def mpl_connect(self, patches_list, legend):
+        raise NotImplementedError
+
     @abstractmethod
     def add_point2d(self, point2d: Point2D, radius=0.05, edgecolor: Color = Color.Blue, facecolor: Color = Color.Blue,
                     facecolor_alpha=1, linewidth=2, label=None) -> None:
@@ -45,7 +52,7 @@ class Drawer2D(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def add_legend(self, new_labels: [str] = None, new_label_colors: [Color] = None, fontsize: int = 10) -> None:
+    def add_legend(self, new_labels: [str] = None, new_label_colors: [Color] = None, fontsize: int = 10, patches_list = None) -> None:
         raise NotImplementedError
 
     @abstractmethod

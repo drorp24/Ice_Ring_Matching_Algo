@@ -38,10 +38,10 @@ class SupplierCategory(JsonableBaseEntity):
 
     @classmethod
     def dict_to_obj(cls, dict_input):
+        assert (dict_input['__class__'] == cls.__name__)
         return SupplierCategory(
             delivery_requests=[DeliveryRequest.dict_to_obj(dr_dict) for dr_dict in dict_input['delivery_requests']],
             drone_loading_docks=[DroneLoadingDock.dict_to_obj(dld_dict)
                                  for dld_dict in dict_input['drone_loading_docks']],
             zero_time=DateTimeExtension.from_dict(dict_input['zero_time']),
             zones=[Zone.dict_to_obj(zone_dict) for zone_dict in dict_input['zones']])
-

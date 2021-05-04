@@ -10,9 +10,10 @@ from visualization.basic.pltgantt_drawer import create_gantt_drawer
 from visualization.operational import operational_drawer2d, operational_gantt_drawer
 
 
-def draw_matched_scenario(delivery_board, graph, supplier_category, map_image, aggregate_by_delivering_drones):
-    draw_operational_graph_on_map(graph, map_image, should_block=False)
-    draw_matches_on_map(delivery_board, map_image, should_block=False)
+def draw_matched_scenario(delivery_board, graph, supplier_category, map_image, aggregate_by_delivering_drones,draw_zones=False,
+                          coordinate_sys: Drawer2DCoordinateSys = Drawer2DCoordinateSys.GEOGRAPHIC):
+    draw_operational_graph_on_map(graph, supplier_category,map_image, should_block=False,draw_zones=draw_zones, coordinate_sys=coordinate_sys)
+    draw_matches_on_map(delivery_board, map_image, should_block=False, coordinate_sys=coordinate_sys)
     draw_match_gantt(delivery_board, supplier_category, aggregate_by_delivering_drones, should_block=True)
 
 
@@ -78,15 +79,19 @@ def draw_match_gantt(delivery_board, supplier_category, aggregate_by_delivering_
     board_gantt_drawer.draw(should_block)
 
 
-def draw_matches_on_map(delivery_board, map_image, should_block=False):
-    board_map_drawer = create_drawer_2d(Drawer2DCoordinateSys.GEOGRAPHIC, map_image)
+def draw_matches_on_map(delivery_board, map_image, should_block=False,
+                        coordinate_sys: Drawer2DCoordinateSys = Drawer2DCoordinateSys.GEOGRAPHIC):
+    board_map_drawer = create_drawer_2d(coordinate_sys, map_image)
     operational_drawer2d.add_delivery_board(board_map_drawer, delivery_board, draw_unmatched=True)
     board_map_drawer.draw(should_block)
 
 
-def draw_operational_graph_on_map(graph, map_image, should_block=False):
-    dr_drawer = create_drawer_2d(Drawer2DCoordinateSys.GEOGRAPHIC, map_image)
+def draw_operational_graph_on_map(graph,supplier_category, map_image, should_block=False,draw_zones = False,
+                                  coordinate_sys: Drawer2DCoordinateSys = Drawer2DCoordinateSys.GEOGRAPHIC):
+    dr_drawer = create_drawer_2d(coordinate_sys, map_image)
     operational_drawer2d.add_operational_graph(dr_drawer, graph, draw_internal=True, draw_edges=False)
+    if draw_zones:
+        operational_drawer2d.add_zones(dr_drawer,supplier_category.zones)
     dr_drawer.draw(should_block)
 
 
