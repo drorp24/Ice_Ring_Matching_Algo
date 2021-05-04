@@ -6,8 +6,8 @@ from optional import Optional
 from common.entities.base_entities.package import PackageType
 from common.math.angle import Angle
 from drop_envelope.slide_service import MockSlidesServiceWrapper
-from geometry.utils import Shapeable
 from geometry.geo2d import Polygon2D, EmptyGeometry2D, Point2D
+from geometry.utils import Shapeable
 
 
 @dataclass
@@ -73,3 +73,6 @@ class DropEnvelope(Shapeable):
                 self.drone_azimuth == other.drone_azimuth and
                 self.package_type == other.package_type and
                 self.internal_envelope == other.internal_envelope)
+
+    def __hash__(self):
+        return hash(tuple((self.drop_azimuth.degrees, self.drone_azimuth.degrees, self.package_type, str(self.internal_envelope))))

@@ -91,9 +91,10 @@ class PackageTypeAmountMap(JsonableBaseEntity):
 
 class DronePackageConfiguration(JsonableBaseEntity):
 
-    def __init__(self, drone_type: DroneType, package_type_map: PackageTypeAmountMap):
+    def __init__(self, drone_type: DroneType, package_type_map: PackageTypeAmountMap, max_session_time: int):
         self._drone_type = drone_type
         self._package_type_map = package_type_map
+        self._max_session_time = max_session_time
 
     @property
     def drone_type(self) -> DroneType:
@@ -102,6 +103,14 @@ class DronePackageConfiguration(JsonableBaseEntity):
     @property
     def package_type_map(self) -> PackageTypeAmountMap:
         return self._package_type_map
+
+    @property
+    def max_session_time(self) -> int:
+        return self._max_session_time
+
+    @max_session_time.setter
+    def max_session_time(self, max_session_time: int):
+        self._max_session_time = max_session_time
 
     def get_package_type_amount(self, package_type: PackageType) -> int:
         return self.package_type_map.get_package_type_amount(package_type)
@@ -128,7 +137,8 @@ class DronePackageConfiguration(JsonableBaseEntity):
         assert (dict_input['__class__'] == cls.__name__)
         return DronePackageConfiguration(
             drone_type=DroneType.dict_to_obj(dict_input['drone_type']),
-            package_type_map=PackageTypeAmountMap.dict_to_obj(dict_input['package_type_map']))
+            package_type_map=PackageTypeAmountMap.dict_to_obj(dict_input['package_type_map']),
+            max_session_time=dict_input['max_session_time'])
 
 
 class PackageConfiguration(Enum):
@@ -158,38 +168,45 @@ class PackageConfiguration(Enum):
 
 
 class DroneTypeToPackageConfigurationOptions:
-    drone_configurations_map: {DroneType: [PackageConfiguration]} = \
-        {DroneType.drone_type_1: [PackageConfiguration.LARGE_X2, PackageConfiguration.MEDIUM_X4,
-                                  PackageConfiguration.SMALL_X8, PackageConfiguration.TINY_X16],
-         DroneType.drone_type_2: [PackageConfiguration.LARGE_X4, PackageConfiguration.MEDIUM_X8,
-                                  PackageConfiguration.SMALL_X16, PackageConfiguration.TINY_X32],
-         DroneType.drone_type_3: [PackageConfiguration.LARGE_X2, PackageConfiguration.MEDIUM_X4,
-                                  PackageConfiguration.SMALL_X8, PackageConfiguration.TINY_X16],
-         DroneType.drone_type_4: [PackageConfiguration.LARGE_X2, PackageConfiguration.MEDIUM_X4,
-                                  PackageConfiguration.SMALL_X8, PackageConfiguration.TINY_X16]
-         }
+    drone_configurations_map: {DroneType: {PackageConfiguration: int}} = \
+        {DroneType.drone_type_1: {PackageConfiguration.LARGE_X2: 400,
+                                  PackageConfiguration.MEDIUM_X4: 400,
+                                  PackageConfiguration.SMALL_X8: 400,
+                                  PackageConfiguration.TINY_X16: 400},
+         DroneType.drone_type_2: {PackageConfiguration.LARGE_X4: 400,
+                                  PackageConfiguration.MEDIUM_X8: 400,
+                                  PackageConfiguration.SMALL_X16: 400,
+                                  PackageConfiguration.TINY_X32: 400},
+         DroneType.drone_type_3: {PackageConfiguration.LARGE_X2: 400,
+                                  PackageConfiguration.MEDIUM_X4: 400,
+                                  PackageConfiguration.SMALL_X8: 400,
+                                  PackageConfiguration.TINY_X16: 400},
+         DroneType.drone_type_4: {PackageConfiguration.LARGE_X2: 400,
+                                  PackageConfiguration.MEDIUM_X4: 400,
+                                  PackageConfiguration.SMALL_X8: 400,
+                                  PackageConfiguration.TINY_X16: 400}}
 
     @classmethod
-    def add_configuration_option(cls, configuration_option: {DroneType: [PackageConfiguration]}):
+    def add_configuration_option(cls, configuration_option: {DroneType: {PackageConfiguration: int}}):
         for key in configuration_option:
-            cls.drone_configurations_map[key] = configuration_option[key]
+            cls.drone_configurations_map[key].update(configuration_option[key])
 
     @classmethod
     def get_drone_configuration(cls, drone_type: DroneType,
                                 configuration: PackageConfiguration) -> DronePackageConfiguration:
-        index = cls.drone_configurations_map[drone_type].index(configuration)
-        return DronePackageConfiguration(drone_type, cls.drone_configurations_map[drone_type][index].value)
+        return DronePackageConfiguration(drone_type=drone_type, package_type_map=configuration.value,
+                                         max_session_time=cls.drone_configurations_map[drone_type][configuration])
+
+    @classmethod
+    def update_max_session_time(cls, drone_type: DroneType,
+                                configuration: PackageConfiguration,
+                                max_session_time: int):
+        cls.drone_configurations_map[drone_type][configuration] = max_session_time
 
 
 class DroneConfigurations:
-    drone_configurations_map: {DroneType: {PackageConfiguration: DronePackageConfiguration}} = \
-        {drone_type: {
-            configuration: DroneTypeToPackageConfigurationOptions.get_drone_configuration(drone_type, configuration)
-            for configuration in configurations}
-            for drone_type, configurations in
-            DroneTypeToPackageConfigurationOptions.drone_configurations_map.items()}
-
     @classmethod
     def get_drone_configuration(cls, drone_type: DroneType,
                                 configuration: PackageConfiguration) -> DronePackageConfiguration:
-        return cls.drone_configurations_map[drone_type][configuration]
+        return DroneTypeToPackageConfigurationOptions.get_drone_configuration(drone_type=drone_type,
+                                                                              configuration=configuration)

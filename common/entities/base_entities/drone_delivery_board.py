@@ -20,6 +20,10 @@ class DeliveringDronesBoard(JsonableBaseEntity):
     def amount_of_formations(self) -> int:
         return len(self._delivering_drones_list)
 
+    def get_max_session_time_per_drone_delivery(self) -> [int]:
+        return [drone_delivery.drone_formation.drone_package_configuration.max_session_time
+                for drone_delivery in self.delivering_drones_list]
+
     def get_package_type_amount_per_drone_delivery(self, package_type: PackageType) -> [int]:
         return [drone_delivery.drone_formation.get_package_type_amount(package_type) for drone_delivery in
                 self._delivering_drones_list]
@@ -109,17 +113,17 @@ class DroneDeliveryBoard(JsonableBaseEntity):
 
         unmatched_delivery_requests_str = \
             '\n'.join(map(str, self.unmatched_delivery_requests)) \
-            if len(self._unmatched_delivery_requests) > 0 \
-            else "[No unmatched delivery requests]"
+                if len(self._unmatched_delivery_requests) > 0 \
+                else "[No unmatched delivery requests]"
 
         return "\n".join((
-               f"\n[DroneDeliveryBoard]",
-               f"Total amount per package type: {self.get_total_amount_per_package_type()}",
-               f"Total work time in minutes: {self.get_total_work_time_in_minutes()}",
-               f"Total priority: {self.get_total_priority()}",
-               f"Unmatched delivery requests amount: {len(self._unmatched_delivery_requests)}",
-               f"{drone_deliveries_str}",
-               f"\n{unmatched_delivery_requests_str}"))
+            f"\n[DroneDeliveryBoard]",
+            f"Total amount per package type: {self.get_total_amount_per_package_type()}",
+            f"Total work time in minutes: {self.get_total_work_time_in_minutes()}",
+            f"Total priority: {self.get_total_priority()}",
+            f"Unmatched delivery requests amount: {len(self._unmatched_delivery_requests)}",
+            f"{drone_deliveries_str}",
+            f"\n{unmatched_delivery_requests_str}"))
 
     def __hash__(self):
         return hash((tuple(self._drone_deliveries), tuple(self._unmatched_delivery_requests)))

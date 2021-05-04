@@ -40,8 +40,8 @@ def add_delivery_option(drawer: Drawer2D, do: DeliveryOption, draw_internal=True
             drawer.add_line_string2d(segment, edgecolor=color, linewidth=2)
 
 
-def add_delivery_request(drawer: Drawer2D, dr: DeliveryRequest, draw_internal=True, color: Color = Color.Green):
-    drawer.add_point2d(dr.calc_location(), edgecolor=color, facecolor=color, linewidth=1)
+def add_delivery_request(drawer: Drawer2D, dr: DeliveryRequest, draw_internal=True, color: Color = Color.Green, radius=0.05):
+    drawer.add_point2d(dr.calc_location(),radius=radius, edgecolor=color, facecolor=color, linewidth=1)
     if draw_internal:
         for do in dr.delivery_options:
             drawer.add_point2d(do.calc_location(), edgecolor=color, linewidth=2)
@@ -54,11 +54,11 @@ def add_drone_loading_dock(drawer: Drawer2D, ds: DroneLoadingDock):
     drawer.add_point2d(ds.calc_location(), edgecolor=Color.Black, facecolor=Color.DodgerBlue, linewidth=5)
 
 
-def add_operational_graph(drawer: Drawer2D, op_gr: OperationalGraph, draw_internal=True, draw_edges: bool = True):
+def add_operational_graph(drawer: Drawer2D, op_gr: OperationalGraph, draw_internal=True, draw_edges: bool = True, radius=0.05):
     if draw_internal:
         for node in op_gr.nodes:
             if node.internal_type is DeliveryRequest:
-                add_delivery_request(drawer, node.internal_node, False)
+                add_delivery_request(drawer, node.internal_node, False,radius=radius)
             elif node.internal_type is DroneLoadingDock:
                 add_drone_loading_dock(drawer, node.internal_node)
 

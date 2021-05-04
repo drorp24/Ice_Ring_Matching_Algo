@@ -5,9 +5,6 @@ from enum import Enum
 
 from common.entities.base_entities.base_entity import JsonableBaseEntity
 
-MAX_POTENTIAL_DROP_ENV_RADIUS_METERS: float = 1000.0
-MAX_DELTA_BETWEEN_MIN_AND_MAX_RADIUS: float = 100.0
-
 
 class PotentialDropEnvelope(JsonableBaseEntity):
 
@@ -41,34 +38,29 @@ class PotentialDropEnvelope(JsonableBaseEntity):
 
 class Package(JsonableBaseEntity):
 
-    def __init__(self, weight: float):
+    def __init__(self, weight: float, minimal_radius_meters: float, maximal_radius_meters: float):
         self._weight = weight
         self.__potential_drop_envelope = PotentialDropEnvelope(
-            minimal_radius_meters=Package.calc_minimal_radius_meters(weight),
-            maximal_radius_meters=Package.calc_max_radius_meters(weight))
+            minimal_radius_meters=minimal_radius_meters,
+            maximal_radius_meters=maximal_radius_meters)
 
     @property
     def weight(self) -> float:
         return self._weight
 
-    @staticmethod
-    def calc_max_radius_meters(weight: float) -> float:
-        return Package._normalize_by_weight(MAX_POTENTIAL_DROP_ENV_RADIUS_METERS, weight)
+    @property
+    def minimal_radius_meters(self) -> float:
+        return self.__potential_drop_envelope.minimal_radius_meters
 
-    @staticmethod
-    def calc_minimal_radius_meters(weight: float) -> float:
-        return Package._normalize_by_weight(MAX_POTENTIAL_DROP_ENV_RADIUS_METERS, weight) - \
-               Package._normalize_by_weight(MAX_DELTA_BETWEEN_MIN_AND_MAX_RADIUS, weight)
-
-    @staticmethod
-    def _normalize_by_weight(value: float, weight: float) -> float:
-        return value / weight
+    @property
+    def maximal_radius_meters(self) -> float:
+        return self.__potential_drop_envelope.maximal_radius_meters
 
     def calc_potential_drop_envelope(self) -> PotentialDropEnvelope:
         return self.__potential_drop_envelope
 
     def __str__(self):
-        return 'package of weight ' + str(self._weight)
+        return f'package of weight: {str(self._weight)},potential drop env of: {str(self.__potential_drop_envelope)}'
 
     def __deepcopy__(self, memodict=None):
         if memodict is None:
@@ -78,10 +70,10 @@ class Package(JsonableBaseEntity):
 
 
 class PackageType(Enum):
-    TINY = Package(1)
-    SMALL = Package(2)
-    MEDIUM = Package(4)
-    LARGE = Package(8)
+    TINY = Package(weight=1, minimal_radius_meters=900, maximal_radius_meters=1000)
+    SMALL = Package(weight=2, minimal_radius_meters=450, maximal_radius_meters=500)
+    MEDIUM = Package(weight=4, minimal_radius_meters=225, maximal_radius_meters=250)
+    LARGE = Package(weight=8, minimal_radius_meters=112.5, maximal_radius_meters=125)
 
     @classmethod
     def dict_to_obj(cls, input_dict):
@@ -91,6 +83,12 @@ class PackageType(Enum):
 
     def calc_weight(self):
         return self.value.weight
+
+    def get_rmin(self):
+        return self.value.minimal_radius_meters
+
+    def get_rmax(self):
+        return self.value.maximal_radius_meters
 
     def __dict__(self):
         return {'__enum__': str(self)}
@@ -102,7 +100,8 @@ class PackageType(Enum):
         return hash(tuple((self.name, self.value)))
 
     def __eq__(self, other: PackageType):
-        return self.name == other.name and self.calc_weight() == other.calc_weight()
+        return all([self.name == other.name, self.calc_weight() == other.calc_weight(),
+                    self.get_rmin() == other.get_rmin(),self.get_rmax() == other.get_rmax()])
 
     def __lt__(self, other: PackageType):
         return self.name < other.name
