@@ -33,7 +33,10 @@ class Routes(JsonableBaseEntity):
 
 class InitialSolution(ABC):
 
+    def __init__(self, matcher_input: MatcherInput):
+        self.matcher_input = matcher_input
+
     @staticmethod
     @abstractmethod
-    def calc(matcher_input: MatcherInput) -> Routes:
+    def calc() -> Routes:
         raise NotImplementedError()

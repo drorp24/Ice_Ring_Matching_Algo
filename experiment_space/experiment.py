@@ -1,4 +1,7 @@
 from __future__ import annotations
+
+from pathlib import Path
+
 from common.entities.base_entities.base_entity import JsonableBaseEntity
 from common.entities.base_entities.drone_delivery_board import DroneDeliveryBoard
 from common.entities.base_entities.fleet.delivering_drones_board_generation import generate_delivering_drones_board
@@ -7,7 +10,6 @@ from experiment_space.analyzer.analyzer import Analyzer
 from experiment_space.graph_creation_algorithm import GraphCreationAlgorithm, List, create_graph_algorithm_by_name
 from experiment_space.supplier_category import SupplierCategory
 from matching.matcher_config import MatcherConfig
-from matching.matcher_factory import create_matcher
 from matching.matcher_input import MatcherInput
 from matching.matching_master import MatchingMaster
 
@@ -57,14 +59,15 @@ class Experiment(JsonableBaseEntity):
                               dict_input['graph_creation_algorithm']),
                           board_level_properties=BoardLevelProperties.dict_to_obj(dict_input['board_level_properties']))
 
-    def run_match(self, graph=None) -> DroneDeliveryBoard:
+    def run_match(self, graph=None, init_guess_path: Path = None) -> DroneDeliveryBoard:
         if graph is None:
             graph = self.graph_creation_algorithm.create(supplier_category=self.supplier_category)
         delivering_drones_board = generate_delivering_drones_board(self.drone_set_properties_list,
                                                                    self.board_level_properties)
         matcher_input = MatcherInput(graph=graph, delivering_drones_board=delivering_drones_board,
                                      config=self.matcher_config)
-        delivery_board = MatchingMaster(matcher_input=matcher_input).match()
+        delivery_board = MatchingMaster(
+            matcher_input=matcher_input).match_with_time_greedy_as_init_guess(init_guess_path)
         return delivery_board
 
     @staticmethod
