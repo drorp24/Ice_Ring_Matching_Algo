@@ -33,6 +33,12 @@ class EntityID(JsonableBaseEntity):
             else:
                 return dict_input['uuid']
 
+    def display_name(self,amount_chars:int) -> str:
+        if len(str(self.uuid)) >= amount_chars:
+            return str(self.uuid)[-amount_chars:]
+
+        return str(self.uuid)
+
     def __hash__(self):
         return hash(self._uuid)
 
