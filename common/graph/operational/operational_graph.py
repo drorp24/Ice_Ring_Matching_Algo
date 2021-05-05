@@ -1,14 +1,13 @@
 from __future__ import annotations
 
-import json
 from copy import deepcopy, copy
+from dataclasses import dataclass
 from functools import lru_cache
 from pathlib import Path
+from typing import List, Union
 
 import numpy as np
-from dataclasses import dataclass
-from typing import List, Union
-from networkx import DiGraph, subgraph, to_numpy_array, is_isomorphic
+from networkx import DiGraph, to_numpy_array, is_isomorphic
 from networkx.readwrite import json_graph
 
 from common.entities.base_entities.base_entity import JsonableBaseEntity
@@ -314,7 +313,7 @@ class OperationalGraph(JsonableBaseEntity):
     def __eq__(self, other):
         return all([is_isomorphic(self._internal_graph, other._internal_graph),
                     self._delivery_requests_map == other._delivery_requests_map,
-                   self._loading_docks_map == other._loading_docks_map])
+                    self._loading_docks_map == other._loading_docks_map])
 
     def __deepcopy__(self, memodict=None):
         if memodict is None:
@@ -327,12 +326,10 @@ class OperationalGraph(JsonableBaseEntity):
         return new_copy
 
     def __dict__(self):
-        d = {'__class__': type(self).__name__}
-        d.update({"internal_graph": json_graph.node_link_data(self._internal_graph)})
-        docks_map_dict = [dock.__dict__() for dock in list(self._loading_docks_map.values())]
-        d.update({"loading_docks_map": docks_map_dict})
-        requests_map_dict = [request.__dict__() for request in list(self._delivery_requests_map.values())]
-        d.update({"delivery_requests_map": requests_map_dict})
+        d = {'__class__': type(self).__name__,
+             'internal_graph': json_graph.node_link_data(self._internal_graph),
+             'loading_docks_map': [dock.__dict__() for dock in list(self._loading_docks_map.values())],
+             'delivery_requests_map': [request.__dict__() for request in list(self._delivery_requests_map.values())]}
         return d
 
     def __str__(self):
@@ -373,7 +370,7 @@ class OperationalGraph(JsonableBaseEntity):
         return og
 
     @staticmethod
-    def encode_node(z):
+    def encode_self(z):
         if isinstance(z, OperationalNode):
             return (z.__dict__())
         elif isinstance(z, EntityID):
@@ -382,10 +379,8 @@ class OperationalGraph(JsonableBaseEntity):
             type_name = z.__class__.__name__
             raise TypeError(f"Object of type '{type_name}' is not JSON serializable")
 
-    def to_json(self, file_path: Path):
-        with open(file_path, 'w') as f:
-            dict_self = self.__dict__()
-            json.dump(dict_self, f, sort_keys=False, default=self.encode_node)
+    def to_json(self, file_path: Path = None, sort_keys=False):
+        return super().to_json(file_path, sort_keys)
 
 
 def assert_node_is_temporal(internal_node) -> None:
