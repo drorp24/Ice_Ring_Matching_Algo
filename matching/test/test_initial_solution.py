@@ -116,7 +116,7 @@ class BasicInitialSolutionTest(TestCase):
             MonitorData.objective.name].values[-1]
 
         delivery_board_using_initial_first_stored_objective = using_initial_routes_matcher.matcher_monitor.monitor.data[
-            MonitorData.objective.name].values[1] # for some reason it is only updated
+            MonitorData.objective.name].values[1]
 
         self.assertEqual(initial_solution_last_stored_objective, delivery_board_using_initial_first_stored_objective)
         self.assertLessEqual(len(delivery_board_using_initial_routes.unmatched_delivery_requests),

@@ -31,9 +31,9 @@ class MatchingMaster:
             init_guess = Routes.from_json(Routes, init_guess_path)
         else:
             init_guess = self._create_init_guess_using_time_greedy()
-        self._matcher_input.config.solver._timeout_sec = 10
-        matcher =  ORToolsMatcher(self._matcher_input)
-        return matcher.match_from_init_solution(initial_routes = init_guess)
+        matcher = ORToolsMatcher(self._matcher_input)
+        delivery_board = matcher.match_from_init_solution(initial_routes=init_guess)
+        return delivery_board
 
     def _match_using_time_greedy(self):
         drone_deliveries = []
@@ -51,12 +51,13 @@ class MatchingMaster:
             start_match_time_delta_in_minutes = self._matcher_input.config.submatch_time_window_minutes
 
         last_start_match_time_delta_in_minutes = self._matcher_input.config.constraints.travel_time.max_route_time \
-            - full_time_windows_num * self._matcher_input.config.submatch_time_window_minutes
+                                                 - full_time_windows_num * self._matcher_input.config.submatch_time_window_minutes
         if last_start_match_time_delta_in_minutes > \
                 max(self._matcher_input.delivering_drones_board.get_max_session_time_per_drone_delivery()):
             self._update_delivering_drones_max_route_time(updating_matcher_input.delivering_drones_board,
-                                                      last_start_match_time_delta_in_minutes)
-            self._run_intermediate_match(drone_deliveries, last_start_match_time_delta_in_minutes, updating_matcher_input, full_time_windows_num -1)
+                                                          last_start_match_time_delta_in_minutes)
+            self._run_intermediate_match(drone_deliveries, last_start_match_time_delta_in_minutes,
+                                         updating_matcher_input, full_time_windows_num - 1)
         return DroneDeliveryBoard(drone_deliveries=drone_deliveries,
                                   unmatched_delivery_requests=[UnmatchedDeliveryRequest(i, node.internal_node)
                                                                for i, node in
@@ -71,20 +72,22 @@ class MatchingMaster:
         full_time_windows_num = int(self._matcher_input.config.constraints.travel_time.max_route_time
                                     / self._matcher_input.config.submatch_time_window_minutes)
         last_start_match_time_delta_in_minutes = self._matcher_input.config.constraints.travel_time.max_route_time \
-            - full_time_windows_num * self._matcher_input.config.submatch_time_window_minutes
+                                                 - full_time_windows_num * self._matcher_input.config.submatch_time_window_minutes
         self._update_delivering_drones_max_route_time(updating_matcher_input.delivering_drones_board,
                                                       self._matcher_input.config.submatch_time_window_minutes)
         start_match_time_delta_in_minutes = 0
         for i in range(full_time_windows_num):
-            intermediate_routes = self._run_intermediate_match_to_routes(start_match_time_delta_in_minutes, updating_matcher_input, i)
+            intermediate_routes = self._run_intermediate_match_to_routes(start_match_time_delta_in_minutes,
+                                                                         updating_matcher_input, i)
 
             for route_index, route in enumerate(intermediate_routes.as_list()):
                 if i == 0:
                     if len(route) > 0:
                         route.append(reloader.get_vehicle_arrive_indices(route_index)[i])
                         init_guess_routes.append(Route(route))
-                elif last_start_match_time_delta_in_minutes <= self._matcher_input.config.constraints.session_time.max_session_time \
-                    and i == (full_time_windows_num - 1):
+                elif last_start_match_time_delta_in_minutes <= max(
+                        self._matcher_input.delivering_drones_board.get_max_session_time_per_drone_delivery()) \
+                        and i == (full_time_windows_num - 1):
                     if len(route) > 0:
                         route.insert(0, reloader.get_vehicle_depart_indices(route_index)[i - 1])
                         init_guess_routes[route_index].indexes.extend(route)
@@ -94,10 +97,13 @@ class MatchingMaster:
                         route.append(reloader.get_vehicle_arrive_indices(route_index)[i])
                         init_guess_routes[route_index].indexes.extend(route)
             start_match_time_delta_in_minutes = self._matcher_input.config.submatch_time_window_minutes
-        if last_start_match_time_delta_in_minutes > self._matcher_input.config.constraints.session_time.max_session_time:
+        if last_start_match_time_delta_in_minutes > max(
+                self._matcher_input.delivering_drones_board.get_max_session_time_per_drone_delivery()):
             self._update_delivering_drones_max_route_time(updating_matcher_input.delivering_drones_board,
-                                                      last_start_match_time_delta_in_minutes)
-            intermediate_routes = self._run_intermediate_match_to_routes(last_start_match_time_delta_in_minutes, updating_matcher_input, full_time_windows_num - 1)
+                                                          last_start_match_time_delta_in_minutes)
+            intermediate_routes = self._run_intermediate_match_to_routes(last_start_match_time_delta_in_minutes,
+                                                                         updating_matcher_input,
+                                                                         full_time_windows_num - 1)
             for route_index, route in enumerate(intermediate_routes.as_list()):
                 if len(route) > 0:
                     route.insert(0, reloader.get_vehicle_depart_indices(route_index)[full_time_windows_num - 1])
@@ -107,7 +113,8 @@ class MatchingMaster:
                 route.indexes.pop()
         return Routes(init_guess_routes)
 
-    def _run_intermediate_match(self, drone_deliveries, start_match_time_delta_in_minutes, updating_matcher_input, session_num):
+    def _run_intermediate_match(self, drone_deliveries, start_match_time_delta_in_minutes, updating_matcher_input,
+                                session_num):
         self._update_delivering_drones_start_dock_time_window(start_match_time_delta_in_minutes,
                                                               updating_matcher_input)
         self._set_end_loading_docks_initial_time_window(updating_matcher_input.delivering_drones_board, session_num)
@@ -142,14 +149,19 @@ class MatchingMaster:
                             delivering_drones_board.delivering_drones_list)
         original_loading_docks = list(set(delivering_drones.end_loading_dock for delivering_drones in
                                           self._matcher_input.delivering_drones_board.delivering_drones_list))
+        time_delta_from_zero_time_in_minutes = \
+            (session_num + 1) * self._matcher_input.config.submatch_time_window_minutes \
+            - self._matcher_input.config.constraints.travel_time.reloading_time
         for i, loading_dock in enumerate(loading_docks):
             new_until = self._matcher_input.config.zero_time.add_time_delta(
                 TimeDeltaExtension(
                     timedelta(
-                        minutes=(session_num + 1) * self._matcher_input.config.submatch_time_window_minutes - self._matcher_input.config.constraints.travel_time.reloading_time)))
+                        minutes=time_delta_from_zero_time_in_minutes)))
             if new_until > original_loading_docks[i].time_window.until:
                 new_until = original_loading_docks[i].time_window.until
 
+            if new_until < loading_dock.time_window.since:
+                new_until = loading_dock.time_window.since
             loading_dock._time_window = \
                 TimeWindowExtension(since=loading_dock.time_window.since,
                                     until=new_until)

@@ -107,14 +107,14 @@ class EndToEndMultipleExperimentRun(unittest.TestCase):
                                                               reloading_time=120,
                                                               important_earliest_coeff=1),
                 priority_constraints=PriorityConstraints(True, priority_cost_coefficient=1000)),
-            unmatched_penalty=10000,
-            reload_per_vehicle=0,
-            monitor=MonitorConfig(enabled=False,
-                iterations_between_monitoring=10,
+            unmatched_penalty=10_000,
+            reload_per_vehicle=3,
+            monitor=MonitorConfig(enabled=True,
+                iterations_between_monitoring=1000,
                 max_iterations=-1,
                 save_plot=True,
                 show_plot=True,
-                separate_charts=True,
+                separate_charts=False,
                 output_directory="outputs"),
             submatch_time_window_minutes=240
         )
@@ -126,7 +126,7 @@ class EndToEndMultipleExperimentRun(unittest.TestCase):
                                 matcher_config=matcher_config,
                                 graph_creation_algorithm=FullyConnectedGraphAlgorithm(edge_cost_factor=25.0,
                                                                                       edge_travel_time_factor=25.0),
-                                board_level_properties=BoardLevelProperties(max_route_time_entire_board=240))
+                                board_level_properties=BoardLevelProperties(max_route_time_entire_board=720))
         map_image = MapImage(map_background_path=Path("visualization/basic/North_map.png"),
                              west_lon=34.907, east_lon=35.905, south_lat=32.489, north_lat=33.932)
         self._run_end_to_end_visual_experiment(experiment, True, map_image)

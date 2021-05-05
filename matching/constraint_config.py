@@ -137,6 +137,6 @@ class ConstraintsConfig(JsonableBaseEntity):
     def __deepcopy__(self, memodict=None):
         if memodict is None:
             memodict = {}
-        new_copy = ConstraintsConfig(self.capacity, self.travel_time, self.session_time, self.priority)
+        new_copy = ConstraintsConfig(self.capacity, self.travel_time, self.priority)
         memodict[id(self)] = new_copy
         return new_copy
