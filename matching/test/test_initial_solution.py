@@ -21,16 +21,18 @@ from common.entities.base_entities.fleet.fleet_property_sets import DroneFormati
 from common.entities.base_entities.package import PackageType
 from common.entities.base_entities.temporal import DateTimeExtension, TimeDeltaExtension
 from experiment_space.distribution.supplier_category_distribution import SupplierCategoryDistribution
-from experiment_space.graph_creation_algorithm import calc_assignment_from_init_solution, DeliveryRequest, \
+from experiment_space.graph_creation_algorithm import DeliveryRequest, \
     FullyConnectedGraphAlgorithm
 from geometry.distribution.geo_distribution import NormalPointDistribution, UniformPointInBboxDistribution
 from geometry.geo2d import Point2D
 from geometry.geo_factory import create_point_2d
-from matching.constraint_config import ConstraintsConfig, CapacityConstraints, TravelTimeConstraints, PriorityConstraints
+from matching.constraint_config import ConstraintsConfig, CapacityConstraints, TravelTimeConstraints, \
+    PriorityConstraints
 from matching.matcher_config import MatcherConfig
 from matching.matcher_factory import create_matcher
 from matching.matcher_input import MatcherInput
 from matching.matching_master import MatchingMaster
+from matching.monitor import MonitorData
 from matching.monitor_config import MonitorConfig
 from matching.ortools.ortools_initial_solution import ORToolsInitialSolution
 from matching.ortools.ortools_solver_config import ORToolsSolverConfig
@@ -65,7 +67,7 @@ class BasicInitialSolutionTest(TestCase):
                                      delivering_drones_board=delivering_drones_board,
                                      config=match_config_initial)
 
-        routes = ORToolsInitialSolution.calc(matcher_input=matcher_input)
+        routes = ORToolsInitialSolution(matcher_input=matcher_input).calc()
         for route in routes.as_list():
             self.assertEqual(len(set(route)), len(route))
 
@@ -98,17 +100,25 @@ class BasicInitialSolutionTest(TestCase):
                                                    delivering_drones_board=delivering_drones_board,
                                                    config=match_config_initial)
 
-        initial_routes = ORToolsInitialSolution.calc(matcher_input=matcher_input_initial_reuse)
+        initial_solution = ORToolsInitialSolution(matcher_input=matcher_input_initial_reuse)
+        initial_routes = initial_solution.calc()
 
-        match_config_auto_reuse = BasicInitialSolutionTest.create_match_config(local_search_strategy="AUTOMATIC",
+        match_config_auto_reuse = BasicInitialSolutionTest.create_match_config(local_search_strategy="GUIDED_LOCAL_SEARCH",
                                                                                reload_per_vehicle=3)
         matcher_input_auto_reuse = MatcherInput(graph=time_overlapping_dependent_graph,
                                                 delivering_drones_board=delivering_drones_board,
                                                 config=match_config_auto_reuse)
 
-        delivery_board_using_initial_routes = calc_assignment_from_init_solution(matcher_input=matcher_input_auto_reuse,
-                                                                                 initial_routes=initial_routes)
+        using_initial_routes_matcher = create_matcher(matcher_input_auto_reuse)
+        delivery_board_using_initial_routes = using_initial_routes_matcher.match_from_init_solution(initial_routes)
 
+        initial_solution_last_stored_objective = initial_solution.matcher.matcher_monitor.monitor.data[
+            MonitorData.objective.name].values[-1]
+
+        delivery_board_using_initial_first_stored_objective = using_initial_routes_matcher.matcher_monitor.monitor.data[
+            MonitorData.objective.name].values[1]
+
+        self.assertEqual(initial_solution_last_stored_objective, delivery_board_using_initial_first_stored_objective)
         self.assertLessEqual(len(delivery_board_using_initial_routes.unmatched_delivery_requests),
                              len(delivery_board_auto_noreuse.unmatched_delivery_requests))
         self.assertGreaterEqual(delivery_board_using_initial_routes.get_total_priority(),
@@ -131,7 +141,13 @@ class BasicInitialSolutionTest(TestCase):
                 priority_constraints=PriorityConstraints(True, priority_cost_coefficient=1000)),
             unmatched_penalty=10000,
             reload_per_vehicle=reload_per_vehicle,
-            monitor=MonitorConfig(enabled=False),
+            monitor=MonitorConfig(enabled=True,
+                                  iterations_between_monitoring=100,
+                                  max_iterations=-1,
+                                  save_plot=False,
+                                  show_plot=False,
+                                  separate_charts=False,
+                                  output_directory="outputs"),
             submatch_time_window_minutes=1440
         )
 
