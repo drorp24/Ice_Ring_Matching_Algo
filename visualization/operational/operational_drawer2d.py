@@ -73,7 +73,7 @@ def add_operational_graph(drawer: Drawer2D, op_gr: OperationalGraph, draw_intern
 
 
 def add_zones(drawer: Drawer2D, zones: [Zone]):
-    list(map(lambda zone: drawer.add_polygon2d(zone.region,edgecolor=Color.DarkBlue, facecolor=Color.Blue), zones))
+    list(map(lambda zone: drawer.add_polygon2d(zone.region, edgecolor=Color.DarkBlue, facecolor=Color.Blue), zones))
 
 
 def _get_color_of_graph_edge(edge: OperationalEdge):
@@ -96,8 +96,8 @@ def add_drone_delivery(drawer: Drawer2D, delivery: DroneDelivery, delivery_color
     for request in delivery.matched_requests:
         matched_delivery_option = request.delivery_request.delivery_options[request.matched_delivery_option_index]
         delivery_patches.append(add_delivery_option(drawer, matched_delivery_option,
-                            draw_internal=False,
-                            color=delivery_color))
+                                                    draw_internal=False,
+                                                    color=delivery_color))
         current_location = matched_delivery_option.calc_location()
         locations.append(current_location)
     add_drone_loading_dock(drawer, delivery.end_drone_loading_dock.drone_loading_dock)
@@ -114,11 +114,12 @@ class _MatchedDeliveryLabelsHandler:
         self.matched_delivery_labels = []
         self.delivery_patches = []
 
-    def add_matched_delivery(self, delivery: DroneDelivery) -> Color:
+    def add_matched_delivery(self, session_index: int, delivery: DroneDelivery) -> Color:
         self.matched_delivery_labels.append(
-            "[" +
-            str(delivery.delivering_drones.drone_formation.drone_formation_type.name) + "] * " +
-            str(delivery.delivering_drones.drone_formation.drone_package_configuration.package_type_map))
+
+            "[" + (delivery.delivering_drones.start_loading_dock.id.display_name(5)) + "]_" +
+            "[" + str(delivery.delivering_drones.id.display_name(5)) + "]_ [" + str(session_index) + "]")
+
         delivery_color = self._optional_delivery_colors[
             len(self.selected_delivery_colors) % len(self._optional_delivery_colors)]
         self.selected_delivery_colors.append(delivery_color)
@@ -130,12 +131,14 @@ def add_unmatched_delivery_requests(drawer: Drawer2D, unmatched_requests: [Unmat
         add_delivery_request(drawer, unmatched.delivery_request, draw_internal=False, color=Color.Red)
 
 
-def add_drone_deliveries(drawer: Drawer2D, drone_deliveries: [DroneDelivery]):
+def add_drone_deliveries(drawer: Drawer2D, board: DroneDeliveryBoard):
     labels_handler = _MatchedDeliveryLabelsHandler()
-    for i, delivery in enumerate(drone_deliveries):
+    for i, delivery in enumerate(board.drone_deliveries):
         if len(delivery.matched_requests) == 0:
             continue
-        delivery_color = labels_handler.add_matched_delivery(delivery)
+        session_index = board.get_drone_deliveries_by_delivering_drones(
+            delivering_drones=delivery.delivering_drones).index(delivery)
+        delivery_color = labels_handler.add_matched_delivery(session_index,delivery)
         labels_handler.delivery_patches.append(add_drone_delivery(drawer, delivery, delivery_color))
     drawer.add_legend(labels_handler.matched_delivery_labels, labels_handler.selected_delivery_colors,
                       patches_list=labels_handler.delivery_patches)
@@ -144,4 +147,4 @@ def add_drone_deliveries(drawer: Drawer2D, drone_deliveries: [DroneDelivery]):
 def add_delivery_board(drawer: Drawer2D, board: DroneDeliveryBoard, draw_unmatched=True):
     if draw_unmatched:
         add_unmatched_delivery_requests(drawer, board.unmatched_delivery_requests)
-    add_drone_deliveries(drawer, board.drone_deliveries)
+    add_drone_deliveries(drawer, board)

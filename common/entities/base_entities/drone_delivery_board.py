@@ -1,6 +1,7 @@
 from copy import deepcopy
 from dataclasses import dataclass
 from functools import lru_cache
+from typing import List
 
 from common.entities.base_entities.base_entity import JsonableBaseEntity
 from common.entities.base_entities.delivery_request import DeliveryRequest
@@ -103,6 +104,13 @@ class DroneDeliveryBoard(JsonableBaseEntity):
     @lru_cache()
     def get_total_priority(self) -> int:
         return sum(drone_delivery.get_total_priority() for drone_delivery in self._drone_deliveries)
+
+    def get_drone_deliveries_by_delivering_drones(self, delivering_drones: DeliveringDrones) -> List[DroneDelivery]:
+        drone_deliveries = [drone_delivery for drone_delivery in self.drone_deliveries if
+                            drone_delivery.delivering_drones == delivering_drones]
+
+        return sorted(drone_deliveries,
+                      key=lambda dd: dd.start_drone_loading_dock.delivery_time_window.since.get_internal())
 
     def __eq__(self, other):
         return self.drone_deliveries == other.drone_deliveries \
