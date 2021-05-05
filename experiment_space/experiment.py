@@ -67,7 +67,7 @@ class Experiment(JsonableBaseEntity):
         matcher_input = MatcherInput(graph=graph, delivering_drones_board=delivering_drones_board,
                                      config=self.matcher_config)
         delivery_board = MatchingMaster(
-            matcher_input=matcher_input).match_with_time_greedy_as_init_guess(init_guess_path)
+            matcher_input=matcher_input).match()
         return delivery_board
 
     @staticmethod

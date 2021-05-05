@@ -46,13 +46,11 @@ class BasicV05End2EndExperiment(unittest.TestCase):
     @staticmethod
     def _run_end_to_end_visual_experiment(experiment: Experiment, show_visuals: bool, map_image: MapImage = None):
         graph = experiment.graph_creation_algorithm.create(experiment.supplier_category)
-
-
         print("# delivery_requests from json", len(experiment.supplier_category.delivery_requests))
         print("# drone_loading_docks from json", len(experiment.supplier_category.drone_loading_docks))
         print("# graph nodes including docks", len(graph.nodes))
 
-        result_drone_delivery_board = experiment.run_match()
+        result_drone_delivery_board = experiment.run_match(graph=graph)
         print(result_drone_delivery_board)
         analyzers_to_run = [MatchedDeliveryRequestsAnalyzer,
                             UnmatchedDeliveryRequestsAnalyzer,

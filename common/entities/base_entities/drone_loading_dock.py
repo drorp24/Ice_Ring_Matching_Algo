@@ -60,7 +60,8 @@ class DroneLoadingDock(JsonableBaseEntity, Localizable, Temporal, ShapeableColle
         return self.__class__ == other.__class__ and \
                self.id == other.id and \
                self.drone_type == other.drone_type and \
-               self.drone_loading_station == other.drone_loading_station
+               self.drone_loading_station == other.drone_loading_station and \
+               self.time_window == other.time_window
 
     def __hash__(self):
         return hash((self.id, self._drone_loading_station, self._drone_type, self._time_window))
