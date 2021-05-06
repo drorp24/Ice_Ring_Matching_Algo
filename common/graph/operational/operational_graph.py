@@ -370,7 +370,7 @@ class OperationalGraph(JsonableBaseEntity):
         return og
 
     @staticmethod
-    def encode_self(z):
+    def encode_node(z):
         if isinstance(z, OperationalNode):
             return (z.__dict__())
         elif isinstance(z, EntityID):
@@ -379,8 +379,8 @@ class OperationalGraph(JsonableBaseEntity):
             type_name = z.__class__.__name__
             raise TypeError(f"Object of type '{type_name}' is not JSON serializable")
 
-    def to_json(self, file_path: Path = None, sort_keys=False):
-        return super().to_json(file_path, sort_keys)
+    def to_json(self, file_path: Path = None, sort_keys=False, **kwargs) -> Union[str, None]:
+        return super().to_json(file_path, sort_keys, default=self.encode_node, **kwargs)
 
 
 def assert_node_is_temporal(internal_node) -> None:
