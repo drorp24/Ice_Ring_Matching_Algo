@@ -128,15 +128,13 @@ class BasicDroneDeliveryGenerationTests(unittest.TestCase):
     def test_drone_delivery_board_to_json_and_back_to_drone_delivery_board(self):
         self.drone_delivery_board.to_json(self.drone_delivery_board_json_path)
 
-        drone_delivery_board_from_json = DroneDeliveryBoard.from_json(DroneDeliveryBoard,
-                                                                      self.drone_delivery_board_json_path)
+        drone_delivery_board_from_json = DroneDeliveryBoard.from_json(self.drone_delivery_board_json_path)
         self.assertEqual(self.drone_delivery_board, drone_delivery_board_from_json)
 
     def test_delivering_drones_is_jsonable(self):
         self.delivering_drones_1.to_json(self.delivering_drones_json_path)
 
-        delivering_drones_from_json = DeliveringDrones.from_json(DeliveringDrones,
-                                                                    self.delivering_drones_json_path)
+        delivering_drones_from_json = DeliveringDrones.from_json(self.delivering_drones_json_path)
         self.assertEqual(self.delivering_drones_1, delivering_drones_from_json)
 
     @staticmethod

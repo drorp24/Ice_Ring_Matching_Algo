@@ -72,7 +72,7 @@ class BasicGraphNodeTestCases(unittest.TestCase):
 
     def test_operational_graph_is_jsonable(self):
         self.example_operational_graph.to_json(self.temp_path)
-        operational_graph_from_json = OperationalGraph.from_json(OperationalGraph, self.temp_path)
+        operational_graph_from_json = OperationalGraph.from_json(self.temp_path)
         self.assertEqual(self.example_operational_graph, operational_graph_from_json)
 
     def test_operational_graph_deepcopy(self):

@@ -20,13 +20,13 @@ class BasicExperimentTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         supplier_category_path = Path('experiment_space/tests/jsons/test_supplier_category.json')
-        cls.supplier_category = SupplierCategory.from_json(SupplierCategory, supplier_category_path)
+        cls.supplier_category = SupplierCategory.from_json(supplier_category_path)
 
         matcher_config_path = Path('experiment_space/tests/jsons/test_matcher_config.json')
-        cls.matcher_config = MatcherConfig.from_json(MatcherConfig, matcher_config_path)
+        cls.matcher_config = MatcherConfig.from_json(matcher_config_path)
 
         drone_set_properties_path = Path('experiment_space/tests/jsons/test_drone_set_properties.json')
-        drone_set_properties = DroneSetProperties.from_json(DroneSetProperties, drone_set_properties_path)
+        drone_set_properties = DroneSetProperties.from_json(drone_set_properties_path)
         cls.drone_set_properties = drone_set_properties
 
         cls.clustered_graph_creation_algorithm = ClusteredDeliveryRequestGraphAlgorithm(edge_cost_factor=25.0,

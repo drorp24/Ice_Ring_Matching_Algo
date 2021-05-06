@@ -96,7 +96,7 @@ class TestFleetConfigurationAttribution(unittest.TestCase):
         delivering_drones_board.to_json(self.delivering_drones_board_json_path)
 
         delivering_drones_board_from_json = \
-            DeliveringDronesBoard.from_json(DeliveringDronesBoard, self.delivering_drones_board_json_path)
+            DeliveringDronesBoard.from_json(self.delivering_drones_board_json_path)
 
         self.assertEqual(delivering_drones_board, delivering_drones_board_from_json)
 

@@ -1,10 +1,12 @@
 from __future__ import annotations
 
-import json
-from abc import abstractmethod, ABCMeta
-from pathlib import Path
-from uuid import UUID
 import dataclasses
+import json
+from abc import abstractmethod
+from pathlib import Path
+from typing import Union, Type
+from uuid import UUID
+
 from common.utils.uuid_utils import convert_uuid_to_str
 
 
@@ -38,15 +40,18 @@ class BaseEntity(object):
 
 
 class JsonableBaseEntity(BaseEntity):
+    def to_json(self, file_path: Path = None, sort_keys=True, **kwargs) -> Union[str, None]:
+        dict_self = self.__dict__()
+        if file_path:
+            with open(file_path, 'w') as f:
+                json.dump(dict_self, f, sort_keys=sort_keys, **kwargs)
+        else:
+            return json.dumps(dict_self, sort_keys=sort_keys, **kwargs)
 
-    def to_json(self, file_path: Path):
-        with open(file_path, 'w') as f:
-            dict_self = self.__dict__()
-            json.dump(dict_self, f, sort_keys=True)
-
-    def from_json(target_class: ABCMeta, file_path: Path):
-        obj_dict = target_class.json_to_dict(file_path)
-        return target_class.dict_to_obj(obj_dict)
+    @classmethod
+    def from_json(cls: Type[JsonableBaseEntity], file_path: Path):
+        obj_dict = cls.json_to_dict(file_path)
+        return cls.dict_to_obj(obj_dict)
 
     @staticmethod
     def json_to_dict(file_path: Path):
