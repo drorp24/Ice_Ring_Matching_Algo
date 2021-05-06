@@ -28,7 +28,7 @@ class MatchingMaster:
 
     def match_with_time_greedy_as_init_guess(self, init_guess_path: Path = None) -> DroneDeliveryBoard:
         if init_guess_path:
-            init_guess = Routes.from_json(Routes, init_guess_path)
+            init_guess = Routes.from_json(init_guess_path)
         else:
             init_guess = self._create_init_guess_using_time_greedy()
         matcher = ORToolsMatcher(self._matcher_input)
