@@ -55,7 +55,7 @@ class TestPolicyDetermination (unittest.TestCase):
 
     def test_policy_determination(self):
         fleetPolicyDeterminationAttribution.extract_parameters([self.drone_set_properties_1, self.drone_set_properties_2], self.config_obj,
-                                                               [20,30,40,50])
+                                                               [20,300,300,300])
         #fleetPolicyDeterminationAttribution.formulate_as_mip_problem()
         #fleetPolicyDeterminationAttribution.calc_equality_constraints()
         #fleetPolicyDeterminationAttribution.calc_equality_bounds()
@@ -83,7 +83,7 @@ class TestPolicyDetermination (unittest.TestCase):
                  PackageConfiguration.TINY_X16: 0.2}),
             start_loading_dock=loading_dock_1,
             end_loading_dock=loading_dock_1,
-            drone_amount=3)
+            drone_amount=10)
 
     @classmethod
     def define_drone_set_properties_2(cls):
@@ -106,4 +106,4 @@ class TestPolicyDetermination (unittest.TestCase):
                  PackageConfiguration.TINY_X32: 0.0}),
             start_loading_dock=loading_dock_2,
             end_loading_dock=loading_dock_2,
-            drone_amount=1)
+            drone_amount=10)
