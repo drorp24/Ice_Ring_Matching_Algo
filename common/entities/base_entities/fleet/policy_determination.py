@@ -52,7 +52,7 @@ class fleetPolicyDeterminationAttribution:
 
     #@staticmethod
     @classmethod
-    def _calc_equality_constraints(cls):
+    def _calc_equality_constraints_1(cls):
         constraints_coefficients = np.zeros((len (PackageType), cls._calc_number_variables()))
         #print (constraints_coefficients)
         for i in range (len (PackageType)):
@@ -77,9 +77,26 @@ class fleetPolicyDeterminationAttribution:
         return constraints_coefficients
 
     @classmethod
-    def _calc_equality_bounds(cls):
+    def _calc_equality_constraints_2(cls):
+        constraints_coefficients = np.zeros((len (cls.policy_determination_config.drones_per_fleet), cls._calc_number_variables()))
+        for i in range(len (cls.policy_determination_config.drones_per_fleet)):
+            for j in range (len (PackageType)):
+                constraints_coefficients[i, i + j * len (cls.policy_determination_config.drones_per_fleet)] = 1
+
+        print (constraints_coefficients)
+        return constraints_coefficients
+
+
+
+    @classmethod
+    def _calc_equality_bounds_1(cls):
         print (cls.required_quantities_per_type)
         return cls.required_quantities_per_type
+
+    @classmethod
+    def _calc_equality_bounds_2(cls):
+        print ([1 for i in range (len (cls.policy_determination_config.drones_per_fleet))])
+        return [1 for i in range (len (cls.policy_determination_config.drones_per_fleet))]
 
     @classmethod
     def _calc_objective_coefficients(cls):
@@ -93,9 +110,9 @@ class fleetPolicyDeterminationAttribution:
     def _formulate_as_mip_problem(cls) -> MIPData:
         data = {MIPParameters.num_variables: cls._calc_number_variables(),
                 MIPParameters.equality_constraints_coefficients:
-                    cls._calc_equality_constraints() ,
+                np.concatenate ((cls._calc_equality_constraints_1 (), cls._calc_equality_constraints_2 ()), axis=0),
                 MIPParameters.equality_bounds:
-                    cls._calc_equality_bounds() ,
+                    cls._calc_equality_bounds_1() + cls._calc_equality_bounds_2(),
                 MIPParameters.objective_coefficients: cls._calc_objective_coefficients()}
         return MIPData(data)
 
