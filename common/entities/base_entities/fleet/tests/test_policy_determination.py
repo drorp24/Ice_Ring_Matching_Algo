@@ -57,9 +57,10 @@ class TestPolicyDetermination (unittest.TestCase):
         fleetPolicyDeterminationAttribution.extract_parameters([self.drone_set_properties_1, self.drone_set_properties_2], self.config_obj,
                                                                [20,30,40,50])
         #fleetPolicyDeterminationAttribution.formulate_as_mip_problem()
-        fleetPolicyDeterminationAttribution.calc_equality_constraints()
-        fleetPolicyDeterminationAttribution.calc_equality_bounds()
-        fleetPolicyDeterminationAttribution.calc_objective_coefficients()
+        #fleetPolicyDeterminationAttribution.calc_equality_constraints()
+        #fleetPolicyDeterminationAttribution.calc_equality_bounds()
+        #fleetPolicyDeterminationAttribution.calc_objective_coefficients()
+        fleetPolicyDeterminationAttribution.solve()
 
     @classmethod
     def define_drone_set_properties_1(cls):

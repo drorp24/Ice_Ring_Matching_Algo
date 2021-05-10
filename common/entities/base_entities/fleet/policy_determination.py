@@ -52,7 +52,7 @@ class fleetPolicyDeterminationAttribution:
 
     #@staticmethod
     @classmethod
-    def calc_equality_constraints(cls):
+    def _calc_equality_constraints(cls):
         constraints_coefficients = np.zeros((len (PackageType), cls._calc_number_variables()))
         #print (constraints_coefficients)
         for i in range (len (PackageType)):
@@ -77,26 +77,44 @@ class fleetPolicyDeterminationAttribution:
         return constraints_coefficients
 
     @classmethod
-    def calc_equality_bounds(cls):
+    def _calc_equality_bounds(cls):
         print (cls.required_quantities_per_type)
         return cls.required_quantities_per_type
 
     @classmethod
-    def calc_objective_coefficients(cls):
+    def _calc_objective_coefficients(cls):
         objective_coeff = [0 for i in range (cls._calc_number_variables())]
         for i in range (len (PackageType) * (len(cls.policy_determination_config.drones_per_fleet)) , cls._calc_number_variables()):
             objective_coeff[i] = 1
         print (objective_coeff)
         return objective_coeff
 
+    @classmethod
+    def _formulate_as_mip_problem(cls) -> MIPData:
+        data = {MIPParameters.num_variables: cls._calc_number_variables(),
+                MIPParameters.equality_constraints_coefficients:
+                    cls._calc_equality_constraints() ,
+                MIPParameters.equality_bounds:
+                    cls._calc_equality_bounds() ,
+                MIPParameters.objective_coefficients: cls._calc_objective_coefficients()}
+        return MIPData(data)
+
+    @classmethod
+    def solve(cls) :
+        mip_data = cls._formulate_as_mip_problem()
+        variables = MIPSolver.set_variables(parameters=mip_data)
+        mip_solver = MIPSolver()
+        mip_solver.set_equalities_constraints(parameters=mip_data, variables=variables)
+        mip_solver.set_objective_coeffs(parameters=mip_data, variables=variables)
+        mip_solver.set_minimization()
+        mip_solver.solve()
+        print (variables)
+        print ([variables[j].solution_value() for j in range(cls._calc_number_variables())])
+
+        #return cls._export_drone_formation_amounts(variables)
 
 
 
-
-
-
-
-            #@staticmethod
     #def _calc_constraints_coefficients(configuration_options_amount, formation_amounts, formation_sizes, num_vars):
     #    constraints_coefficients = np.zeros((configuration_options_amount, num_vars))
     #    for i in range(configuration_options_amount):
