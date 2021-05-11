@@ -117,10 +117,12 @@ class fleetPolicyDeterminationAttribution:
     @classmethod
     def _formulate_as_mip_problem(cls) -> MIPData:
         data = {MIPParameters.num_variables: cls._calc_number_variables(),
+                MIPParameters.inequality_constraints_coefficients: cls._calc_equality_constraints_2 (),
+                MIPParameters.inequality_bounds: cls._calc_equality_bounds_2(),
                 MIPParameters.equality_constraints_coefficients:
-                np.concatenate ((cls._calc_equality_constraints_1 (), cls._calc_equality_constraints_2 ()), axis=0),
+                cls._calc_equality_constraints_1 (),
                 MIPParameters.equality_bounds:
-                    cls._calc_equality_bounds_1() + cls._calc_equality_bounds_2(),
+                    cls._calc_equality_bounds_1(),
                 MIPParameters.objective_coefficients: cls._calc_objective_coefficients()}
         return MIPData(data)
 
@@ -174,6 +176,7 @@ class fleetPolicyDeterminationAttribution:
         variables = MIPSolver.set_variables(parameters=mip_data)
         mip_solver = MIPSolver()
         mip_solver.set_equalities_constraints(parameters=mip_data, variables=variables)
+        mip_solver.set_inequalities_constraints(parameters=mip_data, variables=variables)
         mip_solver.set_objective_coeffs(parameters=mip_data, variables=variables)
         mip_solver.set_minimization()
         mip_solver.solve()
