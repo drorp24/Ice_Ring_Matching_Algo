@@ -6,7 +6,8 @@ from common.entities.base_entities.drone import DroneTypeToPackageConfigurationO
 from matching.matcher_config import ConstraintsConfig, MatcherConfig
 from common.math.mip_solver import MIPSolver, MIPData, MIPParameters
 import copy
-
+from common.entities.base_entities.drone_loading_dock import DroneLoadingDock
+from common.entities.base_entities.fleet.fleet_property_sets import PackageConfigurationPolicy
 
 @dataclass
 class PolicyConfigDeterminationParameters:
@@ -14,10 +15,15 @@ class PolicyConfigDeterminationParameters:
     drones_per_fleet: []
     reloads_per_dock : []
     required_quantities_per_type: []
+    loading_docks : []
+
+@dataclass
+class PolicyPerDock:
+    Policies: {DroneLoadingDock, PackageConfigurationPolicy}
 
 class fleetPolicyDeterminationAttribution:
     policy_determination_config: PolicyConfigDeterminationParameters = \
-        PolicyConfigDeterminationParameters ([], [], [], [])
+        PolicyConfigDeterminationParameters ([], [], [], [], [])
 
     @classmethod
     def extract_parameters(cls, drone_set_properties_list: [DroneSetProperties],
@@ -26,6 +32,7 @@ class fleetPolicyDeterminationAttribution:
         cls.policy_determination_config.drones_per_fleet = [drone_set_properties.drone_amount for drone_set_properties in drone_set_properties_list]
         cls.policy_determination_config.reloads_per_dock = [config_obj.reload_per_vehicle for i in range(len(drone_set_properties_list))]
         cls.required_quantities_per_type = copy.deepcopy (requirements_per_type)
+        cls.policy_determination_config.loading_docks = [drone_set_properties.start_loading_dock for drone_set_properties in drone_set_properties_list]
 
         print (cls.policy_determination_config.quantities_per_loading_dock)
         print (cls.policy_determination_config.drones_per_fleet)
@@ -42,6 +49,7 @@ class fleetPolicyDeterminationAttribution:
                     quantity = PackageTypeAmountMap.get_package_type_amount(item.value, typePackage)
                     if quantity > 0:
                         quantities [j,i] = quantity
+                        break
                 j = j + 1
 
         return quantities
@@ -117,6 +125,50 @@ class fleetPolicyDeterminationAttribution:
         return MIPData(data)
 
     @classmethod
+    def _export_policies_per_dock (cls, variables):
+        solution = [variables[j].solution_value() for j in range(cls._calc_number_variables())]
+        solution_dict = dict()
+        for i in range (len (cls.policy_determination_config.loading_docks)):
+            solution_dict [cls.policy_determination_config.loading_docks[i]] = []
+            j = 0
+            for typePackage in PackageType:
+                if solution [i + j * len (cls.policy_determination_config.drones_per_fleet)] > 0:
+                    print (cls.policy_determination_config.loading_docks[i], typePackage, solution [i + j * len (cls.policy_determination_config.drones_per_fleet)])
+                    for item in DroneTypeToPackageConfigurationOptions.drone_configurations_map[cls.policy_determination_config.loading_docks[i].drone_type]:
+                        quantity = PackageTypeAmountMap.get_package_type_amount(item.value, typePackage)
+                        if quantity > 0:
+                            solution_dict[cls.policy_determination_config.loading_docks[i]].append ({item.name: solution [i + j * len (cls.policy_determination_config.drones_per_fleet)]})
+
+
+                j = j + 1
+
+        print (solution_dict)
+        solution_object = dict()
+        for key, value in solution_dict.items() :
+            dict_policy = value [0]
+            for i in range (1, len(value)):
+                dict_policy.update (value [i])
+
+            solution_object[key] = dict_policy
+
+
+
+            #print (value)
+            #print ([val for val in value])
+
+            #for val in value:
+            #    print({val_s[0]: val_s[1] for val_s in val.items()})
+
+
+            #print (PackageConfigurationPolicy({val for val in value}))
+        print (PolicyPerDock(solution_object))
+        return PolicyPerDock(solution_object)
+
+
+
+
+
+    @classmethod
     def solve(cls) :
         mip_data = cls._formulate_as_mip_problem()
         variables = MIPSolver.set_variables(parameters=mip_data)
@@ -127,6 +179,7 @@ class fleetPolicyDeterminationAttribution:
         mip_solver.solve()
         print (variables)
         print ([variables[j].solution_value() for j in range(cls._calc_number_variables())])
+        cls._export_policies_per_dock (variables)
 
         #return cls._export_drone_formation_amounts(variables)
 
