@@ -4,7 +4,7 @@ import numpy as np
 from common.entities.base_entities.package import PackageType
 from common.entities.base_entities.drone import DroneTypeToPackageConfigurationOptions, PackageTypeAmountMap
 from matching.matcher_config import ConstraintsConfig, MatcherConfig
-from common.math.lp_solver import MIPSolver, MIPData, MIPParameters
+from common.math.lp_solver import LPSolver, LPData, LPParameters
 import copy
 from common.entities.base_entities.drone_loading_dock import DroneLoadingDock
 from common.entities.base_entities.fleet.fleet_property_sets import PackageConfigurationPolicy
@@ -115,16 +115,16 @@ class fleetPolicyDeterminationAttribution:
         return objective_coeff
 
     @classmethod
-    def _formulate_as_mip_problem(cls) -> MIPData:
-        data = {MIPParameters.num_variables: cls._calc_number_variables(),
-                MIPParameters.inequality_constraints_coefficients: cls._calc_equality_constraints_2 (),
-                MIPParameters.inequality_bounds: cls._calc_equality_bounds_2(),
-                MIPParameters.equality_constraints_coefficients:
+    def _formulate_as_lp_problem(cls) -> LPData:
+        data = {LPParameters.num_variables: cls._calc_number_variables(),
+                LPParameters.inequality_constraints_coefficients: cls._calc_equality_constraints_2 (),
+                LPParameters.inequality_bounds: cls._calc_equality_bounds_2(),
+                LPParameters.equality_constraints_coefficients:
                 cls._calc_equality_constraints_1 (),
-                MIPParameters.equality_bounds:
+                LPParameters.equality_bounds:
                     cls._calc_equality_bounds_1(),
-                MIPParameters.objective_coefficients: cls._calc_objective_coefficients()}
-        return MIPData(data)
+                LPParameters.objective_coefficients: cls._calc_objective_coefficients()}
+        return LPData(data)
 
     @classmethod
     def _export_policies_per_dock (cls, variables):
@@ -172,14 +172,14 @@ class fleetPolicyDeterminationAttribution:
 
     @classmethod
     def solve(cls) :
-        mip_data = cls._formulate_as_mip_problem()
-        variables = MIPSolver.set_variables(parameters=mip_data)
-        mip_solver = MIPSolver()
-        mip_solver.set_equalities_constraints(parameters=mip_data, variables=variables)
-        mip_solver.set_inequalities_constraints(parameters=mip_data, variables=variables)
-        mip_solver.set_objective_coeffs(parameters=mip_data, variables=variables)
-        mip_solver.set_minimization()
-        mip_solver.solve()
+        lp_data = cls._formulate_as_lp_problem()
+        variables = LPSolver.set_variables(parameters=lp_data)
+        lp_solver = LPSolver()
+        lp_solver.set_equalities_constraints(parameters=lp_data, variables=variables)
+        lp_solver.set_inequalities_constraints(parameters=lp_data, variables=variables)
+        lp_solver.set_objective_coeffs(parameters=lp_data, variables=variables)
+        lp_solver.set_minimization()
+        lp_solver.solve()
         #print (variables)
         print ([variables[j].solution_value() for j in range(cls._calc_number_variables())])
         return cls._export_policies_per_dock (variables)

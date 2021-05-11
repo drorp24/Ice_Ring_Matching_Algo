@@ -83,7 +83,7 @@ class TestPolicyDetermination (unittest.TestCase):
                  PackageConfiguration.TINY_X16: 0.2}),
             start_loading_dock=loading_dock_1,
             end_loading_dock=loading_dock_1,
-            drone_amount=1000)
+            drone_amount=10)
 
     @classmethod
     def define_drone_set_properties_2(cls):
@@ -106,4 +106,4 @@ class TestPolicyDetermination (unittest.TestCase):
                  PackageConfiguration.TINY_X32: 0.0}),
             start_loading_dock=loading_dock_2,
             end_loading_dock=loading_dock_2,
-            drone_amount=1000)
+            drone_amount=10)
