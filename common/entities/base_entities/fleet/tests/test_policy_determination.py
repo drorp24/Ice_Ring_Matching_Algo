@@ -1,17 +1,12 @@
-from common.entities.base_entities.fleet.policy_determination import PolicyConfigDeterminationParameters, fleetPolicyDeterminationAttribution
+from common.entities.base_entities.fleet.policy_determination import PolicyConfigDeterminationParameters, FleetPolicyDeterminationAttribution
 import unittest
 from common.entities.base_entities.drone import DroneType, PackageConfiguration
-from common.entities.base_entities.drone_delivery_board import DeliveringDronesBoard
-from common.entities.base_entities.drone_formation import DroneFormationType, DroneFormations, \
-    PackageConfigurationOption, DroneFormation
+from common.entities.base_entities.drone_formation import DroneFormationType
 from common.entities.base_entities.drone_loading_dock import DroneLoadingDock
 from common.entities.base_entities.drone_loading_station import DroneLoadingStation
 from common.entities.base_entities.entity_id import EntityID
-from common.entities.base_entities.fleet.delivering_drones_board_generation import generate_delivering_drones_board
-from common.entities.base_entities.fleet.fleet_configuration_attribution import FleetConfigurationAttribution
-from common.entities.base_entities.fleet.fleet_partition import FleetPartition
 from common.entities.base_entities.fleet.fleet_property_sets import DroneSetProperties, DroneFormationTypePolicy, \
-    PackageConfigurationPolicy, BoardLevelProperties
+    PackageConfigurationPolicy
 from common.entities.base_entities.temporal import TimeWindowExtension, TimeDeltaExtension
 from common.entities.base_entities.tests.test_drone_delivery import ZERO_TIME
 from geometry.geo_factory import create_point_2d
@@ -22,12 +17,17 @@ from matching.ortools.ortools_solver_config import ORToolsSolverConfig
 from matching.constraint_config import CapacityConstraints, PriorityConstraints, TravelTimeConstraints
 from datetime import date, time
 from matching.monitor_config import MonitorConfig
+from common.entities.base_entities.package import PackageType
+
 
 class TestPolicyDetermination (unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.drone_set_properties_1 = TestPolicyDetermination.define_drone_set_properties_1()
         cls.drone_set_properties_2 = TestPolicyDetermination.define_drone_set_properties_2()
+        cls.drone_set_properties_3 = TestPolicyDetermination.define_drone_set_properties_3()
+        cls.requirements_per_type = {PackageType.MEDIUM: 300, PackageType.LARGE: 300, PackageType.TINY: 200,
+                                     PackageType.SMALL: 300}
 
         cls.config_obj = MatcherConfig(
             zero_time=DateTimeExtension(dt_date=date(2020, 1, 23), dt_time=time(11, 30, 0)),
@@ -54,13 +54,16 @@ class TestPolicyDetermination (unittest.TestCase):
         )
 
     def test_policy_determination(self):
-        fleetPolicyDeterminationAttribution.extract_parameters([self.drone_set_properties_1, self.drone_set_properties_2], self.config_obj,
-                                                               [20,300,300,300])
-        #fleetPolicyDeterminationAttribution.formulate_as_mip_problem()
-        #fleetPolicyDeterminationAttribution.calc_equality_constraints()
-        #fleetPolicyDeterminationAttribution.calc_equality_bounds()
-        #fleetPolicyDeterminationAttribution.calc_objective_coefficients()
-        fleetPolicyDeterminationAttribution.solve()
+        FleetPolicyDeterminationAttribution.extract_parameters([self.drone_set_properties_1, self.drone_set_properties_2
+                                                        ,self.drone_set_properties_3,], self.config_obj,
+                                                               self.requirements_per_type)
+        policies = FleetPolicyDeterminationAttribution.solve()
+        print (policies.Policies[self.drone_set_properties_2.start_loading_dock])
+        self.assertEqual(policies.Policies[self.drone_set_properties_2.start_loading_dock],
+                         PackageConfigurationPolicy({
+                 PackageConfiguration.MEDIUM_X8: 0.7,
+                 PackageConfiguration.SMALL_X16: 0.17500000000000002,
+                 PackageConfiguration.TINY_X32: 0.125}))
 
     @classmethod
     def define_drone_set_properties_1(cls):
@@ -106,4 +109,27 @@ class TestPolicyDetermination (unittest.TestCase):
                  PackageConfiguration.TINY_X32: 0.0}),
             start_loading_dock=loading_dock_2,
             end_loading_dock=loading_dock_2,
+            drone_amount=50)
+
+    @classmethod
+    def define_drone_set_properties_3(cls):
+        loading_dock_3 = DroneLoadingDock(EntityID.generate_uuid(),
+                                          DroneLoadingStation(EntityID.generate_uuid(), create_point_2d(0, 0)),
+                                          DroneType.drone_type_3,
+                                          TimeWindowExtension(
+                                              since=ZERO_TIME,
+                                              until=ZERO_TIME.add_time_delta(
+                                                  TimeDeltaExtension(timedelta(hours=5)))))
+        return DroneSetProperties(
+            drone_type=loading_dock_3.drone_type,
+            drone_formation_policy=DroneFormationTypePolicy(
+                {DroneFormationType.PAIR: 1.0,
+                 DroneFormationType.QUAD: 0.0}),
+            package_configuration_policy=PackageConfigurationPolicy(
+                {PackageConfiguration.LARGE_X4: 0.0,
+                 PackageConfiguration.MEDIUM_X8: 0.4,
+                 PackageConfiguration.SMALL_X16: 0.6,
+                 PackageConfiguration.TINY_X32: 0.0}),
+            start_loading_dock=loading_dock_3,
+            end_loading_dock=loading_dock_3,
             drone_amount=10)
