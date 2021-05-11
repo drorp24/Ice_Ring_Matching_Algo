@@ -65,6 +65,7 @@ class TestPolicyDetermination (unittest.TestCase):
                  PackageConfiguration.SMALL_X16: 0.17500000000000002,
                  PackageConfiguration.TINY_X32: 0.125}))
 
+
     @classmethod
     def define_drone_set_properties_1(cls):
         loading_dock_1 = DroneLoadingDock(EntityID.generate_uuid(),

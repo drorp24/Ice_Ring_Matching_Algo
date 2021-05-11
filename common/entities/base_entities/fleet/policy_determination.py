@@ -148,6 +148,7 @@ class FleetPolicyDeterminationAttribution:
             solution_object[key] = dict_policy
 
         print (PolicyPerDock(solution_object))
+        print (type(PolicyPerDock(solution_object)))
         return PolicyPerDock(solution_object)
 
     @classmethod
