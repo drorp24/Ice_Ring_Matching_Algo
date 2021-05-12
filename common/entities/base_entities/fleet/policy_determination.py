@@ -52,7 +52,6 @@ class FleetPolicyDeterminationAttribution:
 
         return required_quantities
 
-
     @classmethod
     def _calc_quantities_matrix (cls, drone_set_properties_list: [DroneSetProperties]):
         quantities = np.zeros(( len(PackageType), len (drone_set_properties_list)))
@@ -139,13 +138,8 @@ class FleetPolicyDeterminationAttribution:
 
                 j = j + 1
 
-
         solution_object = dict()
         for key, value in solution_dict.items() :
-            #dict_policy = value [0]
-            #for i in range (1, len(value)):
-            #    dict_policy.update (value [i])
-
             solution_object[key] = PackageConfigurationPolicy(value)
 
         print (PolicyPerDock(solution_object))

@@ -31,7 +31,7 @@ class TestPolicyDetermination (unittest.TestCase):
         cls.requirements_per_type_small = {PackageType.MEDIUM: 30, PackageType.LARGE: 30, PackageType.TINY: 20,
                                      PackageType.SMALL: 30}
         cls.requirements_for_some_types_are_zeros = {PackageType.MEDIUM: 300, PackageType.LARGE: 300,
-                                     PackageType.SMALL: 300 }
+                                     PackageType.SMALL: 300}
 
         cls.config_obj = MatcherConfig(
             zero_time=DateTimeExtension(dt_date=date(2020, 1, 23), dt_time=time(11, 30, 0)),
