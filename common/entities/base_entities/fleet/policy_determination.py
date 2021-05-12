@@ -2,8 +2,7 @@ from dataclasses import dataclass
 from common.entities.base_entities.fleet.fleet_property_sets import DroneSetProperties
 import numpy as np
 from common.entities.base_entities.package import PackageType
-from common.entities.base_entities.drone import DroneTypeToPackageConfigurationOptions, PackageTypeAmountMap, \
-    PackageConfiguration
+from common.entities.base_entities.drone import DroneTypeToPackageConfigurationOptions, PackageTypeAmountMap
 from matching.matcher_config import MatcherConfig
 from common.math.lp_solver import LPSolver, LPData, LPParameters
 from common.entities.base_entities.drone_loading_dock import DroneLoadingDock
@@ -17,7 +16,6 @@ class PolicyConfigDeterminationParameters:
     reloads_per_dock : []
     required_quantities_per_type: []
     loading_docks : []
-    amount_of_loading_docks: []
 
 
 @dataclass
@@ -27,7 +25,7 @@ class PolicyPerDock:
 
 class FleetPolicyDeterminationAttribution:
     policy_determination_config: PolicyConfigDeterminationParameters = \
-        PolicyConfigDeterminationParameters ([], [], [], [], [], 0)
+        PolicyConfigDeterminationParameters ([], [], [], [], [])
 
     @classmethod
     def extract_parameters(cls, drone_set_properties_list: [DroneSetProperties],
@@ -37,7 +35,6 @@ class FleetPolicyDeterminationAttribution:
         cls.policy_determination_config.reloads_per_dock = [config_obj.reload_per_vehicle for i in range(len(drone_set_properties_list))]
         cls.required_quantities_per_type = cls._calc_required_quantities (requirements_per_type)
         cls.policy_determination_config.loading_docks = [drone_set_properties.start_loading_dock for drone_set_properties in drone_set_properties_list]
-        cls.policy_determination_config.amount_of_loading_docks = len (drone_set_properties_list)
 
     @classmethod
     def _calc_required_quantities (cls, requirements_per_type: {PackageType, float}):
@@ -141,12 +138,10 @@ class FleetPolicyDeterminationAttribution:
         for key, value in solution_dict.items() :
             solution_object[key] = PackageConfigurationPolicy(value)
 
-        print (PolicyPerDock(solution_object))
-        print (type(PolicyPerDock(solution_object)))
         return PolicyPerDock(solution_object)
 
     @classmethod
-    def solve(cls) :
+    def solve(cls) -> PolicyPerDock :
         lp_data = cls._formulate_as_lp_problem()
         variables = LPSolver.set_variables(parameters=lp_data)
         lp_solver = LPSolver()
@@ -155,5 +150,4 @@ class FleetPolicyDeterminationAttribution:
         lp_solver.set_objective_coeffs(parameters=lp_data, variables=variables)
         lp_solver.set_minimization()
         lp_solver.solve()
-        print ([variables[j].solution_value() for j in range(cls._calc_number_variables())])
         return cls._export_policies_per_dock (variables)
