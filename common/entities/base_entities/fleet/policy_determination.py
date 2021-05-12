@@ -12,7 +12,7 @@ from common.entities.base_entities.fleet.fleet_property_sets import PackageConfi
 @dataclass
 class PolicyConfigDeterminationParameters:
     quantities_per_loading_dock: []
-    drones_per_fleet: []
+    drones_per_dock: []
     reloads_per_dock : []
     required_quantities_per_type: []
     loading_docks : []
@@ -31,7 +31,7 @@ class FleetPolicyDeterminationAttribution:
     def extract_parameters(cls, drone_set_properties_list: [DroneSetProperties],
                            config_obj: MatcherConfig, requirements_per_type):
         cls.policy_determination_config.quantities_per_loading_dock = cls._calc_quantities_matrix(drone_set_properties_list)
-        cls.policy_determination_config.drones_per_fleet = [drone_set_properties.drone_amount for drone_set_properties in drone_set_properties_list]
+        cls.policy_determination_config.drones_per_dock = [drone_set_properties.drone_amount for drone_set_properties in drone_set_properties_list]
         cls.policy_determination_config.reloads_per_dock = [config_obj.reload_per_vehicle for i in range(len(drone_set_properties_list))]
         cls.required_quantities_per_type = cls._calc_required_quantities (requirements_per_type)
         cls.policy_determination_config.loading_docks = [drone_set_properties.start_loading_dock for drone_set_properties in drone_set_properties_list]
@@ -66,28 +66,28 @@ class FleetPolicyDeterminationAttribution:
 
     @classmethod
     def _calc_number_variables(cls) -> int:
-        return (len(cls.policy_determination_config.drones_per_fleet) + 1) * len (PackageType)
+        return (len(cls.policy_determination_config.drones_per_dock) + 1) * len (PackageType)
 
     @classmethod
     def _calc_equality_constraints(cls):
         constraints_coefficients = np.zeros((len (PackageType), cls._calc_number_variables()))
         for i in range (len (PackageType)):
-            s_index = i * len (cls.policy_determination_config.drones_per_fleet)
-            e_index = (i + 1) * (len (cls.policy_determination_config.drones_per_fleet))
+            s_index = i * len (cls.policy_determination_config.drones_per_dock)
+            e_index = (i + 1) * (len (cls.policy_determination_config.drones_per_dock))
             for j in range (s_index ,  e_index):
                 constraints_coefficients[i, j] = cls.policy_determination_config.quantities_per_loading_dock[i, j - s_index]\
                                                  * (1 + cls.policy_determination_config.reloads_per_dock[j - s_index])*\
-                                                 (cls.policy_determination_config.drones_per_fleet [j - s_index])
-            constraints_coefficients [i, len (PackageType) * (len(cls.policy_determination_config.drones_per_fleet)) + i] = 1
+                                                 (cls.policy_determination_config.drones_per_dock [j - s_index])
+            constraints_coefficients [i, len (PackageType) * (len(cls.policy_determination_config.drones_per_dock)) + i] = 1
 
         return constraints_coefficients
 
     @classmethod
     def _calc_inequality_constraints(cls):
-        constraints_coefficients = np.zeros((len (cls.policy_determination_config.drones_per_fleet), cls._calc_number_variables()))
-        for i in range(len (cls.policy_determination_config.drones_per_fleet)):
+        constraints_coefficients = np.zeros((len (cls.policy_determination_config.drones_per_dock), cls._calc_number_variables()))
+        for i in range(len (cls.policy_determination_config.drones_per_dock)):
             for j in range (len (PackageType)):
-                constraints_coefficients[i, i + j * len (cls.policy_determination_config.drones_per_fleet)] = 1
+                constraints_coefficients[i, i + j * len (cls.policy_determination_config.drones_per_dock)] = 1
 
         return constraints_coefficients
 
@@ -97,12 +97,12 @@ class FleetPolicyDeterminationAttribution:
 
     @classmethod
     def _calc_inequality_bounds(cls):
-        return [1 for i in range (len (cls.policy_determination_config.drones_per_fleet))]
+        return [1 for i in range (len (cls.policy_determination_config.drones_per_dock))]
 
     @classmethod
     def _calc_objective_coefficients(cls):
         objective_coeff = [0 for i in range (cls._calc_number_variables())]
-        for i in range (len (PackageType) * (len(cls.policy_determination_config.drones_per_fleet)) , cls._calc_number_variables()):
+        for i in range (len (PackageType) * (len(cls.policy_determination_config.drones_per_dock)) , cls._calc_number_variables()):
             objective_coeff[i] = 1
         return objective_coeff
 
@@ -126,12 +126,12 @@ class FleetPolicyDeterminationAttribution:
             solution_dict [cls.policy_determination_config.loading_docks[i]] = dict()
             j = 0
             for typePackage in PackageType:
-                if solution [i + j * len (cls.policy_determination_config.drones_per_fleet)] > 10 ** -6:
+                if solution [i + j * len (cls.policy_determination_config.drones_per_dock)] > 10 ** -6:
                     for item in DroneTypeToPackageConfigurationOptions.drone_configurations_map[cls.policy_determination_config.loading_docks[i].drone_type]:
                         quantity = PackageTypeAmountMap.get_package_type_amount(item.value, typePackage)
                         if quantity > 0:
                             solution_dict[cls.policy_determination_config.loading_docks[i]][item] =\
-                                float(format (solution [i + j * len (cls.policy_determination_config.drones_per_fleet)], ".4f"))
+                                float(format (solution [i + j * len (cls.policy_determination_config.drones_per_dock)], ".4f"))
                 j = j + 1
 
         solution_object = dict()
