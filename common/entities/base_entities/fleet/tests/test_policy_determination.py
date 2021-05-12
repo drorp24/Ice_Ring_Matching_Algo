@@ -1,4 +1,4 @@
-from common.entities.base_entities.fleet.policy_determination import PolicyConfigDeterminationParameters, FleetPolicyDeterminationAttribution
+from common.entities.base_entities.fleet.policy_determination import FleetPolicyDeterminationAttribution
 import unittest
 from common.entities.base_entities.drone import DroneType, PackageConfiguration
 from common.entities.base_entities.drone_formation import DroneFormationType
@@ -28,6 +28,10 @@ class TestPolicyDetermination (unittest.TestCase):
         cls.drone_set_properties_3 = TestPolicyDetermination.define_drone_set_properties_3()
         cls.requirements_per_type = {PackageType.MEDIUM: 300, PackageType.LARGE: 300, PackageType.TINY: 200,
                                      PackageType.SMALL: 300}
+        cls.requirements_per_type_small = {PackageType.MEDIUM: 30, PackageType.LARGE: 30, PackageType.TINY: 20,
+                                     PackageType.SMALL: 30}
+        cls.requirements_for_some_types_are_zeros = {PackageType.MEDIUM: 300, PackageType.LARGE: 300,
+                                     PackageType.SMALL: 300 }
 
         cls.config_obj = MatcherConfig(
             zero_time=DateTimeExtension(dt_date=date(2020, 1, 23), dt_time=time(11, 30, 0)),
@@ -53,18 +57,52 @@ class TestPolicyDetermination (unittest.TestCase):
             submatch_time_window_minutes=1440
         )
 
-    def test_policy_determination(self):
+    def test_policy_determination_excess_demand (self):
         FleetPolicyDeterminationAttribution.extract_parameters([self.drone_set_properties_1, self.drone_set_properties_2
                                                         ,self.drone_set_properties_3,], self.config_obj,
                                                                self.requirements_per_type)
         policies = FleetPolicyDeterminationAttribution.solve()
-        print (policies.Policies[self.drone_set_properties_2.start_loading_dock])
+        self.assertEqual(policies.Policies[self.drone_set_properties_1.start_loading_dock],
+                         PackageConfigurationPolicy({PackageConfiguration.MEDIUM_X4: 1.0}))
         self.assertEqual(policies.Policies[self.drone_set_properties_2.start_loading_dock],
                          PackageConfigurationPolicy({
-                 PackageConfiguration.MEDIUM_X8: 0.7,
-                 PackageConfiguration.SMALL_X16: 0.17500000000000002,
-                 PackageConfiguration.TINY_X32: 0.125}))
+                 PackageConfiguration.MEDIUM_X8: 0.5,
+                 PackageConfiguration.SMALL_X16: 0.37499999999999994,
+                 PackageConfiguration.TINY_X32: 0.12499999999999999}))
+        self.assertEqual(policies.Policies[self.drone_set_properties_3.start_loading_dock],
+                         PackageConfigurationPolicy({PackageConfiguration.MEDIUM_X4: 1.0}))
 
+    def test_policy_determination_excess_supply (self):
+        FleetPolicyDeterminationAttribution.extract_parameters([self.drone_set_properties_1, self.drone_set_properties_2
+                                                        ,self.drone_set_properties_3,], self.config_obj,
+                                                               self.requirements_per_type_small)
+        policies = FleetPolicyDeterminationAttribution.solve()
+        self.assertEqual(policies.Policies[self.drone_set_properties_1.start_loading_dock],
+                         PackageConfigurationPolicy({}))
+        self.assertEqual(policies.Policies[self.drone_set_properties_2.start_loading_dock],
+                         PackageConfigurationPolicy({
+                 PackageConfiguration.LARGE_X4: 0.14999999999999997,
+                 PackageConfiguration.SMALL_X16:0.03749999999999999,
+                 PackageConfiguration.MEDIUM_X8: 0.07499999999999998,
+                 PackageConfiguration.TINY_X32: 0.012499999999999999}))
+        self.assertEqual(policies.Policies[self.drone_set_properties_3.start_loading_dock],
+                         PackageConfigurationPolicy({}))
+
+    def test_policy_determination_zero_demand_for_some_types (self):
+        FleetPolicyDeterminationAttribution.extract_parameters([self.drone_set_properties_1, self.drone_set_properties_2
+                                                        ,self.drone_set_properties_3,], self.config_obj,
+                                                               self.requirements_for_some_types_are_zeros)
+        policies = FleetPolicyDeterminationAttribution.solve()
+        self.assertEqual(policies.Policies[self.drone_set_properties_1.start_loading_dock],
+                         PackageConfigurationPolicy({PackageConfiguration.MEDIUM_X4: 1.0}))
+        self.assertEqual(policies.Policies[self.drone_set_properties_2.start_loading_dock],
+                         PackageConfigurationPolicy({
+                 PackageConfiguration.SMALL_X16: 0.37499999999999994,
+                 PackageConfiguration.MEDIUM_X8: 0.625,
+                 }))
+        self.assertEqual(policies.Policies[self.drone_set_properties_3.start_loading_dock],
+                         PackageConfigurationPolicy({PackageConfiguration.MEDIUM_X4: 0.24999999999999886,
+                                                    PackageConfiguration.LARGE_X2: 0.7500000000000011}))
 
     @classmethod
     def define_drone_set_properties_1(cls):

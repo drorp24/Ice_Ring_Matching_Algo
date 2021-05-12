@@ -127,25 +127,26 @@ class FleetPolicyDeterminationAttribution:
         solution = [variables[j].solution_value() for j in range(cls._calc_number_variables())]
         solution_dict = dict()
         for i in range (len (cls.policy_determination_config.loading_docks)):
-            solution_dict [cls.policy_determination_config.loading_docks[i]] = []
+            solution_dict [cls.policy_determination_config.loading_docks[i]] = dict()
             j = 0
             for typePackage in PackageType:
                 if solution [i + j * len (cls.policy_determination_config.drones_per_fleet)] > 10 ** -6:
                     for item in DroneTypeToPackageConfigurationOptions.drone_configurations_map[cls.policy_determination_config.loading_docks[i].drone_type]:
                         quantity = PackageTypeAmountMap.get_package_type_amount(item.value, typePackage)
                         if quantity > 0:
-                            solution_dict[cls.policy_determination_config.loading_docks[i]].append ({item.name: solution [i + j * len (cls.policy_determination_config.drones_per_fleet)]})
+                            solution_dict[cls.policy_determination_config.loading_docks[i]][item] =\
+                                solution [i + j * len (cls.policy_determination_config.drones_per_fleet)]
 
                 j = j + 1
 
 
         solution_object = dict()
         for key, value in solution_dict.items() :
-            dict_policy = value [0]
-            for i in range (1, len(value)):
-                dict_policy.update (value [i])
+            #dict_policy = value [0]
+            #for i in range (1, len(value)):
+            #    dict_policy.update (value [i])
 
-            solution_object[key] = dict_policy
+            solution_object[key] = PackageConfigurationPolicy(value)
 
         print (PolicyPerDock(solution_object))
         print (type(PolicyPerDock(solution_object)))

@@ -20,7 +20,7 @@ class LPData:
 
 
 class LPSolver:
-    solver: pywraplp.Solver = pywraplp.Solver.CreateSolver('SCIP')
+    solver: pywraplp.Solver = pywraplp.Solver.CreateSolver('GLOP')
 
     @classmethod
     def set_variables(cls, parameters: LPData, lower_bound=0.0, upper_bound=solver.infinity()) -> {}:
