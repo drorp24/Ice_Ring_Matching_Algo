@@ -57,6 +57,30 @@ class TestPolicyDetermination (unittest.TestCase):
             submatch_time_window_minutes=1440
         )
 
+        cls.config_obj_with_reload = MatcherConfig(
+            zero_time=DateTimeExtension(dt_date=date(2020, 1, 23), dt_time=time(11, 30, 0)),
+            solver=ORToolsSolverConfig(first_solution_strategy="path_cheapest_arc",
+                                       local_search_strategy="automatic", timeout_sec=30),
+            constraints=ConstraintsConfig(
+                capacity_constraints=CapacityConstraints(count_capacity_from_zero=True, capacity_cost_coefficient=1000),
+                travel_time_constraints=TravelTimeConstraints(max_waiting_time=10,
+                                                              max_route_time=1440,
+                                                              count_time_from_zero=False,
+                                                              reloading_time=0,
+                                                              important_earliest_coeff=1),
+                priority_constraints=PriorityConstraints(True, priority_cost_coefficient=1000)),
+            unmatched_penalty=100000,
+            reload_per_vehicle=1,
+            monitor=MonitorConfig(enabled=True,
+                                  iterations_between_monitoring=10,
+                                  max_iterations=100000,
+                                  save_plot=True,
+                                  show_plot=True,
+                                  separate_charts=True,
+                                  output_directory="outputs"),
+            submatch_time_window_minutes=1440
+        )
+
     def test_policy_determination_excess_demand (self):
         FleetPolicyDeterminationAttribution.extract_parameters([self.drone_set_properties_1, self.drone_set_properties_2
                                                         ,self.drone_set_properties_3,], self.config_obj,
@@ -103,6 +127,21 @@ class TestPolicyDetermination (unittest.TestCase):
         self.assertEqual(policies.Policies[self.drone_set_properties_3.start_loading_dock],
                          PackageConfigurationPolicy({PackageConfiguration.MEDIUM_X4: 0.25,
                                                     PackageConfiguration.LARGE_X2: 0.75}))
+
+    def test_policy_determination_with_reload (self):
+        FleetPolicyDeterminationAttribution.extract_parameters([self.drone_set_properties_1, self.drone_set_properties_2
+                                                                   , self.drone_set_properties_3, ], self.config_obj_with_reload,
+                                                               self.requirements_per_type)
+        policies = FleetPolicyDeterminationAttribution.solve()
+        self.assertEqual(policies.Policies[self.drone_set_properties_1.start_loading_dock],
+                         PackageConfigurationPolicy({PackageConfiguration.LARGE_X2: 1.0}))
+        self.assertEqual(policies.Policies[self.drone_set_properties_2.start_loading_dock],
+                         PackageConfigurationPolicy({PackageConfiguration.LARGE_X4: 0.375,
+                             PackageConfiguration.MEDIUM_X8: 0.375,
+                             PackageConfiguration.SMALL_X16: 0.1875,
+                             PackageConfiguration.TINY_X32: 0.0625}))
+        self.assertEqual(policies.Policies[self.drone_set_properties_3.start_loading_dock],
+                         PackageConfigurationPolicy({PackageConfiguration.LARGE_X2: 1.0}))
 
     @classmethod
     def define_drone_set_properties_1(cls):
@@ -172,3 +211,4 @@ class TestPolicyDetermination (unittest.TestCase):
             start_loading_dock=loading_dock_3,
             end_loading_dock=loading_dock_3,
             drone_amount=10)
+
