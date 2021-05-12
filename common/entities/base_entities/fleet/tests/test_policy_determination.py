@@ -67,8 +67,8 @@ class TestPolicyDetermination (unittest.TestCase):
         self.assertEqual(policies.Policies[self.drone_set_properties_2.start_loading_dock],
                          PackageConfigurationPolicy({
                  PackageConfiguration.MEDIUM_X8: 0.5,
-                 PackageConfiguration.SMALL_X16: 0.37499999999999994,
-                 PackageConfiguration.TINY_X32: 0.12499999999999999}))
+                 PackageConfiguration.SMALL_X16: 0.375,
+                 PackageConfiguration.TINY_X32: 0.125}))
         self.assertEqual(policies.Policies[self.drone_set_properties_3.start_loading_dock],
                          PackageConfigurationPolicy({PackageConfiguration.MEDIUM_X4: 1.0}))
 
@@ -81,10 +81,10 @@ class TestPolicyDetermination (unittest.TestCase):
                          PackageConfigurationPolicy({}))
         self.assertEqual(policies.Policies[self.drone_set_properties_2.start_loading_dock],
                          PackageConfigurationPolicy({
-                 PackageConfiguration.LARGE_X4: 0.14999999999999997,
-                 PackageConfiguration.SMALL_X16:0.03749999999999999,
-                 PackageConfiguration.MEDIUM_X8: 0.07499999999999998,
-                 PackageConfiguration.TINY_X32: 0.012499999999999999}))
+                 PackageConfiguration.LARGE_X4: 0.15,
+                 PackageConfiguration.SMALL_X16: 0.0375,
+                 PackageConfiguration.MEDIUM_X8: 0.075,
+                 PackageConfiguration.TINY_X32: 0.0125}))
         self.assertEqual(policies.Policies[self.drone_set_properties_3.start_loading_dock],
                          PackageConfigurationPolicy({}))
 
@@ -97,12 +97,12 @@ class TestPolicyDetermination (unittest.TestCase):
                          PackageConfigurationPolicy({PackageConfiguration.MEDIUM_X4: 1.0}))
         self.assertEqual(policies.Policies[self.drone_set_properties_2.start_loading_dock],
                          PackageConfigurationPolicy({
-                 PackageConfiguration.SMALL_X16: 0.37499999999999994,
+                 PackageConfiguration.SMALL_X16: 0.375,
                  PackageConfiguration.MEDIUM_X8: 0.625,
                  }))
         self.assertEqual(policies.Policies[self.drone_set_properties_3.start_loading_dock],
-                         PackageConfigurationPolicy({PackageConfiguration.MEDIUM_X4: 0.24999999999999886,
-                                                    PackageConfiguration.LARGE_X2: 0.7500000000000011}))
+                         PackageConfigurationPolicy({PackageConfiguration.MEDIUM_X4: 0.25,
+                                                    PackageConfiguration.LARGE_X2: 0.75}))
 
     @classmethod
     def define_drone_set_properties_1(cls):

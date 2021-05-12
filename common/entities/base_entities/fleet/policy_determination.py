@@ -134,8 +134,7 @@ class FleetPolicyDeterminationAttribution:
                         quantity = PackageTypeAmountMap.get_package_type_amount(item.value, typePackage)
                         if quantity > 0:
                             solution_dict[cls.policy_determination_config.loading_docks[i]][item] =\
-                                solution [i + j * len (cls.policy_determination_config.drones_per_fleet)]
-
+                                float(format (solution [i + j * len (cls.policy_determination_config.drones_per_fleet)], ".4f"))
                 j = j + 1
 
         solution_object = dict()
