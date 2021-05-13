@@ -9,6 +9,7 @@ from experiment_space.imported_json_parser import ImportedJsonParser
 from experiment_space.visualization.experiment_visualizer import draw_matched_scenario
 from visualization.basic.drawer2d import Drawer2DCoordinateSys
 from visualization.basic.pltdrawer2d import MapImage
+from visualization.operational.operational_tables import fleet_usage
 
 SHOW_VISUALS = True
 
@@ -28,8 +29,6 @@ class BasicV05End2EndExperiment(unittest.TestCase):
 
         experiment_dict = Experiment.json_to_dict(cls.experiment_json_from_parser_path)
         cls.experiment = Experiment.dict_to_obj(experiment_dict)
-
-
 
     @classmethod
     def tearDownClass(cls):
@@ -67,4 +66,7 @@ class BasicV05End2EndExperiment(unittest.TestCase):
                                   draw_zones=True,
                                   coordinate_sys=Drawer2DCoordinateSys.GEOGRAPHIC_UTM
                                   )
+
+            fleet_usage(experiment.matcher_config, experiment.supplier_category.delivery_requests,
+                        result_drone_delivery_board)
         return analysis_results
