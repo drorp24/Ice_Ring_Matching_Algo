@@ -62,7 +62,7 @@ class LPSolver:
         cls.solver.Solve()
 
 
-def solve_mip(lp_data: LPData) -> Dict:
+def solve_lp(lp_data: LPData) -> Dict:
     lp_solver = LPSolver()
     variables = lp_solver.set_variables(parameters=lp_data)
     lp_solver.set_equalities_constraints(parameters=lp_data, variables=variables)
