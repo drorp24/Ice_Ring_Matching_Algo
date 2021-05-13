@@ -39,13 +39,11 @@ class FleetPolicyDeterminationAttribution:
     @classmethod
     def _calc_required_quantities (cls, requirements_per_type: {PackageType, float}):
         required_quantities = [0 for i in range(len(PackageType))]
-        j = 0
-        for type in PackageType:
+        for j, type in enumerate(PackageType):
             for key, value in requirements_per_type.items():
                 if key == type:
                     required_quantities[j] = value
                     break
-            j = j +1
 
         return required_quantities
 
@@ -53,14 +51,12 @@ class FleetPolicyDeterminationAttribution:
     def _calc_quantities_matrix (cls, drone_set_properties_list: [DroneSetProperties]):
         quantities = np.zeros(( len(PackageType), len (drone_set_properties_list)))
         for i in range (len (drone_set_properties_list)):
-            j = 0
-            for typePackage in PackageType:
+            for j, typePackage in enumerate(PackageType):
                 for item in DroneTypeToPackageConfigurationOptions.drone_configurations_map[drone_set_properties_list[i].drone_type]:
                     quantity = PackageTypeAmountMap.get_package_type_amount(item.value, typePackage)
                     if quantity > 0:
                         quantities [j,i] = quantity
                         break
-                j = j + 1
 
         return quantities
 
@@ -124,15 +120,14 @@ class FleetPolicyDeterminationAttribution:
         solution_dict = dict()
         for i in range (len (cls.policy_determination_config.loading_docks)):
             solution_dict [cls.policy_determination_config.loading_docks[i]] = dict()
-            j = 0
-            for typePackage in PackageType:
+
+            for j, typePackage in enumerate(PackageType):
                 if solution [i + j * len (cls.policy_determination_config.drones_per_dock)] > 10 ** -4:
                     for item in DroneTypeToPackageConfigurationOptions.drone_configurations_map[cls.policy_determination_config.loading_docks[i].drone_type]:
                         quantity = PackageTypeAmountMap.get_package_type_amount(item.value, typePackage)
                         if quantity > 0:
                             solution_dict[cls.policy_determination_config.loading_docks[i]][item] =\
                                 float(format (solution [i + j * len (cls.policy_determination_config.drones_per_dock)], ".4f"))
-                j = j + 1
 
         solution_object = dict()
         for key, value in solution_dict.items() :
