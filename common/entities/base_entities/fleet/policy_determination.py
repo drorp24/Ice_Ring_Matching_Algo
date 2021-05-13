@@ -126,7 +126,7 @@ class FleetPolicyDeterminationAttribution:
             solution_dict [cls.policy_determination_config.loading_docks[i]] = dict()
             j = 0
             for typePackage in PackageType:
-                if solution [i + j * len (cls.policy_determination_config.drones_per_dock)] > 10 ** -6:
+                if solution [i + j * len (cls.policy_determination_config.drones_per_dock)] > 10 ** -4:
                     for item in DroneTypeToPackageConfigurationOptions.drone_configurations_map[cls.policy_determination_config.loading_docks[i].drone_type]:
                         quantity = PackageTypeAmountMap.get_package_type_amount(item.value, typePackage)
                         if quantity > 0:
