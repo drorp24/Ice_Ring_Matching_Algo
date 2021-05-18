@@ -56,8 +56,8 @@ class BasicMinimumEnd2EndWithPolicyCalculation(unittest.TestCase):
         policies = FleetPolicyDeterminationAttribution.solve()
         print (policies)
         for drone_set_properties in self.drone_set_properties_list:
-            drone_set_properties.package_configuration_policy = policies.Policies[drone_set_properties.start_loading_dock]
-            print (policies.Policies[drone_set_properties.start_loading_dock])
+            drone_set_properties.package_configuration_policy = policies.policies[drone_set_properties.start_loading_dock]
+            print (policies.policies[drone_set_properties.start_loading_dock])
 
 
     def test_create_graph_model(self):

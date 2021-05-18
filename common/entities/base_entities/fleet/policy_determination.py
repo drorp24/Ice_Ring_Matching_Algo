@@ -20,7 +20,8 @@ class PolicyConfigDeterminationParameters:
 
 @dataclass
 class PolicyPerDock:
-    Policies: {DroneLoadingDock, PackageConfigurationPolicy}
+    policies: {DroneLoadingDock, PackageConfigurationPolicy}
+    unserved: float
 
 
 class FleetPolicyDeterminationAttribution:
@@ -133,7 +134,8 @@ class FleetPolicyDeterminationAttribution:
         for key, value in solution_dict.items() :
             solution_object[key] = PackageConfigurationPolicy(value)
 
-        return PolicyPerDock(solution_object)
+        Unserved = sum (solution [len (PackageType) * (len(cls.policy_determination_config.drones_per_dock)) : ])
+        return PolicyPerDock(solution_object, Unserved)
 
     @classmethod
     def solve(cls) -> PolicyPerDock :

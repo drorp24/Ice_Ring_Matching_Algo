@@ -62,12 +62,4 @@ class LPSolver:
         cls.solver.Solve()
 
 
-def solve_lp(lp_data: LPData) -> Dict:
-    lp_solver = LPSolver()
-    variables = lp_solver.set_variables(parameters=lp_data)
-    lp_solver.set_equalities_constraints(parameters=lp_data, variables=variables)
-    lp_solver.set_inequalities_constraints(parameters=lp_data, variables=variables)
-    lp_solver.set_objective_coeffs(parameters=lp_data, variables=variables)
-    lp_solver.set_minimization()
-    lp_solver.solve()
-    return variables
+
