@@ -15,6 +15,6 @@
   },
   "matcher_config_path": "experiment_space/tests/jsons/exported/configuration_file.json",
   "zones_file_path": "experiment_space/tests/jsons/exported/Zones.json",
-  "delivery_board_path": "experiment_space/tests/jsons/exported/delivery_board.json",
+  "delivery_board_path": "",
   "operational_graph_path": ""
 }
