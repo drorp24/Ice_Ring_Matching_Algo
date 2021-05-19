@@ -11,6 +11,7 @@ from experiment_space.imported_json_parser import ImportedJsonParser
 from experiment_space.visualization.experiment_visualizer import draw_matched_scenario, draw_delivery_board
 from visualization.basic.drawer2d import Drawer2DCoordinateSys
 from visualization.basic.pltdrawer2d import MapImage
+from visualization.operational.operational_tables import fleet_usage
 
 SHOW_VISUALS = True
 EXPORT_JSON = True
@@ -103,3 +104,6 @@ class BasicV05End2EndExperiment(unittest.TestCase):
                                 supplier_category=experiment.supplier_category, map_image=map_image,
                                 aggregate_by_delivering_drones=True,
                                 coordinate_sys=Drawer2DCoordinateSys.GEOGRAPHIC_UTM)
+
+        fleet_usage(experiment.matcher_config, experiment.supplier_category.delivery_requests,
+                    delivery_board)
