@@ -44,9 +44,9 @@ class JsonableBaseEntity(BaseEntity):
         dict_self = self.__dict__()
         if file_path:
             with open(file_path, 'w') as f:
-                json.dump(dict_self, f, sort_keys=sort_keys, **kwargs)
+                json.dump(dict_self, f, sort_keys=sort_keys, **kwargs,ensure_ascii=False)
         else:
-            return json.dumps(dict_self, sort_keys=sort_keys, **kwargs)
+            return json.dumps(dict_self, sort_keys=sort_keys, **kwargs,ensure_ascii=False)
 
     @classmethod
     def from_json(cls: Type[JsonableBaseEntity], file_path: Path):

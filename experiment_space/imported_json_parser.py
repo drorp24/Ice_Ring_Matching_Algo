@@ -24,9 +24,11 @@ class ImportedJsonParser(JsonableBaseEntity):
     matcher_config_path: str
     graph_creation_algorithm: GraphCreationAlgorithm
     board_level_properties: BoardLevelProperties
+    operational_graph_path: str
+    delivery_board_path: str
 
     @classmethod
-    def dict_to_obj(cls, dict_input):
+    def dict_to_obj(cls, dict_input: dict):
         assert (dict_input['__class__'] == cls.__name__)
 
         graph_algorithm_name = dict_input['graph_creation_algorithm']['__class__']
@@ -40,7 +42,9 @@ class ImportedJsonParser(JsonableBaseEntity):
             matcher_config_path=dict_input['matcher_config_path'],
             graph_creation_algorithm=graph_algorithm_class.dict_to_obj(
                 dict_input['graph_creation_algorithm']),
-            board_level_properties=BoardLevelProperties.dict_to_obj(dict_input['board_level_properties'])
+            board_level_properties=BoardLevelProperties.dict_to_obj(dict_input['board_level_properties']),
+            operational_graph_path=dict_input['operational_graph_path'],
+            delivery_board_path=dict_input['delivery_board_path']
         )
 
     def save_as_experiment(self, file_path: Path):
@@ -51,7 +55,10 @@ class ImportedJsonParser(JsonableBaseEntity):
                           drone_set_properties_list=self.export_drone_set_properties(),
                           matcher_config=self.export_matcher_config(),
                           graph_creation_algorithm=self.graph_creation_algorithm,
-                          board_level_properties=self.board_level_properties)
+                          board_level_properties=self.board_level_properties,
+                          delivery_board_path=self.delivery_board_path,
+                          operational_graph_path=self.operational_graph_path
+                          )
 
     def export_supplier_category(self) -> SupplierCategory:
         delivery_requests_dict = DeliveryRequest.json_to_dict(Path(self.delivery_requests_file_path))
