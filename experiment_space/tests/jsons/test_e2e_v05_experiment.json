@@ -11,8 +11,10 @@
   "graph_creation_algorithm": {
     "__class__": "PackageTimeZonesDependentGraphAlgorithm",
     "edge_cost_factor": 0.0000588235,
-    "edge_travel_time_factor":0.0000588235
+    "edge_travel_time_factor": 0.0000588235
   },
   "matcher_config_path": "experiment_space/tests/jsons/exported/configuration_file.json",
-  "zones_file_path": "experiment_space/tests/jsons/exported/Zones.json"
+  "zones_file_path": "experiment_space/tests/jsons/exported/Zones.json",
+  "delivery_board_path": "",
+  "operational_graph_path": ""
 }

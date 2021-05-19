@@ -26,6 +26,8 @@ class ImportedJsonParserTest(unittest.TestCase):
                                                      drone_set_properties_list_path=drone_set_properties_list_path,
                                                      matcher_config_path=matcher_config_path,
                                                      graph_creation_algorithm=FullyConnectedGraphAlgorithm(),
+                                                     delivery_board_path="",
+                                                     operational_graph_path="",
                                                      board_level_properties=BoardLevelProperties())
 
         cls.supplier_category = cls.expected_parser_obj.export_supplier_category()
