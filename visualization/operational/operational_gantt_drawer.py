@@ -58,7 +58,7 @@ def _set_row_color_per_dock(delivering_drones_list, drawer):
     docks_colors = {}
     for i, delivering_drones in enumerate(delivering_drones_list):
         row_number = i + 1 + UNMATCHED_ROW_NUMBER
-        row_color = MATCHED_REQUEST_BAR_COLORS[(sum([ord(c) for c in str(delivering_drones.start_loading_dock.id.uuid)])
+        row_color = MATCHED_REQUEST_BAR_COLORS[(_convert_id_to_int(delivering_drones.start_loading_dock.id)
                                                 + 20)
                                                % len(MATCHED_REQUEST_BAR_COLORS)]
         drawer.set_row_color(row_number, row_color, ROW_BACKGROUND_ALPHA)
@@ -66,6 +66,10 @@ def _set_row_color_per_dock(delivering_drones_list, drawer):
     drawer.add_legend([dock_id.display_name(DISPLAY_NAME_CHAR_AMOUNT)
                        for dock_id in list(docks_colors.keys())], list(docks_colors.values()),
                       ROW_BACKGROUND_ALPHA, title="Docks")
+
+
+def _convert_id_to_int(id):
+    return int("".join([str(ord(c)) for c in str(id.uuid)]))
 
 
 def _add_unmatched_requests(board, drawer):
