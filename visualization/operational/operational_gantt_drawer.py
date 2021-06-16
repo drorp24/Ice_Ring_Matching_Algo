@@ -1,5 +1,3 @@
-import random
-
 from common.entities.base_entities.drone_delivery_board import DroneDeliveryBoard
 from common.entities.base_entities.temporal import TimeWindowExtension
 from visualization.basic.color import Color
@@ -8,21 +6,24 @@ from visualization.basic.gantt_drawer import GanttDrawer
 
 def generate_matched_request_bar_colors() -> [Color]:
     matched_request_bar_colors = list(Color)
+    matched_request_bar_colors = sorted(matched_request_bar_colors,
+                                        key=lambda color: color.name)
     matched_request_bar_colors.remove(Color.White)
     matched_request_bar_colors.remove(Color.Red)
     matched_request_bar_colors.remove(Color.Grey)
     matched_request_bar_colors.remove(Color.Orange)
-    random.shuffle(matched_request_bar_colors)
     return matched_request_bar_colors
 
 
 UNMATCHED_ROW_NUMBER = 1
 MATCHED_REQUEST_BAR_COLORS = generate_matched_request_bar_colors()
 OPERATING_TIME_WINDOW_COLOR = Color.Red
-ROW_BACKGROUND_ALPHA = 0.3
+ROW_BACKGROUND_ALPHA = 0.5
+DISPLAY_NAME_CHAR_AMOUNT = 10
 
 
-def add_delivery_board_with_row_per_delivering_drones(drawer: GanttDrawer, board: DroneDeliveryBoard, draw_unmatched=True):
+def add_delivery_board_with_row_per_delivering_drones(drawer: GanttDrawer, board: DroneDeliveryBoard,
+                                                      draw_unmatched=True):
     delivering_drones_list = list(set(delivery.delivering_drones for delivery in board.drone_deliveries))
     _set_row_color_per_dock(delivering_drones_list, drawer)
     for i, delivery in enumerate(board.drone_deliveries):
@@ -54,23 +55,17 @@ def add_delivery_board_with_row_per_delivering_drones(drawer: GanttDrawer, board
 
 
 def _set_row_color_per_dock(delivering_drones_list, drawer):
-    loading_dock_idx = set()
-    loading_docks_row_colors = set()
-    docks_row_numbers = {}
+    docks_colors = {}
     for i, delivering_drones in enumerate(delivering_drones_list):
         row_number = i + 1 + UNMATCHED_ROW_NUMBER
-        loading_dock_idx.add(delivering_drones.start_loading_dock.id.uuid)
-        row_numbers = docks_row_numbers.get(delivering_drones.start_loading_dock.id.uuid, None)
-        if row_numbers is None:
-            docks_row_numbers.update({delivering_drones.start_loading_dock.id.uuid: [row_number]})
-        else:
-            row_numbers.append(row_number)
-    for i, id in enumerate(loading_dock_idx):
-        row_color = MATCHED_REQUEST_BAR_COLORS[i + 10]
-        loading_docks_row_colors.add(row_color)
-        for row_number in docks_row_numbers[id]:
-            drawer.set_row_color(row_number, row_color, ROW_BACKGROUND_ALPHA)
-    drawer.add_legend(list(loading_dock_idx), list(loading_docks_row_colors), ROW_BACKGROUND_ALPHA, title="Docks")
+        row_color = MATCHED_REQUEST_BAR_COLORS[(sum([ord(c) for c in str(delivering_drones.start_loading_dock.id.uuid)])
+                                                + 20)
+                                               % len(MATCHED_REQUEST_BAR_COLORS)]
+        drawer.set_row_color(row_number, row_color, ROW_BACKGROUND_ALPHA)
+        docks_colors[delivering_drones.start_loading_dock.id] = row_color
+    drawer.add_legend([dock_id.display_name(DISPLAY_NAME_CHAR_AMOUNT)
+                       for dock_id in list(docks_colors.keys())], list(docks_colors.values()),
+                      ROW_BACKGROUND_ALPHA, title="Docks")
 
 
 def _add_unmatched_requests(board, drawer):
